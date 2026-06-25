@@ -23,11 +23,10 @@ Only the chunking strategy varies; all other pipeline components are held consta
 ## Setup
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync                  # installs all dependencies + dev group into .venv
 cp .env.example .env
 # Add your OPENAI_API_KEY to .env
+source .venv/bin/activate
 ```
 
 ## Pipeline (run in order)

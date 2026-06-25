@@ -202,7 +202,8 @@ Evaluation (Retrieval-Metriken + Antwort-Rubrik + Effizienz)
 
 | Zweck | Werkzeug |
 |-------|----------|
-| Sprache | Python |
+| Sprache | Python ≥ 3.11 |
+| Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs) |
 | Dokumentverarbeitung | Python-Markdown, `pathlib`, `regex` |
 | Token-Zählung | `tiktoken` |
 | Embeddings | OpenAI API (`text-embedding-3-large` Standard; `text-embedding-3-small` bei Kosten-/Geschwindigkeitsfokus) |
@@ -224,7 +225,8 @@ Evaluation (Retrieval-Metriken + Antwort-Rubrik + Effizienz)
 ```
 bachelor-rag-chunking/
 ├── README.md
-├── requirements.txt
+├── pyproject.toml
+├── uv.lock
 ├── .env.example
 ├── data/
 │   ├── raw/
