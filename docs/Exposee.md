@@ -12,8 +12,6 @@ Jonas Weirauch
 
 Matrikelnummer: [entfernt]
 
-[entfernt]
-
 Betreuer/in: Prof. Klaus Quibeldey-Cirkel
 
 Abgabedatum: 31.12.2026

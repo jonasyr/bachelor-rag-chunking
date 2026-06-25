@@ -29,5 +29,11 @@ chroma_db/
 # Plans / internal tooling
 docs/superpowers/
 
+# Generated / binary docs
+*.pdf
+
+# Serena MCP tooling
+.serena/
+
 # OS
 .DS_Store
