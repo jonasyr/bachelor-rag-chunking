@@ -1,30 +1,40 @@
 # Suggested Commands
 
-## Project is pre-implementation (June 2026)
-No `src/` or scripts exist yet. Commands below reflect the planned structure from `docs/Ground_Truth_Projektleitfaden.md`.
-
-## Environment setup (planned)
+## Environment setup
 ```bash
-python -m venv .venv
+uv sync                   # install all deps + dev group into .venv (reads uv.lock)
+cp .env.example .env      # then fill in OPENAI_API_KEY
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # then fill in OPENAI_API_KEY
 ```
 
-## Pipeline entry points (planned, under `src/`)
+Adding a new dependency:
 ```bash
-python src/ingest.py          # load Vue.js snapshot → documents.jsonl
-python src/preprocess.py      # clean Markdown
-python src/chunking.py        # produce chunks_c1/c2/c3.jsonl
-python src/embed.py           # embed chunks → Chroma indices
-python src/retrieve.py        # run retrieval for question set
-python src/generate.py        # generate answers via LLM
-python src/evaluate_retrieval.py   # compute Recall@k, Precision@k, MRR
-python src/evaluate_answers.py     # apply rubric scoring
+uv add <package>          # updates pyproject.toml + uv.lock
+uv add --group dev <pkg>  # dev-only dependency
+```
+
+## Pipeline entry points (under `src/` — all currently stubs)
+```bash
+python src/ingest.py
+python src/preprocess.py
+python src/chunking.py [--strategy C1|C2|C3|all]
+python src/embed.py    [--strategy C1|C2|C3|all]
+python src/retrieve.py [--strategy C1|C2|C3|all]
+python src/generate.py [--strategy C1|C2|C3|all]
+python src/evaluate_retrieval.py [--k 5]
+python src/evaluate_answers.py --mode scaffold
+python src/evaluate_answers.py --mode summarise
 ```
 
 ## Minimal prototype sequence (do this first)
-Load one Markdown file → produce C1/C2/C3 chunks → embed → build Chroma index → query one question → show Top-5 → generate answer. Only scale to full pipeline once prototype works.
+```bash
+python src/ingest.py
+python src/preprocess.py
+python src/chunking.py
+python src/embed.py --strategy C1
+python src/retrieve.py --strategy C1
+python src/generate.py --strategy C1
+```
 
 ## Analysis
 ```bash
@@ -38,10 +48,12 @@ streamlit run app/streamlit_app.py
 
 ## Corpus snapshot (Vue.js)
 ```bash
-git clone https://github.com/vuejs/docs.git
-# check out a specific commit, copy src/guide/essentials/, src/guide/components/,
-# src/guide/reusability/, src/guide/best-practices/ into data/raw/vue_docs_snapshot/
-# document commit hash in corpus_manifest.csv
+git clone https://github.com/vuejs/docs.git /tmp/vuejs-docs
+# check out a specific commit, document the hash
+# copy src/guide/essentials/, src/guide/components/,
+#      src/guide/reusability/, src/guide/best-practices/
+# into data/raw/vue_docs_snapshot/
+# fill in docs/corpus_manifest.csv
 ```
 
 ## Git
