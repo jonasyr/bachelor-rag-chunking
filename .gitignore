@@ -1,1 +1,33 @@
 .vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Environment
+.env
+
+# Data — raw snapshot and processed artefacts (large files)
+data/raw/
+data/processed/
+data/evaluation/retrieved_results.csv
+data/evaluation/generated_answers.csv
+data/evaluation/scores.csv
+
+# Chroma vector store
+chroma_db/
+*.chroma
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Plans / internal tooling
+docs/superpowers/
+
+# OS
+.DS_Store
