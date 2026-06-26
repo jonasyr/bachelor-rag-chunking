@@ -33,5 +33,8 @@ docs/superpowers/
 *.pdf
 
 
+# Claude Code auto-memory
+.claude/auto-memory/dirty-files*
+
 # OS
 .DS_Store
