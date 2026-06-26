@@ -141,6 +141,7 @@ Project was scaffolded in June 2026 (pre-implementation). Key decisions recorded
 - Corpus changed from FastAPI to Vue.js (abgrenzung from an existing practitioner blog)
 - All pipeline scripts are intentionally stubs — implementation starts Phase 3 (Sept 2026)
 - `.serena/` memories committed — project context travels with the repo
+- Claude Code auto-memory initialized — `.claude/auto-memory/dirty-files*` gitignored (ephemeral session state)
 
 Master reference for all decisions: `docs/Ground_Truth_Projektleitfaden.md`
 <!-- END AUTO-MANAGED -->
