@@ -79,7 +79,8 @@ bachelor-rag-chunking/
 │   ├── Exposee.md                        # approved thesis exposé
 │   ├── prompts.md                        # LLM prompt templates (constant across strategies)
 │   ├── methodology.md                    # snapshot details, model version log
-│   └── corpus_manifest.csv              # Vue.js file inventory
+│   ├── corpus_manifest.csv              # Vue.js file inventory
+│   └── superpowers/plans/               # dated implementation plans (task-by-task, checkbox-tracked)
 └── .serena/                  # Serena MCP project config + memories (committed)
 ```
 
@@ -111,7 +112,7 @@ bachelor-rag-chunking/
 - Chunk IDs: `{STRATEGY}_{DOC_ID}_{SEQ}` e.g. `C1_D001_0001`
 
 **CSV schemas (exact — §10 Ground Truth, no extra columns):**
-- `questions.csv`: `question_id, question, type, difficulty`
+- `questions.csv`: `question_id, question, type, difficulty, notes`
 - `ground_truth.csv`: `question_id, expected_answer, relevant_doc_ids, relevant_section_ids`
 - `retrieved_results.csv`: `question_id, strategy, rank, chunk_id, score, is_relevant`
 - `generated_answers.csv`: `question_id, strategy, answer, sources, prompt_tokens, completion_tokens`
@@ -143,6 +144,7 @@ Project was scaffolded in June 2026 (pre-implementation). Key decisions recorded
 - All pipeline scripts are intentionally stubs — implementation starts Phase 3 (Sept 2026)
 - `.serena/` memories committed — project context travels with the repo
 - Claude Code auto-memory initialized — `.claude/auto-memory/dirty-files*` gitignored (ephemeral session state)
+- Corpus snapshot locked (D20–D26, plan: `docs/superpowers/plans/2026-08-13-corpus-snapshot.md`, not yet executed): full `src/guide/` from `vuejs/docs` pinned at commit `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (52 files, ~106k tokens); Composition-API content only (`options-api` blocks stripped); `section_id` = `{doc_id}#{anchor}` from explicit `{#...}` anchors, never slugified; relevance = any token-span overlap (≥100-token sensitivity check); token encoding `cl100k_base` (tiktoken 0.13.0). Plan introduces `src/markdown_utils.py` (pure cleaning/section-extraction functions) alongside `src/ingest.py`.
 
 Master reference for all decisions: `docs/Ground_Truth_Projektleitfaden.md`
 <!-- END AUTO-MANAGED -->
