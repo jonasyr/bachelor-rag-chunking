@@ -20,7 +20,8 @@ Vue.js docs snapshot (data/raw/vue_docs_snapshot/)
 ```
 bachelor-rag-chunking/
 ├── README.md
-├── requirements.txt
+├── pyproject.toml
+├── uv.lock
 ├── .env.example
 ├── data/
 │   ├── raw/vue_docs_snapshot/          ← Vue.js Markdown files
