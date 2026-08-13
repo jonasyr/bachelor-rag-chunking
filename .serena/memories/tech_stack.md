@@ -26,4 +26,4 @@ All binding per Decision Log (see `mem:decisions` D15–D16).
 - **top-k = 5** — constant across all strategies. Do NOT vary top-k (would introduce a second independent variable).
 - Exact model version, SDK version, API version, and query dates must be recorded in the methodology chapter at implementation time — never reference a snapshot model name in the writing without that record.
 - Embedding language: corpus is English; questions and reference answers must also be English (embedding space consistency).
-- `requirements.txt` is the canonical dependency list.
+- `pyproject.toml` + `uv.lock` are the canonical dependency source (installed via `uv sync`). There is no `requirements.txt`.

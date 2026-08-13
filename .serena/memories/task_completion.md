@@ -20,9 +20,10 @@ When a coding task on this project is considered done:
 ## Before Committing
 ```bash
 # No linter/formatter enforced yet — project is pre-implementation.
-# Once requirements.txt exists:
-# python -m pytest  (if tests exist)
-# python -m flake8 src/  or ruff check src/
+# Dependencies: uv sync  (pyproject.toml + uv.lock)
+# Once tooling is added as a dev dependency:
+# uv run pytest        (if tests exist)
+# uv run ruff check src/
 ```
 
 > When linter/formatter/test commands are established, update this memory.
