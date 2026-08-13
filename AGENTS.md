@@ -138,6 +138,7 @@ bachelor-rag-chunking/
 
 Project was scaffolded in June 2026 (pre-implementation). Key decisions recorded:
 - Switched from `requirements.txt` to `pyproject.toml` + `uv` for reproducible lockfile installs
+- `.gitignore` uses negation patterns (`!data/raw/vue_docs_snapshot/`, `!data/processed/.gitkeep`) so scaffold directories survive a fresh clone while actual data stays ignored
 - Corpus changed from FastAPI to Vue.js (abgrenzung from an existing practitioner blog)
 - All pipeline scripts are intentionally stubs — implementation starts Phase 3 (Sept 2026)
 - `.serena/` memories committed — project context travels with the repo
