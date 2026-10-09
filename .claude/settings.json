@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "academic-research-skills@academic-research-skills": true,
+    "deepeval@claude-plugins-official": true,
+    "huggingface-skills@claude-plugins-official": true
+  }
+}
