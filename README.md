@@ -27,14 +27,17 @@ uv sync                  # installs all dependencies + dev group into .venv
 cp .env.example .env
 # Add your OPENAI_API_KEY to .env
 source .venv/bin/activate
+uv tool install pre-commit && pre-commit install   # ruff and checks before each commit
 ```
+
+All scripts in `src/` are stubs for now (status 13.10.2026). Tooling, CI and the link to the thesis repo:
+[`docs/development.md`](docs/development.md).
 
 ## Pipeline (run in order)
 
 ```bash
-# 1. Fetch Vue.js snapshot (see docs/methodology.md §Snapshot)
-#    Clone vuejs/docs, pin a commit, copy relevant src/guide/ folders to
-#    data/raw/vue_docs_snapshot/
+# 1. Fetch Vue.js snapshot into data/raw/vue_docs_snapshot/
+#    (corpus scope still open: docs/Ground_Truth_Projektleitfaden.md §19; record it in docs/methodology.md)
 
 # 2. Ingest
 python src/ingest.py
@@ -93,7 +96,7 @@ jupyter notebook notebooks/analysis.ipynb
 ├── data/raw/         Vue.js snapshot (not committed)
 ├── data/processed/   Intermediate artefacts — documents.jsonl, chunks_*.jsonl (not committed)
 ├── data/evaluation/  questions.csv, ground_truth.csv, scores.csv
-├── docs/             Thesis documents, methodology notes, prompts, corpus manifest
+├── docs/             Documentation index (docs/README.md), master reference, ADRs, methodology, prompts
 ├── notebooks/        Analysis and visualisation
 ├── app/              Streamlit demo
 └── chroma_db/        Persistent vector store (not committed)
@@ -106,3 +109,5 @@ jupyter notebook notebooks/analysis.ipynb
 - All parameters live in `src/config.py`
 - Ground truth must be finalised **before** running evaluation
 - Every intermediate artefact is saved to disk
+
+Details and reasons: [`docs/README.md`](docs/README.md) (master reference, decisions in `docs/adr/`).
