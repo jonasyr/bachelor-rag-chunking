@@ -3,7 +3,7 @@
 **Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines RAG-Systems für technische Projektdokumentation**
 
 Bachelor's thesis — B.Sc. Informatik, IU Internationale Hochschule.  
-Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel · Deadline: 31.12.2026
+Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel · Deadline: 24.12.2026
 
 ---
 

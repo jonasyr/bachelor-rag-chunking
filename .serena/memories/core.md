@@ -4,7 +4,7 @@
 Bachelor's thesis (B.Sc. Informatik, IU Internationale Hochschule).  
 Author: Jonas Weirauch (Matrikelnummer [entfernt]).  
 Supervisor: Prof. Klaus Quibeldey-Cirkel.  
-Submission deadline: **31.12.2026**. Work period: **July–December 2026**.
+Submission deadline: **24.12.2026**. Work period: **July–December 2026**.
 
 ## Title
 **Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines Retrieval-Augmented-Generation-Systems für technische Projektdokumentation**
