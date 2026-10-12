@@ -33,15 +33,15 @@ SCORES_FILE = DATA_EVAL / "scores.csv"
 # ---------------------------------------------------------------------------
 
 # C1: fixed-size, no overlap
-C1_CHUNK_SIZE = 500       # tokens
+C1_CHUNK_SIZE = 500  # tokens
 C1_OVERLAP = 0
 
 # C2: fixed-size, with overlap  — strong baseline (Qu et al. 2025)
-C2_CHUNK_SIZE = 500       # tokens
-C2_OVERLAP = 100          # tokens
+C2_CHUNK_SIZE = 500  # tokens
+C2_OVERLAP = 100  # tokens
 
 # C3: structure-based (Markdown H2/H3 boundaries)
-C3_MAX_TOKENS = 800       # hard cap per chunk; oversized sections split by paragraph
+C3_MAX_TOKENS = 800  # hard cap per chunk; oversized sections split by paragraph
 
 STRATEGY_IDS = {
     "C1": "fixed_500_no_overlap",
@@ -64,17 +64,17 @@ CHROMA_COLLECTIONS = {
 # ---------------------------------------------------------------------------
 # Retrieval parameters (D14)
 # ---------------------------------------------------------------------------
-TOP_K = 5   # constant — do NOT vary; would introduce a second independent variable
+TOP_K = 5  # constant — do NOT vary; would introduce a second independent variable
 
 # ---------------------------------------------------------------------------
 # LLM / Embedding (D15, D16)
 # ---------------------------------------------------------------------------
 # Pin exact versions at implementation time and document date of first use.
 # Use neutral placeholders until then; replace before running experiments.
-EMBEDDING_MODEL = "text-embedding-3-large"   # or text-embedding-3-small for cost focus
-LLM_MODEL = "gpt-4o"                        # PLACEHOLDER — pin exact snapshot at impl time
+EMBEDDING_MODEL = "text-embedding-3-large"  # or text-embedding-3-small for cost focus
+LLM_MODEL = "gpt-4o"  # PLACEHOLDER — pin exact snapshot at impl time
 
-LLM_TEMPERATURE = 0.0   # constant for reproducibility (D14)
+LLM_TEMPERATURE = 0.0  # constant for reproducibility (D14)
 LLM_MAX_TOKENS = 1024
 
 # ---------------------------------------------------------------------------

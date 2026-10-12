@@ -7,7 +7,8 @@ Rubric criteria: correctness, completeness, groundedness, no_hallucination, clar
 Output schema (§10 Ground Truth): question_id, strategy, correctness, completeness,
                                    groundedness, no_hallucination, clarity, total_score
 """
-from config import GENERATED_ANSWERS_FILE, SCORES_FILE, RUBRIC_CRITERIA
+
+from config import GENERATED_ANSWERS_FILE, RUBRIC_CRITERIA, SCORES_FILE
 
 
 def scaffold() -> None:
@@ -22,6 +23,7 @@ def summarise() -> None:
 
 if __name__ == "__main__":
     import argparse
+
     p = argparse.ArgumentParser()
     p.add_argument("--mode", choices=["scaffold", "summarise"], required=True)
     args = p.parse_args()

@@ -8,7 +8,9 @@ C3: structure-based H2/H3, max 800 tokens  (config.C3_MAX_TOKENS)
 
 Chunk schema: {"chunk_id", "doc_id", "strategy", "text", "start_token", "end_token"}
 """
+
 from pathlib import Path
+
 from config import CHUNK_FILES, DOCUMENTS_FILE
 
 
@@ -19,6 +21,7 @@ def chunk(strategy_key: str, docs_file: Path = DOCUMENTS_FILE) -> None:
 
 if __name__ == "__main__":
     import argparse
+
     p = argparse.ArgumentParser()
     p.add_argument("--strategy", choices=["C1", "C2", "C3", "all"], default="all")
     args = p.parse_args()
