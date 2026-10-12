@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - name: Install dependencies
+        run: uv sync
+      - name: Lint and format (pre-commit hooks)
+        run: uvx pre-commit run --all-files --show-diff-on-failure
+      - name: Byte-compile sources
+        run: uv run python -m compileall -q src app
+      - name: Tests
+        run: |
+          if [ -d tests ]; then uv run --with pytest pytest -q; else echo "no tests yet"; fi
