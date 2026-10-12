@@ -1,156 +1,38 @@
 # bachelor-rag-chunking
 
-<!-- AUTO-MANAGED: project-description -->
-## Overview
+> Agent entry point. Keep it short: facts live in `docs/`; this file maps them.
 
-**bachelor-rag-chunking** — Bachelor's thesis (B.Sc. Informatik, IU Internationale Hochschule).
+## Purpose
 
-Controlled experimental comparison of three chunking strategies for a RAG (Retrieval-Augmented Generation) pipeline on the Vue.js open-source documentation. Only the chunking strategy varies; all other pipeline components are held constant to isolate its effect on retrieval and answer quality.
+Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
+RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
+Vue.js documentation in which only the chunking strategy (C1/C2/C3) varies. Status 13.10.2026: all pipeline
+scripts in `src/` are stubs; the corpus scope is an open decision (`docs/Ground_Truth_Projektleitfaden.md` §19).
+Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
-**Research question:** How do different chunking strategies influence retrieval and answer quality of a RAG system when answering project-specific questions based on technical open-source documentation?
+## Commands
 
-**Deadline:** 24.12.2026 · Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel
-<!-- END AUTO-MANAGED -->
+| Task | Command |
+|---|---|
+| Install | `uv sync` (then `cp .env.example .env`, add `OPENAI_API_KEY`) |
+| Lint/format | `uvx pre-commit run --all-files` (ruff + checks; also runs on commit after `pre-commit install`) |
+| Test | `uv run pytest` (no `tests/` yet; CI runs it once it exists) |
+| Run | `uv run python src/<step>.py --help` — order and options: `README.md`, `docs/development.md` |
 
-<!-- AUTO-MANAGED: build-commands -->
-## Build & Development Commands
+## Conventions
 
-```bash
-# Install all dependencies (runtime + dev)
-uv sync
+- All parameters (paths, chunk sizes, models, top-k, temperature) live only in `src/config.py`.
+- Invariants: only chunking varies; `temperature = 0`, `top_k = 5`; prompt constant (`docs/prompts.md`); ground
+  truth final before any evaluation (ADR 0006, 0014, 0017).
+- Strategy keys `C1`/`C2`/`C3`; strategy field values and IDs as in `config.STRATEGY_IDS`; data formats exactly as in
+  the Leitfaden §10 (`questions.csv` includes `notes`).
+- Corpus, questions and answers in English; thesis text in German (lives in PaperLab).
+- Conventional Commits; no AI attribution lines. Never commit `.env`. Plans go to `docs/superpowers/plans/` (versioned).
 
-# Activate virtual environment
-source .venv/bin/activate
+## Map
 
-# Pipeline — run in order (all scripts are currently stubs)
-python src/ingest.py
-python src/preprocess.py
-python src/chunking.py [--strategy C1|C2|C3|all]
-python src/embed.py    [--strategy C1|C2|C3|all]
-python src/retrieve.py [--strategy C1|C2|C3|all]
-python src/generate.py [--strategy C1|C2|C3|all]
-python src/evaluate_retrieval.py [--k 5]
-python src/evaluate_answers.py --mode scaffold   # create score sheet
-python src/evaluate_answers.py --mode summarise  # print results
-
-# Interactive demo (implement after pipeline is complete)
-streamlit run app/streamlit_app.py
-
-# Analysis notebook
-jupyter notebook notebooks/analysis.ipynb
-
-# Add a dependency
-uv add <package>
-uv add --group dev <package>
-```
-<!-- END AUTO-MANAGED -->
-
-<!-- AUTO-MANAGED: architecture -->
-## Architecture
-
-```
-bachelor-rag-chunking/
-├── pyproject.toml            # dependencies (uv), Python ≥3.11
-├── uv.lock                   # pinned lockfile — commit this
-├── .env.example              # copy to .env, add OPENAI_API_KEY
-├── src/
-│   ├── config.py             # ALL parameters live here (chunk sizes, paths, model names)
-│   ├── ingest.py             # .md files → data/processed/documents.jsonl
-│   ├── preprocess.py         # strip frontmatter, normalise whitespace
-│   ├── chunking.py           # C1/C2/C3 → chunks_c1/c2/c3.jsonl
-│   ├── embed.py              # OpenAI embeddings → Chroma (one collection per strategy)
-│   ├── retrieve.py           # top-k query per question × strategy → retrieved_results.csv
-│   ├── generate.py           # LLM answers → generated_answers.csv
-│   ├── evaluate_retrieval.py # Recall@k, Precision@k, Hit@k, MRR
-│   └── evaluate_answers.py   # manual rubric scaffold + summary
-├── app/streamlit_app.py      # side-by-side strategy comparison (placeholder)
-├── notebooks/analysis.ipynb  # visualisations (placeholder)
-├── data/
-│   ├── raw/vue_docs_snapshot/   # Vue.js .md snapshot (gitignored, manual step)
-│   ├── processed/               # documents.jsonl, chunks_c*.jsonl (gitignored)
-│   └── evaluation/
-│       ├── questions.csv        # ~40 questions, manually curated
-│       ├── ground_truth.csv     # reference answers + relevant source IDs
-│       ├── retrieved_results.csv  # generated by retrieve.py
-│       ├── generated_answers.csv  # generated by generate.py
-│       └── scores.csv             # manual rubric scores (0–2)
-├── docs/
-│   ├── Ground_Truth_Projektleitfaden.md  # MASTER REFERENCE — all binding decisions
-│   ├── Exposee.md                        # approved thesis exposé
-│   ├── prompts.md                        # LLM prompt templates (constant across strategies)
-│   ├── methodology.md                    # snapshot details, model version log
-│   ├── corpus_manifest.csv              # Vue.js file inventory
-│   └── superpowers/plans/               # dated implementation plans (task-by-task, checkbox-tracked)
-└── .serena/                  # Serena MCP project config + memories (committed)
-```
-
-**Pipeline data flow:**
-`vue_docs_snapshot/` → `ingest` → `preprocess` → `chunking` → `embed` → `retrieve` → `generate` → `evaluate`
-
-**Three chunking strategies (only independent variable):**
-| ID | Strategy | Params |
-|----|----------|--------|
-| C1 | Fixed-size, no overlap | 500 tokens, overlap 0 |
-| C2 | Fixed-size, with overlap | 500 tokens, overlap 100 |
-| C3 | Structure-based (H2/H3) | max 800 tokens/section |
-<!-- END AUTO-MANAGED -->
-
-<!-- AUTO-MANAGED: conventions -->
-## Code Conventions
-
-**The one hard rule:** all parameters (chunk sizes, model names, paths, top-k, temperature) live exclusively in `src/config.py`. Never hardcode them elsewhere.
-
-**Python style:**
-- Python ≥ 3.11, snake_case throughout, type hints on all public functions
-- All `src/` scripts runnable standalone via `if __name__ == "__main__"` + argparse
-- Strategy keys: `"C1"`, `"C2"`, `"C3"` (uppercase, in code and CSV values)
-- Strategy ID strings (in JSONL/CSV `strategy` field): `"fixed_500_no_overlap"`, `"fixed_500_overlap_100"`, `"structure_h2h3"`
-
-**ID conventions:**
-- Document IDs: `D001`, `D002`, … (zero-padded 3 digits)
-- Question IDs: `Q001`–`Q040`
-- Chunk IDs: `{STRATEGY}_{DOC_ID}_{SEQ}` e.g. `C1_D001_0001`
-
-**CSV schemas (exact — §10 Ground Truth, no extra columns):**
-- `questions.csv`: `question_id, question, type, difficulty, notes`
-- `ground_truth.csv`: `question_id, expected_answer, relevant_doc_ids, relevant_section_ids`
-- `retrieved_results.csv`: `question_id, strategy, rank, chunk_id, score, is_relevant`
-- `generated_answers.csv`: `question_id, strategy, answer, sources, prompt_tokens, completion_tokens`
-- `scores.csv`: `question_id, strategy, correctness, completeness, groundedness, no_hallucination, clarity, total_score`
-
-**Experimental invariants (never change):**
-- `temperature = 0` — all LLM calls
-- `top_k = 5` — retrieval, constant across all strategies
-- Prompt template constant across all strategies (see `docs/prompts.md`)
-- Ground truth must be finalised **before** any evaluation run
-<!-- END AUTO-MANAGED -->
-
-<!-- AUTO-MANAGED: patterns -->
-## Detected Patterns
-
-- **Stub pattern:** all pipeline scripts (`src/*.py` except `config.py`) follow the same shape: module docstring with schema, typed function signature, `raise NotImplementedError`, standalone `__main__` with argparse. Implement one file at a time in pipeline order.
-- **Strategy dispatch:** scripts that operate per-strategy accept `strategy_key: str` and a `"all"` shorthand in argparse that expands to `["C1", "C2", "C3"]`.
-- **Config as single source of truth:** `src/config.py` exports `Path` constants, chunk parameters, model names, and the `STRATEGY_IDS` / `CHUNK_FILES` / `CHROMA_COLLECTIONS` dicts used across all scripts.
-- **Save everything:** every intermediate artefact is persisted to `data/processed/` or `data/evaluation/` — this is the reproducibility guarantee for the thesis.
-<!-- END AUTO-MANAGED -->
-
-<!-- AUTO-MANAGED: git-insights -->
-## Git Insights
-
-Project was scaffolded in June 2026 (pre-implementation). Key decisions recorded:
-- Switched from `requirements.txt` to `pyproject.toml` + `uv` for reproducible lockfile installs
-- `.gitignore` uses negation patterns (`!data/raw/vue_docs_snapshot/`, `!data/processed/.gitkeep`) so scaffold directories survive a fresh clone while actual data stays ignored
-- Corpus changed from FastAPI to Vue.js (abgrenzung from an existing practitioner blog)
-- All pipeline scripts are intentionally stubs — implementation starts Phase 3 (Sept 2026)
-- `.serena/` memories committed — project context travels with the repo
-- Claude Code auto-memory initialized — `.claude/auto-memory/dirty-files*` gitignored (ephemeral session state)
-- Corpus snapshot locked (D20–D26, plan: `docs/superpowers/plans/2026-08-13-corpus-snapshot.md`, not yet executed): full `src/guide/` from `vuejs/docs` pinned at commit `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (52 files, ~106k tokens); Composition-API content only (`options-api` blocks stripped); `section_id` = `{doc_id}#{anchor}` from explicit `{#...}` anchors, never slugified; relevance = any token-span overlap (≥100-token sensitivity check); token encoding `cl100k_base` (tiktoken 0.13.0). Plan introduces `src/markdown_utils.py` (pure cleaning/section-extraction functions) alongside `src/ingest.py`.
-
-Master reference for all decisions: `docs/Ground_Truth_Projektleitfaden.md`
-<!-- END AUTO-MANAGED -->
-
-<!-- MANUAL -->
-## Custom Notes
-
-<!-- Add project-specific notes here. This section is never auto-modified. -->
-<!-- END MANUAL -->
+- `docs/README.md` — documentation index (single source of truth)
+- `docs/Ground_Truth_Projektleitfaden.md` — binding reference: design, formats (§10), evaluation, open decisions (§19)
+- `docs/adr/` — decisions D1–D18
+- `docs/development.md` — setup, tooling, CI, link to PaperLab (`output/` convention)
+- `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
