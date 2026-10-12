@@ -5,7 +5,9 @@ writes data/processed/documents.jsonl.
 
 Output schema: {"doc_id", "path", "title", "text", "tokens"}
 """
+
 from pathlib import Path
+
 from config import DATA_RAW, DOCUMENTS_FILE
 
 

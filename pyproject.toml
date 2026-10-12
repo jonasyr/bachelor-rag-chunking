@@ -31,3 +31,14 @@ dev = [
     "jupyter>=1.0.0",
     "ipykernel>=6.29.0",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# F401: the pipeline skeleton imports config values for steps not implemented yet;
+# re-enable once src/ is implemented.
+ignore = ["F401"]

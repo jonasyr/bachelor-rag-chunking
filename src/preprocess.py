@@ -3,7 +3,9 @@
 Reads documents.jsonl, strips VitePress frontmatter and custom directives,
 normalises whitespace. Writes cleaned records back in-place.
 """
+
 from pathlib import Path
+
 from config import DOCUMENTS_FILE
 
 

@@ -3,6 +3,7 @@
 One persistent Chroma collection per strategy (config.CHROMA_COLLECTIONS).
 Uses OpenAI Embeddings API (config.EMBEDDING_MODEL).
 """
+
 from config import CHROMA_COLLECTIONS
 
 
@@ -13,6 +14,7 @@ def embed_and_store(strategy_key: str) -> None:
 
 if __name__ == "__main__":
     import argparse
+
     p = argparse.ArgumentParser()
     p.add_argument("--strategy", choices=["C1", "C2", "C3", "all"], default="all")
     args = p.parse_args()
