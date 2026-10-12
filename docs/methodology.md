@@ -1,7 +1,8 @@
 # Methodology Notes
 
 Working notes for the methodology chapter of the thesis.
-Decisions are binding only when recorded in `Ground_Truth_Projektleitfaden.md`.
+Decisions are binding only when recorded in `Ground_Truth_Projektleitfaden.md` (§2, `adr/`).
+The corpus scope is still open (Leitfaden §19); fill in the snapshot below once it is decided.
 
 ---
 

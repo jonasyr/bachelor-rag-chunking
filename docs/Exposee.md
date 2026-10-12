@@ -1,3 +1,6 @@
+> Lesekopie für Agents und zum schnellen Lesen. Original ist das LaTeX-Exposé im privaten PaperLab-Repo
+> (`expose/` im Ordner der Bachelorarbeit). Verbindliche Entscheidungen: `Ground_Truth_Projektleitfaden.md`, `adr/`.
+
 Exposé
 
 IU Internationale Hochschule
@@ -10,7 +13,6 @@ für technische Projektdokumentation
 
 Jonas Weirauch
 
-Matrikelnummer: [entfernt]
 
 Betreuer/in: Prof. Klaus Quibeldey-Cirkel
 
@@ -609,7 +611,6 @@ für technische Projektdokumentation
 
 Jonas Weirauch
 
-Matrikelnummer: [entfernt]
 
 [entfernt]
 
