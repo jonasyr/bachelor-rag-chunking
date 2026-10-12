@@ -7,7 +7,7 @@ Source: `docs/Ground_Truth_Projektleitfaden.md` §2.
 | D1 | **Corpus: Vue.js** (`vuejs/docs`, Markdown, `src/` directory) | Replaces FastAPI — abgrenzung from practitioner blog with FastAPI/Supabase/Stripe |
 | D2 | **Citation: biblatex + biber, APA 7, `\parencite{}`** | — |
 | D3 | **No industry partner** (no Peano or similar) | — |
-| D4 | **Work period: July–December 2026**, submission 15.12.2026 (finalization) / 31.12.2026 (official deadline) | — |
+| D4 | **Work period: July–December 2026**, submission 24.12.2026 (official deadline, confirmed 13.10.2026; earlier 31.12.2026) | — |
 | D5 | **Three strategies: C1** (fixed, no overlap), **C2** (fixed, overlap 100), **C3** (structure-based H2/H3). C4 semantic = optional only | — |
 | D6 | **Only chunking varies** — all other pipeline components constant | Core experimental design invariant |
 | D7 | **Triangulation: manual primary, RAGAS secondary**, agreement = validity indicator | RAGAS role upgraded from "optional" to binding secondary |

@@ -9,7 +9,7 @@ Controlled experimental comparison of three chunking strategies for a RAG (Retri
 
 **Research question:** How do different chunking strategies influence retrieval and answer quality of a RAG system when answering project-specific questions based on technical open-source documentation?
 
-**Deadline:** 31.12.2026 · Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel
+**Deadline:** 24.12.2026 · Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel
 <!-- END AUTO-MANAGED -->
 
 <!-- AUTO-MANAGED: build-commands -->
