@@ -32,15 +32,9 @@ chroma_db/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Plans / internal tooling
-docs/superpowers/
-
 # Generated / binary docs
 *.pdf
 
-
-# Claude Code auto-memory
-.claude/auto-memory/dirty-files*
 
 # OS
 .DS_Store
