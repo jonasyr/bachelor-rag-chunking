@@ -1,7 +1,8 @@
 # Ground Truth und Projektleitfaden für die Bachelorarbeit
 
 > Zentrales Arbeits-, Entscheidungs- und Referenzdokument für die gesamte Bearbeitung.
-> Stand: Juni 2026. Bearbeitungszeitraum der Arbeit: ca. Juli–Dezember 2026.
+> Stand: Juni 2026, aktualisiert 13.10.2026 (Docs-Audit: Entscheidungen als ADRs, Abgabe 24.12.2026, Korpus-Ausschnitt offen).
+> Bearbeitungszeitraum der Arbeit: Juli–Dezember 2026, Abgabe 24.12.2026 ([ADR 0004](adr/0004-zeitraum-und-abgabe.md)).
 
 ---
 
@@ -45,12 +46,14 @@ Die Arbeit vergleicht drei Chunking-Strategien für ein RAG-System auf Basis der
 
 ## 2. Verbindliche Entscheidungen (Decision Log)
 
+Jede Entscheidung hat eine eigene Datei mit Kontext und Folgen: [`docs/adr/`](adr/README.md) (D*n* = ADR 00*nn*). Neue Entscheidungen werden dort angelegt und hier in einer Zeile ergänzt.
+
 | # | Entscheidung | Status | Quelle | Verhältnis zur Baseline |
 |---|--------------|--------|--------|--------------------------|
 | D1 | **Dokumentkorpus: Vue.js-Dokumentation** (`vuejs/docs`, Markdown) | verbindlich | Chat | **ersetzt FastAPI** |
 | D2 | Zitierstil: **biblatex + biber, APA 7, `\parencite`** | verbindlich | Chat | konkretisiert |
 | D3 | **Kein Praxispartner** (Peano o. Ä. nicht einbinden) | verbindlich | Chat | ergänzt |
-| D4 | Bearbeitungszeitraum: **Juli–Dezember 2026** | verbindlich | Chat | konkretisiert (Baseline hatte nur Wochenraster) |
+| D4 | Bearbeitungszeitraum: **Juli–Dezember 2026**, Abgabe **24.12.2026** (bestätigt 13.10.2026) | verbindlich | Chat | konkretisiert (Baseline hatte nur Wochenraster) |
 | D5 | **Drei Chunking-Strategien**: C1 fixed ohne Overlap, C2 fixed mit Overlap, C3 strukturbasiert (Markdown-Überschriften). C4 semantisch nur optional | verbindlich | Exposé/Baseline | übernommen |
 | D6 | **Nur Chunking variiert**, alle übrigen Pipeline-Komponenten konstant | verbindlich | Exposé | übernommen |
 | D7 | **Evaluation als Triangulation**: manuelle referenzbasierte Bewertung **primär**, automatisiertes Framework (RAGAS) **sekundär**, Übereinstimmung beider als **Validitätsindikator** | verbindlich | Chat | **verschärft** (Baseline: RAGAS nur „optional") |
@@ -257,8 +260,13 @@ bachelor-rag-chunking/
 ├── app/
 │   └── streamlit_app.py
 └── docs/
+    ├── README.md                 (Index der Dokumentation)
+    ├── Ground_Truth_Projektleitfaden.md
+    ├── adr/                      (Entscheidungen D1–D18 als ADR)
+    ├── development.md            (Werkzeuge, CI, Anbindung an PaperLab)
     ├── methodology.md
     ├── prompts.md
+    ├── Exposee.md                (Lesekopie, Original in PaperLab)
     └── corpus_manifest.csv
 ```
 
@@ -278,8 +286,8 @@ bachelor-rag-chunking/
 
 **`questions.csv`**
 ```
-question_id,question,type,difficulty
-Q001,"What is the difference between ref and reactive in Vue?",conceptual,medium
+question_id,question,type,difficulty,notes
+Q001,"What is the difference between ref and reactive in Vue?",conceptual,medium,
 ```
 
 **`ground_truth.csv`**
@@ -430,27 +438,21 @@ Deskriptiv ausreichend: Mittelwert, Median, Standardabweichung, Boxplot, Verglei
 
 > Der Fragenkatalog (Phase Datenerhebung) wird regelmäßig unterschätzt — bewusst Zeit einplanen.
 
+> **Planungsstand Juni 2026.** Abgabe ist der 24.12.2026 (ADR 0004). Stand 13.10.2026: Pipeline in `src/` noch als Gerüst (`NotImplementedError`), Korpus-Ausschnitt offen (§19). Der Plan ist entsprechend zu verschieben.
+
 ---
 
 ## 17. Vom Projekt zur Bachelorarbeit (Schreibleitfaden)
 
-**Kapitelstruktur (IU-konform, 6 Hauptkapitel):**
-1. **Einleitung** — Problemstellung, Ziel, Forschungsfrage, Aufbau
-2. **Theoretische Fundierung** — LLMs/Embeddings, RAG/Dense Retrieval, Chunking, Evaluation; Forschungslücke
-3. **Methodik und Forschungsdesign** — Design, Korpus/Snapshot, Fragenkatalog/Ground Truth, Evaluationsverfahren (Triangulation)
-4. **Präsentation und Analyse der Forschungsergebnisse** — Retrieval-Ergebnisse, Antwortbewertung, Zusammenhang Retrieval/Antwort, Effizienz (keine Interpretation im Ergebnisteil)
-5. **Diskussion und Handlungsempfehlungen** — Interpretation, Einordnung in Literatur, Trade-offs, Empfehlungen, Validität
-6. **Fazit und Limitationen** — Beantwortung der Forschungsfrage, Ausblick
-
-**Wiederverwendung:** Textbausteine aus dem Exposé (Einleitung, Theorie, Methodik) dürfen in die Arbeit übernommen werden. Die Ergebnis-/Diskussionskapitel entstehen neu aus den Auswertungsdaten.
-
-**Implementierungskapitel** (kann in Kapitel 3 oder als eigener Abschnitt vor der Evaluation stehen): Systemarchitektur, Preprocessing, Chunking, Embedding, Vector Store, Retrieval, Prompting, Antwortgenerierung, Datenspeicherung.
+Kapitelstruktur, Text und Form der Arbeit liegen im privaten PaperLab-Repo (Ordner der Bachelorarbeit,
+`sections/` nach dem IU-Gerüst für Bachelorarbeiten; geprüft mit `./paperlab check`). Dieses Repo liefert dafür
+Ergebnisse, Tabellen und Abbildungen (siehe `docs/development.md`).
 
 ---
 
 ## 18. Literaturbasis (15 verifizierte Quellen)
 
-Alle Quellen sind in `literatur.bib` enthalten und im Exposé zitiert. APA 7 / biblatex / biber.
+Alle Quellen sind im Exposé zitiert; die BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. APA 7 / biblatex / biber.
 
 | BibTeX-Key | Rolle in der Argumentation | Typ |
 |------------|----------------------------|-----|
@@ -477,7 +479,7 @@ Alle Quellen sind in `literatur.bib` enthalten und im Exposé zitiert. APA 7 / b
 ## 19. Offene Entscheidungen / vor Beginn zu bestätigen
 
 - **Exposé-Umfang:** Aktuelle Fassung ist näher an „Betreuungsanfrage" (2–3 Seiten). Die IU-Formvorgabe nennt 5 Seiten ±10 %. Falls das Exposé als reguläre IU-Abgabe zählt, Theorie und Methodik entsprechend ausbauen (jeder Unterabschnitt ≥ ½ Seite).
-- **Exakter Vue-Korpus-Ausschnitt:** finale Auswahl der `src/guide/`-Bereiche und Seitenzahl festlegen (Ziel 50–100 Dateien).
+- **Exakter Vue-Korpus-Ausschnitt (offen, Stand 13.10.2026):** Vorschlag aus einem Plan vom 13.08.2026 (`docs/superpowers/plans/2026-08-13-corpus-snapshot.md`, liegt vermutlich auf dem PC und ist noch nicht im Repo): ganzes `src/guide/` aus `vuejs/docs` auf Commit `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (52 Dateien, ca. 106k Tokens), nur Composition-API-Inhalte (`options-api`-Blöcke entfernt), `section_id` = `{doc_id}#{anchor}` aus expliziten `{#…}`-Ankern, relevant = jede Überlappung von Token-Spannen (Sensitivitätsprüfung ab 100 Tokens), Token-Kodierung `cl100k_base` (tiktoken 0.13.0). Abweichung von §5.2 (vier Unterordner, 50–100 Dateien). Nach Bestätigung als ADR festhalten und §5 anpassen.
 - **Modell-/Versionswahl:** konkretes GPT-Modell, Embedding-Modell (`-large` vs. `-small`), SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren.
 - **Embedding-Sprache:** Korpus ist englisch; Fragen/Referenzantworten englisch halten (Konsistenz mit Embedding-Raum).
 - **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität).
@@ -487,13 +489,8 @@ Alle Quellen sind in `literatur.bib` enthalten und im Exposé zitiert. APA 7 / b
 
 ## 20. Schreibstil- und Formregeln (IU)
 
-- APA 7 (IU-Zitierleitfaden), nur tatsächlich zitierte Quellen, alphabetisch, hängender Einzug.
-- Wissenschaftlich, sachlich, objektiv, präzise; keine Ich-/Wir-/„man"-Formen, keine Umgangssprache, keine Floskeln, keine Ausrufezeichen, keine wertenden Aussagen.
-- Passive/neutrale Formulierungen bevorzugen, klarer roter Faden (Problem → Forschungsfrage → Theorie → Methodik → Ergebnisse → Diskussion).
-- Maximal 3 Gliederungsebenen (1 / 1.1 / 1.1.1), jede Untergliederung mindestens zwei Unterpunkte.
-- **(Unter-)Überschrift nur, wenn darunter mindestens ca. eine halbe Seite Text folgt** — sonst keine eigene Überschrift, Inhalt in Fließtext integrieren.
-- Hauptteil 40 Textseiten ±10 % (36–44); Abbildungs-/Tabellenverzeichnis ab 3 Abbildungen/Tabellen; Quellenangabe direkt unter Abbildungen/Tabellen (10 pt).
-- Ergebnisteil ohne Interpretation; Interpretation in Diskussion.
+Einzige Quelle ist `docs/guidelines/IU_Source_of_Truth.md` im privaten PaperLab-Repo (aus den IU-Originalen 2025
+abgeleitet, mit Fundstellen); `./paperlab check` prüft Format und Stilregeln automatisch.
 
 ---
 
