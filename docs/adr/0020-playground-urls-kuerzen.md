@@ -9,7 +9,8 @@ Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md))
 - Der Korpus verlinkt Beispiele im Vue Playground und im Template Explorer, z. B.
   `[Try it in the Playground](https://play.vuejs.org/#eNp9…)`. Der Teil nach `#` enthält den kompletten Beispielcode
   komprimiert und kodiert; er ist für Menschen und Embeddings bedeutungslos.
-- Auf Commit `b75d188` belegen diese URLs 21.862 von 139.500 Tokens (15,7 %), eine einzelne URL bis zu 886 Tokens.
+- Auf Commit `b75d188` belegen diese URLs 21.906 von 139.500 Tokens (15,7 %; Differenz des bereinigten Korpus mit
+  und ohne diese Regel), eine einzelne URL bis zu 886 Tokens.
 - Größenbasierte Chunks (C1, C2) würden dadurch teilweise mit Zeichenrauschen gefüllt, C3 bräuchte für eine einzige URL
   einen harten Schnitt; Embeddings und die gemessenen Kosten ([ADR 0008](0008-kosten-als-variable.md)) würden verzerrt.
 
