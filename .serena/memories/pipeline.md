@@ -5,7 +5,7 @@ Flow, repo layout and data formats: `docs/explanation/research-design.md`, `docs
   `start_token`/`end_token` must come from `src/tokens.py` so chunks and sections share one index space.
 - `preprocess.py` rewrites `documents.jsonl` in place and refuses a second run (re-run `ingest.py` first); unknown HTML
   in the corpus raises on purpose — add a test + rule in `preprocess.py`, never silence it.
-- Implemented: `snapshot.py`, `ingest.py`, `preprocess.py`, `tokens.py` (tests in `tests/`). Other `src/*.py` are stubs (`raise NotImplementedError`); implement in pipeline order, minimal
+- Implemented: `snapshot.py`, `ingest.py`, `preprocess.py`, `tokens.py`, `chunking.py` (tests in `tests/`). Other `src/*.py` are stubs (`raise NotImplementedError`); implement in pipeline order, minimal
   prototype first (`docs/how-to/run-the-experiment.md`: load → C1–C3 → embed → Chroma per strategy → one question → top-5 → answer).
 - `ingest.py`/`preprocess.py` take no CLI options; the per-strategy scripts take `--strategy C1|C2|C3|all`.
 - Persist every intermediate artefact (`data/processed/`, `data/evaluation/`); raw and processed data are gitignored,

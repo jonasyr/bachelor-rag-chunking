@@ -5,7 +5,8 @@ import re
 
 import pytest
 
-from config import DATA_RAW, DOCUMENTS_FILE, SECTIONS_FILE
+from chunking import chunk
+from config import C3_MAX_TOKENS, C3_MIN_TOKENS, DATA_RAW, DOCUMENTS_FILE, SECTIONS_FILE
 from preprocess import clean_markdown
 
 GUIDE = DATA_RAW / "guide"
@@ -39,3 +40,17 @@ def test_processed_artifacts_are_consistent():
     tokens_by_doc = {d["doc_id"]: d["tokens"] for d in docs}
     for s in sections:
         assert 0 <= s["start_token"] < s["end_token"] <= tokens_by_doc[s["doc_id"]], s["section_id"]
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+def test_real_corpus_chunks(key, tmp_path):
+    out = tmp_path / f"chunks_{key}.jsonl"
+    count = chunk(key, out_file=out)  # chunk() checks every invariant per document
+    lengths = [
+        c["end_token"] - c["start_token"]
+        for c in map(json.loads, out.read_text(encoding="utf-8").splitlines())
+    ]
+    assert count == len(lengths)
+    if key == "C3":
+        assert all(C3_MIN_TOKENS <= n <= C3_MAX_TOKENS for n in lengths)

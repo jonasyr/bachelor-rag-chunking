@@ -92,12 +92,12 @@ Vue.js bietet entwicklerorientierte, didaktisch hochwertige Dokumentation mit ko
 |----|-----------|-----------|---------|----------|
 | **C1** | Fixed-size ohne Overlap | 500 Tokens, Overlap 0 | einfach, reproduzierbar, Baseline | Kontextbruch an Grenzen |
 | **C2** | Fixed-size mit Overlap | 500 Tokens, Overlap 100 | bessere Abdeckung, **starke Baseline** | mehr Chunks, mehr Redundanz, höhere Kosten |
-| **C3** | Strukturbasiert | Abschnitt unter H2/H3, max. 800 Tokens, große Abschnitte nach Absätzen unterteilen | erhält semantische Einheiten | uneinheitliche Chunkgrößen (auf Vue relevant: lange Abschnitte) |
+| **C3** | Strukturbasiert | Abschnitt unter H1–H3, 50–800 Tokens (kurze verschmelzen, lange an Absätzen teilen; [ADR 0021](../adr/0021-c3-grenzen.md)) | erhält semantische Einheiten | uneinheitliche Chunkgrößen (auf Vue relevant: lange Abschnitte) |
 | C4 | Semantisch (optional) | Trennung nach semantischer Ähnlichkeit | theoretisch spannend | Mehraufwand, weitere Modellabhängigkeit, nur falls Zeit |
 
 **Konstant halten (nur Chunking variiert):** Korpus/Snapshot, Sprache (Englisch), Embedding-Modell, LLM, Temperatur (0), top-k (5), Prompt, Fragenset, Bewertungsrubrik, Vector Store, Retrieval-Art (Dense), Antwortformat.
 
-> Hinweis zu C3 auf Vue: Manche Abschnitte (z. B. „Reactivity Fundamentals") sind lang und erzeugen große Chunks; die Untergrenze/Obergrenze und die Absatz-Unterteilung sind daher sauber zu dokumentieren.
+> C3 auf Vue: 77 von 560 Überschriften-Segmenten sind kürzer als 50 Tokens, 26 länger als 800; Regeln und Begründung in [ADR 0021](../adr/0021-c3-grenzen.md).
 
 
 ## RAG-Pipeline-Architektur

@@ -27,3 +27,4 @@ Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte a
 | [0018](0018-literaturbasis.md) | Literaturbasis: 15 verifizierte Quellen | Angenommen |
 | [0019](0019-korpus-ausschnitt.md) | Korpus-Ausschnitt: ganzes `src/guide/`, nur Composition API | Angenommen |
 | [0020](0020-playground-urls-kuerzen.md) | Kodierte Playground-URLs beim Preprocessing kürzen | Angenommen |
+| [0021](0021-c3-grenzen.md) | C3: Untergrenze 50 Tokens, Verschmelzen vor dem Teilen | Angenommen |

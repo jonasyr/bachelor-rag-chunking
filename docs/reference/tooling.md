@@ -65,7 +65,7 @@ bachelor-rag-chunking/
     ├── README.md                 (Index der Dokumentation)
     ├── explanation/  reference/  how-to/   (Diátaxis)
     ├── plan.md                   (Zeitplan, offene Entscheidungen)
-    ├── adr/                      (Entscheidungen D1–D20)
+    ├── adr/                      (Entscheidungen D1–D21)
     ├── Exposee.md                (Lesekopie, Original in PaperLab)
     └── corpus_manifest.csv
 ```
@@ -76,7 +76,7 @@ sind gitignored; die Ordner bleiben über `.gitkeep` erhalten. Formate: [Datenar
 ## Skripte und Optionen
 
 Alle Schritte in `src/` laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py`, Optionen mit `--help`).
-Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py` (Tests in `tests/`, `uv run pytest`); die übrigen Schritte sind Gerüste (`raise NotImplementedError`).
+Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py` (Tests in `tests/`, `uv run pytest`); die übrigen Schritte sind Gerüste (`raise NotImplementedError`).
 
 | Skript | Optionen |
 |---|---|

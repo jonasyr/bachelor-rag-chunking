@@ -16,6 +16,14 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
+## Chunking
+
+| Strategie | Chunks | Tokens min / Mittel / max |
+|---|---:|---|
+| C1 | 260 | 11 / 452 / 500 |
+| C2 | 305 | 108 / 469 / 500 |
+| C3 | 493 | 50 / 239 / 799 |
+
 ## Modellversionen (bei der Umsetzung eintragen)
 
 | Komponente | Version | Datum der ersten Nutzung |
