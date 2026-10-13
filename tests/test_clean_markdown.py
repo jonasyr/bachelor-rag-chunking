@@ -10,7 +10,7 @@ def clean(body: str) -> str:
 
 
 def test_bom_and_frontmatter_removed():
-    result = clean_markdown("﻿---\noutline: deep\n---\n\n# T {#t}\n\nBody\n")
+    result = clean_markdown("\ufeff---\noutline: deep\n---\n\n# T {#t}\n\nBody\n")
     assert result.text == "# T\n\nBody\n"
 
 

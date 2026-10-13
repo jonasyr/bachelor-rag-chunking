@@ -87,7 +87,7 @@ def _strip_frontmatter(lines: list[str]) -> list[str]:
 
 def clean_markdown(text: str) -> CleanResult:
     """Return Composition-API-only Markdown and its anchored H1-H3 headings."""
-    text = text.lstrip("﻿").replace("\r\n", "\n")
+    text = text.lstrip("\ufeff").replace("\r\n", "\n")
     lines = _strip_frontmatter(text.split("\n"))
 
     out: list[str] = []

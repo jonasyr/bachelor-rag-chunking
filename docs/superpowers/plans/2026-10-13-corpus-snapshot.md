@@ -241,7 +241,7 @@ def clean(body: str) -> str:
 
 
 def test_bom_and_frontmatter_removed():
-    result = clean_markdown("﻿---\noutline: deep\n---\n\n# T {#t}\n\nBody\n")
+    result = clean_markdown("\ufeff---\noutline: deep\n---\n\n# T {#t}\n\nBody\n")
     assert result.text == "# T\n\nBody\n"
 
 
@@ -427,7 +427,7 @@ def _strip_frontmatter(lines: list[str]) -> list[str]:
 
 def clean_markdown(text: str) -> CleanResult:
     """Return Composition-API-only Markdown and its anchored H1-H3 headings."""
-    text = text.lstrip("﻿").replace("\r\n", "\n")
+    text = text.lstrip("\ufeff").replace("\r\n", "\n")
     lines = _strip_frontmatter(text.split("\n"))
 
     out: list[str] = []
@@ -916,7 +916,7 @@ def make_snapshot(root, files):
 
 
 def test_title_of_skips_frontmatter_bom_and_code():
-    text = "﻿---\noutline: deep\n---\n\n```sh\n# not a title\n```\n\n# Real Title {#real}\n"
+    text = "\ufeff---\noutline: deep\n---\n\n```sh\n# not a title\n```\n\n# Real Title {#real}\n"
     assert title_of(text) == "Real Title"
 
 
@@ -931,7 +931,7 @@ def test_ingest_assigns_ids_by_path_and_writes_exact_keys(tmp_path):
         snap,
         {
             "guide/introduction.md": "# Introduction {#introduction}\n",
-            "guide/components/props.md": "﻿# Props {#props}\n\nText\n",
+            "guide/components/props.md": "\ufeff# Props {#props}\n\nText\n",
             "guide/essentials/a.md": "# A {#a}\n",
         },
     )
@@ -945,7 +945,7 @@ def test_ingest_assigns_ids_by_path_and_writes_exact_keys(tmp_path):
         ("D003", "guide/introduction.md", "Introduction"),
     ]
     assert list(docs[0]) == ["doc_id", "path", "title", "text", "tokens"]
-    assert not docs[0]["text"].startswith("﻿")
+    assert not docs[0]["text"].startswith("\ufeff")
     assert docs[0]["tokens"] == tokens.count(docs[0]["text"])
 
 
@@ -984,7 +984,7 @@ FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 def title_of(text: str) -> str:
     """Text of the first H1 outside code fences, without its anchor."""
     in_fence = False
-    for line in text.lstrip("﻿").split("\n"):
+    for line in text.lstrip("\ufeff").split("\n"):
         if FENCE_RE.match(line):
             in_fence = not in_fence
         elif not in_fence and (m := H1_RE.match(line)):
