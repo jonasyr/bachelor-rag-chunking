@@ -24,14 +24,24 @@ Wiederverwendet wird die Datei nur, wenn Modell, IDs und Texte unverändert sind
 
 **`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `model`, `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
 
-`retrieve.py --strategy` ersetzt in `retrieved_results.csv` nur die Zeilen der gewählten Strategien, und nur wenn
-alle Eingaben (Fragen, Ground Truth, `sections.jsonl`, Frage-, Chunk- und Vektordateien) seit dem letzten
-Retrieval-Lauf unverändert sind (SHA-256 im Laufprotokoll);
-sonst bricht der Lauf ab und alle Strategien müssen neu laufen.
+`retrieve.py` läuft immer über alle Strategien und schreibt `retrieved_results.csv` vollständig neu
+([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
-**`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md); `canary_min_cosine` = Ergebnis der Modellstand-Prüfung, `null` wenn keine nötig war)
+**`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md))
+
+- `input_tokens`/`cost_usd`: nur die eigenen Texte des Schritts (Chunks einer Strategie bzw. Fragen).
+- `canary_*`: Modellstand-Prüfung getrennt davon (`canary_min_cosine` = niedrigste Kosinus-Ähnlichkeit, `null` wenn
+  keine Prüfung nötig war), damit sie die Kosten einer Strategie nicht verfälscht.
+
+`embed.py` (eine Zeile je Strategie):
 ```json
-{"date":"2026-10-13","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":260,"vector_bytes":3194880,"inputs_sha256":{"chunks_c1.jsonl":"…"},"input_tokens":117594,"cost_usd":0.01528722,"api_called":true,"canary_min_cosine":null}
+{"date":"2026-10-13","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":260,"vector_bytes":3194880,"inputs_sha256":{"chunks_c1.jsonl":"…"},"canary_min_cosine":null,"input_tokens":117594,"cost_usd":0.01528722,"canary_input_tokens":0,"canary_cost_usd":0.0,"api_called":true}
+```
+
+`retrieve.py` (eine Zeile je Lauf; `strategy` listet alle Strategien, `vectors`/`dimensions` beziehen sich auf die
+Fragen, `inputs_sha256` belegt alle Eingaben, u. a. die eingefrorene Ground Truth nach ADR 0017):
+```json
+{"date":"…","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"retrieve","strategy":"C1,C2,C3","dimensions":3072,"vectors":40,"inputs_sha256":{"questions.csv":"…","ground_truth.csv":"…","sections.jsonl":"…","query_embeddings.npz":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…","embeddings_c1.npz":"…","embeddings_c2.npz":"…","embeddings_c3.npz":"…"},"canary_min_cosine":0.99999,"input_tokens":600,"cost_usd":0.000078,"canary_input_tokens":2700,"canary_cost_usd":0.000351,"api_called":true}
 ```
 
 `start_token`/`end_token` von Chunks und Abschnitten zählen beide über `src/tokens.py` (`cl100k_base`) und sind daher direkt vergleichbar.

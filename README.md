@@ -70,8 +70,8 @@ python src/evaluate_answers.py --mode summarise
 
 ```bash
 python src/snapshot.py && python src/ingest.py && python src/preprocess.py && python src/chunking.py
-python src/embed.py --strategy C1
-python src/retrieve.py --strategy C1
+python src/embed.py
+python src/retrieve.py   # always all strategies (ADR 0024)
 python src/generate.py --strategy C1
 ```
 
