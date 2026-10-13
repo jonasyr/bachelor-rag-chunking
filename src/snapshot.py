@@ -2,7 +2,7 @@
 
 Fetches config.VUE_DOCS_COMMIT of config.VUE_DOCS_REPO_URL (shallow), replaces
 data/raw/vue_docs_snapshot/guide/ with every Markdown file below config.VUE_DOCS_SUBDIR and
-writes SNAPSHOT.txt with repository, commit, dates and a sha256 per file.
+writes docs/corpus_snapshot.txt (versioned) with repository, commit, dates and a sha256 per file.
 """
 
 import hashlib
@@ -69,7 +69,7 @@ def snapshot(
     out_dir: Path = DATA_RAW,
     info_file: Path = SNAPSHOT_INFO_FILE,
 ) -> int:
-    """Fetch the pinned commit, copy its Markdown files and write SNAPSHOT.txt; return the count."""
+    """Fetch the pinned commit, copy its Markdown files, write the record; return the file count."""
     if shutil.which("git") is None:
         raise RuntimeError("git is required to create the snapshot")
     out_dir.mkdir(parents=True, exist_ok=True)

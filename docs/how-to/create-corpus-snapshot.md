@@ -5,11 +5,11 @@
 Ausschnitt und Commit: [Korpus](../reference/corpus.md) ([ADR 0019](../adr/0019-korpus-ausschnitt.md)). Ergebnis in [Experiment-Protokoll](../reference/experiment-record.md) und `docs/corpus_manifest.csv` eintragen.
 
 1. `uv run python src/snapshot.py` — holt den Commit aus `config.VUE_DOCS_COMMIT`, kopiert `src/guide/` nach
-   `data/raw/vue_docs_snapshot/guide/` und schreibt `SNAPSHOT.txt` (Commit, Datum, SHA-256 je Datei).
+   `data/raw/vue_docs_snapshot/guide/` und schreibt `docs/corpus_snapshot.txt` (Commit, Datum, SHA-256 je Datei; versioniert).
 2. `uv run python src/ingest.py` — schreibt `data/processed/documents.jsonl`.
 3. `uv run python src/preprocess.py` — bereinigt die Texte, schreibt `sections.jsonl` und `docs/corpus_manifest.csv`.
-4. Werte aus `SNAPSHOT.txt` und die Token-Summe ins [Experiment-Protokoll](../reference/experiment-record.md)
-   übernehmen, `docs/corpus_manifest.csv` committen.
+4. Werte aus `docs/corpus_snapshot.txt` und die Token-Summe ins [Experiment-Protokoll](../reference/experiment-record.md)
+   übernehmen, `docs/corpus_snapshot.txt` und `docs/corpus_manifest.csv` committen.
 
 Prüfen: `uv run pytest` (die Integrationstests in `tests/test_corpus_integration.py` laufen nur mit vorhandenem Snapshot).
 

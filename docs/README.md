@@ -25,6 +25,7 @@ RAG-Systems für technische Projektdokumentation“. Jede Tatsache hat genau ein
 | [reference/experiment-record.md](reference/experiment-record.md) | Snapshot und Modellversionen (bei der Umsetzung ausfüllen) |
 | [reference/tooling.md](reference/tooling.md) | Tech-Stack, Repository-Struktur, Skript-Optionen, Qualitätswerkzeuge |
 | [corpus_manifest.csv](corpus_manifest.csv) | Korpusmanifest (52 Dateien, erzeugt von `src/preprocess.py`) |
+| [corpus_snapshot.txt](corpus_snapshot.txt) | Snapshot-Protokoll: Commit, Daten, SHA-256 je Datei (erzeugt von `src/snapshot.py`) |
 
 ## Hintergrund (explanation)
 
