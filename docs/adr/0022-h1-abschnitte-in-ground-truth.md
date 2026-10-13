@@ -2,7 +2,7 @@
 
 ## Status
 
-Vorgeschlagen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0017](0017-fragenkatalog.md))
+Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0017](0017-fragenkatalog.md))
 
 ## Kontext
 
