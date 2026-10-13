@@ -14,5 +14,11 @@ def overlap_tokens(chunk: dict, section: dict) -> int:
 
 
 def is_relevant(chunk: dict, sections: list[dict], min_overlap: int) -> bool:
-    """True if the chunk overlaps any of the sections by at least min_overlap tokens."""
-    return any(overlap_tokens(chunk, s) >= min_overlap for s in sections)
+    """True if the chunk overlaps a section by at least min(min_overlap, chunk length) tokens.
+
+    Capping the threshold at the chunk length keeps a chunk shorter than min_overlap eligible
+    when it lies fully inside a relevant section; at least one shared token is always needed
+    (ADR 0026).
+    """
+    needed = max(1, min(min_overlap, chunk["end_token"] - chunk["start_token"]))
+    return any(overlap_tokens(chunk, s) >= needed for s in sections)
