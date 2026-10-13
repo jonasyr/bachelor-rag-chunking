@@ -26,6 +26,7 @@ DROP_LINE_TAGS = ("img", "details", "/details", "br")
 FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})\s*([\w+-]*)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 ANCHOR_RE = re.compile(r"\s*\{#([^}]+)\}\s*$")
+API_MARKER_RE = re.compile(r"\s*(\\\*)+$")  # `\*` / `\*\*`: API-style markers on headings
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
 BLOCK_OPEN_RE = re.compile(r"^\s*<(" + "|".join(DROP_BLOCK_TAGS) + r")\b([^>]*)>")
 UNWRAP_OPEN_RE = re.compile(r'^\s*<(div|p) class="' + UNWRAP_CLASS + r'">\s*$')
@@ -39,6 +40,7 @@ COMMENT_RE = re.compile(r"\s*<!--.*?-->")
 OPTIONS_SPAN_RE = re.compile(r'<span class="options-api">.*?</span>')
 COMPOSITION_SPAN_RE = re.compile(r'<span class="composition-api">(.*?)</span>')
 EMPTY_SPAN_RE = re.compile(r'<span id="[^"]*"></span>')
+VERSION_BADGE_RE = re.compile(r'<sup class="vt-badge" data-text="([^"]+)"\s*/>')
 INLINE_SELF_CLOSING_RE = re.compile(r"\s*<(sup|[A-Z][\w-]*)\b[^>]*/>")
 HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z]")
 MANIFEST_HEADER = ["file_id", "path", "title", "section", "tokens", "included"]
@@ -170,6 +172,7 @@ def clean_markdown(text: str) -> CleanResult:
         line = OPTIONS_SPAN_RE.sub("", line)
         line = COMPOSITION_SPAN_RE.sub(r"\1", line)
         line = EMPTY_SPAN_RE.sub("", line)
+        line = VERSION_BADGE_RE.sub(r"(\1)", line)
         line = INLINE_SELF_CLOSING_RE.sub("", line)
         if 'class="options-api"' in line:
             raise ValueError(f"options-api markup left after cleaning: {line!r}")
@@ -181,6 +184,7 @@ def clean_markdown(text: str) -> CleanResult:
             a = ANCHOR_RE.search(title)
             if a:
                 title = title[: a.start()]
+            title = API_MARKER_RE.sub("", title)
             if level <= SECTION_MAX_LEVEL:
                 if not a:
                     raise ValueError(f"heading without anchor: {line!r}")
