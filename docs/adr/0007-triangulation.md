@@ -1,17 +1,22 @@
-# ADR 0007: Evaluation als Triangulation: manuell primär, RAGAS sekundär
+# 0007. Evaluation als Triangulation: manuell primär, RAGAS sekundär
 
-- **Status:** angenommen (D7, verbindlich)
-- **Quelle:** Chat; Verhältnis zur Baseline: verschärft (Baseline: RAGAS nur optional)
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §12.3
+## Status
+
+Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war)
 
 ## Kontext
 
-LLM-as-a-Judge hat bekannte Grenzen der Verlässlichkeit; eine rein automatische Bewertung ist ausgeschlossen.
+- Die manuelle, referenzbasierte Bewertung beruht auf einer eigenen Ground Truth, ist nicht zirkulär und verteidigbar ([Leitfaden §12.3](../Ground_Truth_Projektleitfaden.md#123-triangulation-verbindlich)).
+- Ein automatisiertes Framework wie RAGAS ist skalierbar und reproduzierbar, LLM-as-a-Judge hat aber bekannte Zuverlässigkeitsgrenzen (Leitfaden §12.3).
+- Eine rein automatische Bewertung ohne menschliche Kontrolle liegt außerhalb des Scopes (Leitfaden §3).
 
 ## Entscheidung
 
-Primär wird manuell und referenzbasiert bewertet, sekundär mit RAGAS (Faithfulness, Context Relevance). Die Übereinstimmung beider wird als Validitätsindikator berichtet.
+Wir werden primär manuell und referenzbasiert bewerten und sekundär mit RAGAS (Faithfulness, Kontextrelevanz).
+Wir werden die Übereinstimmung beider Bewertungen als Validitätsindikator auswerten und berichten.
 
-## Folgen
+## Konsequenzen
 
-RAGAS ist nie alleinige Grundlage. Übereinstimmung spricht für Robustheit, Abweichung ist ein Befund zur Verlässlichkeit der Metrik.
+- Gut: Übereinstimmung spricht für Robustheit der Ergebnisse; eine Abweichung ist ein eigener Befund zur Zuverlässigkeit der Metrik (Leitfaden §12.3).
+- Schlecht: Die manuelle Bewertung kostet Zeit, eine Zweitbewertung von 10–20 % der Antworten wird empfohlen (Leitfaden §12.6).
+- Neutral: RAGAS ist nie alleinige Grundlage.

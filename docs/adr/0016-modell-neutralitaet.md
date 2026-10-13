@@ -1,17 +1,21 @@
-# ADR 0016: Modell-Neutralität
+# 0016. Modell-Neutralität
 
-- **Status:** angenommen (D16, verbindlich)
-- **Quelle:** Baseline; Verhältnis zur Baseline: übernommen
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §8, §19
+## Status
+
+Angenommen (D16 im Leitfaden; Quelle: Baseline, übernommen)
 
 ## Kontext
 
-Im Exposé und in der Arbeit wird neutral formuliert; konkrete Versionsnummern werden erst bei der tatsächlichen Implementierung festgeschrieben (Leitfaden §8).
+- Im Exposé und in der Arbeit wird neutral formuliert; konkrete Versionsnummern (Modell, SDK, API) werden erst bei der tatsächlichen Implementierung festgeschrieben ([Leitfaden §8](../Ground_Truth_Projektleitfaden.md#8-technische-umsetzung--tech-stack)).
+- Zur Reliabilität gehört, die Modellversion zu dokumentieren (Leitfaden §13).
+- Modell, Embedding-Modell (`-large` oder `-small`) und SDK-/API-Version sind noch offen ([Leitfaden §19](../Ground_Truth_Projektleitfaden.md#19-offene-entscheidungen--vor-beginn-zu-bestätigen)).
 
 ## Entscheidung
 
-Es wird ein festes GPT-Modell über die OpenAI API verwendet. Modell, SDK- und API-Version werden zum Implementierungszeitpunkt fixiert, mit Datum dokumentiert und während der Evaluation konstant gehalten.
+Wir werden ein festes GPT-Modell über die OpenAI API verwenden.
+Wir werden Modell, SDK- und API-Version zum Implementierungszeitpunkt fixieren, mit Datum dokumentieren und während der Evaluation konstant halten.
 
-## Folgen
+## Konsequenzen
 
-`LLM_MODEL` in `src/config.py` ist bis dahin ein Platzhalter; Versionen werden in `docs/methodology.md` eingetragen.
+- Neutral: `LLM_MODEL` in [`src/config.py`](../../src/config.py) ist bis dahin ein Platzhalter.
+- Neutral: Die fixierten Versionen werden in [`docs/methodology.md`](../methodology.md) und im Methodik-/Implementierungskapitel eingetragen.

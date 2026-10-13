@@ -1,17 +1,21 @@
-# ADR 0015: Tech-Stack
+# 0015. Tech-Stack
 
-- **Status:** angenommen (D15, verbindlich)
-- **Quelle:** Baseline; Verhältnis zur Baseline: übernommen
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §8
+## Status
+
+Angenommen (D15 im Leitfaden; Quelle: Baseline, übernommen)
 
 ## Kontext
 
-Die Pipeline soll mit verbreiteten, gut dokumentierten Werkzeugen gebaut werden.
+- Der Leitfaden nennt für die Werkzeugwahl keinen Grund; sie ist aus der Baseline übernommen ([Leitfaden §8](../Ground_Truth_Projektleitfaden.md#8-technische-umsetzung--tech-stack)).
+- Die Pipeline braucht je Strategie einen eigenen Vektorindex sowie Embeddings, Token-Zählung, Auswertung und Diagramme (Leitfaden §7).
 
 ## Entscheidung
 
-Python, OpenAI API (LLM und Embeddings), Chroma, tiktoken, Pandas, Matplotlib/Plotly, Streamlit, optional RAGAS; Abhängigkeiten über uv und `pyproject.toml`.
+Wir werden Python (≥ 3.11), die OpenAI API (LLM und Embeddings), Chroma (lokal, persistent), tiktoken, Pandas, Matplotlib/Plotly, Streamlit und optional RAGAS einsetzen.
+Wir werden Abhängigkeiten mit uv über `pyproject.toml` und `uv.lock` verwalten.
 
-## Folgen
+## Konsequenzen
 
-Details im Leitfaden §8; Entwicklungswerkzeuge in `docs/development.md`.
+- Gut: `uv.lock` macht Installationen reproduzierbar (Leitfaden §8).
+- Neutral: LLM und Embeddings laufen über die OpenAI API; Modell- und Versionswahl regelt [ADR 0016](0016-modell-neutralitaet.md).
+- Neutral: Entwicklungswerkzeuge stehen in [`docs/development.md`](../development.md).
