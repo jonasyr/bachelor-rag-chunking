@@ -24,7 +24,7 @@ Bereiche in `src/guide/` (Dateien): `essentials` (13), `components` (8), `extras
   H3-Überschrift ist (z. B. `D027#reactive`). Alle H1–H3-Überschriften im Ausschnitt tragen einen solchen Anker;
   `sections.jsonl` enthält 52 H1-, 279 H2- und 229 H3-Abschnitte.
 - **H1-Abschnitte** umfassen jeweils die ganze Seite. Für `relevant_section_ids` gilt
-  [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) (vorgeschlagen): H2/H3-Abschnitte annotieren, einen
+  [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md): H2/H3-Abschnitte annotieren, einen
   H1-Abschnitt nur, wenn wirklich die ganze Seite die Antwort ist.
 - **Relevanz eines Chunks:** relevant, wenn seine Token-Spanne die Token-Spanne eines Abschnitts aus
   `relevant_section_ids` überlappt (jede Überlappung). Sensitivitätsprüfung: Mindestüberlappung 100 Tokens.

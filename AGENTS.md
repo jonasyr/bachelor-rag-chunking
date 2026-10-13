@@ -34,5 +34,5 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 - `docs/README.md` — documentation index (single source of truth)
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/plan.md` — schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D22 (0022 proposed)
+- `docs/adr/` — decisions D1–D22
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
