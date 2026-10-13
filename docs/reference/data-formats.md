@@ -5,7 +5,7 @@
 
 **`documents.jsonl`**
 ```json
-{"doc_id":"D001","path":"guide/essentials/reactivity-fundamentals.md","title":"Reactivity Fundamentals","text":"...","tokens":1700}
+{"doc_id":"D027","path":"guide/essentials/reactivity-fundamentals.md","title":"Reactivity Fundamentals","text":"...","tokens":3063}
 ```
 
 **`chunks_c1.jsonl`** (analog c2/c3)
@@ -29,7 +29,7 @@ Q001,"What is the difference between ref and reactive in Vue?",conceptual,medium
 **`ground_truth.csv`**
 ```
 question_id,expected_answer,relevant_doc_ids,relevant_section_ids
-Q001,"ref wraps any value in a reactive object with a .value property; reactive makes an object deeply reactive but only works on objects.",D001,"D001#ref-vs-reactive"
+Q001,"ref wraps any value in a reactive object with a .value property; reactive makes an object deeply reactive but only works on objects.",D027,"D027#reactive"
 ```
 
 **`retrieved_results.csv`**

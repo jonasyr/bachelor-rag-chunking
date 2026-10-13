@@ -97,7 +97,7 @@ Vue.js bietet entwicklerorientierte, didaktisch hochwertige Dokumentation mit ko
 
 **Konstant halten (nur Chunking variiert):** Korpus/Snapshot, Sprache (Englisch), Embedding-Modell, LLM, Temperatur (0), top-k (5), Prompt, Fragenset, Bewertungsrubrik, Vector Store, Retrieval-Art (Dense), Antwortformat.
 
-> C3 auf Vue: 77 von 560 Überschriften-Segmenten sind kürzer als 50 Tokens, 26 länger als 800; Regeln und Begründung in [ADR 0021](../adr/0021-c3-grenzen.md).
+> C3 auf Vue: 77 von 560 Überschriften-Segmenten sind kürzer als 50 Tokens, 8 länger als 800; Regeln und Begründung in [ADR 0021](../adr/0021-c3-grenzen.md).
 
 
 ## RAG-Pipeline-Architektur
