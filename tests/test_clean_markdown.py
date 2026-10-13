@@ -69,6 +69,44 @@ def test_promo_blocks_details_and_images():
     assert clean(body) == "# Title\n\nUsage before 3.5\n\nOld way\n\nSee docs\n"
 
 
+def test_inline_code_is_never_cleaned():
+    body = '2. `<PascalCase />` is clearer; write `<!-- c -->` or `<span class="options-api">`.\n'
+    assert clean(body) == "# Title\n\n" + body
+
+
+def test_highlighted_shell_block_becomes_fenced_code():
+    body = (
+        '<div class="language-sh"><pre><code><span style="color:green;">✔</span> '
+        "<span>Project name: … &lt;your-project-name&gt;</span>\n"
+        "<span>Add TypeScript? … No / Yes</span>\n"
+        "<span></span>\n"
+        "<span>Done.</span></code></pre></div>\n\nAfter\n"
+    )
+    expected = (
+        "# Title\n\n```sh\n✔ Project name: … <your-project-name>\nAdd TypeScript? … No / Yes\n\n"
+        "Done.\n```\n\nAfter\n"
+    )
+    assert clean(body) == expected
+
+
+def test_inline_html_in_prose_becomes_markdown():
+    body = (
+        "3. <code>process.env<wbr>.NODE_ENV</code> is replaced.\n"
+        "A <code v-pre>{{ }}</code> tag.\n"
+        "Here both <span v-pre>`{{ message }}`</span> render.\n"
+    )
+    expected = (
+        "# Title\n\n3. `process.env.NODE_ENV` is replaced.\nA `{{ }}` tag.\n"
+        "Here both `{{ message }}` render.\n"
+    )
+    assert clean(body) == expected
+
+
+def test_unknown_inline_html_in_prose_raises():
+    with pytest.raises(ValueError, match="unhandled inline HTML"):
+        clean_markdown(DOC + "Text with <kbd>Ctrl</kbd> keys.\n")
+
+
 def test_version_badge_kept_as_text_and_typescript_badge_dropped():
     body = 'Since <sup class="vt-badge" data-text="3.5+" /> only. See <sup class="vt-badge ts" />\n'
     assert clean(body) == "# Title\n\nSince (3.5+) only. See\n"

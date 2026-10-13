@@ -1,6 +1,7 @@
 """Checks on the real corpus; skipped until the snapshot and processed files exist."""
 
 import json
+import re
 
 import pytest
 
@@ -28,6 +29,11 @@ def test_processed_artifacts_are_consistent():
     assert [d["doc_id"] for d in docs] == [f"D{i:03d}" for i in range(1, EXPECTED_FILES + 1)]
     ids = [s["section_id"] for s in sections]
     assert len(ids) == len(set(ids))
+    for d in docs:
+        prose = re.sub(r"^\s*(`{3,}|~{3,}).*?^\s*\1\s*$", "", d["text"], flags=re.S | re.M)
+        prose = re.sub(r"`[^`\n]*`", "", prose)
+        leftover = re.search(r'</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|class="options-api"|\{#', prose)
+        assert leftover is None, f"{d['path']}: markup left in prose: {leftover.group(0)!r}"
     tokens_by_doc = {d["doc_id"]: d["tokens"] for d in docs}
     for s in sections:
         assert 0 <= s["start_token"] < s["end_token"] <= tokens_by_doc[s["doc_id"]], s["section_id"]
