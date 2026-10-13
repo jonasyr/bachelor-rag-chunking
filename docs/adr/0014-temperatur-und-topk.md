@@ -1,17 +1,19 @@
-# ADR 0014: Temperatur 0 und top-k 5 konstant
+# 0014. Temperatur 0 und top-k 5 konstant
 
-- **Status:** angenommen (D14, verbindlich)
-- **Quelle:** Baseline; Verhältnis zur Baseline: übernommen
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §8
+## Status
+
+Angenommen (D14 im Leitfaden; Quelle: Baseline, übernommen)
 
 ## Kontext
 
-Reproduzierbarkeit und interne Validität.
+- Temperatur 0 ist Teil der Absicherung von interner Validität und Reliabilität ([Leitfaden §13](../Ground_Truth_Projektleitfaden.md#13-validität-und-grenzen)).
+- Würde top-k zusätzlich variiert, entstünde eine zweite unabhängige Variable ([Leitfaden §8](../Ground_Truth_Projektleitfaden.md#8-technische-umsetzung--tech-stack)).
 
 ## Entscheidung
 
-`LLM_TEMPERATURE = 0.0`, `TOP_K = 5` in `src/config.py`, für alle Strategien gleich.
+Wir werden `LLM_TEMPERATURE = 0.0` und `TOP_K = 5` in [`src/config.py`](../../src/config.py) setzen und für alle Strategien gleich halten.
 
-## Folgen
+## Konsequenzen
 
-top-k wird nicht variiert, sonst entstünde eine zweite unabhängige Variable.
+- Gut: Antworten sind möglichst reproduzierbar, Unterschiede bleiben dem Chunking zuordenbar ([ADR 0006](0006-nur-chunking-variiert.md)).
+- Schlecht: Der Einfluss von top-k wird nicht untersucht.

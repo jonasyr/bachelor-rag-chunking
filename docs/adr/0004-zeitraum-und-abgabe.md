@@ -1,17 +1,20 @@
-# ADR 0004: Bearbeitungszeitraum Juli–Dezember 2026, Abgabe 24.12.2026
+# 0004. Bearbeitungszeitraum Juli–Dezember 2026, Abgabe 24.12.2026
 
-- **Status:** angenommen (D4, verbindlich)
-- **Quelle:** Chat; Abgabetermin bestätigt am 13.10.2026; Verhältnis zur Baseline: konkretisiert (Baseline hatte nur ein Wochenraster)
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §16
+## Status
+
+Angenommen (D4 im Leitfaden; Quelle: Chat, Abgabetermin bestätigt am 13.10.2026; konkretisiert die Baseline)
 
 ## Kontext
 
-Der Zeitplan braucht konkrete Kalenderdaten.
+- Die Baseline hatte nur ein Wochenraster; der Zeitplan wurde auf konkrete Kalenderdaten Juli–Dezember 2026 gelegt ([Leitfaden §3](../Ground_Truth_Projektleitfaden.md#3-was-sich-gegenüber-der-ursprünglichen-baseline-geändert-hat)).
+- Der Phasenplan vom Juni 2026 sah die Abgabe am 15.12.2026 vor ([Leitfaden §16](../Ground_Truth_Projektleitfaden.md#16-zeitplan-julidezember-2026)); eine frühere Angabe nannte den 31.12.2026.
+- Der Abgabetermin 24.12.2026 wurde am 13.10.2026 im Chat bestätigt.
+- Stand 13.10.2026 ist die Pipeline in `src/` noch ein Gerüst und der Korpus-Ausschnitt offen (Leitfaden §16, §19).
 
 ## Entscheidung
 
-Bearbeitung Juli bis Dezember 2026. Abgabetermin ist der 24.12.2026 (ursprünglich geplant: 15.12.2026, frühere Angabe 31.12.2026).
+Wir werden die Arbeit von Juli bis Dezember 2026 bearbeiten und am 24.12.2026 abgeben.
 
-## Folgen
+## Konsequenzen
 
-Der Phasenplan steht im Leitfaden §16 (Planungsstand Juni 2026).
+- Schlecht: Der Phasenplan in Leitfaden §16 (Planungsstand Juni 2026) ist veraltet und muss verschoben werden.

@@ -1,17 +1,19 @@
-# ADR 0010: Fixed-size mit Overlap ist eine starke Baseline
+# 0010. Fixed-size mit Overlap ist eine starke Baseline
 
-- **Status:** angenommen (D10, verbindlich)
-- **Quelle:** Chat; Verhältnis zur Baseline: ergänzt
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §3, §4
+## Status
+
+Angenommen (D10 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-Qu et al. (2025) zeigen, dass semantisches/strukturbasiertes Chunking fixed-size mit Overlap nicht konsistent übertrifft.
+- Qu, Bao & Tu (2025) zeigen, dass semantisch oder strukturell motiviertes Chunking größenbasiertes Chunking nicht konsistent übertrifft und der Mehraufwand oft nicht gerechtfertigt ist ([Leitfaden §4.4](../Ground_Truth_Projektleitfaden.md#44-warum-das-thema-nicht-trivial-ist)).
+- Ohne diese Einordnung könnte die Arbeit als trivialer Vergleich gelten (Leitfaden §3).
 
 ## Entscheidung
 
-C2 wird ausdrücklich als leistungsfähige Baseline behandelt, nicht als Strohmann.
+Wir werden C2 (fixed-size mit Overlap) ausdrücklich als leistungsfähige Baseline behandeln, nicht als Strohmann.
 
-## Folgen
+## Konsequenzen
 
-Die Arbeit ist gegen den Vorwurf eines trivialen Vergleichs abgesichert; der Wert liegt in Effektgröße, Kosten, Metrikabhängigkeit und Fragetyp-Effekten.
+- Gut: Die Arbeit ist gegen den Vorwurf der Trivialität abgesichert (Leitfaden §3).
+- Neutral: Der Erkenntnisgewinn liegt in Effektgröße, Kosten, Metrikabhängigkeit, Retrieval-Antwort-Entkopplung und Fragetyp-Effekten (Leitfaden §4.4); H1 formuliert das ([ADR 0009](0009-hypothesen.md)).

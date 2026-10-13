@@ -1,17 +1,21 @@
-# ADR 0017: Fragenkatalog: etwa 40 Fragen mit Referenzantworten
+# 0017. Fragenkatalog: etwa 40 Fragen mit Referenzantworten
 
-- **Status:** angenommen (D17, verbindlich)
-- **Quelle:** Exposé/Baseline; Verhältnis zur Baseline: übernommen
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §11
+## Status
+
+Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 
 ## Kontext
 
-Die Bewertung braucht eine vorab festgelegte Ground Truth.
+- Referenzantworten und relevante Quellen müssen vor der Evaluation feststehen, um nachträgliche, ergebnisorientierte Anpassungen auszuschließen ([Leitfaden §11](../Ground_Truth_Projektleitfaden.md#11-fragenkatalog-ground-truth)).
+- Der Fragenkatalog ist eine der wichtigsten Eigenleistungen und dauert länger als gedacht (Leitfaden §11, §16).
+- Korpus und Embedding-Raum sind englisch (Leitfaden §19).
 
 ## Entscheidung
 
-Etwa 40 Fragen (mindestens 30, höchstens 60) in fünf Typen, mit Referenzantworten und annotierten relevanten Quellen, auf Englisch.
+Wir werden etwa 40 Fragen erstellen (mindestens 30, höchstens 60), verteilt auf fünf Typen (faktisch, prozedural, konzeptuell, vergleichend, Einschränkung/Fehler), jeweils mit Referenzantwort und annotierten relevanten Quellen, auf Englisch.
 
-## Folgen
+## Konsequenzen
 
-Ground Truth wird vor jeder Evaluation finalisiert und danach nicht mehr angepasst.
+- Neutral: Die Ground Truth wird vor jeder Evaluation finalisiert und danach nicht mehr angepasst.
+- Neutral: Die Fragetypen ermöglichen die Prüfung von H3 ([ADR 0009](0009-hypothesen.md)).
+- Schlecht: Die Erstellung braucht bewusst eingeplante Zeit (Leitfaden §16).

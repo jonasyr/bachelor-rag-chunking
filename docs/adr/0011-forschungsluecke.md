@@ -1,17 +1,20 @@
-# ADR 0011: Forschungslücke: entwicklerorientierte Open-Source-Dokumentation
+# 0011. Forschungslücke: entwicklerorientierte Open-Source-Dokumentation
 
-- **Status:** angenommen (D11, verbindlich)
-- **Quelle:** Chat; Verhältnis zur Baseline: ergänzt
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §4.2
+## Status
+
+Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-Kontrollierte Chunking-Vergleiche liegen bisher in fachfremden Domänen (z. B. Öl und Gas, klinische Dokumentation).
+- Kontrollierte Chunking-Vergleiche liegen bisher vor allem in fachfremden Domänen, etwa Öl und Gas (`taiwo2026chunking`) und klinische Entscheidungsunterstützung (`gomezcabello2025chunking`) ([Leitfaden §4.2](../Ground_Truth_Projektleitfaden.md#42-forschungslücke-und-abgrenzung-drei-säulen), §18).
+- Ein informeller Vorläufer auf FastAPI/Supabase/Stripe existiert als Praktiker-Blogbeitrag (Leitfaden §4.2, §4.5).
 
 ## Entscheidung
 
-Die Lücke ist entwicklerorientierte Open-Source-Softwaredokumentation, ergänzt um eine strengere Methodik (manuelle Referenzbewertung, Fragetypen, Snapshot).
+Wir werden die Forschungslücke als entwicklerorientierte Open-Source-Softwaredokumentation bestimmen.
+Wir werden sie durch eine striktere Methodik ergänzen: manuelle Referenzbewertung als Primärverfahren, Fragetyp-Differenzierung und Reproduzierbarkeit über einen Snapshot.
 
-## Folgen
+## Konsequenzen
 
-Begründung im Leitfaden §4.2.
+- Neutral: Die Abgrenzung stützt sich auf drei Säulen: anderer Korpus, andere Domäne, striktere Methodik (Leitfaden §4.2).
+- Neutral: Der Blogbeitrag ist nicht zitierfähig, wird aber in „Verwandte Arbeiten“ kurz als informeller Vorläufer eingeordnet (Leitfaden §4.5).

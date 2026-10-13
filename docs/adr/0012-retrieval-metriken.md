@@ -1,17 +1,20 @@
-# ADR 0012: Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k)
+# 0012. Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k)
 
-- **Status:** angenommen (D12, verbindlich)
-- **Quelle:** Exposé/Baseline; Verhältnis zur Baseline: übernommen
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §12.1
+## Status
+
+Angenommen (D12 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 
 ## Kontext
 
-Die Retrieval-Qualität braucht etablierte IR-Metriken.
+- Unterfrage 2 fragt nach Unterschieden der Retrieval-Qualität, gemessen mit Recall@k, Precision@k und MRR (Leitfaden §1).
+- Die Literaturbasis enthält `manning2008ir` als Quelle für die IR-Metriken Precision, Recall und MRR (Leitfaden §18).
+- top-k ist konstant 5 ([ADR 0014](0014-temperatur-und-topk.md)).
 
 ## Entscheidung
 
-Je Frage und Strategie Recall@k, Precision@k und MRR, vereinfacht zusätzlich Hit@k; k = 5.
+Wir werden je Frage und Strategie Recall@k, Precision@k und MRR berechnen, zusätzlich vereinfacht Hit@k, jeweils mit k = 5 (Definitionen in [Leitfaden §12.1](../Ground_Truth_Projektleitfaden.md#121-retrieval-evaluation)).
 
-## Folgen
+## Konsequenzen
 
-Umsetzung in `src/evaluate_retrieval.py`; Definitionen im Leitfaden §12.1.
+- Neutral: Umsetzung in [`src/evaluate_retrieval.py`](../../src/evaluate_retrieval.py) auf Basis von `retrieved_results.csv`.
+- Neutral: Die Metriken brauchen vorab annotierte relevante Quellen je Frage ([ADR 0017](0017-fragenkatalog.md)).

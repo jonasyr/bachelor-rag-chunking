@@ -1,17 +1,19 @@
-# ADR 0018: Literaturbasis: 15 verifizierte Quellen
+# 0018. Literaturbasis: 15 verifizierte Quellen
 
-- **Status:** angenommen (D18, verbindlich)
-- **Quelle:** Chat; Verhältnis zur Baseline: konkretisiert
-- **Details:** [Ground-Truth-Leitfaden](../Ground_Truth_Projektleitfaden.md), §18
+## Status
+
+Angenommen (D18 im Leitfaden; Quelle: Chat, konkretisiert die Baseline)
 
 ## Kontext
 
-Die Argumentation braucht eine geprüfte Quellenbasis.
+- Der Leitfaden nennt für die Zahl keinen eigenen Grund; alle 15 Quellen sind im Exposé zitiert und decken je eine Rolle in der Argumentation ab ([Leitfaden §18](../Ground_Truth_Projektleitfaden.md#18-literaturbasis-15-verifizierte-quellen)).
+- Der Praktiker-Blogbeitrag (Mai 2026) ist keine zitierfähige wissenschaftliche Quelle (Leitfaden §4.5).
 
 ## Entscheidung
 
-15 Quellen (Liste im Leitfaden §18); die BibTeX-Einträge liegen im privaten PaperLab-Repo im Exposé (`expose/latex/main.bib`).
+Wir werden die 15 Quellen aus Leitfaden §18 als Literaturbasis verwenden; die BibTeX-Einträge liegen im privaten PaperLab-Repo im Exposé (`expose/latex/main.bib`).
 
-## Folgen
+## Konsequenzen
 
-Neue Quellen nur nach Prüfung am Volltext.
+- Neutral: Neue Quellen kommen nur nach Prüfung am Volltext hinzu.
+- Neutral: Zitiert wird nach [ADR 0002](0002-zitierstil-apa.md).
