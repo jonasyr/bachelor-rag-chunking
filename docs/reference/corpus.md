@@ -12,7 +12,7 @@
 | Dateien | 52 |
 | API-Stil | nur Composition API; `<div class="options-api">`-Blöcke werden beim Preprocessing entfernt |
 | Token-Kodierung | `cl100k_base` (`tiktoken` 0.13.0) |
-| Umfang | 139.361 Tokens nach dem Preprocessing, 560 Abschnitte (H1–H3); Protokoll: [Experiment-Protokoll](experiment-record.md) |
+| Umfang | 139.500 Tokens nach dem Preprocessing, 560 Abschnitte (H1–H3); Protokoll: [Experiment-Protokoll](experiment-record.md) |
 
 Bereiche in `src/guide/` (Dateien): `essentials` (13), `components` (8), `extras` (8), `scaling-up` (6),
 `built-ins` (5), `best-practices` (4), `reusability` (3), `typescript` (3), Einstiegsseiten direkt in `guide/` (2).
