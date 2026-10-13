@@ -246,3 +246,22 @@ def test_vintage_check_tokens_are_logged_apart_from_the_questions(setup):
     assert last["input_tokens"] == 2 * 7  # two questions
     assert last["canary_input_tokens"] == 6 * 7  # first/middle/last of two vector files
     assert last["strategy"] == "C1,C3"
+
+
+def test_a_question_row_with_a_missing_field_is_refused(setup):
+    paths, _, _, fake = setup
+    text = paths["questions_file"].read_text(encoding="utf-8")
+    paths["questions_file"].write_text(
+        text.replace(",conceptual,medium,\n", ",conceptual,medium\n"), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="row 3 has 4 fields, expected 5"):
+        retrieve(embedder=fake, **paths)
+
+
+def test_a_ground_truth_row_with_an_extra_field_is_refused(setup):
+    paths, _, _, fake = setup
+    lines = paths["ground_truth_file"].read_text(encoding="utf-8").splitlines()
+    lines[1] += ",surplus"
+    paths["ground_truth_file"].write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="row 2 has 5 fields, expected 4"):
+        retrieve(embedder=fake, **paths)
