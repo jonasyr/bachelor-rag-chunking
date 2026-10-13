@@ -53,6 +53,7 @@ C2_OVERLAP = 100  # tokens
 
 # C3: structure-based (Markdown H2/H3 boundaries)
 C3_MAX_TOKENS = 800  # hard cap per chunk; oversized sections split by paragraph
+C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 
 STRATEGY_IDS = {
     "C1": "fixed_500_no_overlap",
