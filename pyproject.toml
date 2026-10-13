@@ -7,9 +7,9 @@ license = "MIT AND Apache-2.0"
 license-files = ["LICENSE", "LICENSES/*"]
 dependencies = [
     # OpenAI (LLM + embeddings)
-    "openai>=1.30.0",
+    "openai==2.44.0",  # pinned (ADR 0016)
     # Vector store
-    "chromadb>=0.5.0",
+    "chromadb==1.5.9",  # pinned (ADR 0016)
     # Token counting
     "tiktoken==0.13.0",  # pinned (ADR 0019)
     # Environment
