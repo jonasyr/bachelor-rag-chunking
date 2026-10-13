@@ -69,5 +69,6 @@ def test_search_breadth_comes_from_the_config(tmp_path, monkeypatch):
     small = build_collection(
         vector_index.open_client(tmp_path), "rag_test", ["a", "b", "c"], unit_vectors(3), meta
     )
-    assert small.configuration["hnsw"]["ef_search"] == 250
-    assert small.configuration["hnsw"]["ef_construction"] == 250
+    # raw config: `.configuration` emits a Chroma deprecation warning for embedding_function=None
+    hnsw = small.configuration_json["hnsw"]
+    assert (hnsw["space"], hnsw["ef_search"], hnsw["ef_construction"]) == ("cosine", 250, 250)
