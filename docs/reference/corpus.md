@@ -20,12 +20,12 @@ Bereiche in `src/guide/` (Dateien): `essentials` (13), `components` (8), `extras
 
 ## Abschnitte und Relevanz
 
-- **`section_id`** = `{doc_id}#{anchor}`, wobei `anchor` der explizite VitePress-Anker `{#…}` einer H2/H3-Überschrift
-  ist (z. B. `D027#reactive`). Alle H1–H3-Überschriften im Ausschnitt tragen einen solchen Anker; `sections.jsonl`
-  enthält 52 H1-, 279 H2- und 229 H3-Abschnitte.
-- **H1-Abschnitte** umfassen jeweils die ganze Seite. In `relevant_section_ids` werden H2/H3-Abschnitte annotiert; ein
-  H1-Abschnitt nur, wenn wirklich die ganze Seite die Antwort ist (sonst wäre bei jeder Überlappung jeder Chunk der
-  Seite relevant).
+- **`section_id`** = `{doc_id}#{anchor}`, wobei `anchor` der explizite VitePress-Anker `{#…}` einer H1-, H2- oder
+  H3-Überschrift ist (z. B. `D027#reactive`). Alle H1–H3-Überschriften im Ausschnitt tragen einen solchen Anker;
+  `sections.jsonl` enthält 52 H1-, 279 H2- und 229 H3-Abschnitte.
+- **H1-Abschnitte** umfassen jeweils die ganze Seite. Für `relevant_section_ids` gilt
+  [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) (vorgeschlagen): H2/H3-Abschnitte annotieren, einen
+  H1-Abschnitt nur, wenn wirklich die ganze Seite die Antwort ist.
 - **Relevanz eines Chunks:** relevant, wenn seine Token-Spanne die Token-Spanne eines Abschnitts aus
   `relevant_section_ids` überlappt (jede Überlappung). Sensitivitätsprüfung: Mindestüberlappung 100 Tokens.
 - Werte dazu stehen in [`src/config.py`](../../src/config.py).
