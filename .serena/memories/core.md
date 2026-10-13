@@ -5,13 +5,13 @@ submission 24.12.2026): RAG pipeline on Vue.js docs, only the chunking strategy 
 Facts live in `docs/` — start at `docs/README.md`; research design `docs/explanation/research-design.md`
 (conflict priority: its §0).
 
-Status 13.10.2026: corpus fixed (ADR 0019, `docs/reference/corpus.md`); snapshot/ingest/preprocess implemented
-and tested, chunking onwards are stubs; schedule in `docs/plan.md`;
-ruff/pre-commit/CI in place. Repo is public — no personal data (matriculation number etc.).
+Status 13.10.2026: corpus fixed (ADR 0019, 0020); snapshot/ingest/preprocess/chunking implemented and tested,
+embedding onwards are stubs; schedule in `docs/plan.md`; ruff/pre-commit/CI in place. Workflow: branch → PR → Codex
+review (`AGENTS.md` § Code Review Rules, `.claude/agents/codex-reviewer.md`) → merge after Jonas approves. Repo is public — no personal data (matriculation number etc.).
 
 ## Memories
 - Pipeline order, what is implemented, token-span and preprocessing gotchas: `mem:pipeline`
-- C1/C2/C3 details and the C3 long-section pitfall: `mem:chunking`
+- C1/C2/C3 details and the C3 bounds (ADR 0021): `mem:chunking`
 - Metrics, rubric, triangulation pointers: `mem:evaluation`
 - Research question, hypotheses, literature pointers: `mem:research`
 - Where decisions live (ADRs, open ones): `mem:decisions`

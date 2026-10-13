@@ -14,9 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import tokens
-from config import CORPUS_MANIFEST_FILE, DOCUMENTS_FILE, SECTIONS_FILE
+from config import CORPUS_MANIFEST_FILE, DOCUMENTS_FILE, SECTION_MAX_LEVEL, SECTIONS_FILE
 
-SECTION_MAX_LEVEL = 3
 # HTML blocks starting a line outside code fences are page furniture (Options API variants,
 # demos, sponsor boxes, navigation, promo links) and are dropped, except composition-api
 # wrappers, which are unwrapped. Any other HTML line outside fences is an error.

@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 import tokens
-from config import DATA_RAW, DOCUMENTS_FILE
+from config import DATA_RAW, DOCUMENTS_FILE, SNAPSHOT_SUBDIR
 
 H1_RE = re.compile(r"^#\s+(.*?)(?:\s*\{#[^}]+\})?\s*$")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
@@ -31,11 +31,12 @@ def title_of(text: str) -> str:
 def ingest(snapshot_dir: Path = DATA_RAW, out_file: Path = DOCUMENTS_FILE) -> int:
     """Load all guide Markdown files, count tokens, write documents.jsonl; return the count."""
     files = sorted(
-        snapshot_dir.glob("guide/**/*.md"), key=lambda p: p.relative_to(snapshot_dir).as_posix()
+        snapshot_dir.glob(f"{SNAPSHOT_SUBDIR}/**/*.md"),
+        key=lambda p: p.relative_to(snapshot_dir).as_posix(),
     )
     if not files:
         raise FileNotFoundError(
-            f"no Markdown files under {snapshot_dir / 'guide'}; run src/snapshot.py first"
+            f"no Markdown files under {snapshot_dir / SNAPSHOT_SUBDIR}; run src/snapshot.py first"
         )
     out_file.parent.mkdir(parents=True, exist_ok=True)
     with out_file.open("w", encoding="utf-8") as f:
