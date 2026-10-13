@@ -25,7 +25,8 @@ Wiederverwendet wird die Datei nur, wenn Modell, IDs und Texte unverändert sind
 **`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `model`, `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
 
 `retrieve.py --strategy` ersetzt in `retrieved_results.csv` nur die Zeilen der gewählten Strategien, und nur wenn
-`questions.csv` und `ground_truth.csv` seit dem letzten Retrieval-Lauf unverändert sind (Prüfsummen im Laufprotokoll);
+alle Eingaben (Fragen, Ground Truth, `sections.jsonl`, Frage-, Chunk- und Vektordateien) seit dem letzten
+Retrieval-Lauf unverändert sind (SHA-256 im Laufprotokoll);
 sonst bricht der Lauf ab und alle Strategien müssen neu laufen.
 
 **`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md); `canary_min_cosine` = Ergebnis der Modellstand-Prüfung, `null` wenn keine nötig war)
