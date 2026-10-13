@@ -7,6 +7,7 @@ and the corpus manifest.
 """
 
 import csv
+import html
 import json
 import re
 from dataclasses import dataclass
@@ -41,6 +42,13 @@ OPTIONS_SPAN_RE = re.compile(r'<span class="options-api">.*?</span>')
 COMPOSITION_SPAN_RE = re.compile(r'<span class="composition-api">(.*?)</span>')
 EMPTY_SPAN_RE = re.compile(r'<span id="[^"]*"></span>')
 VERSION_BADGE_RE = re.compile(r'<sup class="vt-badge" data-text="([^"]+)"\s*/>')
+WBR_RE = re.compile(r"<wbr\s*/?>")
+V_PRE_SPAN_RE = re.compile(r"<span v-pre>(.*?)</span>")
+CODE_TAG_RE = re.compile(r"<code(?: v-pre)?>(.*?)</code>")
+INLINE_TAG_RE = re.compile(r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>")
+# Pre-rendered, syntax-highlighted listings (e.g. the create-vue prompts) become fenced code.
+LANGUAGE_BLOCK_RE = re.compile(r'^\s*<div class="language-([\w-]+)"><pre><code>(.*)$')
+LANGUAGE_BLOCK_END = "</code></pre></div>"
 INLINE_SELF_CLOSING_RE = re.compile(r"\s*<(sup|[A-Z][\w-]*)\b[^>]*/>")
 HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z]")
 MANIFEST_HEADER = ["file_id", "path", "title", "section", "tokens", "included"]
@@ -78,6 +86,31 @@ def _tag_balance(tag: str, line: str) -> int:
     return opens - len(re.findall(rf"</{tag}\s*>", line))
 
 
+def _code_spans(line: str) -> list[tuple[int, int]]:
+    return [m.span() for m in INLINE_CODE_RE.finditer(line)]
+
+
+def _sub_outside_code(pattern: re.Pattern[str], repl: str, line: str) -> str:
+    """pattern.sub(repl, line), leaving matches that start inside inline code untouched."""
+    spans = _code_spans(line)
+
+    def replace(m: re.Match[str]) -> str:
+        if any(start <= m.start() < end for start, end in spans):
+            return m.group(0)
+        return m.expand(repl)
+
+    return pattern.sub(replace, line)
+
+
+def _find_outside_code(line: str, token: str) -> int:
+    """Index of the first token outside inline code, or -1."""
+    spans = _code_spans(line)
+    i = line.find(token)
+    while i >= 0 and any(start <= i < end for start, end in spans):
+        i = line.find(token, i + 1)
+    return i
+
+
 def _strip_frontmatter(lines: list[str]) -> list[str]:
     if lines and lines[0].strip() == "---":
         for i in range(1, len(lines)):
@@ -99,6 +132,7 @@ def clean_markdown(text: str) -> CleanResult:
     unwrap: list[tuple[str, int]] = []  # (tag, depth) of open composition-api wrappers
     page_tag: str | None = None  # open <script>/<style> being dropped
     in_comment = False
+    listing: str | None = None  # language of the open pre-rendered listing
 
     def emit(line: str) -> None:
         line = line.rstrip()
@@ -107,6 +141,19 @@ def clean_markdown(text: str) -> CleanResult:
         out.append(line)
 
     for line in lines:
+        if listing is None and fence is None and drop is None and not (page_tag or in_comment):
+            lb = LANGUAGE_BLOCK_RE.match(line)
+            if lb:
+                listing, line = lb.group(1), lb.group(2)
+                emit(f"```{listing}")
+        if listing is not None:
+            end = line.find(LANGUAGE_BLOCK_END)
+            content = line if end < 0 else line[:end]
+            out.append(html.unescape(INLINE_TAG_RE.sub("", content)).rstrip())
+            if end >= 0:
+                emit("```")
+                listing = None
+            continue
         m = FENCE_RE.match(line)
         if fence is not None:
             if m and m.group(2)[0] == fence[0] and len(m.group(2)) >= len(fence) and not m.group(3):
@@ -131,9 +178,10 @@ def clean_markdown(text: str) -> CleanResult:
             if "-->" not in line:
                 continue
             line, in_comment = line.split("-->", 1)[1], False
-        line = COMMENT_RE.sub("", line)
-        if "<!--" in line:
-            line, in_comment = line.split("<!--", 1)[0], True
+        line = _sub_outside_code(COMMENT_RE, "", line)
+        opening = _find_outside_code(line, "<!--")
+        if opening >= 0:
+            line, in_comment = line[:opening], True
         u = UNWRAP_OPEN_RE.match(line)
         if u:
             unwrap.append((u.group(1), 1))
@@ -169,15 +217,24 @@ def clean_markdown(text: str) -> CleanResult:
             if c.group(2):
                 emit(c.group(2))
             continue
-        line = OPTIONS_SPAN_RE.sub("", line)
-        line = COMPOSITION_SPAN_RE.sub(r"\1", line)
-        line = EMPTY_SPAN_RE.sub("", line)
-        line = VERSION_BADGE_RE.sub(r"(\1)", line)
-        line = INLINE_SELF_CLOSING_RE.sub("", line)
-        if 'class="options-api"' in line:
+        for pattern, repl in (
+            (OPTIONS_SPAN_RE, ""),
+            (COMPOSITION_SPAN_RE, r"\1"),
+            (EMPTY_SPAN_RE, ""),
+            (VERSION_BADGE_RE, r"(\1)"),
+            (INLINE_SELF_CLOSING_RE, ""),
+            (WBR_RE, ""),
+            (V_PRE_SPAN_RE, r"\1"),
+            (CODE_TAG_RE, r"`\1`"),
+        ):
+            line = _sub_outside_code(pattern, repl, line)
+        prose = INLINE_CODE_RE.sub("", line)
+        if 'class="options-api"' in prose:
             raise ValueError(f"options-api markup left after cleaning: {line!r}")
         if HTML_LINE_RE.match(line):
             raise ValueError(f"unhandled HTML outside code fences: {line!r}")
+        if INLINE_TAG_RE.search(prose):
+            raise ValueError(f"unhandled inline HTML outside code: {line!r}")
         h = HEADING_RE.match(line)
         if h:
             level, title = len(h.group(1)), h.group(2)
@@ -199,6 +256,7 @@ def clean_markdown(text: str) -> CleanResult:
         (unwrap, "composition-api wrapper"),
         (page_tag, "<script>/<style>"),
         (in_comment, "HTML comment"),
+        (listing, "pre-rendered listing"),
     ):
         if state:
             raise ValueError(f"unclosed {what}")
