@@ -143,6 +143,10 @@ def retrieve(
     sections = load_jsonl(sections_file, "run src/preprocess.py first")
     relevant = relevant_sections(questions, ground_truth, sections)
 
+    missing = [str(vector_files[key]) for key in STRATEGY_IDS if not vector_files[key].exists()]
+    if missing:  # before any API call, so the vintage check always covers every strategy
+        raise FileNotFoundError(f"{', '.join(missing)} not found; run src/embed.py first")
+
     qids = [q["question_id"] for q in questions]
     texts = [q["question"] for q in questions]
     query_vectors = load_vectors(query_file, qids, texts)

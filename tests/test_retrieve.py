@@ -309,3 +309,12 @@ def test_a_mapping_without_every_strategy_is_refused(setup, drop):
     paths[drop] = {k: v for k, v in paths[drop].items() if k != "C2"}
     with pytest.raises(ValueError, match=r"must cover exactly the strategies \['C1', 'C2', 'C3'\]"):
         retrieve(embedder=fake, **paths)
+
+
+def test_a_missing_vector_file_stops_before_any_api_call(setup):
+    paths, _, _, fake = setup
+    paths["vector_files"]["C2"].unlink()
+    calls_before = len(fake.calls)
+    with pytest.raises(FileNotFoundError, match="run src/embed.py first"):
+        retrieve(embedder=fake, **paths)
+    assert len(fake.calls) == calls_before and not paths["query_file"].exists()
