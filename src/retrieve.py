@@ -27,6 +27,7 @@ from config import (
     RELEVANCE_MIN_OVERLAP,
     RETRIEVED_RESULTS_FILE,
     SECTIONS_FILE,
+    STRATEGY_IDS,
     TOP_K,
 )
 from embed import load_jsonl, load_vectors, save_vectors
@@ -126,6 +127,12 @@ def retrieve(
 
     All strategies always run together from the same inputs, so no row of an older run is kept.
     """
+    for name, mapping in (("chunk_files", chunk_files), ("vector_files", vector_files)):
+        if sorted(mapping) != sorted(STRATEGY_IDS):
+            raise ValueError(
+                f"{name} must cover exactly the strategies {sorted(STRATEGY_IDS)}, "
+                f"got {sorted(mapping)}"
+            )
     questions = sorted(
         read_rows(questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED),
         key=lambda q: q["question_id"],
@@ -148,7 +155,7 @@ def retrieve(
         save_vectors(query_file, qids, texts, query_vectors)
 
     client = client or vector_index.open_client()
-    strategies = sorted(chunk_files)
+    strategies = list(STRATEGY_IDS)  # the experiment is always the complete configured set
     rows: list[list] = []
     for key in strategies:
         chunks = load_jsonl(chunk_files[key], "run src/chunking.py first")
