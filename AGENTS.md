@@ -30,11 +30,12 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 - Conventional Commits; no AI attribution lines. Never commit `.env`. Plans go to `docs/superpowers/plans/` (versioned).
 - Every change goes through a branch and a pull request; never push to `main` directly. Each PR gets a Codex review
   (`@codex review` on GitHub, or the `codex-reviewer` agent in `.claude/agents/` as stand-in) and is merged only after
-  Jonas approves.
+  Jonas approves. Bump PaperLab's submodule pointer only after the merge, to a commit on `main`.
 
 ## Code Review Rules
 
-Both Codex's GitHub review and the `codex-reviewer` agent apply these rules; cite the one a finding rests on.
+Both Codex's GitHub review and the `codex-reviewer` agent apply these rules; cite the one a finding rests on. Codex on
+GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 
 ### Experiment validity
 - Only the chunking strategy (C1/C2/C3) may differ between runs. Anything else that differs per strategy (corpus,
@@ -44,19 +45,20 @@ Both Codex's GitHub review and the `codex-reviewer` agent apply these rules; cit
 - Chunks and sections share the token space of `src/tokens.py`, and a chunk's `text` is the exact slice of its
   document (ADR 0019, 0021). A change that breaks either invalidates the relevance rule: P1.
 - Anything that feeds the evaluation is deterministic (fixed seeds, stable sort orders and IDs); nondeterminism there
-  is P2.
+  is P1.
 
 ### Configuration and formats
-- A parameter hard-coded outside `src/config.py` (path, size, model, `top_k`, temperature) is P2.
+- A parameter hard-coded outside `src/config.py` (path, size, model, `top_k`, temperature) is P1.
 - Data artefacts deviating from `docs/reference/data-formats.md`, or strategy keys/IDs not taken from
   `config.STRATEGY_IDS`, are P1: later steps and the thesis tables depend on them.
 
 ### Secrets and privacy
-- `.env`, API keys and personal data (e-mail, matriculation number) are never committed, logged or printed; the repo
-  is public. P1.
+- `.env`, API keys and personal data (e-mail, matriculation number) never appear in committed files, logs or output;
+  the repo is public. P1. (Git author metadata is outside this rule.)
 
 ### Tests
-- Tests never call the OpenAI API or the network (the snapshot tests use a local git repository); one that can is P1.
+- Tests never call the OpenAI API and need no network beyond tiktoken's one-time download of the `cl100k_base`
+  encoding (the snapshot tests use a local git repository); a test that can reach anything else is P1.
 
 ## Map
 
