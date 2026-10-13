@@ -50,6 +50,7 @@ outside fences; fence content stays verbatim, the opening info string is reduced
 | blank-line runs | collapsed to one blank line; trailing whitespace stripped |
 | pre-rendered listing `<div class="language-sh"><pre><code>…</code></pre></div>` | becomes a fenced block (`sh`), tags stripped, entities unescaped |
 | inline `<code>…</code>`, `<code v-pre>…</code>` / `<span v-pre>…</span>` / `<wbr>` | become `` `…` `` / content / nothing |
+| encoded state in Vue tool links (`https://play.vuejs.org/#eNp…`, also `sfc`, `explorer`, `template-explorer`) | hash removed, link kept ([ADR 0020](../../adr/0020-playground-urls-kuerzen.md)) |
 | any other HTML line, or inline tag in prose, outside fences | error (no silent leftovers) |
 
 All inline rules skip text inside inline code (`` `…` ``), so documented markup such as `` `<PascalCase />` `` stays intact.

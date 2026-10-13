@@ -1,51 +1,51 @@
 file_id,path,title,section,tokens,included
 D001,guide/best-practices/accessibility.md,Accessibility,Best Practices,5281,yes
-D002,guide/best-practices/performance.md,Performance,Best Practices,3419,yes
+D002,guide/best-practices/performance.md,Performance,Best Practices,2879,yes
 D003,guide/best-practices/production-deployment.md,Production Deployment,Best Practices,532,yes
 D004,guide/best-practices/security.md,Security,Best Practices,2027,yes
-D005,guide/built-ins/keep-alive.md,KeepAlive,Built-ins,1325,yes
+D005,guide/built-ins/keep-alive.md,KeepAlive,Built-ins,985,yes
 D006,guide/built-ins/suspense.md,Suspense,Built-ins,1774,yes
 D007,guide/built-ins/teleport.md,Teleport,Built-ins,1394,yes
-D008,guide/built-ins/transition-group.md,TransitionGroup,Built-ins,1369,yes
-D009,guide/built-ins/transition.md,Transition,Built-ins,7456,yes
+D008,guide/built-ins/transition-group.md,TransitionGroup,Built-ins,823,yes
+D009,guide/built-ins/transition.md,Transition,Built-ins,3921,yes
 D010,guide/components/async.md,Async Components,Components,1411,yes
 D011,guide/components/attrs.md,Fallthrough Attributes,Components,1459,yes
 D012,guide/components/events.md,Component Events,Components,1308,yes
 D013,guide/components/props.md,Props,Components,3754,yes
-D014,guide/components/provide-inject.md,Provide / Inject,Components,1835,yes
+D014,guide/components/provide-inject.md,Provide / Inject,Components,1563,yes
 D015,guide/components/registration.md,Component Registration,Components,895,yes
-D016,guide/components/slots.md,Slots,Components,6490,yes
-D017,guide/components/v-model.md,Component v-model,Components,4414,yes
+D016,guide/components/slots.md,Slots,Components,3657,yes
+D017,guide/components/v-model.md,Component v-model,Components,2034,yes
 D018,guide/essentials/application.md,Creating a Vue Application,Essentials,940,yes
 D019,guide/essentials/class-and-style.md,Class and Style Bindings,Essentials,1621,yes
-D020,guide/essentials/component-basics.md,Components Basics,Essentials,5343,yes
-D021,guide/essentials/computed.md,Computed Properties,Essentials,1767,yes
-D022,guide/essentials/conditional.md,Conditional Rendering,Essentials,1020,yes
-D023,guide/essentials/event-handling.md,Event Handling,Essentials,2557,yes
-D024,guide/essentials/forms.md,Form Input Bindings,Essentials,3786,yes
+D020,guide/essentials/component-basics.md,Components Basics,Essentials,3666,yes
+D021,guide/essentials/computed.md,Computed Properties,Essentials,1489,yes
+D022,guide/essentials/conditional.md,Conditional Rendering,Essentials,846,yes
+D023,guide/essentials/event-handling.md,Event Handling,Essentials,2039,yes
+D024,guide/essentials/forms.md,Form Input Bindings,Essentials,2123,yes
 D025,guide/essentials/lifecycle.md,Lifecycle Hooks,Essentials,447,yes
-D026,guide/essentials/list.md,List Rendering,Essentials,3352,yes
-D027,guide/essentials/reactivity-fundamentals.md,Reactivity Fundamentals,Essentials,3209,yes
-D028,guide/essentials/template-refs.md,Template Refs,Essentials,1950,yes
+D026,guide/essentials/list.md,List Rendering,Essentials,2416,yes
+D027,guide/essentials/reactivity-fundamentals.md,Reactivity Fundamentals,Essentials,3063,yes
+D028,guide/essentials/template-refs.md,Template Refs,Essentials,1583,yes
 D029,guide/essentials/template-syntax.md,Template Syntax,Essentials,2676,yes
-D030,guide/essentials/watchers.md,Watchers,Essentials,3449,yes
-D031,guide/extras/animation.md,Animation Techniques,Extras,1100,yes
+D030,guide/essentials/watchers.md,Watchers,Essentials,2896,yes
+D031,guide/extras/animation.md,Animation Techniques,Extras,756,yes
 D032,guide/extras/composition-api-faq.md,Composition API FAQ,Extras,2677,yes
-D033,guide/extras/reactivity-in-depth.md,Reactivity in Depth,Extras,6320,yes
+D033,guide/extras/reactivity-in-depth.md,Reactivity in Depth,Extras,4437,yes
 D034,guide/extras/reactivity-transform.md,Reactivity Transform,Extras,2410,yes
 D035,guide/extras/render-function.md,Render Functions & JSX,Extras,4511,yes
-D036,guide/extras/rendering-mechanism.md,Rendering Mechanism,Extras,2642,yes
+D036,guide/extras/rendering-mechanism.md,Rendering Mechanism,Extras,2140,yes
 D037,guide/extras/ways-of-using-vue.md,Ways of Using Vue,Extras,1227,yes
 D038,guide/extras/web-components.md,Vue and Web Components,Extras,4989,yes
-D039,guide/introduction.md,Introduction,Guide,2465,yes
-D040,guide/quick-start.md,Quick Start,Guide,2876,yes
-D041,guide/reusability/composables.md,Composables,Reusability,4900,yes
+D039,guide/introduction.md,Introduction,Guide,1963,yes
+D040,guide/quick-start.md,Quick Start,Guide,2729,yes
+D041,guide/reusability/composables.md,Composables,Reusability,3749,yes
 D042,guide/reusability/custom-directives.md,Custom Directives,Reusability,1610,yes
 D043,guide/reusability/plugins.md,Plugins,Reusability,963,yes
-D044,guide/scaling-up/routing.md,Routing,Scaling Up,958,yes
+D044,guide/scaling-up/routing.md,Routing,Scaling Up,588,yes
 D045,guide/scaling-up/sfc.md,Single-File Components,Scaling Up,1023,yes
 D046,guide/scaling-up/ssr.md,Server-Side Rendering (SSR),Scaling Up,4212,yes
-D047,guide/scaling-up/state-management.md,State Management,Scaling Up,1562,yes
+D047,guide/scaling-up/state-management.md,State Management,Scaling Up,1313,yes
 D048,guide/scaling-up/testing.md,Testing,Scaling Up,4447,yes
 D049,guide/scaling-up/tooling.md,Tooling,Scaling Up,2429,yes
 D050,guide/typescript/composition-api.md,TypeScript with Composition API,TypeScript,3654,yes
