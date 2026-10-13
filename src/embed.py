@@ -13,7 +13,13 @@ from typing import Any
 import numpy as np
 
 import vector_index
-from config import CHROMA_COLLECTIONS, CHUNK_FILES, EMBEDDING_FILES, EMBEDDING_RUNS_FILE
+from config import (
+    CHROMA_COLLECTIONS,
+    CHUNK_FILES,
+    EMBEDDING_FILES,
+    EMBEDDING_MODEL,
+    EMBEDDING_RUNS_FILE,
+)
 from embedding_client import Embedder, embed_texts
 from run_log import append_run, sha256_of
 
@@ -29,6 +35,12 @@ def load_vectors(path: Path, ids: list[str], texts: list[str]) -> np.ndarray | N
     if not path.exists():
         return None
     with np.load(path, allow_pickle=False) as data:
+        stored_model = str(data["model"]) if "model" in data else "an unknown model"
+        if stored_model != EMBEDDING_MODEL:
+            raise ValueError(
+                f"{path} was embedded with {stored_model}, config says {EMBEDDING_MODEL}; "
+                "delete it deliberately to embed again"
+            )
         if data["ids"].tolist() != ids or data["texts"].tolist() != texts:
             raise ValueError(
                 f"{path} does not match its inputs; delete it deliberately to embed again"
@@ -38,7 +50,13 @@ def load_vectors(path: Path, ids: list[str], texts: list[str]) -> np.ndarray | N
 
 def save_vectors(path: Path, ids: list[str], texts: list[str], vectors: np.ndarray) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(path, ids=np.array(ids), texts=np.array(texts), vectors=vectors.astype(np.float32))
+    np.savez(
+        path,
+        model=np.array(EMBEDDING_MODEL),
+        ids=np.array(ids),
+        texts=np.array(texts),
+        vectors=vectors.astype(np.float32),
+    )
 
 
 def embed_and_store(

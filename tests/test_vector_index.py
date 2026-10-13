@@ -46,3 +46,18 @@ def test_a_wrong_chroma_result_is_detected(tmp_path, monkeypatch):
     monkeypatch.setattr(vector_index, "chroma_top_k", lambda *a: [("c", 0.99), ("b", 0.5)])
     with pytest.raises(ValueError, match="differs from the exact ranking"):
         verified_top_k(collection, ids, vectors, vectors[0], 2)
+
+
+def test_a_missing_higher_hit_is_detected_even_with_a_near_tie(tmp_path, monkeypatch):
+    client = vector_index.open_client(tmp_path)
+    ids = ["a", "b", "c", "d"]
+    vectors = np.array(
+        [[1, 0], [0.9, 0.43589], [0.5, 0.86603], [0.499995, 0.86603]], dtype=np.float32
+    )
+    meta = [{"doc_id": "D001", "start_token": 0, "end_token": 1}] * 4
+    collection = build_collection(client, "rag_test", ids, vectors, meta)
+    exact = dict(exact_top_k(ids, vectors, np.array([1, 0], dtype=np.float32), 4))
+    found = [("a", exact["a"]), ("c", exact["c"]), ("d", exact["d"])]  # b (0.9) is missing
+    monkeypatch.setattr(vector_index, "chroma_top_k", lambda *a: found)
+    with pytest.raises(ValueError, match="differs from the exact ranking"):
+        verified_top_k(collection, ids, vectors, np.array([1, 0], dtype=np.float32), 3)

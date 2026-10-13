@@ -18,7 +18,7 @@ Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md))
 
 ## Entscheidung
 
-Wir werden Chunk- und Fragevektoren einmal erzeugen und mit IDs und Texten speichern (`embeddings_cN.npz`,
+Wir werden Chunk- und Fragevektoren einmal erzeugen und mit Modellname, IDs und Texten speichern (`embeddings_cN.npz`,
 `query_embeddings.npz`); die Chroma-Indizes werden nur aus diesen Vektoren gebaut, eine Neuberechnung erfordert das
 bewusste Löschen der Datei.
 Wir werden Chroma mit der Metrik `cosine` und `ef_search` mindestens in Größe der Sammlung betreiben, jedes Top-k gegen

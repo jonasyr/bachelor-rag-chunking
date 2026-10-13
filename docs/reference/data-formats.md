@@ -19,9 +19,12 @@
 ```
 
 **`embeddings_c1.npz`** (analog c2/c3; `data/processed/`, nicht versioniert; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
-Arrays `ids` (Chunk-IDs in Dateireihenfolge), `texts` (Chunk-Texte), `vectors` (float32, n × 3.072).
+Arrays `model` (Embedding-Modell), `ids` (Chunk-IDs in Dateireihenfolge), `texts` (Chunk-Texte), `vectors` (float32, n × 3.072).
+Wiederverwendet wird die Datei nur, wenn Modell, IDs und Texte unverändert sind.
 
-**`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
+**`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `model`, `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
+
+`retrieve.py --strategy` ersetzt in `retrieved_results.csv` nur die Zeilen der gewählten Strategien.
 
 **`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md))
 ```json

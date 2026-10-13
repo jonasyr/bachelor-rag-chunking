@@ -173,3 +173,11 @@ def test_changed_question_text_is_not_silently_reused(setup):
     paths["questions_file"].write_text(text, encoding="utf-8")
     with pytest.raises(ValueError, match="delete it deliberately"):
         retrieve(["C1"], embedder=fake, **paths)
+
+
+def test_a_single_strategy_run_keeps_the_other_strategies(setup):
+    paths, _, _, fake = setup
+    retrieve(["C1", "C3"], embedder=fake, **paths)
+    full = read_out(paths["out_file"])
+    retrieve(["C1"], embedder=fake, **paths)
+    assert read_out(paths["out_file"]) == full

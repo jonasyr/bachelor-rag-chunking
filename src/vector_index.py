@@ -75,9 +75,15 @@ def verified_top_k(
     exact_sim = dict(ranking)
     found = chroma_top_k(collection, query, k)
     kth = exact[-1][1] if exact else 0.0
-    consistent = len(found) == len(exact) and all(
-        abs(exact_sim.get(cid, -2.0) - score) <= tolerance and score >= kth - tolerance
-        for cid, score in found
+    # Every hit clearly above the rank-k score must be found; only near-ties at rank k may swap.
+    required = {cid for cid, score in ranking if score > kth + tolerance}
+    consistent = (
+        len(found) == len(exact)
+        and required <= {cid for cid, _ in found}
+        and all(
+            abs(exact_sim.get(cid, -2.0) - score) <= tolerance and score >= kth - tolerance
+            for cid, score in found
+        )
     )
     if not consistent:
         raise ValueError(f"Chroma result {found} differs from the exact ranking {exact}")

@@ -70,3 +70,10 @@ def test_changed_chunks_require_deliberate_reembedding(paths, fake_embedder):
     write_chunks(paths["chunk_file"], ["ref() wraps a value.", "changed text", "props"])
     with pytest.raises(ValueError, match="delete it deliberately"):
         embed_and_store("C1", embedder=fake_embedder, **paths)
+
+
+def test_vectors_of_another_model_are_not_reused(paths, fake_embedder, monkeypatch):
+    embed_and_store("C1", embedder=fake_embedder, **paths)
+    monkeypatch.setattr("embed.EMBEDDING_MODEL", "text-embedding-3-small")
+    with pytest.raises(ValueError, match="text-embedding-3-large"):
+        embed_and_store("C1", embedder=fake_embedder, **paths)

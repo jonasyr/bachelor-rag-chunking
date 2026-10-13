@@ -49,7 +49,7 @@ Sources were checked on 13.10.2026 and go to `docs/reference/literature.md` (sec
 
 ## Artefacts and formats (added to `docs/reference/data-formats.md`)
 
-- `data/processed/embeddings_c1.npz` (c2, c3): arrays `ids`, `texts` (str), `vectors` (float32, n × 3,072). Gitignored.
+- `data/processed/embeddings_c1.npz` (c2, c3): arrays `model`, `ids`, `texts` (str), `vectors` (float32, n × 3,072); reused only if model, IDs and texts match. Gitignored.
 - `data/evaluation/query_embeddings.npz`: arrays `ids` (question IDs), `texts` (questions), `vectors`. Gitignored.
 - `data/processed/embedding_runs.jsonl`: one record per embed or retrieval run:
   `{"step","strategy","model","dimensions","date","openai_sdk","chromadb","vectors","input_tokens","cost_usd","api_called","vector_bytes","inputs_sha256"}`.
