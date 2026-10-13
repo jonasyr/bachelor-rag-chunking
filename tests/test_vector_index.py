@@ -72,3 +72,11 @@ def test_search_breadth_comes_from_the_config(tmp_path, monkeypatch):
     # raw config: `.configuration` emits a Chroma deprecation warning for embedding_function=None
     hnsw = small.configuration_json["hnsw"]
     assert (hnsw["space"], hnsw["ef_search"], hnsw["ef_construction"]) == ("cosine", 250, 250)
+
+
+def test_distance_metric_comes_from_the_config(tmp_path, monkeypatch):
+    monkeypatch.setattr(vector_index, "CHROMA_SPACE", "ip")
+    meta = [{"doc_id": "D001", "start_token": 0, "end_token": 1}] * 2
+    client = vector_index.open_client(tmp_path)
+    collection = build_collection(client, "rag_test", ["a", "b"], unit_vectors(2), meta)
+    assert collection.configuration_json["hnsw"]["space"] == "ip"
