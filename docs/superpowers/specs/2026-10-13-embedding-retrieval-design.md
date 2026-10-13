@@ -62,6 +62,13 @@ Sources were checked on 13.10.2026 and go to `docs/reference/literature.md` (sec
 `EMBEDDING_PRICE_PER_MTOK = 0.13` (source and access date in a comment), `EMBEDDING_FILES` (per strategy),
 `QUERY_EMBEDDINGS_FILE`, `EMBEDDING_RUNS_FILE`, `SCORE_TOLERANCE = 1e-5`, `ID_SEPARATOR = ";"`.
 
+## Model-vintage check (added after the Codex review of PR #5)
+
+Before new vectors join an existing set (another strategy or the questions), `src/canary.py` re-embeds the first,
+middle and last stored text of each existing vector file and aborts if the cosine to the stored vector is below
+`CANARY_MIN_COSINE = 0.999` (measured 13.10.2026: same model ≥ 0.99996, different chunks ≤ 0.84). The lowest value
+goes to the run log as `canary_min_cosine`.
+
 ## Error handling
 
 Fail loudly with a hint: missing API key; vectors not matching the chunk file; unexpected dimension; Chroma result

@@ -2,6 +2,7 @@ import csv
 import json
 
 import pytest
+from conftest import FakeEmbedder
 
 import tokens
 import vector_index
@@ -55,6 +56,7 @@ def setup(tmp_path, fake_embedder):
             chunk_file=chunk_files[key],
             vector_file=vector_files[key],
             runs_file=tmp_path / "runs.jsonl",
+            siblings=[],
         )
 
     target = load_jsonl(chunk_files["C3"], "")[3]  # questions reuse a chunk text: exact match
@@ -123,9 +125,10 @@ def test_rerun_is_byte_identical_without_api_call(setup):
     calls_before = len(fake.calls)
     retrieve(["C1", "C3"], embedder=fake, **paths)
     first = paths["out_file"].read_bytes()
+    assert len(fake.calls) == calls_before + 2  # model-vintage check, then the questions
     retrieve(["C1", "C3"], embedder=fake, **paths)
     assert paths["out_file"].read_bytes() == first
-    assert len(fake.calls) == calls_before + 1  # questions embedded once only
+    assert len(fake.calls) == calls_before + 2  # rerun: no API call at all
 
 
 def test_run_log_records_ground_truth_checksums(setup):
@@ -181,3 +184,10 @@ def test_a_single_strategy_run_keeps_the_other_strategies(setup):
     full = read_out(paths["out_file"])
     retrieve(["C1"], embedder=fake, **paths)
     assert read_out(paths["out_file"]) == full
+
+
+def test_questions_are_not_embedded_with_a_changed_model(setup):
+    paths, _, _, _ = setup
+    with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
+        retrieve(["C1", "C3"], embedder=FakeEmbedder(salt="model-update"), **paths)
+    assert not paths["query_file"].exists()

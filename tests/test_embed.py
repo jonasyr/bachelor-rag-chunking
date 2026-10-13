@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pytest
+from conftest import FakeEmbedder
 
 import vector_index
 from embed import embed_and_store
@@ -33,6 +34,7 @@ def paths(tmp_path):
         "vector_file": tmp_path / "embeddings_c1.npz",
         "runs_file": tmp_path / "embedding_runs.jsonl",
         "client": vector_index.open_client(tmp_path / "chroma"),
+        "siblings": [],  # never compare against the real vector files in tests
     }
 
 
@@ -77,3 +79,20 @@ def test_vectors_of_another_model_are_not_reused(paths, fake_embedder, monkeypat
     monkeypatch.setattr("embed.EMBEDDING_MODEL", "text-embedding-3-small")
     with pytest.raises(ValueError, match="text-embedding-3-large"):
         embed_and_store("C1", embedder=fake_embedder, **paths)
+
+
+def test_reembedding_one_strategy_checks_the_others(paths, fake_embedder, tmp_path):
+    other = tmp_path / "embeddings_c2.npz"
+    embed_and_store("C1", embedder=fake_embedder, **{**paths, "vector_file": other})
+    run = embed_and_store("C1", embedder=fake_embedder, **{**paths, "siblings": [other]})
+    texts = ["ref() wraps a value.", "reactive() makes objects reactive.", "props"]
+    assert fake_embedder.calls[-2] == texts  # canary: first, middle and last stored text
+    assert run["canary_min_cosine"] == pytest.approx(1.0)
+
+
+def test_reembedding_with_a_changed_model_aborts(paths, tmp_path):
+    other = tmp_path / "embeddings_c2.npz"
+    embed_and_store("C1", embedder=FakeEmbedder(), **{**paths, "vector_file": other})
+    with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
+        embed_and_store("C1", embedder=FakeEmbedder(salt="new"), **{**paths, "siblings": [other]})
+    assert not paths["vector_file"].exists()
