@@ -90,6 +90,9 @@ TOP_K = 5  # constant — do NOT vary; would introduce a second independent vari
 SCORE_TOLERANCE = 1e-5  # Chroma vs exact NumPy cosine (float32), D24
 # HNSW ef_search and ef_construction = max(collection size, this); >= size: exhaustive search (D24).
 HNSW_MIN_BREADTH = 100  # Chroma default for both
+# Chroma distance (D24). Results are read as similarity = 1 - distance and checked against exact
+# cosine; for unit-length OpenAI vectors that holds for "cosine" (and "ip"), not for "l2".
+CHROMA_SPACE = "cosine"
 # Model-vintage check (D24): measured 13.10.2026, same model >= 0.99996, different chunks <= 0.84.
 CANARY_MIN_COSINE = 0.999
 ID_SEPARATOR = ";"  # several IDs in one ground_truth.csv field

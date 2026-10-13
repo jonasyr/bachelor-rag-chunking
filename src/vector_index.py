@@ -11,7 +11,7 @@ import numpy as np
 from chromadb.config import Settings
 from chromadb.errors import NotFoundError
 
-from config import CHROMA_DIR, HNSW_MIN_BREADTH, SCORE_TOLERANCE
+from config import CHROMA_DIR, CHROMA_SPACE, HNSW_MIN_BREADTH, SCORE_TOLERANCE
 
 Hit = tuple[str, float]  # (chunk_id, cosine similarity)
 
@@ -34,7 +34,7 @@ def build_collection(
         name=name,
         embedding_function=None,  # vectors always come from the stored reference vectors
         configuration={
-            "hnsw": {"space": "cosine", "ef_search": breadth, "ef_construction": breadth}
+            "hnsw": {"space": CHROMA_SPACE, "ef_search": breadth, "ef_construction": breadth}
         },
     )
     step = client.get_max_batch_size()

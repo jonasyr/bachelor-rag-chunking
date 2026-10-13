@@ -37,16 +37,29 @@ from relevance import is_relevant
 from run_log import append_run, sha256_of
 
 HEADER = ["question_id", "strategy", "rank", "chunk_id", "score", "is_relevant"]
+# Exact input schemas from docs/reference/data-formats.md
+QUESTIONS_HEADER = ["question_id", "question", "type", "difficulty", "notes"]
+GROUND_TRUTH_HEADER = ["question_id", "expected_answer", "relevant_doc_ids", "relevant_section_ids"]
 
 
-def read_rows(path: Path, what: str) -> list[dict]:
-    """Rows of a CSV file; raise if the file is missing or has no rows."""
+def read_rows(path: Path, what: str, header: list[str]) -> list[dict]:
+    """Rows of a CSV file with exactly `header`; raise if missing, malformed, empty or duplicate."""
     if not path.exists():
         raise FileNotFoundError(f"{path} not found; create the {what} first")
     with path.open(encoding="utf-8", newline="") as f:
-        rows = list(csv.DictReader(f))
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        if reader.fieldnames != header:
+            raise ValueError(
+                f"{path} has columns {reader.fieldnames}, docs/reference/data-formats.md "
+                f"requires {header}"
+            )
     if not rows:
         raise ValueError(f"{path} has no rows; the {what} must be complete before retrieval")
+    ids = [row["question_id"] for row in rows]
+    duplicates = sorted({qid for qid in ids if ids.count(qid) > 1})
+    if duplicates:
+        raise ValueError(f"{path}: duplicate question_id {duplicates}")
     return rows
 
 
@@ -99,9 +112,10 @@ def retrieve(
 ) -> int:
     """Write retrieved_results.csv for all questions and the given strategies; return row count."""
     questions = sorted(
-        read_rows(questions_file, "question catalogue"), key=lambda q: q["question_id"]
+        read_rows(questions_file, "question catalogue", QUESTIONS_HEADER),
+        key=lambda q: q["question_id"],
     )
-    ground_truth = read_rows(ground_truth_file, "ground truth")
+    ground_truth = read_rows(ground_truth_file, "ground truth", GROUND_TRUTH_HEADER)
     sections = load_jsonl(sections_file, "run src/preprocess.py first")
     relevant = relevant_sections(questions, ground_truth, sections)
 

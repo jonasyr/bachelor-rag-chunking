@@ -233,3 +233,32 @@ def test_the_run_log_covers_every_retrieval_input(setup):
         "embeddings_c1.npz",
         "embeddings_c3.npz",
     }
+
+
+def test_questions_without_the_documented_columns_are_refused(setup):
+    paths, _, _, fake = setup
+    lines = paths["questions_file"].read_text(encoding="utf-8").split("\n", 1)
+    paths["questions_file"].write_text(
+        "question_id,question,type,difficulty\n" + lines[1].replace(",easy,\n", ",easy\n"),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="columns"):
+        retrieve(["C1"], embedder=fake, **paths)
+
+
+def test_ground_truth_with_extra_columns_is_refused(setup):
+    paths, _, _, fake = setup
+    text = paths["ground_truth_file"].read_text(encoding="utf-8")
+    paths["ground_truth_file"].write_text(
+        text.replace("relevant_section_ids", "relevant_section_ids,x", 1), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="columns"):
+        retrieve(["C1"], embedder=fake, **paths)
+
+
+def test_duplicate_question_ids_are_refused(setup):
+    paths, _, _, fake = setup
+    text = paths["ground_truth_file"].read_text(encoding="utf-8")
+    paths["ground_truth_file"].write_text(text + text.splitlines()[1] + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate question_id"):
+        retrieve(["C1"], embedder=fake, **paths)
