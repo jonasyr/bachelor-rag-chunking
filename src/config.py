@@ -95,6 +95,11 @@ HNSW_MIN_BREADTH = 100  # Chroma default for both
 CHROMA_SPACE = "cosine"
 # Model-vintage check (D24): measured 13.10.2026, same model >= 0.99996, different chunks <= 0.84.
 CANARY_MIN_COSINE = 0.999
+CANARY_PROBE_POSITIONS = (
+    0.0,
+    0.5,
+    1.0,
+)  # relative positions of re-embedded texts: first, middle, last
 ID_SEPARATOR = ";"  # several IDs in one ground_truth.csv field
 
 # A chunk counts as relevant if its token span overlaps a relevant section by at least
