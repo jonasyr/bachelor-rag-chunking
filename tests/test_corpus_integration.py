@@ -1,12 +1,20 @@
 """Checks on the real corpus; skipped until the snapshot and processed files exist."""
 
+import hashlib
 import json
 import re
 
 import pytest
 
 from chunking import chunk
-from config import C3_MAX_TOKENS, C3_MIN_TOKENS, DATA_RAW, DOCUMENTS_FILE, SECTIONS_FILE
+from config import (
+    C3_MAX_TOKENS,
+    C3_MIN_TOKENS,
+    DATA_RAW,
+    DOCUMENTS_FILE,
+    SECTIONS_FILE,
+    SNAPSHOT_INFO_FILE,
+)
 from preprocess import clean_markdown
 
 GUIDE = DATA_RAW / "guide"
@@ -54,3 +62,22 @@ def test_real_corpus_chunks(key, tmp_path):
     assert count == len(lengths)
     if key == "C3":
         assert all(C3_MIN_TOKENS <= n <= C3_MAX_TOKENS for n in lengths)
+
+
+@pytest.mark.skipif(not GUIDE.is_dir(), reason="no snapshot; run src/snapshot.py")
+def test_snapshot_matches_the_versioned_checksums():
+    lines = SNAPSHOT_INFO_FILE.read_text(encoding="utf-8").splitlines()
+    recorded: dict[str, str] = {}
+    for line in lines:
+        if re.match(r"^[0-9a-f]{64}  ", line):
+            digest, rel = line.split("  ", 1)
+            recorded[rel] = digest
+    files = {p.relative_to(DATA_RAW).as_posix(): p for p in GUIDE.rglob("*.md")}
+    assert set(recorded) == set(files)
+    for rel, path in files.items():
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == recorded[rel], rel
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+def test_c2_has_more_chunks_than_c1(tmp_path):
+    assert chunk("C2", out_file=tmp_path / "c2.jsonl") > chunk("C1", out_file=tmp_path / "c1.jsonl")

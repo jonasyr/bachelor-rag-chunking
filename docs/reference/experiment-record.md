@@ -11,7 +11,7 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (Commit-Datum 31.07.2026) |
-| Datum des Snapshots | 13.10.2026 (`data/raw/vue_docs_snapshot/SNAPSHOT.txt`) |
+| Datum des Snapshots | 13.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, SHA-256 je Datei) |
 | Verwendete Pfade | siehe `docs/corpus_manifest.csv` |
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
