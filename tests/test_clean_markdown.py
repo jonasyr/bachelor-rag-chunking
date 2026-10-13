@@ -1,6 +1,6 @@
 import pytest
 
-from preprocess import clean_markdown
+from preprocess import clean_markdown, fence_marker
 
 DOC = "# Title {#title}\n\n"
 
@@ -201,3 +201,9 @@ def test_encoded_url_in_autolink_keeps_closing_bracket():
 def test_fence_closes_only_with_same_marker():
     body = "~~~\n```\n\n## Not a heading\n~~~\n\nAfter\n"
     assert clean(body) == "# Title\n\n~~~\n```\n\n## Not a heading\n~~~\n\nAfter\n"
+
+
+def test_fence_needs_at_most_three_spaces_of_indentation():
+    assert fence_marker("   ```js") == "```"
+    assert fence_marker("    ```js") is None
+    assert fence_marker("```js `x`") is None

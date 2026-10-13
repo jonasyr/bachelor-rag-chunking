@@ -23,7 +23,7 @@ UNWRAP_CLASS = "composition-api"
 DROP_BLOCK_TAGS = ("div", "p", "ScrimbaLink", "VueSchoolLink")
 DROP_LINE_TAGS = ("img", "details", "/details", "br")
 
-FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
+FENCE_RE = re.compile(r"^( {0,3})(`{3,}|~{3,})(.*)$")  # CommonMark: at most 3 spaces of indent
 FENCE_LANG_RE = re.compile(r"\s*([\w+-]*)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 ANCHOR_RE = re.compile(r"\s*\{#([^}]+)\}\s*$")
