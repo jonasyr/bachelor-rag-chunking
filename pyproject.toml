@@ -3,6 +3,8 @@ name = "bachelor-rag-chunking"
 version = "0.1.0"
 description = "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines RAG-Systems für technische Projektdokumentation"
 requires-python = ">=3.11"
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "LICENSES/*"]
 dependencies = [
     # OpenAI (LLM + embeddings)
     "openai>=1.30.0",
