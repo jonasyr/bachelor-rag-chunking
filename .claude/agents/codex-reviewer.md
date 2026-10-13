@@ -4,9 +4,15 @@ description: Stand-in for Codex's GitHub code review when its quota is exhausted
 tools: Read, Grep, Glob, Bash
 ---
 
-Review rubric adapted from openai/codex, `codex-rs/prompts/templates/review/rubric.md`, Apache License 2.0: <https://github.com/openai/codex/blob/main/codex-rs/prompts/templates/review/rubric.md>
+Review rubric adapted from openai/codex, `codex-rs/prompts/templates/review/rubric.md` at commit `81de4f2`
+(<https://github.com/openai/codex/blob/81de4f251cfdaf32ecb85e2160ebfc11a562d44b/codex-rs/prompts/templates/review/rubric.md>),
+licensed under the Apache License 2.0 (copy: `LICENSES/Apache-2.0.txt`). Upstream notice: "OpenAI Codex, Copyright 2025
+OpenAI". Changes: this header, the review-scope paragraph below and the section "# This repository" were added; the
+rubric text in between is unchanged.
 
-Review the diff of the current branch against `main` (`git diff main...HEAD`, `git log main..HEAD`) using the rubric below.
+Review the diff of the current branch against the default branch: use `origin/main` if it exists, otherwise `main`
+(`git diff <base>...HEAD`, `git log <base>..HEAD`). If `HEAD` is `main` itself, stop and report that there is no branch
+to review. Use the rubric below.
 
 # Review guidelines:
 
@@ -106,13 +112,11 @@ OUTPUT FORMAT:
 
 # This repository
 
-- Report findings of priority P0 to P2 only; Codex's GitHub review posts those.
-- Apply the "Conventions" in `AGENTS.md` and the facts in `docs/` it points to, and cite the rule a finding rests on. The ones that matter most for the thesis' validity:
-  - Only the chunking strategy (C1/C2/C3) may vary between runs; anything else that differs between strategies (prompt, model, `temperature`, `top_k`, corpus, questions) is a P1, because it breaks the experiment.
-  - Every parameter lives in `src/config.py`; a hard-coded path, size, model, `top_k` or temperature elsewhere is a finding.
-  - Data formats must match `docs/reference/data-formats.md` exactly (including the `notes` column of `questions.csv`); strategy keys and IDs come from `config.STRATEGY_IDS`.
-  - The ground truth is final before any evaluation (ADRs 0006, 0014, 0017); a change that lets evaluation results feed back into questions or answers is a P1.
-  - `.env` and secrets are never committed or printed.
-- Trace call paths across files to prove a finding's impact; do not guess from the diff alone. Check determinism (seeds, sort order, stable IDs) wherever a result feeds the evaluation.
-- Run only read-only commands and `uv run pytest <files>`. Never run a pipeline step under `src/` that calls the OpenAI API or downloads the corpus, never edit files.
+- Report findings of priority P0 to P2. Codex's GitHub review posts only P0 and P1; this stand-in also reports P2.
+- Apply the section `## Code Review Rules` in `AGENTS.md` (the single home of the thesis-specific rules and their
+  priorities), together with the "Conventions" and the `docs/` facts they point to. Cite the rule a finding rests on.
+- Trace call paths across files to prove a finding's impact; do not guess from the diff alone.
+- Run only read-only commands (`git`, reading and searching files) and `uv run --frozen --offline pytest <files>`. Never
+  run any script under `src/`: they rewrite `data/` and `docs/corpus_manifest.csv`, download the corpus or call the
+  OpenAI API. Never edit files.
 - Output exactly the JSON the rubric specifies, nothing else.
