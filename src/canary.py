@@ -1,10 +1,10 @@
 """Model-vintage check before new embeddings are added (ADR 0024).
 
 `text-embedding-3-large` is an alias without dated snapshots, so the model behind it can change.
-Before vectors are added to an existing set (another strategy or the questions), the first,
-middle and last stored text of every existing vector file are embedded again and compared with
-their stored vectors. A cosine below CANARY_MIN_COSINE means the model changed; mixing vectors
-would then let more than the chunking vary (ADR 0006).
+Before vectors are added to an existing set (another strategy or the questions), the stored texts
+at CANARY_PROBE_POSITIONS (first, middle, last) of every existing vector file are embedded again
+and compared with their stored vectors. A cosine below CANARY_MIN_COSINE means the model
+changed; mixing vectors would then let more than the chunking vary (ADR 0006).
 """
 
 from pathlib import Path
@@ -13,6 +13,7 @@ import numpy as np
 
 from config import (
     CANARY_MIN_COSINE,
+    CANARY_PROBE_POSITIONS,
     EMBEDDING_FILES,
     EMBEDDING_MODEL,
     QUERY_EMBEDDINGS_FILE,
@@ -24,7 +25,8 @@ from embedding_client import Embedder
 def _probes(path: Path) -> tuple[list[str], np.ndarray]:
     with np.load(path, allow_pickle=False) as data:
         texts, vectors = data["texts"].tolist(), data["vectors"]
-    picks = sorted({0, len(texts) // 2, len(texts) - 1})
+    last = len(texts) - 1
+    picks = sorted({int(p * last + 0.5) for p in CANARY_PROBE_POSITIONS})
     return [texts[i] for i in picks], vectors[picks]
 
 

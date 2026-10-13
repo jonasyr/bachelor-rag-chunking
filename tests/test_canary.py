@@ -31,3 +31,12 @@ def test_same_model_passes_with_the_measured_cosine(stored):
 def test_a_changed_model_behind_the_same_name_aborts(stored):
     with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
         check_vintage(FakeEmbedder(salt="model-update"), [stored])
+
+
+def test_probe_positions_come_from_the_config(stored, monkeypatch):
+    import canary
+
+    monkeypatch.setattr(canary, "CANARY_PROBE_POSITIONS", (0.0, 1.0))
+    fake = FakeEmbedder()
+    canary.check_vintage(fake, [stored])
+    assert fake.calls == [["chunk text 0", "chunk text 6"]]
