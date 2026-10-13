@@ -121,4 +121,5 @@ Details and reasons: [`docs/README.md`](docs/README.md) (master reference, decis
 - Corpus: the [Vue.js documentation](https://github.com/vuejs/docs) © Yuxi (Evan) You and Vue documentation
   contributors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It is downloaded at run time
   (`src/snapshot.py`, commit in `src/config.py`) and not redistributed here; derived artefacts such as
-  `docs/corpus_manifest.csv` refer to it. The cleaning steps applied to it are documented in ADR 0019–0021.
+  `docs/corpus_manifest.csv` refer to it. It is modified before use; the cleaning steps are listed in
+  [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0020).
