@@ -44,6 +44,23 @@ Wiederholungsmessung (13.10.2026, 2.706 Tokens, 0,00035 USD): je drei Chunks pro
 Kosinus zum gespeicherten Vektor ≥ 0,99996 (7 von 9 bitgleich), ähnlichster anderer Chunk ≤ 0,84. Daraus der
 Schwellwert 0,999 der Modellstand-Prüfung ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
+## Schwierigkeitsprobe (Pilot, 14.10.2026)
+
+Zweck: prüfen, ob das Retrieval auf dem Korpus schwer genug ist, um die Strategien zu unterscheiden (kein
+Deckeneffekt). Acht Pilotfragen in `data/pilot/` (alle fünf Fragetypen, fünf Korpusbereiche, je ein relevanter
+Abschnitt); sie sind **nicht** Teil des Fragenkatalogs. Auswertung: `scripts/difficulty_probe.py`; Kosten 0,0004 USD.
+
+| Strategie | Hit@5 | MRR | Precision@5 | Recall@5 |
+|---|---:|---:|---:|---:|
+| C1 | 1,00 | 0,94 | 0,23 | 1,00 |
+| C2 | 1,00 | 0,79 | 0,30 | 1,00 |
+| C3 | 1,00 | 0,94 | 0,23 | 1,00 |
+
+Befund: Bei einfachen Fragen mit genau einem passenden Abschnitt finden alle Strategien die Antwort (Hit@5 und
+Recall@5 = 1,00, Deckeneffekt); Unterschiede zeigen sich nur in Rang und Präzision (MRR, Precision@5). Folgerung für den
+Fragenkatalog: anspruchsvollere Fragen (mehrere Abschnitte oder Seiten, Detailfragen, Fragen ohne wörtliche Nähe zur
+Überschrift) und MRR/Precision@5 als zentrale Kennzahlen.
+
 ## Modellversionen (bei der Umsetzung eintragen)
 
 | Komponente | Version | Datum der ersten Nutzung |
