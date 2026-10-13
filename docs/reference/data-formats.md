@@ -60,6 +60,13 @@ Q001,"ref wraps any value in a reactive object with a .value property; reactive 
 
 Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `;` getrennt (`config.ID_SEPARATOR`).
 
+`retrieve.py` prüft beide Dateien vor jedem Lauf und bricht bei Verstößen ab:
+
+- Kopfzeilen exakt wie oben, jede Zeile mit genau dieser Feldanzahl, keine doppelte `question_id`.
+- Pflichtfelder nicht leer: in `questions.csv` alle außer `notes`, in `ground_truth.csv` alle.
+- Jede Frage hat eine Ground-Truth-Zeile und umgekehrt; alle `relevant_section_ids` existieren in `sections.jsonl`.
+- `relevant_doc_ids` sind genau die Dokumente der `relevant_section_ids`.
+
 **`retrieved_results.csv`**
 ```
 question_id,strategy,rank,chunk_id,score,is_relevant

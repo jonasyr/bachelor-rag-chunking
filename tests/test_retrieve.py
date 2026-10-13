@@ -70,7 +70,7 @@ def setup(tmp_path, fake_embedder):
     truth = tmp_path / "ground_truth.csv"
     truth.write_text(
         "question_id,expected_answer,relevant_doc_ids,relevant_section_ids\n"
-        'Q001,"Watchers run side effects.",D002,"D002#second; D003#second"\n'
+        'Q001,"Watchers run side effects.","D002;D003","D002#second; D003#second"\n'
         f'Q002,"Same text.",{target["doc_id"]},{target["doc_id"]}#first\n',
         encoding="utf-8",
     )
@@ -264,4 +264,37 @@ def test_a_ground_truth_row_with_an_extra_field_is_refused(setup):
     lines[1] += ",surplus"
     paths["ground_truth_file"].write_text("\n".join(lines) + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="row 2 has 5 fields, expected 4"):
+        retrieve(embedder=fake, **paths)
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "message"),
+    [
+        ('"Watchers run side effects."', '""', "Q001: empty expected_answer"),
+        ('"D002;D003"', '""', "Q001: empty relevant_doc_ids"),
+        ('"D002;D003"', '"D002;D003;D009"', r"Q001: relevant_doc_ids \['D009'\] not in the corpus"),
+        ('"D002;D003"', '"D002"', "Q001: relevant_doc_ids must be exactly the documents"),
+    ],
+)
+def test_incomplete_or_inconsistent_ground_truth_is_refused(setup, old, new, message):
+    paths, _, _, fake = setup
+    text = paths["ground_truth_file"].read_text(encoding="utf-8")
+    paths["ground_truth_file"].write_text(text.replace(old, new, 1), encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        retrieve(embedder=fake, **paths)
+
+
+def test_empty_required_question_fields_are_refused(setup):
+    paths, _, _, fake = setup
+    text = paths["questions_file"].read_text(encoding="utf-8")
+    paths["questions_file"].write_text(text.replace(",conceptual,", ",,", 1), encoding="utf-8")
+    with pytest.raises(ValueError, match="Q001: empty type"):
+        retrieve(embedder=fake, **paths)
+
+
+def test_ground_truth_rows_without_a_question_are_refused(setup):
+    paths, _, _, fake = setup
+    with paths["ground_truth_file"].open("a", encoding="utf-8") as f:
+        f.write('Q777,"Orphan.",D002,D002#first\n')
+    with pytest.raises(ValueError, match=r"ground truth for unknown questions \['Q777'\]"):
         retrieve(embedder=fake, **paths)

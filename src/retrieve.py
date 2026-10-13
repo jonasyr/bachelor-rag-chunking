@@ -38,10 +38,11 @@ HEADER = ["question_id", "strategy", "rank", "chunk_id", "score", "is_relevant"]
 # Exact input schemas from docs/reference/data-formats.md
 QUESTIONS_HEADER = ["question_id", "question", "type", "difficulty", "notes"]
 GROUND_TRUTH_HEADER = ["question_id", "expected_answer", "relevant_doc_ids", "relevant_section_ids"]
+QUESTIONS_REQUIRED = ["question_id", "question", "type", "difficulty"]  # `notes` may be empty
 
 
-def read_rows(path: Path, what: str, header: list[str]) -> list[dict]:
-    """Rows of a CSV file with exactly `header`; raise if missing, malformed, empty or duplicate."""
+def read_rows(path: Path, what: str, header: list[str], required: list[str]) -> list[dict]:
+    """Rows with exactly `header` and non-blank `required` fields; raise on any violation."""
     if not path.exists():
         raise FileNotFoundError(f"{path} not found; create the {what} first")
     with path.open(encoding="utf-8", newline="") as f:
@@ -59,6 +60,10 @@ def read_rows(path: Path, what: str, header: list[str]) -> list[dict]:
     rows = [dict(zip(header, record, strict=True)) for record in records[1:]]
     if not rows:
         raise ValueError(f"{path} has no rows; the {what} must be complete before retrieval")
+    for row in rows:
+        for field in required:
+            if not row[field].strip():
+                raise ValueError(f"{path}: {row['question_id'] or '?'}: empty {field}")
     ids = [row["question_id"] for row in rows]
     duplicates = sorted({qid for qid in ids if ids.count(qid) > 1})
     if duplicates:
@@ -73,9 +78,13 @@ def split_ids(field: str) -> list[str]:
 def relevant_sections(
     questions: list[dict], ground_truth: list[dict], sections: list[dict]
 ) -> dict[str, list[dict]]:
-    """Annotated sections per question; raise on missing ground truth or unknown section IDs."""
+    """Annotated sections per question; raise if the ground truth is incomplete or inconsistent."""
     by_id = {s["section_id"]: s for s in sections}
+    corpus_docs = {s["doc_id"] for s in sections}
     truth = {row["question_id"]: row for row in ground_truth}
+    orphans = sorted(set(truth) - {q["question_id"] for q in questions})
+    if orphans:
+        raise ValueError(f"ground truth for unknown questions {orphans}")
     result: dict[str, list[dict]] = {}
     for q in questions:
         qid = q["question_id"]
@@ -87,6 +96,16 @@ def relevant_sections(
         unknown = [sid for sid in ids if sid not in by_id]
         if unknown:
             raise ValueError(f"{qid}: unknown section IDs {unknown}")
+        listed = set(split_ids(truth[qid]["relevant_doc_ids"]))
+        outside = sorted(listed - corpus_docs)
+        if outside:
+            raise ValueError(f"{qid}: relevant_doc_ids {outside} not in the corpus")
+        expected = sorted({by_id[sid]["doc_id"] for sid in ids})
+        if sorted(listed) != expected:
+            raise ValueError(
+                f"{qid}: relevant_doc_ids must be exactly the documents of "
+                f"relevant_section_ids {expected}"
+            )
         result[qid] = [by_id[sid] for sid in ids]
     return result
 
@@ -108,10 +127,12 @@ def retrieve(
     All strategies always run together from the same inputs, so no row of an older run is kept.
     """
     questions = sorted(
-        read_rows(questions_file, "question catalogue", QUESTIONS_HEADER),
+        read_rows(questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED),
         key=lambda q: q["question_id"],
     )
-    ground_truth = read_rows(ground_truth_file, "ground truth", GROUND_TRUTH_HEADER)
+    ground_truth = read_rows(
+        ground_truth_file, "ground truth", GROUND_TRUTH_HEADER, GROUND_TRUTH_HEADER
+    )
     sections = load_jsonl(sections_file, "run src/preprocess.py first")
     relevant = relevant_sections(questions, ground_truth, sections)
 
