@@ -5,4 +5,4 @@ Strategies and parameters: ADR 0005 / `docs/explanation/research-design.md`; val
   floor/ceiling in the methodology.
 - `strategy` field values come from `config.STRATEGY_IDS` (`fixed_500_no_overlap`, `fixed_500_overlap_100`,
   `structure_h2h3`); short keys `C1`–`C3` in CLI, file names and CSV `strategy` columns.
-- C4 (semantic) only if phases 1–4 finish early.
+- C4 (semantic) only if the 09.11. milestone (ground truth frozen) is met on time (`docs/plan.md`).

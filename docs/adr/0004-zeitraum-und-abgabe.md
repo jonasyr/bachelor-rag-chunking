@@ -7,7 +7,7 @@ Angenommen (D4 im Leitfaden; Quelle: Chat, Abgabetermin bestätigt am 13.10.2026
 ## Kontext
 
 - Die Baseline hatte nur ein Wochenraster; der Zeitplan wurde auf konkrete Kalenderdaten Juli–Dezember 2026 gelegt ([Leitfaden §3](../explanation/research-design.md#was-sich-gegenüber-der-ursprünglichen-baseline-geändert-hat)).
-- Der Phasenplan vom Juni 2026 sah die Abgabe am 15.12.2026 vor ([Leitfaden §16](../plan.md#zeitplan-julidezember-2026)); eine frühere Angabe nannte den 31.12.2026.
+- Der Phasenplan vom Juni 2026 sah die Abgabe am 15.12.2026 vor ([Leitfaden §16](../plan.md#zeitplan-131024122026)); eine frühere Angabe nannte den 31.12.2026.
 - Der Abgabetermin 24.12.2026 wurde am 13.10.2026 im Chat bestätigt.
 - Stand 13.10.2026 ist die Pipeline in `src/` noch ein Gerüst und der Korpus-Ausschnitt offen (Leitfaden §16, §19).
 

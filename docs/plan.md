@@ -2,27 +2,33 @@
 
 > Projektstand, kein Diátaxis-Typ. Übersicht: [Dokumentation](README.md).
 
-## Zeitplan (Juli–Dezember 2026)
+## Zeitplan (13.10.–24.12.2026)
 
-| Zeitraum | Phase | Schwerpunkte |
-|----------|-------|--------------|
-| 01.–14.07. | Vorbereitung | Thema/Scope final, Arbeitsumgebung, Repository |
-| 06.–27.07. | Literaturrecherche | Theoriebasis RAG/Chunking/Evaluation |
-| 20.–31.07. | Forschungsfrage schärfen | Hypothesen, Abstimmung Betreuung |
-| 01.–14.08. | Methodik vorbereiten | Design, Pipeline-Architektur, Evaluationsschema, Rubrik |
-| 11.–24.08. | Snapshot/Korpus | Vue-Snapshot, Bereinigung, Korpusmanifest |
-| 24.08.–07.09. | Datenerhebung | Fragenkatalog, Referenzantworten, Annotation |
-| 07.–28.09. | Implementierung | Preprocessing, Chunking, Embedding, Retrieval, Generierung |
-| 28.09.–12.10. | Datenauswertung | Experimente, Retrieval-Metriken, Antwortbewertung |
-| 12.–26.10. | Analyse/Visualisierung | deskriptiv, Korrelation, Abbildungen |
-| 26.10.–23.11. | Schreibphase | Theorie, Methodik, Implementierung, Ergebnisse, Diskussion |
-| 23.11.–07.12. | Überarbeitung | Sprache, Argumentation, roter Faden |
-| 07.–14.12. | Korrektur/Puffer | Korrektorat, Formatierung, Zitation, Reserve |
-| 15.12. | Abgabe | Finalisierung und Einreichung |
+Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, dann Schreiben. Abgabe 24.12.2026
+([ADR 0004](adr/0004-zeitraum-und-abgabe.md)); Korpus-Ausschnitt: [ADR 0019](adr/0019-korpus-ausschnitt.md).
 
-> Der Fragenkatalog (Phase Datenerhebung) wird regelmäßig unterschätzt — bewusst Zeit einplanen.
+| Zeitraum | Phase | Schwerpunkte | Ergebnis |
+|----------|-------|--------------|----------|
+| 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py` (test-first), Korpusmanifest | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll |
+| 20.10.–02.11. | Pipeline | Chunking C1–C3, Embedding, Chroma, Retrieval, Generierung; Modelle und SDK pinnen; Prototyp mit einer Frage | lauffähige Pipeline, Modellversionen dokumentiert |
+| 20.10.–08.11. | Fragenkatalog (parallel) | 40 Fragen, Referenzantworten, `relevant_section_ids`; Pilot mit 5 Fragen gegen den Prototyp | `questions.csv`, `ground_truth.csv` |
+| 03.–09.11. | Auswertungsskripte | Relevanz per Token-Überlappung, Recall/Precision/MRR/Hit@5, RAGAS, Kostenerfassung | `evaluate_retrieval.py`, `evaluate_answers.py` getestet |
+| **09.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)) | Commit-Hash im Experiment-Protokoll |
+| 10.–16.11. | Experimente | volle Läufe C1–C3, Sensitivitätsprüfung (≥ 100 Tokens Überlappung) | `retrieved_results.csv`, `generated_answers.csv` |
+| 17.–25.11. | Bewertung und Analyse | manuelle Rubrik (120 Antworten), RAGAS-Abgleich, Statistik, Abbildungen | `scores.csv`, `output/tables/`, `output/figures/` |
+| 26.11.–13.12. | Schreibphase | Methodik, Implementierung, Ergebnisse, Diskussion, Fazit (Grundlagen siehe Hinweis) | Rohfassung komplett |
+| 14.–20.12. | Überarbeitung | Sprache, Argumentation, roter Faden, `./paperlab check` | Endfassung |
+| 21.–23.12. | Puffer | Korrektorat, Formatierung, Zitation, `./paperlab final` | Abgabe-PDF |
+| 24.12. | Abgabe | Einreichung | |
 
-> **Planungsstand Juni 2026.** Abgabe ist der 24.12.2026 (ADR 0004). Stand 13.10.2026: Pipeline in `src/` noch als Gerüst (`NotImplementedError`), Korpus-Ausschnitt offen (unten). Der Plan ist entsprechend zu verschieben.
+> **Risiko Schreibphase:** Für das Schreiben bleiben knapp drei Wochen. Kapitel ohne Ergebnisabhängigkeit
+> (Einleitung, Grundlagen, Methodik) ab Anfang November parallel zur Pipeline entwerfen.
+
+> Der Fragenkatalog wird regelmäßig unterschätzt — bewusst Zeit einplanen.
+
+> **Puffer-Regel:** Rutscht der Meilenstein 09.11., zuerst C4 und RAGAS-Feinheiten streichen, nicht die Schreibphase.
+
+Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Historie.
 
 
 ## Offene Entscheidungen / vor Beginn zu bestätigen
@@ -31,4 +37,4 @@
 - **Modell-/Versionswahl:** konkretes GPT-Modell, Embedding-Modell (`-large` vs. `-small`), SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren.
 - **Embedding-Sprache:** Korpus ist englisch; Fragen/Referenzantworten englisch halten (Konsistenz mit Embedding-Raum).
 - **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität).
-- **C4 (semantisch):** nur einplanen, wenn Phasen 1–4 planmäßig laufen.
+- **C4 (semantisch):** nur einplanen, wenn der Meilenstein 09.11. (Ground Truth eingefroren) planmäßig erreicht ist.
