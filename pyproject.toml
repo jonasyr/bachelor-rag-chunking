@@ -47,3 +47,9 @@ ignore = ["F401"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.pyright]
+# Editor type checking: scripts import siblings from src/ and run in the uv venv.
+venvPath = "."
+venv = ".venv"
+extraPaths = ["src"]
