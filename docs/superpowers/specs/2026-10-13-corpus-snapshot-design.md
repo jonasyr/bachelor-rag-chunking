@@ -21,7 +21,7 @@ Success criteria:
 
 | Unit | Responsibility | Depends on |
 |---|---|---|
-| `src/tokens.py` (new) | `encode(text) -> list[int]` and `char_to_token(text) -> list[int]` (token index for each character offset) with `config.TOKEN_ENCODING`. Shared with the later chunking step so `start_token`/`end_token` and section spans use one index space. | tiktoken |
+| `src/tokens.py` (new) | `encode`, `decode`, `count`, `token_starts(text)` (character offset of each token) and `char_to_token(starts, offset)` with `config.TOKEN_ENCODING`. Shared with the later chunking step so `start_token`/`end_token` and section spans use one index space. | tiktoken |
 | `src/snapshot.py` (new, no CLI options) | Shallow `git fetch` of `config.VUE_DOCS_COMMIT` from `config.VUE_DOCS_REPO_URL` into a temporary directory, verify `HEAD` equals the pinned hash, replace the contents of `DATA_RAW` (keeping `.gitkeep`) with `{VUE_DOCS_SUBDIR}/**/*.md` stored as `guide/…`, write `DATA_RAW/SNAPSHOT.txt` (repo, commit, commit date, snapshot date, file count, sha256 per file). | git, config |
 | `src/ingest.py` | Read `DATA_RAW/guide/**/*.md` sorted by POSIX path, assign `D001…` in that order, `title` = H1 text without anchor, raw `text`, `tokens` = token count; write `documents.jsonl`. | tokens, config |
 | `src/preprocess.py` | Pure `clean_markdown(text) -> CleanResult(text, headings)`; `section_spans(...)`; `preprocess()` rewrites `documents.jsonl` in place (`text`, `tokens`), writes `sections.jsonl` and `docs/corpus_manifest.csv`. | tokens, config |
@@ -36,16 +36,17 @@ outside fences; fence content stays verbatim, the opening info string is reduced
 | Element | Treatment |
 |---|---|
 | YAML frontmatter at file start | dropped |
-| `<div class="options-api">` … matching `</div>` (nested divs counted) | dropped with content |
-| `<span class="options-api">…</span>` | dropped with content |
-| `<div class="composition-api">` / matching `</div>`, `<span class="composition-api">…</span>` | tags removed, content kept |
-| top-level `<script …>…</script>`, `<style …>…</style>` | dropped |
-| `<div class="demo">` … matching `</div>` | dropped with content |
+| `<div class="composition-api">`, `<p class="composition-api">` | wrapper lines removed, content kept |
+| any other HTML block starting a line with `<div`, `<p`, `<ScrimbaLink`, `<VueSchoolLink` (Options API variants, demos, sponsor boxes, navigation tiles, promo links) | dropped with content up to the matching close tag (nesting counted, inline code ignored) |
+| `<span class="options-api">…</span>` / `<span class="composition-api">…</span>` | dropped / unwrapped |
+| page-level `<script …>…</script>`, `<style …>…</style>` | dropped |
+| `<img>`, `<details>`, `</details>`, `<br>` lines; self-closing components (`<VueSchoolLink … />`); inline `<sup … />`; empty `<span id="…"></span>` | dropped |
+| `<summary>Text</summary>` | becomes `Text` |
 | HTML comments `<!-- … -->` (also multi-line) | dropped |
-| self-closing custom components on their own line (`<VueSchoolLink … />`) | dropped |
 | containers `:::tip`, `::: tip`, `:::warning`, `:::danger`, `:::info`, `:::details`, `::: code-group` (optional space, optional title) | opening line becomes the title text (or nothing), body kept, closing `:::` dropped |
 | `{#anchor}` at end of a heading | recorded, then removed from the heading |
-| runs of 3+ newlines | collapsed to one blank line; trailing whitespace stripped |
+| blank-line runs | collapsed to one blank line; trailing whitespace stripped |
+| any other HTML line outside fences | error (no silent leftovers) |
 
 ## Sections
 
@@ -58,9 +59,9 @@ outside fences; fence content stays verbatim, the opening info string is reduced
 
 ## Manifest
 
-`docs/corpus_manifest.csv` with the existing header `file_id,path,title,section,tokens,included`; `section` is the
-first folder below `guide/` in title case with hyphens as spaces (`best-practices` → `Best Practices`), top-level
-pages get `Guide`; `tokens` after preprocessing; `included` = `yes` for all rows.
+`docs/corpus_manifest.csv` with the existing header `file_id,path,title,section,tokens,included`; `section` comes
+from an explicit map of the folders below `guide/` (`best-practices` → `Best Practices`, `typescript` → `TypeScript`,
+…; an unknown folder is an error), top-level pages get `Guide`; `tokens` after preprocessing; `included` = `yes` for all rows.
 
 ## Configuration (`src/config.py`)
 
