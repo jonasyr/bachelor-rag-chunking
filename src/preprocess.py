@@ -6,8 +6,14 @@ records the anchored H1-H3 sections. Rewrites documents.jsonl in place, writes s
 and the corpus manifest.
 """
 
+import csv
+import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
+
+import tokens
+from config import CORPUS_MANIFEST_FILE, DOCUMENTS_FILE, SECTIONS_FILE
 
 SECTION_MAX_LEVEL = 3
 # HTML blocks starting a line outside code fences are page furniture (Options API variants,
@@ -35,6 +41,18 @@ COMPOSITION_SPAN_RE = re.compile(r'<span class="composition-api">(.*?)</span>')
 EMPTY_SPAN_RE = re.compile(r'<span id="[^"]*"></span>')
 INLINE_SELF_CLOSING_RE = re.compile(r"\s*<(sup|[A-Z][\w-]*)\b[^>]*/>")
 HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z]")
+MANIFEST_HEADER = ["file_id", "path", "title", "section", "tokens", "included"]
+# Manifest `section` per folder below guide/ (pages directly in guide/ get "Guide").
+SECTION_NAMES = {
+    "best-practices": "Best Practices",
+    "built-ins": "Built-ins",
+    "components": "Components",
+    "essentials": "Essentials",
+    "extras": "Extras",
+    "reusability": "Reusability",
+    "scaling-up": "Scaling Up",
+    "typescript": "TypeScript",
+}
 
 
 @dataclass(frozen=True)
@@ -196,3 +214,90 @@ def clean_markdown(text: str) -> CleanResult:
     if sum(h.level == 1 for h in headings) != 1:
         raise ValueError("document needs exactly one H1")
     return CleanResult("\n".join(out) + "\n", headings)
+
+
+def section_spans(doc_id: str, result: CleanResult) -> list[dict]:
+    """Token span of every heading up to the next heading of the same or a higher level."""
+    starts = tokens.token_starts(result.text)
+    spans = []
+    for i, h in enumerate(result.headings):
+        end = next(
+            (o.offset for o in result.headings[i + 1 :] if o.level <= h.level), len(result.text)
+        )
+        spans.append(
+            {
+                "section_id": f"{doc_id}#{h.anchor}",
+                "doc_id": doc_id,
+                "anchor": h.anchor,
+                "title": h.title,
+                "level": h.level,
+                "start_token": tokens.char_to_token(starts, h.offset),
+                "end_token": tokens.char_to_token(starts, end),
+            }
+        )
+    return spans
+
+
+def manifest_section(path: str) -> str:
+    """Manifest `section` column for a path like guide/<folder>/<page>.md."""
+    parts = path.split("/")
+    if len(parts) == 2:
+        return "Guide"
+    if parts[1] not in SECTION_NAMES:
+        raise ValueError(f"{path}: no manifest section for folder {parts[1]!r}")
+    return SECTION_NAMES[parts[1]]
+
+
+def _write_jsonl(path: Path, records: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        for record in records:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def preprocess(
+    doc_file: Path = DOCUMENTS_FILE,
+    sections_file: Path = SECTIONS_FILE,
+    manifest_file: Path = CORPUS_MANIFEST_FILE,
+) -> tuple[int, int]:
+    """Clean documents.jsonl in place; write sections.jsonl and the corpus manifest."""
+    if not doc_file.exists():
+        raise FileNotFoundError(f"{doc_file} not found; run src/ingest.py first")
+    docs = [json.loads(line) for line in doc_file.read_text(encoding="utf-8").splitlines() if line]
+    if docs and all("{#" not in d["text"] for d in docs):
+        raise RuntimeError(f"{doc_file} is already preprocessed; run src/ingest.py first")
+
+    sections: list[dict] = []
+    for doc in docs:
+        try:
+            result = clean_markdown(doc["text"])
+        except ValueError as e:
+            raise ValueError(f"{doc['path']}: {e}") from e
+        doc["text"] = result.text
+        doc["tokens"] = tokens.count(result.text)
+        sections.extend(section_spans(doc["doc_id"], result))
+
+    _write_jsonl(doc_file, docs)
+    _write_jsonl(sections_file, sections)
+    with manifest_file.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(MANIFEST_HEADER)
+        for d in docs:
+            writer.writerow(
+                [
+                    d["doc_id"],
+                    d["path"],
+                    d["title"],
+                    manifest_section(d["path"]),
+                    d["tokens"],
+                    "yes",
+                ]
+            )
+    return len(docs), len(sections)
+
+
+if __name__ == "__main__":
+    n_docs, n_sections = preprocess()
+    print(
+        f"{n_docs} documents, {n_sections} sections -> {DOCUMENTS_FILE.name}, {SECTIONS_FILE.name}"
+    )
