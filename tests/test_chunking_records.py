@@ -42,6 +42,13 @@ def test_check_chunks_rejects_a_stale_token_count():
         check_chunks(doc, make_chunks(doc, [(0, doc["tokens"])], "C3"), "C3")
 
 
+def test_check_chunks_enforces_the_c3_floor():
+    doc, _ = doc_from_markdown("D001", "# T {#t}\n\n" + "word " * 60 + "\n")
+    chunks = make_chunks(doc, [(0, 10), (10, doc["tokens"])], "C3")
+    with pytest.raises(ValueError, match="shorter than 50"):
+        check_chunks(doc, chunks, "C3")
+
+
 @pytest.fixture
 def inputs(tmp_path):
     docs, sections = [], []
@@ -106,3 +113,13 @@ def test_c3_rejects_sections_of_unknown_documents(inputs, tmp_path):
 def test_unknown_strategy(tmp_path):
     with pytest.raises(ValueError, match="unknown strategy"):
         chunk("C4", tmp_path / "d.jsonl", tmp_path / "s.jsonl", tmp_path / "o.jsonl")
+
+
+@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+def test_raw_reingested_documents_are_rejected(inputs, tmp_path, key):
+    docs, docs_file, sections_file = inputs
+    raw = '# Intro {#intro}\n\n<div class="options-api">\n\nOld API.\n\n</div>\n\nShort page.\n'
+    stale = [docs[0], {**docs[1], "text": raw, "tokens": tokens.count(raw)}]
+    docs_file.write_text("".join(json.dumps(d) + "\n" for d in stale), encoding="utf-8")
+    with pytest.raises(ValueError, match="D002: sections.jsonl does not match"):
+        chunk(key, docs_file, sections_file, tmp_path / "out.jsonl")

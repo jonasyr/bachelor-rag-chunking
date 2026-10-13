@@ -95,7 +95,11 @@ def _split_long(seg: Span, breaks: list[int], max_tokens: int, min_tokens: int) 
     start, end = seg
     pieces: list[Span] = []
     while end - start > max_tokens:
-        fitting = [b for b in breaks if start < b <= start + max_tokens and end - b >= min_tokens]
+        fitting = [
+            b
+            for b in breaks
+            if start + min_tokens <= b <= start + max_tokens and end - b >= min_tokens
+        ]
         stop = max(fitting) if fitting else min(start + max_tokens, end - min_tokens)
         pieces.append((start, stop))
         start = stop
@@ -163,6 +167,8 @@ def check_chunks(doc: dict, chunks: list[dict], key: str) -> None:
             fail(f"windows are not {size} tokens with step {size - overlap}")
     elif any(cur[0] != prev[1] for prev, cur in pairs):
         fail("chunks leave a gap or overlap")
+    if key == "C3" and n >= C3_MIN_TOKENS and any(b - a < C3_MIN_TOKENS for a, b in spans):
+        fail(f"a chunk is shorter than {C3_MIN_TOKENS} tokens")
     if key != "C2" and "".join(c["text"] for c in chunks) != doc["text"]:
         fail("chunk texts do not reassemble the document")
 
@@ -173,14 +179,34 @@ def _read_jsonl(path: Path, hint: str) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
 
 
-def _section_boundaries(docs: list[dict], sections_file: Path) -> dict[str, list[int]]:
+def _check_alignment(doc: dict, sections: list[dict]) -> None:
+    """sections.jsonl must describe exactly this text (catches ingest re-run without preprocess)."""
+    text = doc["text"]
+    starts = tokens.token_starts(text)
+    aligned = max(s["end_token"] for s in sections) == doc["tokens"] == len(starts) and all(
+        s["start_token"] < len(starts) and text.startswith("#", starts[s["start_token"]])
+        for s in sections
+    )
+    if not aligned:
+        raise ValueError(
+            f"{doc['doc_id']}: sections.jsonl does not match documents.jsonl; "
+            "run src/ingest.py and src/preprocess.py"
+        )
+
+
+def _sections_by_doc(docs: list[dict], sections_file: Path) -> dict[str, list[dict]]:
+    """Sections per document, checked against the documents they describe."""
     ids = {d["doc_id"] for d in docs}
-    boundaries: dict[str, list[int]] = {}
+    by_doc: dict[str, list[dict]] = {}
     for s in _read_jsonl(sections_file, "run src/preprocess.py first"):
         if s["doc_id"] not in ids:
             raise ValueError(f"section {s['section_id']} belongs to an unknown document")
-        boundaries.setdefault(s["doc_id"], []).append(s["start_token"])
-    return boundaries
+        by_doc.setdefault(s["doc_id"], []).append(s)
+    for doc in docs:
+        if doc["doc_id"] not in by_doc:
+            raise ValueError(f"{doc['doc_id']}: no sections; run src/preprocess.py")
+        _check_alignment(doc, by_doc[doc["doc_id"]])
+    return by_doc
 
 
 def chunk(
@@ -194,7 +220,7 @@ def chunk(
         raise ValueError(f"unknown strategy {strategy_key!r}")
     out_file = out_file or CHUNK_FILES[strategy_key]
     docs = _read_jsonl(docs_file, "run src/preprocess.py first")
-    boundaries = _section_boundaries(docs, sections_file) if strategy_key == "C3" else {}
+    sections = _sections_by_doc(docs, sections_file)
 
     chunks: list[dict] = []
     for doc in docs:
@@ -202,9 +228,7 @@ def chunk(
         if strategy_key in FIXED_WINDOWS:
             spans = fixed_size_spans(n, *FIXED_WINDOWS[strategy_key])
         else:
-            heads = boundaries.get(doc["doc_id"])
-            if not heads:
-                raise ValueError(f"{doc['doc_id']}: no sections; run src/preprocess.py")
+            heads = [s["start_token"] for s in sections[doc["doc_id"]]]
             if min(heads) != 0:
                 raise ValueError(f"{doc['doc_id']}: the first section does not start at token 0")
             breaks = paragraph_breaks(doc["text"], tokens.token_starts(doc["text"]), 0, n)

@@ -33,6 +33,8 @@ def test_paragraph_breaks_ignore_blank_lines_inside_fences():
         (1000, [0], [700, 990], [(0, 700), (700, 1000)]),
         # a paragraph longer than the ceiling is cut hard
         (2000, [0], [1900], [(0, 800), (800, 1600), (1600, 2000)]),
+        # a break right after a heading is not used: no piece under the floor in front
+        (1331, [0], [6], [(0, 800), (800, 1331)]),
         # a hard cut never leaves a tail under the floor
         (820, [0], [], [(0, 770), (770, 820)]),
     ],
