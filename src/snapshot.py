@@ -15,11 +15,13 @@ from pathlib import Path
 from config import DATA_RAW, SNAPSHOT_INFO_FILE, VUE_DOCS_COMMIT, VUE_DOCS_REPO_URL, VUE_DOCS_SUBDIR
 
 TARGET_DIR = "guide"
+# Byte-identical checkout on every machine: ignore the user's line-ending settings.
+GIT = ["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf"]
 
 
 def _git(cwd: Path, *args: str) -> str:
     try:
-        result = subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True, text=True)
+        result = subprocess.run([*GIT, *args], cwd=cwd, check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"git {' '.join(args)} failed: {e.stderr.strip()}") from e
     return result.stdout.strip()

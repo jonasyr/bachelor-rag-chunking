@@ -57,6 +57,18 @@ def test_snapshot_copies_guide_markdown_and_writes_checksums(origin, tmp_path):
     assert f"{digest}  guide/a.md" in text
 
 
+def test_snapshot_bytes_ignore_users_autocrlf(origin, tmp_path, monkeypatch):
+    repo, sha = origin
+    config = tmp_path / "gitconfig"
+    config.write_text("[core]\n\tautocrlf = true\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+    out = tmp_path / "raw"
+
+    snapshot(repo.as_uri(), sha, "src/guide", out, out / "SNAPSHOT.txt")
+
+    assert (out / "guide" / "a.md").read_bytes() == b"# A {#a}\n"
+
+
 def test_snapshot_rejects_unknown_commit(origin, tmp_path):
     repo, _ = origin
     with pytest.raises(RuntimeError, match="git fetch"):
