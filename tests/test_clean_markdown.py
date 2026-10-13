@@ -69,6 +69,18 @@ def test_promo_blocks_details_and_images():
     assert clean(body) == "# Title\n\nUsage before 3.5\n\nOld way\n\nSee docs\n"
 
 
+def test_encoded_playground_state_dropped_from_links():
+    body = (
+        "[Try it in the Playground](https://play.vuejs.org/#eNp9kE1Lw0AQhv) and "
+        "[explorer](https://template-explorer.vuejs.org/#eyJzcmMi) but `https://play.vuejs.org/#keep`.\n"
+    )
+    expected = (
+        "# Title\n\n[Try it in the Playground](https://play.vuejs.org/) and "
+        "[explorer](https://template-explorer.vuejs.org/) but `https://play.vuejs.org/#keep`.\n"
+    )
+    assert clean(body) == expected
+
+
 def test_inline_code_is_never_cleaned():
     body = '2. `<PascalCase />` is clearer; write `<!-- c -->` or `<span class="options-api">`.\n'
     assert clean(body) == "# Title\n\n" + body

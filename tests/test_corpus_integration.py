@@ -32,7 +32,9 @@ def test_processed_artifacts_are_consistent():
     for d in docs:
         prose = re.sub(r"^\s*(`{3,}|~{3,}).*?^\s*\1\s*$", "", d["text"], flags=re.S | re.M)
         prose = re.sub(r"`[^`\n]*`", "", prose)
-        leftover = re.search(r'</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|class="options-api"|\{#', prose)
+        leftover = re.search(
+            r'</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|class="options-api"|\{#|vuejs\.org/#', prose
+        )
         assert leftover is None, f"{d['path']}: markup left in prose: {leftover.group(0)!r}"
     tokens_by_doc = {d["doc_id"]: d["tokens"] for d in docs}
     for s in sections:

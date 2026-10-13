@@ -46,6 +46,10 @@ WBR_RE = re.compile(r"<wbr\s*/?>")
 V_PRE_SPAN_RE = re.compile(r"<span v-pre>(.*?)</span>")
 CODE_TAG_RE = re.compile(r"<code(?: v-pre)?>(.*?)</code>")
 INLINE_TAG_RE = re.compile(r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>")
+# Vue tool links carry the whole demo as an encoded URL hash: noise for retrieval (ADR 0020).
+ENCODED_TOOL_URL_RE = re.compile(
+    r"(https://(?:play|sfc|explorer|template-explorer)\.vuejs\.org/)#[^)\s]*"
+)
 # Pre-rendered, syntax-highlighted listings (e.g. the create-vue prompts) become fenced code.
 LANGUAGE_BLOCK_RE = re.compile(r'^\s*<div class="language-([\w-]+)"><pre><code>(.*)$')
 LANGUAGE_BLOCK_END = "</code></pre></div>"
@@ -226,6 +230,7 @@ def clean_markdown(text: str) -> CleanResult:
             (WBR_RE, ""),
             (V_PRE_SPAN_RE, r"\1"),
             (CODE_TAG_RE, r"`\1`"),
+            (ENCODED_TOOL_URL_RE, r"\1"),
         ):
             line = _sub_outside_code(pattern, repl, line)
         prose = INLINE_CODE_RE.sub("", line)
