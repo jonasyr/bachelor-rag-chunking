@@ -61,3 +61,13 @@ def test_a_missing_higher_hit_is_detected_even_with_a_near_tie(tmp_path, monkeyp
     monkeypatch.setattr(vector_index, "chroma_top_k", lambda *a: found)
     with pytest.raises(ValueError, match="differs from the exact ranking"):
         verified_top_k(collection, ids, vectors, np.array([1, 0], dtype=np.float32), 3)
+
+
+def test_search_breadth_comes_from_the_config(tmp_path, monkeypatch):
+    monkeypatch.setattr(vector_index, "HNSW_MIN_BREADTH", 250)
+    meta = [{"doc_id": "D001", "start_token": 0, "end_token": 1}] * 3
+    small = build_collection(
+        vector_index.open_client(tmp_path), "rag_test", ["a", "b", "c"], unit_vectors(3), meta
+    )
+    assert small.configuration["hnsw"]["ef_search"] == 250
+    assert small.configuration["hnsw"]["ef_construction"] == 250
