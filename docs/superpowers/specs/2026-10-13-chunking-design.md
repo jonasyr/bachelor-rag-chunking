@@ -34,7 +34,7 @@ different token count than `end_token − start_token` (BPE merges at the cut); 
 |---|---|
 | `fixed_size_spans(n_tokens, size, overlap) -> list[tuple[int, int]]` | Windows starting at 0 with step `size − overlap`; each window is `[start, min(start + size, n))`; stops after the window that reaches `n`. `n == 0` gives no spans; `overlap >= size` or `size <= 0` raises `ValueError`. C1 = (500, 0), C2 = (500, 100). |
 | `paragraph_breaks(text, starts, lo, hi) -> list[int]` | Token positions inside `(lo, hi)` where a paragraph starts: the first token at or after the character following a blank line, ignoring blank lines inside fenced code blocks. |
-| `structure_spans(n_tokens, boundaries, breaks, max_tokens, min_tokens) -> list[tuple[int, int]]` | C3: (1) segments between consecutive heading boundaries (H1–H3 `start_token` values from `sections.jsonl`, plus `n`); (2) merge (before splitting): a segment shorter than `min_tokens` is always joined with the following segment (chains accumulate); a short last segment is joined with the previous one; (3) split: a segment longer than `max_tokens` is cut at the furthest paragraph break that keeps the piece ≤ `max_tokens` and leaves a rest of at least `min_tokens`; without such a break the cut is hard at `min(start + max_tokens, end − min_tokens)`. Hence no C3 chunk is shorter than `min_tokens` unless its whole document is. |
+| `structure_spans(n_tokens, boundaries, breaks, max_tokens, min_tokens) -> list[tuple[int, int]]` | C3: (1) segments between consecutive heading boundaries (H1–H3 `start_token` values from `sections.jsonl`, plus `n`); (2) merge (before splitting): a segment shorter than `min_tokens` is always joined with the following segment (chains accumulate); a short last segment is joined with the previous one; (3) split: a segment longer than `max_tokens` is cut at the furthest paragraph break that keeps the piece between `min_tokens` and `max_tokens` and leaves a rest of at least `min_tokens`; without such a break the cut is hard at `min(start + max_tokens, end − min_tokens)`. Hence no C3 chunk is shorter than `min_tokens` unless its whole document is. |
 | `make_chunks(doc, spans, key) -> list[dict]` | Chunk records with `chunk_id = {key}_{doc_id}_{seq:04d}` (seq from 1 per document and strategy), `strategy = STRATEGY_IDS[key]`, `text` = character slice. |
 | `check_chunks(doc, chunks, key)` | Runtime invariants (below); raises `ValueError` naming the chunk. |
 | `chunk(key, docs_file, sections_file, out_file) -> int` | Reads inputs, builds and checks chunks for all documents, writes the JSONL file, returns the chunk count. |
@@ -59,7 +59,7 @@ Add `C3_MIN_TOKENS = 50` next to `C3_MAX_TOKENS` (ADR 0021). Existing `C1_*`, `C
 ## Error handling
 
 `FileNotFoundError` with a hint for missing `documents.jsonl` (run `preprocess.py`) or `sections.jsonl`;
-`ValueError` if a document has no sections, a section belongs to an unknown document, or the H1 section does not start at
+`ValueError` if `sections.jsonl` does not describe the current `documents.jsonl` (last section end ≠ token count, or a section start not at a `#` line — e.g. `ingest.py` re-run without `preprocess.py`; checked for every strategy), if a document has no sections, a section belongs to an unknown document, or the H1 section does not start at
 token 0; `ValueError` for invalid window parameters and for any violated invariant.
 
 ## Tests (`tests/test_chunking.py`, written first)
