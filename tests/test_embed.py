@@ -88,6 +88,8 @@ def test_reembedding_one_strategy_checks_the_others(paths, fake_embedder, tmp_pa
     texts = ["ref() wraps a value.", "reactive() makes objects reactive.", "props"]
     assert fake_embedder.calls[-2] == texts  # canary: first, middle and last stored text
     assert run["canary_min_cosine"] == pytest.approx(1.0)
+    assert run["input_tokens"] == 3 * 7  # only C1's own three chunks
+    assert run["canary_input_tokens"] == 3 * 7  # probes from the sibling file, logged apart
 
 
 def test_reembedding_with_a_changed_model_aborts(paths, tmp_path):

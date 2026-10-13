@@ -10,7 +10,6 @@ Output schema: question_id, strategy, rank, chunk_id, score, is_relevant
 """
 
 import csv
-import json
 from pathlib import Path
 from typing import Any
 
@@ -28,10 +27,9 @@ from config import (
     RELEVANCE_MIN_OVERLAP,
     RETRIEVED_RESULTS_FILE,
     SECTIONS_FILE,
-    STRATEGY_IDS,
     TOP_K,
 )
-from embed import load_jsonl, load_vectors, save_vectors, strategy_keys
+from embed import load_jsonl, load_vectors, save_vectors
 from embedding_client import Embedder, embed_texts
 from relevance import is_relevant
 from run_log import append_run, sha256_of
@@ -63,15 +61,6 @@ def read_rows(path: Path, what: str, header: list[str]) -> list[dict]:
     return rows
 
 
-def last_retrieval_inputs(runs_file: Path) -> dict | None:
-    """inputs_sha256 of the last logged retrieval run, None if there is none."""
-    if not runs_file.exists():
-        return None
-    runs = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines() if line]
-    retrievals = [r for r in runs if r.get("step") == "retrieve"]
-    return retrievals[-1]["inputs_sha256"] if retrievals else None
-
-
 def split_ids(field: str) -> list[str]:
     return [part.strip() for part in field.split(ID_SEPARATOR) if part.strip()]
 
@@ -98,7 +87,6 @@ def relevant_sections(
 
 
 def retrieve(
-    strategy_keys: list[str],
     embedder: Embedder = embed_texts,
     client: Any = None,
     questions_file: Path = QUESTIONS_FILE,
@@ -110,7 +98,10 @@ def retrieve(
     out_file: Path = RETRIEVED_RESULTS_FILE,
     runs_file: Path = EMBEDDING_RUNS_FILE,
 ) -> int:
-    """Write retrieved_results.csv for all questions and the given strategies; return row count."""
+    """Write retrieved_results.csv afresh for all questions and all strategies; return row count.
+
+    All strategies always run together from the same inputs, so no row of an older run is kept.
+    """
     questions = sorted(
         read_rows(questions_file, "question catalogue", QUESTIONS_HEADER),
         key=lambda q: q["question_id"],
@@ -122,17 +113,18 @@ def retrieve(
     qids = [q["question_id"] for q in questions]
     texts = [q["question"] for q in questions]
     query_vectors = load_vectors(query_file, qids, texts)
-    input_tokens = 0
+    input_tokens = canary_tokens = 0
     canary_cosine = None
     if query_vectors is None:  # questions must share the model vintage of the chunk vectors
-        canary_cosine, input_tokens = check_vintage(embedder, list(vector_files.values()))
+        canary_cosine, canary_tokens = check_vintage(embedder, list(vector_files.values()))
         result = embedder(texts)
-        query_vectors, input_tokens = result.vectors, input_tokens + result.input_tokens
+        query_vectors, input_tokens = result.vectors, result.input_tokens
         save_vectors(query_file, qids, texts, query_vectors)
 
     client = client or vector_index.open_client()
+    strategies = sorted(chunk_files)
     rows: list[list] = []
-    for key in sorted(strategy_keys):
+    for key in strategies:
         chunks = load_jsonl(chunk_files[key], "run src/chunking.py first")
         ids = [c["chunk_id"] for c in chunks]
         vectors = load_vectors(vector_files[key], ids, [c["text"] for c in chunks])
@@ -148,39 +140,27 @@ def retrieve(
                 hit = is_relevant(chunk_by_id[chunk_id], relevant[qid], RELEVANCE_MIN_OVERLAP)
                 rows.append([qid, key, rank, chunk_id, f"{score:.6f}", int(hit)])
 
-    # Provenance of every input the rows depend on (all strategies whose files exist).
-    sources = [questions_file, ground_truth_file, sections_file, query_file]
-    sources += [f for files in (chunk_files, vector_files) for f in files.values() if f.exists()]
-    inputs = {f.name: sha256_of(f) for f in sources}
-    if out_file.exists():  # keep the rows of strategies not part of this run ...
-        with out_file.open(encoding="utf-8", newline="") as f:
-            kept = [r for r in csv.reader(f) if r and r != HEADER and r[1] not in strategy_keys]
-        if (
-            kept and last_retrieval_inputs(runs_file) != inputs
-        ):  # ... only if made from the same inputs
-            raise ValueError(
-                "inputs changed since the last retrieval run; run all strategies "
-                f"(--strategy all) to rebuild {out_file.name}"
-            )
-        rows += kept
-    rows = [[str(v) for v in r] for r in rows]
-    rows.sort(key=lambda r: (r[0], r[1], int(r[2])))
+    rows.sort(key=lambda r: (r[0], r[1], r[2]))
     out_file.parent.mkdir(parents=True, exist_ok=True)
     with out_file.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, lineterminator="\n")
         writer.writerow(HEADER)
         writer.writerows(rows)
+    # Provenance of every input the rows depend on (frozen ground truth, ADR 0017).
+    sources = [questions_file, ground_truth_file, sections_file, query_file]
+    sources += [files[key] for files in (chunk_files, vector_files) for key in strategies]
     append_run(
         {
             "step": "retrieve",
-            "strategy": ",".join(sorted(strategy_keys)),
+            "strategy": ",".join(strategies),
             "dimensions": int(query_vectors.shape[1]),
             "vectors": len(qids),
-            "inputs_sha256": inputs,
+            "inputs_sha256": {f.name: sha256_of(f) for f in sources},
             "canary_min_cosine": canary_cosine,
         },
         input_tokens,
         runs_file,
+        canary_tokens,
     )
     return len(rows)
 
@@ -188,7 +168,7 @@ def retrieve(
 if __name__ == "__main__":
     import argparse
 
-    p = argparse.ArgumentParser(description="Retrieve the top-k chunks per question and strategy.")
-    p.add_argument("--strategy", choices=[*STRATEGY_IDS, "all"], default="all")
-    args = p.parse_args()
-    print(f"{retrieve(strategy_keys(args.strategy))} rows -> {RETRIEVED_RESULTS_FILE}")
+    argparse.ArgumentParser(
+        description="Retrieve the top-k chunks per question for all strategies at once."
+    ).parse_args()
+    print(f"{retrieve()} rows -> {RETRIEVED_RESULTS_FILE}")

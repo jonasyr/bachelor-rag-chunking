@@ -90,12 +90,12 @@ def embed_and_store(
     ids = [c["chunk_id"] for c in chunks]
     texts = [c["text"] for c in chunks]
     vectors = load_vectors(vector_file, ids, texts)
-    input_tokens = 0
+    input_tokens = canary_tokens = 0
     canary_cosine = None
     if vectors is None:
-        canary_cosine, input_tokens = check_vintage(embedder, siblings)
+        canary_cosine, canary_tokens = check_vintage(embedder, siblings)
         result = embedder(texts)
-        vectors, input_tokens = result.vectors, input_tokens + result.input_tokens
+        vectors, input_tokens = result.vectors, result.input_tokens
         save_vectors(vector_file, ids, texts, vectors)
     metadatas = [
         {"doc_id": c["doc_id"], "start_token": c["start_token"], "end_token": c["end_token"]}
@@ -115,6 +115,7 @@ def embed_and_store(
         },
         input_tokens,
         runs_file,
+        canary_tokens,
     )
 
 

@@ -11,7 +11,13 @@ from pathlib import Path
 
 import numpy as np
 
-from config import CANARY_MIN_COSINE, EMBEDDING_MODEL
+from config import (
+    CANARY_MIN_COSINE,
+    EMBEDDING_FILES,
+    EMBEDDING_MODEL,
+    QUERY_EMBEDDINGS_FILE,
+    ROOT,
+)
 from embedding_client import Embedder
 
 
@@ -38,10 +44,10 @@ def check_vintage(embedder: Embedder, files: list[Path]) -> tuple[float | None, 
     norms = np.linalg.norm(result.vectors, axis=1) * np.linalg.norm(reference, axis=1)
     lowest = float(((result.vectors * reference).sum(axis=1) / norms).min())
     if lowest < CANARY_MIN_COSINE:
+        stored_files = [*EMBEDDING_FILES.values(), QUERY_EMBEDDINGS_FILE]
         raise RuntimeError(
             f"the model behind {EMBEDDING_MODEL} changed (canary cosine {lowest:.6f} < "
             f"{CANARY_MIN_COSINE}); delete all embedding files deliberately "
-            "(data/processed/embeddings_*.npz, data/evaluation/query_embeddings.npz) "
-            "and embed again"
+            f"({', '.join(str(p.relative_to(ROOT)) for p in stored_files)}) and embed again"
         )
     return lowest, result.input_tokens
