@@ -13,6 +13,7 @@ from relevance import is_relevant
 from retrieve import HEADER, retrieve
 from run_log import sha256_of
 
+HEADER_LINE = ",".join(HEADER) + "\n"
 PAGE = (
     "# {title} {{#{a}}}\n\n## First part {{#first}}\n\n{body}\n\n"
     "## Second part {{#second}}\n\n{body2}\n"
@@ -94,7 +95,7 @@ def read_out(path):
 
 def test_writes_exact_format_and_relevance(setup):
     paths, target, sections, fake = setup
-    assert retrieve(["C3", "C1"], embedder=fake, **paths) == 2 * 2 * 5
+    assert retrieve(embedder=fake, **paths) == 2 * 2 * 5
     rows = read_out(paths["out_file"])
     assert rows[0] == HEADER
     body = rows[1:]
@@ -123,17 +124,17 @@ def test_writes_exact_format_and_relevance(setup):
 def test_rerun_is_byte_identical_without_api_call(setup):
     paths, _, _, fake = setup
     calls_before = len(fake.calls)
-    retrieve(["C1", "C3"], embedder=fake, **paths)
+    retrieve(embedder=fake, **paths)
     first = paths["out_file"].read_bytes()
     assert len(fake.calls) == calls_before + 2  # model-vintage check, then the questions
-    retrieve(["C1", "C3"], embedder=fake, **paths)
+    retrieve(embedder=fake, **paths)
     assert paths["out_file"].read_bytes() == first
     assert len(fake.calls) == calls_before + 2  # rerun: no API call at all
 
 
 def test_run_log_records_ground_truth_checksums(setup):
     paths, _, _, fake = setup
-    retrieve(["C1"], embedder=fake, **paths)
+    retrieve(embedder=fake, **paths)
     last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
     assert last["step"] == "retrieve"
     assert last["inputs_sha256"]["ground_truth.csv"] == sha256_of(paths["ground_truth_file"])
@@ -146,7 +147,7 @@ def test_refuses_empty_ground_truth(setup):
         "question_id,expected_answer,relevant_doc_ids,relevant_section_ids\n", encoding="utf-8"
     )
     with pytest.raises(ValueError, match="must be complete before retrieval"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
 
 
 def test_refuses_unknown_section_ids(setup):
@@ -156,7 +157,7 @@ def test_refuses_unknown_section_ids(setup):
     )
     paths["ground_truth_file"].write_text(text, encoding="utf-8")
     with pytest.raises(ValueError, match="unknown section IDs"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
 
 
 def test_refuses_a_question_without_ground_truth(setup):
@@ -164,64 +165,30 @@ def test_refuses_a_question_without_ground_truth(setup):
     lines = paths["ground_truth_file"].read_text(encoding="utf-8").splitlines()
     paths["ground_truth_file"].write_text("\n".join(lines[:2]) + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="Q002 has no row"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
 
 
 def test_changed_question_text_is_not_silently_reused(setup):
     paths, _, _, fake = setup
-    retrieve(["C1"], embedder=fake, **paths)
+    retrieve(embedder=fake, **paths)
     text = (
         paths["questions_file"].read_text(encoding="utf-8").replace("watchers work", "watchers run")
     )
     paths["questions_file"].write_text(text, encoding="utf-8")
     with pytest.raises(ValueError, match="delete it deliberately"):
-        retrieve(["C1"], embedder=fake, **paths)
-
-
-def test_a_single_strategy_run_keeps_the_other_strategies(setup):
-    paths, _, _, fake = setup
-    retrieve(["C1", "C3"], embedder=fake, **paths)
-    full = read_out(paths["out_file"])
-    retrieve(["C1"], embedder=fake, **paths)
-    assert read_out(paths["out_file"]) == full
+        retrieve(embedder=fake, **paths)
 
 
 def test_questions_are_not_embedded_with_a_changed_model(setup):
     paths, _, _, _ = setup
     with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
-        retrieve(["C1", "C3"], embedder=FakeEmbedder(salt="model-update"), **paths)
+        retrieve(embedder=FakeEmbedder(salt="model-update"), **paths)
     assert not paths["query_file"].exists()
-
-
-def test_a_partial_run_after_changed_ground_truth_is_refused(setup):
-    paths, _, _, fake = setup
-    retrieve(["C1", "C3"], embedder=fake, **paths)
-    text = (
-        paths["ground_truth_file"].read_text(encoding="utf-8").replace("D003#second", "D004#second")
-    )
-    paths["ground_truth_file"].write_text(text, encoding="utf-8")
-    with pytest.raises(ValueError, match="inputs changed since the last retrieval run"):
-        retrieve(["C1"], embedder=fake, **paths)
-    assert retrieve(["C1", "C3"], embedder=fake, **paths) == 20  # a run over all strategies is fine
-
-
-def test_a_partial_run_after_changed_sections_is_refused(setup):
-    paths, _, _, fake = setup
-    retrieve(["C1", "C3"], embedder=fake, **paths)
-    sections = load_jsonl(paths["sections_file"], "")
-    for s in sections:
-        if s["section_id"] == "D003#second":
-            s["end_token"] -= 1  # a changed span changes relevance flags
-    paths["sections_file"].write_text(
-        "".join(json.dumps(s) + "\n" for s in sections), encoding="utf-8"
-    )
-    with pytest.raises(ValueError, match="inputs changed since the last retrieval run"):
-        retrieve(["C1"], embedder=fake, **paths)
 
 
 def test_the_run_log_covers_every_retrieval_input(setup):
     paths, _, _, fake = setup
-    retrieve(["C1", "C3"], embedder=fake, **paths)
+    retrieve(embedder=fake, **paths)
     last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
     assert set(last["inputs_sha256"]) == {
         "questions.csv",
@@ -243,7 +210,7 @@ def test_questions_without_the_documented_columns_are_refused(setup):
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="columns"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
 
 
 def test_ground_truth_with_extra_columns_is_refused(setup):
@@ -253,7 +220,7 @@ def test_ground_truth_with_extra_columns_is_refused(setup):
         text.replace("relevant_section_ids", "relevant_section_ids,x", 1), encoding="utf-8"
     )
     with pytest.raises(ValueError, match="columns"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
 
 
 def test_duplicate_question_ids_are_refused(setup):
@@ -261,4 +228,21 @@ def test_duplicate_question_ids_are_refused(setup):
     text = paths["ground_truth_file"].read_text(encoding="utf-8")
     paths["ground_truth_file"].write_text(text + text.splitlines()[1] + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="duplicate question_id"):
-        retrieve(["C1"], embedder=fake, **paths)
+        retrieve(embedder=fake, **paths)
+
+
+def test_an_existing_result_file_is_replaced_completely(setup):
+    paths, _, _, fake = setup
+    paths["out_file"].write_text(HEADER_LINE + "Q999,C9,1,stale,0.1,1\n", encoding="utf-8")
+    retrieve(embedder=fake, **paths)
+    rows = read_out(paths["out_file"])
+    assert {r[1] for r in rows[1:]} == {"C1", "C3"} and all(r[0] != "Q999" for r in rows[1:])
+
+
+def test_vintage_check_tokens_are_logged_apart_from_the_questions(setup):
+    paths, _, _, fake = setup
+    retrieve(embedder=fake, **paths)
+    last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
+    assert last["input_tokens"] == 2 * 7  # two questions
+    assert last["canary_input_tokens"] == 6 * 7  # first/middle/last of two vector files
+    assert last["strategy"] == "C1,C3"
