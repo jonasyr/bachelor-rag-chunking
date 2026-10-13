@@ -23,5 +23,5 @@ Verwendete Pfade:
 - src/guide/ (rekursiv, nur Composition API)
 Dateiformat: Markdown
 Anzahl Dateien: 52
-Gesamtumfang: 139.361 Tokens (cl100k_base, nach Preprocessing), 560 Abschnitte
+Gesamtumfang: 139.500 Tokens (cl100k_base, nach Preprocessing), 560 Abschnitte
 ```

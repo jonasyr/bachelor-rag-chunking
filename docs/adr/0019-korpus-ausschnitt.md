@@ -10,7 +10,7 @@ Angenommen (13.10.2026; konkretisiert [ADR 0001](0001-korpus-vuejs.md), ersetzt 
 - Der bisherige Vorschlag (vier Unterordner `essentials`, `components`, `reusability`, `best-practices`) umfasst auf dem gewählten Commit nur 28 Dateien und verfehlt damit den selbst gesetzten Rahmen von 50–100 Dateien.
 - `src/guide/` auf Commit `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (31.07.2026) enthält 52 Markdown-Dateien in neun Bereichen.
 - Die Seiten enthalten parallele `options-api`- und `composition-api`-Blöcke (172 bzw. 169). Beide Varianten beschreiben weitgehend denselben Inhalt und würden beim Retrieval als Beinahe-Duplikate konkurrieren.
-- Alle 506 H2/H3-Überschriften tragen explizite VitePress-Anker (`{#…}`); damit lassen sich Abschnitte ohne eigene Slug-Erzeugung eindeutig benennen.
+- Alle H2/H3-Überschriften (514 im Rohtext, 282 H2 und 232 H3) tragen explizite VitePress-Anker (`{#…}`); damit lassen sich Abschnitte ohne eigene Slug-Erzeugung eindeutig benennen.
 - Referenzquellen und Relevanzurteile müssen vor der Evaluation feststehen und mechanisch prüfbar sein ([ADR 0017](0017-fragenkatalog.md), [ADR 0012](0012-retrieval-metriken.md)).
 
 ## Entscheidung

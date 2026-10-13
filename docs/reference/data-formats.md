@@ -15,7 +15,7 @@
 
 **`sections.jsonl`** (ein Eintrag je H1–H3-Abschnitt; Spanne in Tokens des bereinigten `text`, Ende exklusiv; ein Abschnitt reicht bis zur nächsten Überschrift gleicher oder höherer Ebene; [ADR 0019](../adr/0019-korpus-ausschnitt.md))
 ```json
-{"section_id":"D027#declaring-reactive-state-1","doc_id":"D027","anchor":"declaring-reactive-state-1","title":"Declaring Reactive State","level":2,"start_token":60,"end_token":1722}
+{"section_id":"D027#declaring-reactive-state-1","doc_id":"D027","anchor":"declaring-reactive-state-1","title":"Declaring Reactive State","level":2,"start_token":60,"end_token":1713}
 ```
 
 `start_token`/`end_token` von Chunks und Abschnitten zählen beide über `src/tokens.py` (`cl100k_base`) und sind daher direkt vergleichbar.

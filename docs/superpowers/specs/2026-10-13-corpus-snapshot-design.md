@@ -13,7 +13,7 @@ Success criteria:
 
 - `snapshot.py`, `ingest.py`, `preprocess.py` run in that order from the repo root without options.
 - 52 documents `D001`–`D052`; `documents.jsonl` keys exactly `doc_id, path, title, text, tokens`.
-- No `options-api` markup remains; code inside fences is unchanged apart from the info string.
+- No `options-api` markup remains; code inside fences is unchanged apart from the info string and trailing whitespace.
 - Every H1–H3 heading yields one `section_id = {doc_id}#{anchor}`, unique across the corpus.
 - `uv run pytest` and `uvx pre-commit run --all-files` pass.
 
@@ -22,7 +22,7 @@ Success criteria:
 | Unit | Responsibility | Depends on |
 |---|---|---|
 | `src/tokens.py` (new) | `encode`, `decode`, `count`, `token_starts(text)` (character offset of each token) and `char_to_token(starts, offset)` with `config.TOKEN_ENCODING`. Shared with the later chunking step so `start_token`/`end_token` and section spans use one index space. | tiktoken |
-| `src/snapshot.py` (new, no CLI options) | Shallow `git fetch` of `config.VUE_DOCS_COMMIT` from `config.VUE_DOCS_REPO_URL` into a temporary directory, verify `HEAD` equals the pinned hash, replace the contents of `DATA_RAW` (keeping `.gitkeep`) with `{VUE_DOCS_SUBDIR}/**/*.md` stored as `guide/…`, write `DATA_RAW/SNAPSHOT.txt` (repo, commit, commit date, snapshot date, file count, sha256 per file). | git, config |
+| `src/snapshot.py` (new, no CLI options) | Shallow `git fetch` of `config.VUE_DOCS_COMMIT` from `config.VUE_DOCS_REPO_URL` into a temporary directory, verify `HEAD` equals the pinned hash, replace the contents of `DATA_RAW/guide/` with `{VUE_DOCS_SUBDIR}/**/*.md` stored as `guide/…`, write `DATA_RAW/SNAPSHOT.txt` (repo, commit, commit date, snapshot date, file count, sha256 per file). | git, config |
 | `src/ingest.py` | Read `DATA_RAW/guide/**/*.md` sorted by POSIX path, assign `D001…` in that order, `title` = H1 text without anchor, raw `text`, `tokens` = token count; write `documents.jsonl`. | tokens, config |
 | `src/preprocess.py` | Pure `clean_markdown(text) -> CleanResult(text, headings)`; `section_spans(...)`; `preprocess()` rewrites `documents.jsonl` in place (`text`, `tokens`), writes `sections.jsonl` and `docs/corpus_manifest.csv`. | tokens, config |
 
@@ -48,7 +48,11 @@ outside fences; fence content stays verbatim, the opening info string is reduced
 | containers `:::tip`, `::: tip`, `:::warning`, `:::danger`, `:::info`, `:::details`, `::: code-group` (optional space, optional title) | opening line becomes the title text (or nothing), body kept, closing `:::` dropped |
 | `{#anchor}` at end of a heading | recorded, then removed from the heading |
 | blank-line runs | collapsed to one blank line; trailing whitespace stripped |
-| any other HTML line outside fences | error (no silent leftovers) |
+| pre-rendered listing `<div class="language-sh"><pre><code>…</code></pre></div>` | becomes a fenced block (`sh`), tags stripped, entities unescaped |
+| inline `<code>…</code>`, `<code v-pre>…</code>` / `<span v-pre>…</span>` / `<wbr>` | become `` `…` `` / content / nothing |
+| any other HTML line, or inline tag in prose, outside fences | error (no silent leftovers) |
+
+All inline rules skip text inside inline code (`` `…` ``), so documented markup such as `` `<PascalCase />` `` stays intact.
 
 ## Sections
 
