@@ -40,7 +40,9 @@ outside fences; fence content stays verbatim, the opening info string is reduced
 | any other HTML block starting a line with `<div`, `<p`, `<ScrimbaLink`, `<VueSchoolLink` (Options API variants, demos, sponsor boxes, navigation tiles, promo links) | dropped with content up to the matching close tag (nesting counted, inline code ignored) |
 | `<span class="options-api">…</span>` / `<span class="composition-api">…</span>` | dropped / unwrapped |
 | page-level `<script …>…</script>`, `<style …>…</style>` | dropped |
-| `<img>`, `<details>`, `</details>`, `<br>` lines; self-closing components (`<VueSchoolLink … />`); inline `<sup … />`; empty `<span id="…"></span>` | dropped |
+| `<img>`, `<details>`, `</details>`, `<br>` lines; self-closing components (`<VueSchoolLink … />`); inline `<sup class="vt-badge ts" />`; empty `<span id="…"></span>` | dropped |
+| version badge `<sup class="vt-badge" data-text="3.5+" />` | becomes `(3.5+)` (factual content) |
+| trailing `\*` / `\*\*` API-style markers on headings | removed |
 | `<summary>Text</summary>` | becomes `Text` |
 | HTML comments `<!-- … -->` (also multi-line) | dropped |
 | containers `:::tip`, `::: tip`, `:::warning`, `:::danger`, `:::info`, `:::details`, `::: code-group` (optional space, optional title) | opening line becomes the title text (or nothing), body kept, closing `:::` dropped |

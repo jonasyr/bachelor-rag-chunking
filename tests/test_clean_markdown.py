@@ -69,6 +69,19 @@ def test_promo_blocks_details_and_images():
     assert clean(body) == "# Title\n\nUsage before 3.5\n\nOld way\n\nSee docs\n"
 
 
+def test_version_badge_kept_as_text_and_typescript_badge_dropped():
+    body = 'Since <sup class="vt-badge" data-text="3.5+" /> only. See <sup class="vt-badge ts" />\n'
+    assert clean(body) == "# Title\n\nSince (3.5+) only. See\n"
+
+
+def test_api_style_markers_stripped_from_headings():
+    result = clean_markdown(
+        DOC + "## `ref()` \\*\\* {#ref}\n\n### Stateful Methods \\* {#stateful}\n"
+    )
+    assert [h.title for h in result.headings] == ["Title", "`ref()`", "Stateful Methods"]
+    assert "\\*" not in result.text
+
+
 def test_fence_info_strings_reduced_and_indented_fences_tracked():
     listed = "- item\n\n   ```vue-html\n   <div>\n   ```\n"
     body = "```js{2-6}\ncode\n```\n\n```sh [npm]\nnpm i\n```\n\n" + listed
