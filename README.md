@@ -31,13 +31,13 @@ uv tool install pre-commit && pre-commit install   # ruff and checks before each
 ```
 
 All scripts in `src/` are stubs for now (status 13.10.2026). Tooling, CI and the link to the thesis repo:
-[`docs/development.md`](docs/development.md).
+[`docs/README.md`](docs/README.md).
 
 ## Pipeline (run in order)
 
 ```bash
 # 1. Fetch Vue.js snapshot into data/raw/vue_docs_snapshot/
-#    (corpus scope still open: docs/Ground_Truth_Projektleitfaden.md §19; record it in docs/methodology.md)
+#    (corpus scope still open: docs/plan.md; steps: docs/how-to/create-corpus-snapshot.md)
 
 # 2. Ingest
 python src/ingest.py
