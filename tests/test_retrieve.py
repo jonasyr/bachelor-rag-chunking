@@ -191,3 +191,15 @@ def test_questions_are_not_embedded_with_a_changed_model(setup):
     with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
         retrieve(["C1", "C3"], embedder=FakeEmbedder(salt="model-update"), **paths)
     assert not paths["query_file"].exists()
+
+
+def test_a_partial_run_after_changed_ground_truth_is_refused(setup):
+    paths, _, _, fake = setup
+    retrieve(["C1", "C3"], embedder=fake, **paths)
+    text = (
+        paths["ground_truth_file"].read_text(encoding="utf-8").replace("D003#second", "D004#second")
+    )
+    paths["ground_truth_file"].write_text(text, encoding="utf-8")
+    with pytest.raises(ValueError, match="inputs changed since the last retrieval run"):
+        retrieve(["C1"], embedder=fake, **paths)
+    assert retrieve(["C1", "C3"], embedder=fake, **paths) == 20  # a run over all strategies is fine

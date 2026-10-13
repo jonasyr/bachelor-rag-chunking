@@ -96,3 +96,11 @@ def test_reembedding_with_a_changed_model_aborts(paths, tmp_path):
     with pytest.raises(RuntimeError, match="delete all embedding files deliberately"):
         embed_and_store("C1", embedder=FakeEmbedder(salt="new"), **{**paths, "siblings": [other]})
     assert not paths["vector_file"].exists()
+
+
+def test_cli_strategies_come_from_the_config(monkeypatch):
+    import embed
+
+    monkeypatch.setattr(embed, "STRATEGY_IDS", {"C1": "a", "C2": "b", "C3": "c", "C4": "d"})
+    assert embed.strategy_keys("all") == ["C1", "C2", "C3", "C4"]
+    assert embed.strategy_keys("C2") == ["C2"]

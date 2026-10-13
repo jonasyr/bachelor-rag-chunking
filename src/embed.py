@@ -21,9 +21,15 @@ from config import (
     EMBEDDING_MODEL,
     EMBEDDING_RUNS_FILE,
     QUERY_EMBEDDINGS_FILE,
+    STRATEGY_IDS,
 )
 from embedding_client import Embedder, embed_texts
 from run_log import append_run, sha256_of
+
+
+def strategy_keys(choice: str) -> list[str]:
+    """CLI choice -> strategy keys from config.STRATEGY_IDS ("all" means every strategy)."""
+    return list(STRATEGY_IDS) if choice == "all" else [choice]
 
 
 def load_jsonl(path: Path, hint: str) -> list[dict]:
@@ -116,10 +122,9 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="Embed chunks and build one Chroma index per strategy.")
-    p.add_argument("--strategy", choices=["C1", "C2", "C3", "all"], default="all")
+    p.add_argument("--strategy", choices=[*STRATEGY_IDS, "all"], default="all")
     args = p.parse_args()
-    keys = ["C1", "C2", "C3"] if args.strategy == "all" else [args.strategy]
-    for k in keys:
+    for k in strategy_keys(args.strategy):
         run = embed_and_store(k)
         print(
             f"{k}: {run['vectors']} vectors, {run['input_tokens']} tokens, "
