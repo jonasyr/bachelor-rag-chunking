@@ -12,9 +12,15 @@ import tempfile
 from datetime import date
 from pathlib import Path
 
-from config import DATA_RAW, SNAPSHOT_INFO_FILE, VUE_DOCS_COMMIT, VUE_DOCS_REPO_URL, VUE_DOCS_SUBDIR
+from config import (
+    DATA_RAW,
+    SNAPSHOT_INFO_FILE,
+    SNAPSHOT_SUBDIR,
+    VUE_DOCS_COMMIT,
+    VUE_DOCS_REPO_URL,
+    VUE_DOCS_SUBDIR,
+)
 
-TARGET_DIR = "guide"
 # Byte-identical checkout on every machine: ignore the user's line-ending settings.
 GIT = ["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf"]
 
@@ -42,7 +48,7 @@ def copy_markdown(src_dir: Path, out_dir: Path) -> list[Path]:
     """Replace out_dir/guide with the *.md files below src_dir; return paths relative to out_dir."""
     if not src_dir.is_dir():
         raise FileNotFoundError(f"{src_dir} not found in the checkout")
-    target = out_dir / TARGET_DIR
+    target = out_dir / SNAPSHOT_SUBDIR
     if target.exists():
         shutil.rmtree(target)
     copied = []
@@ -87,4 +93,4 @@ def snapshot(
 
 
 if __name__ == "__main__":
-    print(f"{snapshot()} files -> {DATA_RAW / TARGET_DIR}")
+    print(f"{snapshot()} files -> {DATA_RAW / SNAPSHOT_SUBDIR}")
