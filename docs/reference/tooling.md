@@ -13,7 +13,7 @@ Konstante Parameter (Temperatur, top-k): [ADR 0014](../adr/0014-temperatur-und-t
 | Sprache | Python ≥ 3.11 |
 | Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs) |
 | Dokumentverarbeitung | Python-Markdown, `pathlib`, `regex` |
-| Token-Zählung | `tiktoken` |
+| Token-Zählung | `tiktoken` 0.13.0 (gepinnt), Kodierung `cl100k_base`, gekapselt in `src/tokens.py` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)) |
 | Embeddings | OpenAI API (`text-embedding-3-large` Standard; `text-embedding-3-small` bei Kosten-/Geschwindigkeitsfokus) |
 | Vector Store | Chroma (lokal, persistent) |
 | LLM | festes GPT-Modell über OpenAI API |
@@ -91,4 +91,6 @@ Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py` (Tests in `tests/`, `uv r
 |---|---|---|
 | ruff | Lint (E, F, W, I, B, UP; F401 bis zur Implementierung aus) und Formatierung, Zeilenlänge 100 | `pyproject.toml` `[tool.ruff]` |
 | pre-commit | ruff, große Dateien (> 5 MB), private Schlüssel, Merge-Konflikte, YAML/TOML, Zeilenenden | `.pre-commit-config.yaml` |
-| GitHub Actions | `uv sync`, alle pre-commit-Hooks, `compileall` für `src/` und `app/`, `pytest`, sobald `tests/` existiert | `.github/workflows/ci.yml` |
+| pytest | Unit-Tests aller umgesetzten Schritte; Korpus-Integrationstests werden ohne Snapshot übersprungen (z. B. in CI) | `tests/`, `pyproject.toml` `[tool.pytest.ini_options]` |
+| Pyright (Editor) | Typprüfung mit uv-venv und `src/` als Importpfad | `pyproject.toml` `[tool.pyright]` |
+| GitHub Actions | `uv sync`, alle pre-commit-Hooks, `compileall` für `src/` und `app/`, `pytest` | `.github/workflows/ci.yml` |
