@@ -33,8 +33,8 @@ RAG-Systems für technische Projektdokumentation“. Jede Tatsache hat genau ein
 
 ## Entscheidungen und Plan
 
-- [adr/](adr/README.md): Entscheidungen D1–D18, je eine Datei
-- [plan.md](plan.md): Zeitplan und offene Entscheidungen (u. a. Korpus-Ausschnitt)
+- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019, je eine Datei
+- [plan.md](plan.md): Zeitplan und offene Entscheidungen
 - [Exposee.md](Exposee.md): Lesekopie des Exposés; Original (LaTeX) im privaten PaperLab-Repo
 
 Text, Gliederung und IU-Form der Arbeit liegen im privaten Repo PaperLab, das dieses Repo als Submodul `code/`

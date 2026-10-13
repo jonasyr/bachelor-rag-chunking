@@ -5,7 +5,7 @@ submission 24.12.2026): RAG pipeline on Vue.js docs, only the chunking strategy 
 Facts live in `docs/` — start at `docs/README.md`; research design `docs/explanation/research-design.md`
 (conflict priority: its §0).
 
-Status 13.10.2026: `src/` scripts are stubs; corpus scope open (`docs/plan.md`, plan likely on Jonas's PC);
+Status 13.10.2026: `src/` scripts are stubs; corpus scope decided (ADR 0019, `docs/reference/corpus.md`);
 ruff/pre-commit/CI in place. Repo is public — no personal data (matriculation number etc.).
 
 ## Memories

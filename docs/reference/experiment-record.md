@@ -2,18 +2,18 @@
 
 > Seitentyp: Nachschlagen (reference). Übersicht: [Dokumentation](../README.md).
 
-Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Implementierungskapitel. Der genaue
-Korpus-Ausschnitt ist noch offen ([Plan](../plan.md)).
+Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt:
+[Korpus](corpus.md) ([ADR 0019](../adr/0019-korpus-ausschnitt.md)).
 
 ## Snapshot
 
 | Feld | Wert |
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
-| Commit | _noch offen_ |
+| Commit | `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (Commit-Datum 31.07.2026) |
 | Datum des Snapshots | _noch offen_ |
 | Verwendete Pfade | siehe `docs/corpus_manifest.csv` |
-| Anzahl Dateien | _noch offen_ |
+| Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | _noch offen_ |
 
 ## Modellversionen (bei der Umsetzung eintragen)
