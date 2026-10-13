@@ -6,8 +6,8 @@ Angenommen (D14 im Leitfaden; Quelle: Baseline, übernommen)
 
 ## Kontext
 
-- Temperatur 0 ist Teil der Absicherung von interner Validität und Reliabilität ([Leitfaden §13](../Ground_Truth_Projektleitfaden.md#13-validität-und-grenzen)).
-- Würde top-k zusätzlich variiert, entstünde eine zweite unabhängige Variable ([Leitfaden §8](../Ground_Truth_Projektleitfaden.md#8-technische-umsetzung--tech-stack)).
+- Temperatur 0 ist Teil der Absicherung von interner Validität und Reliabilität ([Leitfaden §13](../explanation/research-design.md#validität-und-grenzen)).
+- Würde top-k zusätzlich variiert, entstünde eine zweite unabhängige Variable ([Leitfaden §8](../reference/tooling.md#tech-stack)).
 
 ## Entscheidung
 

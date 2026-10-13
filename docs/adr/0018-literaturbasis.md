@@ -6,7 +6,7 @@ Angenommen (D18 im Leitfaden; Quelle: Chat, konkretisiert die Baseline)
 
 ## Kontext
 
-- Der Leitfaden nennt für die Zahl keinen eigenen Grund; alle 15 Quellen sind im Exposé zitiert und decken je eine Rolle in der Argumentation ab ([Leitfaden §18](../Ground_Truth_Projektleitfaden.md#18-literaturbasis-15-verifizierte-quellen)).
+- Der Leitfaden nennt für die Zahl keinen eigenen Grund; alle 15 Quellen sind im Exposé zitiert und decken je eine Rolle in der Argumentation ab ([Leitfaden §18](../reference/literature.md)).
 - Der Praktiker-Blogbeitrag (Mai 2026) ist keine zitierfähige wissenschaftliche Quelle (Leitfaden §4.5).
 
 ## Entscheidung

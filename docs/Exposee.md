@@ -1,5 +1,5 @@
 > Lesekopie für Agents und zum schnellen Lesen. Original ist das LaTeX-Exposé im privaten PaperLab-Repo
-> (`expose/` im Ordner der Bachelorarbeit). Verbindliche Entscheidungen: `Ground_Truth_Projektleitfaden.md`, `adr/`.
+> (`expose/` im Ordner der Bachelorarbeit). Verbindliche Entscheidungen: `adr/`; Übersicht: `README.md`.
 
 Exposé
 

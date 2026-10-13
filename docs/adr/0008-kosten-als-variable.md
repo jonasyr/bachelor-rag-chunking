@@ -6,13 +6,13 @@ Angenommen (D8 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-- Die Strategien unterscheiden sich im Aufwand: C2 erzeugt mehr Chunks, mehr Redundanz und höhere Kosten ([Leitfaden §6](../Ground_Truth_Projektleitfaden.md#6-chunking-strategien)).
+- Die Strategien unterscheiden sich im Aufwand: C2 erzeugt mehr Chunks, mehr Redundanz und höhere Kosten ([Leitfaden §6](../explanation/research-design.md#chunking-strategien)).
 - Unterfrage 4 fragt nach Trade-offs zwischen Chunk-Größe, Redundanz, Retrieval-Präzision, Kosten und Antwortqualität (Leitfaden §1).
 - Der Erkenntnisgewinn liegt unter anderem in Effektgröße und Kosten, nicht nur darin, welche Strategie gewinnt (Leitfaden §4.4).
 
 ## Entscheidung
 
-Wir werden je Strategie Chunk-Anzahl, Indexgröße sowie Prompt- und Completion-Tokens erfassen ([Leitfaden §12.4](../Ground_Truth_Projektleitfaden.md#124-effizienzkosten-abhängige-variable)).
+Wir werden je Strategie Chunk-Anzahl, Indexgröße sowie Prompt- und Completion-Tokens erfassen ([Leitfaden §12.4](../reference/evaluation.md#effizienzkosten-abhängige-variable)).
 
 ## Konsequenzen
 
