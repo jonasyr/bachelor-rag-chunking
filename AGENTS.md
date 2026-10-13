@@ -7,7 +7,7 @@
 Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
 RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
 Vue.js documentation in which only the chunking strategy (C1/C2/C3) varies. Status 13.10.2026: corpus fixed (ADR 0019);
-`snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py` implemented and tested, later steps are stubs (`docs/plan.md`).
+snapshot to retrieval (`snapshot.py` … `retrieve.py`) implemented and tested, later steps are stubs (`docs/plan.md`).
 Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
 ## Commands
@@ -65,6 +65,6 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 - `docs/README.md` — documentation index (single source of truth)
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/plan.md` — schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D22
+- `docs/adr/` — decisions D1–D24
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)

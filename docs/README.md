@@ -34,7 +34,7 @@ RAG-Systems für technische Projektdokumentation“. Jede Tatsache hat genau ein
 
 ## Entscheidungen und Plan
 
-- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0022, je eine Datei
+- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0024, je eine Datei
 - [plan.md](plan.md): Zeitplan und offene Entscheidungen
 - [Exposee.md](Exposee.md): Lesekopie des Exposés; Original (LaTeX) im privaten PaperLab-Repo
 

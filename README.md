@@ -30,7 +30,7 @@ source .venv/bin/activate
 uv tool install pre-commit && pre-commit install   # ruff and checks before each commit
 ```
 
-`snapshot.py`, `ingest.py`, `preprocess.py` and `chunking.py` are implemented and tested (`uv run pytest`); the later steps are still stubs. Tooling, CI and the link to the thesis repo:
+`snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py` and `retrieve.py` are implemented and tested (`uv run pytest`); the later steps are still stubs. Tooling, CI and the link to the thesis repo:
 [`docs/README.md`](docs/README.md).
 
 ## Pipeline (run in order)

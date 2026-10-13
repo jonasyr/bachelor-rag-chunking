@@ -14,8 +14,8 @@ Konstante Parameter (Temperatur, top-k): [ADR 0014](../adr/0014-temperatur-und-t
 | Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs) |
 | Dokumentverarbeitung | Python-Markdown, `pathlib`, `regex` |
 | Token-Zählung | `tiktoken` 0.13.0 (gepinnt), Kodierung `cl100k_base`, gekapselt in `src/tokens.py` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)) |
-| Embeddings | OpenAI API (`text-embedding-3-large` Standard; `text-embedding-3-small` bei Kosten-/Geschwindigkeitsfokus) |
-| Vector Store | Chroma (lokal, persistent) |
+| Embeddings | OpenAI API, `text-embedding-3-large` (3.072 Dimensionen; SDK 2.44.0; [ADR 0023](../adr/0023-embedding-modell.md)) |
+| Vector Store | Chroma 1.5.9 (lokal, persistent; Kosinus, exakte Suche geprüft; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) |
 | LLM | festes GPT-Modell über OpenAI API |
 | Datenanalyse | Pandas |
 | Diagramme | Matplotlib / Plotly |
@@ -50,6 +50,10 @@ bachelor-rag-chunking/
 │   ├── ingest.py
 │   ├── preprocess.py
 │   ├── chunking.py
+│   ├── embedding_client.py
+│   ├── vector_index.py
+│   ├── relevance.py
+│   ├── run_log.py
 │   ├── embed.py
 │   ├── retrieve.py
 │   ├── generate.py
@@ -65,7 +69,7 @@ bachelor-rag-chunking/
     ├── README.md                 (Index der Dokumentation)
     ├── explanation/  reference/  how-to/   (Diátaxis)
     ├── plan.md                   (Zeitplan, offene Entscheidungen)
-    ├── adr/                      (Entscheidungen D1–D21)
+    ├── adr/                      (Entscheidungen D1–D24)
     ├── Exposee.md                (Lesekopie, Original in PaperLab)
     └── corpus_manifest.csv
 ```
@@ -76,7 +80,7 @@ sind gitignored; die Ordner bleiben über `.gitkeep` erhalten. Formate: [Datenar
 ## Skripte und Optionen
 
 Alle Schritte in `src/` laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py`, Optionen mit `--help`).
-Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py` (Tests in `tests/`, `uv run pytest`); die übrigen Schritte sind Gerüste (`raise NotImplementedError`).
+Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py`, `retrieve.py` (Tests in `tests/`, `uv run pytest`); die übrigen Schritte sind Gerüste (`raise NotImplementedError`).
 
 | Skript | Optionen |
 |---|---|

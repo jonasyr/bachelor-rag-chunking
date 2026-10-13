@@ -34,7 +34,7 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 ## Offene Entscheidungen / vor Beginn zu bestätigen
 
 - **Exposé-Umfang:** Aktuelle Fassung ist näher an „Betreuungsanfrage" (2–3 Seiten). Die IU-Formvorgabe nennt 5 Seiten ±10 %. Falls das Exposé als reguläre IU-Abgabe zählt, Theorie und Methodik entsprechend ausbauen (jeder Unterabschnitt ≥ ½ Seite).
-- **Modell-/Versionswahl:** konkretes GPT-Modell, Embedding-Modell (`-large` vs. `-small`), SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren.
+- **Modell-/Versionswahl:** konkretes GPT-Modell und SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren. Entschieden: Embedding-Modell sowie SDK- und Chroma-Version ([ADR 0023](adr/0023-embedding-modell.md)); offen: GPT-Modell.
 - **Embedding-Sprache:** Korpus ist englisch; Fragen/Referenzantworten englisch halten (Konsistenz mit Embedding-Raum).
 - **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität).
 - **C4 (semantisch):** nur einplanen, wenn der Meilenstein 09.11. (Ground Truth eingefroren) planmäßig erreicht ist.
