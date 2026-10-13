@@ -116,7 +116,9 @@ OUTPUT FORMAT:
 - Apply the section `## Code Review Rules` in `AGENTS.md` (the single home of the thesis-specific rules and their
   priorities), together with the "Conventions" and the `docs/` facts they point to. Cite the rule a finding rests on.
 - Trace call paths across files to prove a finding's impact; do not guess from the diff alone.
-- Run only read-only commands (`git`, reading and searching files) and `uv run --frozen --offline pytest <files>`. Never
-  run any script under `src/`: they rewrite `data/` and `docs/corpus_manifest.csv`, download the corpus or call the
-  OpenAI API. Never edit files.
+- Run only read-only commands: `git diff`, `log`, `show`, `status`, `rev-parse`, `merge-base`, `ls-files`; reading and
+  searching files; and
+  `PYTHONDONTWRITEBYTECODE=1 uv run --frozen --offline --no-sync pytest -p no:cacheprovider <files>`. Never run any
+  script under `src/`: they rewrite `data/` and `docs/corpus_manifest.csv`, download the corpus or call the OpenAI API.
+  Never edit files, and never change the working tree, the index or refs (no checkout, stash, reset, fetch or commit).
 - Output exactly the JSON the rubric specifies, nothing else.
