@@ -203,3 +203,33 @@ def test_a_partial_run_after_changed_ground_truth_is_refused(setup):
     with pytest.raises(ValueError, match="inputs changed since the last retrieval run"):
         retrieve(["C1"], embedder=fake, **paths)
     assert retrieve(["C1", "C3"], embedder=fake, **paths) == 20  # a run over all strategies is fine
+
+
+def test_a_partial_run_after_changed_sections_is_refused(setup):
+    paths, _, _, fake = setup
+    retrieve(["C1", "C3"], embedder=fake, **paths)
+    sections = load_jsonl(paths["sections_file"], "")
+    for s in sections:
+        if s["section_id"] == "D003#second":
+            s["end_token"] -= 1  # a changed span changes relevance flags
+    paths["sections_file"].write_text(
+        "".join(json.dumps(s) + "\n" for s in sections), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="inputs changed since the last retrieval run"):
+        retrieve(["C1"], embedder=fake, **paths)
+
+
+def test_the_run_log_covers_every_retrieval_input(setup):
+    paths, _, _, fake = setup
+    retrieve(["C1", "C3"], embedder=fake, **paths)
+    last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
+    assert set(last["inputs_sha256"]) == {
+        "questions.csv",
+        "ground_truth.csv",
+        "sections.jsonl",
+        "query_embeddings.npz",
+        "chunks_c1.jsonl",
+        "chunks_c3.jsonl",
+        "embeddings_c1.npz",
+        "embeddings_c3.npz",
+    }

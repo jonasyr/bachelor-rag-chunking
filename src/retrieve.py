@@ -134,10 +134,10 @@ def retrieve(
                 hit = is_relevant(chunk_by_id[chunk_id], relevant[qid], RELEVANCE_MIN_OVERLAP)
                 rows.append([qid, key, rank, chunk_id, f"{score:.6f}", int(hit)])
 
-    inputs = {
-        questions_file.name: sha256_of(questions_file),
-        ground_truth_file.name: sha256_of(ground_truth_file),
-    }
+    # Provenance of every input the rows depend on (all strategies whose files exist).
+    sources = [questions_file, ground_truth_file, sections_file, query_file]
+    sources += [f for files in (chunk_files, vector_files) for f in files.values() if f.exists()]
+    inputs = {f.name: sha256_of(f) for f in sources}
     if out_file.exists():  # keep the rows of strategies not part of this run ...
         with out_file.open(encoding="utf-8", newline="") as f:
             kept = [r for r in csv.reader(f) if r and r != HEADER and r[1] not in strategy_keys]
