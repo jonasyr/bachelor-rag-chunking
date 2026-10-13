@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D5 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
+Angenommen (D5 im Leitfaden; Quelle: Exposé/Baseline, übernommen); C3-Grenzen konkretisiert durch [ADR 0021](0021-c3-grenzen.md)
 
 ## Kontext
 
