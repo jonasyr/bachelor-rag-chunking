@@ -51,3 +51,68 @@ def fixed_size_spans(n_tokens: int, size: int, overlap: int) -> list[Span]:
             break
         start += size - overlap
     return spans
+
+
+def paragraph_breaks(text: str, starts: list[int], lo: int, hi: int) -> list[int]:
+    """Token positions in (lo, hi) that start a paragraph (after a blank line, outside fences)."""
+    breaks: set[int] = set()
+    pos = 0
+    in_fence = False
+    after_blank = False
+    for line in text.split("\n"):
+        if not in_fence and after_blank and line.strip():
+            t = tokens.char_to_token(starts, pos)
+            if lo < t < hi:
+                breaks.add(t)
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+        after_blank = not in_fence and not line.strip()
+        pos += len(line) + 1
+    return sorted(breaks)
+
+
+def _merge_short(segments: list[Span], min_tokens: int) -> list[Span]:
+    """Join each segment shorter than min_tokens with the next one (the last with the previous)."""
+    merged: list[Span] = []
+    pending: Span | None = None
+    for seg in segments:
+        if pending is not None:
+            seg, pending = (pending[0], seg[1]), None
+        if seg[1] - seg[0] < min_tokens:
+            pending = seg
+        else:
+            merged.append(seg)
+    if pending is not None:
+        if merged:
+            merged[-1] = (merged[-1][0], pending[1])
+        else:
+            merged.append(pending)
+    return merged
+
+
+def _split_long(seg: Span, breaks: list[int], max_tokens: int, min_tokens: int) -> list[Span]:
+    """Cut at paragraph breaks into pieces of at most max_tokens; no rest under min_tokens."""
+    start, end = seg
+    pieces: list[Span] = []
+    while end - start > max_tokens:
+        fitting = [b for b in breaks if start < b <= start + max_tokens and end - b >= min_tokens]
+        stop = max(fitting) if fitting else min(start + max_tokens, end - min_tokens)
+        pieces.append((start, stop))
+        start = stop
+    pieces.append((start, end))
+    return pieces
+
+
+def structure_spans(
+    n_tokens: int, boundaries: list[int], breaks: list[int], max_tokens: int, min_tokens: int
+) -> list[Span]:
+    """C3: segments between heading boundaries, short ones merged, long ones split."""
+    edges = [0, *sorted({b for b in boundaries if 0 < b < n_tokens}), n_tokens]
+    segments = list(zip(edges, edges[1:], strict=False))
+    spans: list[Span] = []
+    for seg in _merge_short(segments, min_tokens):
+        if seg[1] - seg[0] <= max_tokens:
+            spans.append(seg)
+        else:
+            spans.extend(_split_long(seg, breaks, max_tokens, min_tokens))
+    return spans
