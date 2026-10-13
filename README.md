@@ -30,14 +30,14 @@ source .venv/bin/activate
 uv tool install pre-commit && pre-commit install   # ruff and checks before each commit
 ```
 
-All scripts in `src/` are stubs for now (status 13.10.2026). Tooling, CI and the link to the thesis repo:
+`snapshot.py`, `ingest.py` and `preprocess.py` are implemented and tested (`uv run pytest`); the later steps are still stubs. Tooling, CI and the link to the thesis repo:
 [`docs/README.md`](docs/README.md).
 
 ## Pipeline (run in order)
 
 ```bash
-# 1. Fetch Vue.js snapshot into data/raw/vue_docs_snapshot/
-#    (corpus scope still open: docs/plan.md; steps: docs/how-to/create-corpus-snapshot.md)
+# 1. Fetch the pinned Vue.js snapshot (ADR 0019; docs/how-to/create-corpus-snapshot.md)
+python src/snapshot.py
 
 # 2. Ingest
 python src/ingest.py
@@ -69,7 +69,7 @@ python src/evaluate_answers.py --mode summarise
 ## Minimal prototype (run this first)
 
 ```bash
-python src/ingest.py && python src/preprocess.py && python src/chunking.py
+python src/snapshot.py && python src/ingest.py && python src/preprocess.py && python src/chunking.py
 python src/embed.py --strategy C1
 python src/retrieve.py --strategy C1
 python src/generate.py --strategy C1
@@ -92,9 +92,10 @@ jupyter notebook notebooks/analysis.ipynb
 ## Repository structure
 
 ```
-├── src/              Pipeline scripts (ingest → preprocess → chunking → embed → retrieve → generate → evaluate)
+├── tests/            pytest suite (uv run pytest)
+├── src/              Pipeline scripts (snapshot → ingest → preprocess → chunking → embed → retrieve → generate → evaluate)
 ├── data/raw/         Vue.js snapshot (not committed)
-├── data/processed/   Intermediate artefacts — documents.jsonl, chunks_*.jsonl (not committed)
+├── data/processed/   Intermediate artefacts — documents.jsonl, sections.jsonl, chunks_*.jsonl (not committed)
 ├── data/evaluation/  questions.csv, ground_truth.csv, scores.csv
 ├── docs/             Documentation index (docs/README.md), master reference, ADRs, methodology, prompts
 ├── notebooks/        Analysis and visualisation
