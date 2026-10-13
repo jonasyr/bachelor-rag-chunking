@@ -28,7 +28,6 @@
 ## Offene Entscheidungen / vor Beginn zu bestätigen
 
 - **Exposé-Umfang:** Aktuelle Fassung ist näher an „Betreuungsanfrage" (2–3 Seiten). Die IU-Formvorgabe nennt 5 Seiten ±10 %. Falls das Exposé als reguläre IU-Abgabe zählt, Theorie und Methodik entsprechend ausbauen (jeder Unterabschnitt ≥ ½ Seite).
-- **Exakter Vue-Korpus-Ausschnitt (offen, Stand 13.10.2026):** Vorschlag aus einem Plan vom 13.08.2026 (`docs/superpowers/plans/2026-08-13-corpus-snapshot.md`, liegt vermutlich auf dem PC und ist noch nicht im Repo): ganzes `src/guide/` aus `vuejs/docs` auf Commit `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (52 Dateien, ca. 106k Tokens), nur Composition-API-Inhalte (`options-api`-Blöcke entfernt), `section_id` = `{doc_id}#{anchor}` aus expliziten `{#…}`-Ankern, relevant = jede Überlappung von Token-Spannen (Sensitivitätsprüfung ab 100 Tokens), Token-Kodierung `cl100k_base` (tiktoken 0.13.0). Abweichung von §5.2 (vier Unterordner, 50–100 Dateien). Nach Bestätigung als ADR festhalten und §5 anpassen.
 - **Modell-/Versionswahl:** konkretes GPT-Modell, Embedding-Modell (`-large` vs. `-small`), SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren.
 - **Embedding-Sprache:** Korpus ist englisch; Fragen/Referenzantworten englisch halten (Konsistenz mit Embedding-Raum).
 - **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität).

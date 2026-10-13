@@ -25,3 +25,4 @@ Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte a
 | [0016](0016-modell-neutralitaet.md) | Modell-Neutralität | Angenommen |
 | [0017](0017-fragenkatalog.md) | Fragenkatalog: etwa 40 Fragen mit Referenzantworten | Angenommen |
 | [0018](0018-literaturbasis.md) | Literaturbasis: 15 verifizierte Quellen | Angenommen |
+| [0019](0019-korpus-ausschnitt.md) | Korpus-Ausschnitt: ganzes `src/guide/`, nur Composition API | Angenommen |
