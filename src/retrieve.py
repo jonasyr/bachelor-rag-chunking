@@ -45,13 +45,18 @@ def read_rows(path: Path, what: str, header: list[str]) -> list[dict]:
     if not path.exists():
         raise FileNotFoundError(f"{path} not found; create the {what} first")
     with path.open(encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        rows = list(reader)
-        if reader.fieldnames != header:
+        records = [record for record in csv.reader(f) if record]  # blank lines are no rows
+    found = records[0] if records else []
+    if found != header:
+        raise ValueError(
+            f"{path} has columns {found}, docs/reference/data-formats.md requires {header}"
+        )
+    for number, record in enumerate(records[1:], start=2):
+        if len(record) != len(header):
             raise ValueError(
-                f"{path} has columns {reader.fieldnames}, docs/reference/data-formats.md "
-                f"requires {header}"
+                f"{path}: row {number} has {len(record)} fields, expected {len(header)}"
             )
+    rows = [dict(zip(header, record, strict=True)) for record in records[1:]]
     if not rows:
         raise ValueError(f"{path} has no rows; the {what} must be complete before retrieval")
     ids = [row["question_id"] for row in rows]
