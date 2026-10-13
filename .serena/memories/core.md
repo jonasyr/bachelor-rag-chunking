@@ -2,10 +2,10 @@
 
 Code of Jonas Weirauch's bachelor thesis (IU, B.Sc. Informatik, supervisor Prof. Dr.-Ing. Klaus Quibeldey-Cirkel,
 submission 24.12.2026): RAG pipeline on Vue.js docs, only the chunking strategy varies.
-Facts live in `docs/` — start at `docs/README.md`; binding reference `docs/Ground_Truth_Projektleitfaden.md`
+Facts live in `docs/` — start at `docs/README.md`; research design `docs/explanation/research-design.md`
 (conflict priority: its §0).
 
-Status 13.10.2026: `src/` scripts are stubs; corpus scope open (Leitfaden §19, plan likely on Jonas's PC);
+Status 13.10.2026: `src/` scripts are stubs; corpus scope open (`docs/plan.md`, plan likely on Jonas's PC);
 ruff/pre-commit/CI in place. Repo is public — no personal data (matriculation number etc.).
 
 ## Memories

@@ -1,6 +1,6 @@
 # Chunking
 
-Strategies and parameters: ADR 0005 / Leitfaden §6; values only in `src/config.py`. C2 is a strong baseline (ADR 0010).
+Strategies and parameters: ADR 0005 / `docs/explanation/research-design.md`; values only in `src/config.py`. C2 is a strong baseline (ADR 0010).
 - C3 pitfall: some Vue sections (e.g. "Reactivity Fundamentals") exceed 800 tokens — split by paragraph, document
   floor/ceiling in the methodology.
 - `strategy` field values come from `config.STRATEGY_IDS` (`fixed_500_no_overlap`, `fixed_500_overlap_100`,
