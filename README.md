@@ -112,3 +112,13 @@ jupyter notebook notebooks/analysis.ipynb
 - Every intermediate artefact is saved to disk
 
 Details and reasons: [`docs/README.md`](docs/README.md) (master reference, decisions in `docs/adr/`).
+
+## License
+
+- Code and documentation of this repository: [MIT](LICENSE), © 2026 Jonas Weirauch.
+- `.claude/agents/codex-reviewer.md` contains the review rubric of [openai/codex](https://github.com/openai/codex)
+  under the Apache License 2.0 ([copy](LICENSES/Apache-2.0.txt)); the file states its changes.
+- Corpus: the [Vue.js documentation](https://github.com/vuejs/docs) © Yuxi (Evan) You and Vue documentation
+  contributors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It is downloaded at run time
+  (`src/snapshot.py`, commit in `src/config.py`) and not redistributed here; derived artefacts such as
+  `docs/corpus_manifest.csv` refer to it. The cleaning steps applied to it are documented in ADR 0019–0021.
