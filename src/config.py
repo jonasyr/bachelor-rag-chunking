@@ -69,6 +69,14 @@ CHUNK_FILES = {
     "C3": CHUNKS_C3_FILE,
 }
 
+EMBEDDING_FILES = {
+    "C1": DATA_PROCESSED / "embeddings_c1.npz",
+    "C2": DATA_PROCESSED / "embeddings_c2.npz",
+    "C3": DATA_PROCESSED / "embeddings_c3.npz",
+}
+QUERY_EMBEDDINGS_FILE = DATA_EVAL / "query_embeddings.npz"
+EMBEDDING_RUNS_FILE = DATA_PROCESSED / "embedding_runs.jsonl"
+
 CHROMA_COLLECTIONS = {
     "C1": "rag_c1",
     "C2": "rag_c2",
@@ -79,6 +87,20 @@ CHROMA_COLLECTIONS = {
 # Retrieval parameters (D14)
 # ---------------------------------------------------------------------------
 TOP_K = 5  # constant — do NOT vary; would introduce a second independent variable
+SCORE_TOLERANCE = 1e-5  # Chroma vs exact NumPy cosine (float32), D24
+# HNSW ef_search and ef_construction = max(collection size, this); >= size: exhaustive search (D24).
+HNSW_MIN_BREADTH = 100  # Chroma default for both
+# Chroma distance (D24). Results are read as similarity = 1 - distance and checked against exact
+# cosine; for unit-length OpenAI vectors that holds for "cosine" (and "ip"), not for "l2".
+CHROMA_SPACE = "cosine"
+# Model-vintage check (D24): measured 13.10.2026, same model >= 0.99996, different chunks <= 0.84.
+CANARY_MIN_COSINE = 0.999
+CANARY_PROBE_POSITIONS = (
+    0.0,
+    0.5,
+    1.0,
+)  # relative positions of re-embedded texts: first, middle, last
+ID_SEPARATOR = ";"  # several IDs in one ground_truth.csv field
 
 # A chunk counts as relevant if its token span overlaps a relevant section by at least
 # this many tokens (D19).
@@ -90,7 +112,11 @@ SENSITIVITY_MIN_OVERLAP = 100  # sensitivity check for the retrieval evaluation
 # ---------------------------------------------------------------------------
 # Pin exact versions at implementation time and document date of first use.
 # Use neutral placeholders until then; replace before running experiments.
-EMBEDDING_MODEL = "text-embedding-3-large"  # or text-embedding-3-small for cost focus
+# Embedding model (D23): OpenAI offers only the alias as snapshot, so vectors are stored once (D24).
+EMBEDDING_MODEL = "text-embedding-3-large"
+EMBEDDING_DIMENSIONS = 3072  # model default
+EMBEDDING_BATCH_SIZE = 100  # API: <= 2048 inputs and <= 300,000 tokens per request
+EMBEDDING_PRICE_PER_MTOK = 0.13  # USD per 1M input tokens, OpenAI model page, accessed 13.10.2026
 LLM_MODEL = "gpt-4o"  # PLACEHOLDER — pin exact snapshot at impl time
 
 LLM_TEMPERATURE = 0.0  # constant for reproducibility (D14)

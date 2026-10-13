@@ -29,3 +29,5 @@ Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte a
 | [0020](0020-playground-urls-kuerzen.md) | Kodierte Playground-URLs beim Preprocessing kürzen | Angenommen |
 | [0021](0021-c3-grenzen.md) | C3: Untergrenze 50 Tokens, Verschmelzen vor dem Teilen | Angenommen |
 | [0022](0022-h1-abschnitte-in-ground-truth.md) | H1-Abschnitte in der Ground Truth nur, wenn die ganze Seite die Antwort ist | Angenommen |
+| [0023](0023-embedding-modell.md) | Embedding-Modell: text-embedding-3-large mit 3.072 Dimensionen | Angenommen |
+| [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen |

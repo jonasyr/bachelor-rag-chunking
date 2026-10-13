@@ -24,3 +24,17 @@ Alle Quellen sind im Exposé zitiert; die BibTeX-Einträge liegen im privaten Pa
 | `qu2025semanticchunking` | semantisch/struktur ≠ konsistent besser → starke Baseline, „nicht trivial" | NAACL Findings |
 
 > Nicht zitierfähig, aber in „Verwandte Arbeiten" zu erwähnen: der Praktiker-Blogbeitrag (Mai 2026) mit nahezu identischem Setup auf FastAPI/Supabase/Stripe.
+
+## Technische Quellen (Web)
+
+Abgerufen am 13.10.2026; Grundlage von [ADR 0023](../adr/0023-embedding-modell.md) und
+[ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md). Für die Arbeit als APA-7-Webquellen in die BibTeX-Datei
+(PaperLab) übernehmen.
+
+| Kurzname | Quelle (APA 7) | Belegt |
+|----------|----------------|--------|
+| `openai2024embeddingmodels` | OpenAI. (2024, 25. Januar). *New embedding models and API updates*. https://openai.com/index/new-embedding-models-and-api-updates/ | Einführung von `text-embedding-3-small/-large` |
+| `openai2026embeddingsguide` | OpenAI. (o. J.). *Vector embeddings* [Leitfaden]. https://developers.openai.com/api/docs/guides/embeddings | MTEB 64,6 % / 62,3 %, max. 8.192 Tokens, `cl100k_base`, Normierung auf Länge 1, Kosinus, Dimensionen |
+| `openai2026te3large` | OpenAI. (o. J.). *text-embedding-3-large* [Modellseite]. https://developers.openai.com/api/docs/models/text-embedding-3-large | Preis 0,13 USD je 1 Mio. Tokens, Snapshot nur als Alias |
+| `openai2026embeddingsapi` | OpenAI. (o. J.). *Create embeddings* [API-Referenz]. https://developers.openai.com/api/reference/resources/embeddings/methods/create | ≤ 2.048 Eingaben und ≤ 300.000 Tokens je Anfrage, `usage.prompt_tokens` |
+| `chroma2026configure` | Chroma. (o. J.). *Configure collections*. https://docs.trychroma.com/docs/collections/configure | HNSW ist approximativ; Standard `l2`, `ef_search` = 100 |
