@@ -38,6 +38,8 @@ VUE_DOCS_REPO_URL = "https://github.com/vuejs/docs.git"
 VUE_DOCS_COMMIT = "b75d188ab16bf83bd1f364a77dfd2315be8f3fa4"
 VUE_DOCS_SUBDIR = "src/guide"
 TOKEN_ENCODING = "cl100k_base"  # tiktoken 0.13.0, pinned in pyproject.toml
+SNAPSHOT_SUBDIR = "guide"  # folder below DATA_RAW: snapshot.py writes it, ingest.py reads it
+SECTION_MAX_LEVEL = 3  # H1-H3 headings become sections (sections.jsonl, C3 boundaries; D19, D21)
 
 # ---------------------------------------------------------------------------
 # Chunking parameters (D5, D6)
@@ -51,7 +53,7 @@ C1_OVERLAP = 0
 C2_CHUNK_SIZE = 500  # tokens
 C2_OVERLAP = 100  # tokens
 
-# C3: structure-based (Markdown H2/H3 boundaries)
+# C3: structure-based (H2/H3 boundaries; every document starts with its H1; D21)
 C3_MAX_TOKENS = 800  # hard cap per chunk; oversized sections split by paragraph
 C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 
