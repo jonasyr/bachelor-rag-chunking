@@ -45,6 +45,8 @@ bachelor-rag-chunking/
 │       ├── generated_answers.csv
 │       └── scores.csv
 ├── src/
+│   ├── snapshot.py
+│   ├── tokens.py
 │   ├── ingest.py
 │   ├── preprocess.py
 │   ├── chunking.py
@@ -54,6 +56,7 @@ bachelor-rag-chunking/
 │   ├── evaluate_retrieval.py
 │   ├── evaluate_answers.py
 │   └── config.py
+├── tests/                        (pytest; Integrationstests laufen, sobald der Snapshot existiert)
 ├── notebooks/
 │   └── analysis.ipynb
 ├── app/
@@ -62,7 +65,7 @@ bachelor-rag-chunking/
     ├── README.md                 (Index der Dokumentation)
     ├── explanation/  reference/  how-to/   (Diátaxis)
     ├── plan.md                   (Zeitplan, offene Entscheidungen)
-    ├── adr/                      (Entscheidungen D1–D18)
+    ├── adr/                      (Entscheidungen D1–D19)
     ├── Exposee.md                (Lesekopie, Original in PaperLab)
     └── corpus_manifest.csv
 ```
@@ -73,11 +76,11 @@ sind gitignored; die Ordner bleiben über `.gitkeep` erhalten. Formate: [Datenar
 ## Skripte und Optionen
 
 Alle Schritte in `src/` laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py`, Optionen mit `--help`).
-Stand 13.10.2026 sind alle Schritte Gerüste (`raise NotImplementedError`).
+Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py` (Tests in `tests/`, `uv run pytest`); die übrigen Schritte sind Gerüste (`raise NotImplementedError`).
 
 | Skript | Optionen |
 |---|---|
-| `ingest.py`, `preprocess.py` | keine |
+| `snapshot.py`, `ingest.py`, `preprocess.py` | keine |
 | `chunking.py`, `embed.py`, `retrieve.py`, `generate.py` | `--strategy C1\|C2\|C3\|all` (Standard `all`) |
 | `evaluate_retrieval.py` | `--k` (Standard `TOP_K` = 5) |
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht) |

@@ -24,7 +24,7 @@ RAG-Systems für technische Projektdokumentation“. Jede Tatsache hat genau ein
 | [reference/literature.md](reference/literature.md) | Literaturbasis (15 Quellen) |
 | [reference/experiment-record.md](reference/experiment-record.md) | Snapshot und Modellversionen (bei der Umsetzung ausfüllen) |
 | [reference/tooling.md](reference/tooling.md) | Tech-Stack, Repository-Struktur, Skript-Optionen, Qualitätswerkzeuge |
-| [corpus_manifest.csv](corpus_manifest.csv) | Korpusmanifest (noch leer) |
+| [corpus_manifest.csv](corpus_manifest.csv) | Korpusmanifest (52 Dateien, erzeugt von `src/preprocess.py`) |
 
 ## Hintergrund (explanation)
 
