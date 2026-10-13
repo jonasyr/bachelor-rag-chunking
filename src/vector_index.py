@@ -11,7 +11,7 @@ import numpy as np
 from chromadb.config import Settings
 from chromadb.errors import NotFoundError
 
-from config import CHROMA_DIR, SCORE_TOLERANCE
+from config import CHROMA_DIR, HNSW_MIN_BREADTH, SCORE_TOLERANCE
 
 Hit = tuple[str, float]  # (chunk_id, cosine similarity)
 
@@ -29,7 +29,7 @@ def build_collection(
         client.delete_collection(name)
     except NotFoundError:
         pass
-    breadth = max(len(ids), 100)
+    breadth = max(len(ids), HNSW_MIN_BREADTH)
     collection = client.create_collection(
         name=name,
         embedding_function=None,  # vectors always come from the stored reference vectors
