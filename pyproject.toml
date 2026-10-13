@@ -9,7 +9,7 @@ dependencies = [
     # Vector store
     "chromadb>=0.5.0",
     # Token counting
-    "tiktoken>=0.7.0",
+    "tiktoken==0.13.0",  # pinned (ADR 0019)
     # Environment
     "python-dotenv>=1.0.0",
     # Data
@@ -30,6 +30,7 @@ dependencies = [
 dev = [
     "jupyter>=1.0.0",
     "ipykernel>=6.29.0",
+    "pytest>=8.0",
 ]
 
 [tool.ruff]
@@ -42,3 +43,7 @@ select = ["E", "F", "W", "I", "B", "UP"]
 # F401: the pipeline skeleton imports config values for steps not implemented yet;
 # re-enable once src/ is implemented.
 ignore = ["F401"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
