@@ -7,6 +7,7 @@ from conftest import FakeEmbedder
 import tokens
 import vector_index
 from chunking import chunk
+from config import STRATEGY_IDS
 from embed import embed_and_store, load_jsonl
 from preprocess import clean_markdown, section_spans
 from relevance import is_relevant
@@ -46,7 +47,7 @@ def setup(tmp_path, fake_embedder):
 
     client = vector_index.open_client(tmp_path / "chroma")
     chunk_files, vector_files = {}, {}
-    for key in ("C1", "C3"):
+    for key in STRATEGY_IDS:  # retrieval always needs every configured strategy
         chunk_files[key] = tmp_path / f"chunks_{key.lower()}.jsonl"
         vector_files[key] = tmp_path / f"embeddings_{key.lower()}.npz"
         chunk(key, docs_file, sections_file, chunk_files[key])
@@ -95,7 +96,7 @@ def read_out(path):
 
 def test_writes_exact_format_and_relevance(setup):
     paths, target, sections, fake = setup
-    assert retrieve(embedder=fake, **paths) == 2 * 2 * 5
+    assert retrieve(embedder=fake, **paths) == 2 * len(STRATEGY_IDS) * 5
     rows = read_out(paths["out_file"])
     assert rows[0] == HEADER
     body = rows[1:]
@@ -105,12 +106,12 @@ def test_writes_exact_format_and_relevance(setup):
         ("Q001", "C1", "3"),
         ("Q001", "C1", "4"),
         ("Q001", "C1", "5"),
-        ("Q001", "C3", "1"),
+        ("Q001", "C2", "1"),
     ]
     top_c3_q2 = next(r for r in body if r[0] == "Q002" and r[1] == "C3" and r[2] == "1")
     assert top_c3_q2[3] == target["chunk_id"] and top_c3_q2[4] == "1.000000"
     chunks = {
-        c["chunk_id"]: c for k in ("C1", "C3") for c in load_jsonl(paths["chunk_files"][k], "")
+        c["chunk_id"]: c for k in STRATEGY_IDS for c in load_jsonl(paths["chunk_files"][k], "")
     }
     by_id = {s["section_id"]: s for s in sections}
     gold = {
@@ -196,8 +197,10 @@ def test_the_run_log_covers_every_retrieval_input(setup):
         "sections.jsonl",
         "query_embeddings.npz",
         "chunks_c1.jsonl",
+        "chunks_c2.jsonl",
         "chunks_c3.jsonl",
         "embeddings_c1.npz",
+        "embeddings_c2.npz",
         "embeddings_c3.npz",
     }
 
@@ -236,7 +239,7 @@ def test_an_existing_result_file_is_replaced_completely(setup):
     paths["out_file"].write_text(HEADER_LINE + "Q999,C9,1,stale,0.1,1\n", encoding="utf-8")
     retrieve(embedder=fake, **paths)
     rows = read_out(paths["out_file"])
-    assert {r[1] for r in rows[1:]} == {"C1", "C3"} and all(r[0] != "Q999" for r in rows[1:])
+    assert {r[1] for r in rows[1:]} == set(STRATEGY_IDS) and all(r[0] != "Q999" for r in rows[1:])
 
 
 def test_vintage_check_tokens_are_logged_apart_from_the_questions(setup):
@@ -244,8 +247,8 @@ def test_vintage_check_tokens_are_logged_apart_from_the_questions(setup):
     retrieve(embedder=fake, **paths)
     last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
     assert last["input_tokens"] == 2 * 7  # two questions
-    assert last["canary_input_tokens"] == 6 * 7  # first/middle/last of two vector files
-    assert last["strategy"] == "C1,C3"
+    assert last["canary_input_tokens"] == 3 * len(STRATEGY_IDS) * 7  # first/middle/last per file
+    assert last["strategy"] == ",".join(STRATEGY_IDS)
 
 
 def test_a_question_row_with_a_missing_field_is_refused(setup):
@@ -297,4 +300,12 @@ def test_ground_truth_rows_without_a_question_are_refused(setup):
     with paths["ground_truth_file"].open("a", encoding="utf-8") as f:
         f.write('Q777,"Orphan.",D002,D002#first\n')
     with pytest.raises(ValueError, match=r"ground truth for unknown questions \['Q777'\]"):
+        retrieve(embedder=fake, **paths)
+
+
+@pytest.mark.parametrize("drop", ["chunk_files", "vector_files"])
+def test_a_mapping_without_every_strategy_is_refused(setup, drop):
+    paths, _, _, fake = setup
+    paths[drop] = {k: v for k, v in paths[drop].items() if k != "C2"}
+    with pytest.raises(ValueError, match=r"must cover exactly the strategies \['C1', 'C2', 'C3'\]"):
         retrieve(embedder=fake, **paths)
