@@ -24,6 +24,7 @@ data/evaluation/retrieved_results.csv
 data/evaluation/generated_answers.csv
 data/evaluation/scores.csv
 data/evaluation/query_embeddings.npz
+data/pilot/query_embeddings.npz
 
 # Chroma vector store
 chroma_db/
