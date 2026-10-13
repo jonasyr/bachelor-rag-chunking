@@ -6,7 +6,7 @@ Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-- Kontrollierte Chunking-Vergleiche liegen bisher vor allem in fachfremden Domänen, etwa Öl und Gas (`taiwo2026chunking`) und klinische Entscheidungsunterstützung (`gomezcabello2025chunking`) ([Leitfaden §4.2](../Ground_Truth_Projektleitfaden.md#42-forschungslücke-und-abgrenzung-drei-säulen), §18).
+- Kontrollierte Chunking-Vergleiche liegen bisher vor allem in fachfremden Domänen, etwa Öl und Gas (`taiwo2026chunking`) und klinische Entscheidungsunterstützung (`gomezcabello2025chunking`) ([Leitfaden §4.2](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen), §18).
 - Ein informeller Vorläufer auf FastAPI/Supabase/Stripe existiert als Praktiker-Blogbeitrag (Leitfaden §4.2, §4.5).
 
 ## Entscheidung

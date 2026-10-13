@@ -7,7 +7,7 @@ Angenommen (D5 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 ## Kontext
 
 - Die Forschungsfrage fragt, wie unterschiedliche Chunking-Strategien die Retrieval- und Antwortqualität beeinflussen (Leitfaden §1).
-- Die Strategien stehen in Spannung ([Leitfaden §6](../Ground_Truth_Projektleitfaden.md#6-chunking-strategien)): Fixed-size ohne Overlap ist einfach und reproduzierbar, bricht aber Kontext an Grenzen. Mit Overlap verbessert sich die Abdeckung, dafür entstehen mehr Chunks, mehr Redundanz und höhere Kosten. Strukturbasiertes Chunking erhält semantische Einheiten, erzeugt aber uneinheitliche Chunkgrößen.
+- Die Strategien stehen in Spannung ([Leitfaden §6](../explanation/research-design.md#chunking-strategien)): Fixed-size ohne Overlap ist einfach und reproduzierbar, bricht aber Kontext an Grenzen. Mit Overlap verbessert sich die Abdeckung, dafür entstehen mehr Chunks, mehr Redundanz und höhere Kosten. Strukturbasiertes Chunking erhält semantische Einheiten, erzeugt aber uneinheitliche Chunkgrößen.
 - Semantisches Chunking (C4) bringt Mehraufwand und eine weitere Modellabhängigkeit (Leitfaden §6).
 
 ## Entscheidung

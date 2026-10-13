@@ -12,7 +12,7 @@ Angenommen (D12 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 
 ## Entscheidung
 
-Wir werden je Frage und Strategie Recall@k, Precision@k und MRR berechnen, zusätzlich vereinfacht Hit@k, jeweils mit k = 5 (Definitionen in [Leitfaden §12.1](../Ground_Truth_Projektleitfaden.md#121-retrieval-evaluation)).
+Wir werden je Frage und Strategie Recall@k, Precision@k und MRR berechnen, zusätzlich vereinfacht Hit@k, jeweils mit k = 5 (Definitionen in [Leitfaden §12.1](../reference/evaluation.md#retrieval-evaluation)).
 
 ## Konsequenzen
 

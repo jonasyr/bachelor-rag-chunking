@@ -6,7 +6,7 @@ Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 
 ## Kontext
 
-- Referenzantworten und relevante Quellen müssen vor der Evaluation feststehen, um nachträgliche, ergebnisorientierte Anpassungen auszuschließen ([Leitfaden §11](../Ground_Truth_Projektleitfaden.md#11-fragenkatalog-ground-truth)).
+- Referenzantworten und relevante Quellen müssen vor der Evaluation feststehen, um nachträgliche, ergebnisorientierte Anpassungen auszuschließen ([Leitfaden §11](../reference/question-catalogue.md)).
 - Der Fragenkatalog ist eine der wichtigsten Eigenleistungen und dauert länger als gedacht (Leitfaden §11, §16).
 - Korpus und Embedding-Raum sind englisch (Leitfaden §19).
 

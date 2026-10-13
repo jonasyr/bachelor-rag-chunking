@@ -7,7 +7,7 @@ Angenommen (D13 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
 ## Kontext
 
 - Unterfrage 3 fragt nach Korrektheit, Vollständigkeit, Quellenbezug und Halluzinationsfreiheit der Antworten (Leitfaden §1).
-- Es wird keine priorisierte Domäne (Medizin, Recht, Sicherheit) untersucht; gleiche Gewichte sind leichter zu begründen als komplexe Gewichtungen ([Leitfaden §12.2](../Ground_Truth_Projektleitfaden.md#122-antwort-evaluation-rubrik-02)).
+- Es wird keine priorisierte Domäne (Medizin, Recht, Sicherheit) untersucht; gleiche Gewichte sind leichter zu begründen als komplexe Gewichtungen ([Leitfaden §12.2](../reference/evaluation.md#antwort-evaluation-rubrik-02)).
 
 ## Entscheidung
 

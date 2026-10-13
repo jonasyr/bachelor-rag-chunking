@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. Übertragen aus dem Decision Log des
-[Ground-Truth-Leitfadens](../Ground_Truth_Projektleitfaden.md) (D1–D18, Stand Juni 2026). Offene Entscheidungen stehen dort in §19.
+früheren Ground-Truth-Leitfadens (D1–D18, Stand Juni 2026; in der Git-Historie). Hintergrund: [Forschungsdesign](../explanation/research-design.md); offene Entscheidungen: [Plan](../plan.md).
 Format: Michael Nygard (Status, Kontext, Entscheidung, Konsequenzen), Nummern und Dateinamen bleiben fest.
 Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte auf „ersetzt durch …“ setzen.
 

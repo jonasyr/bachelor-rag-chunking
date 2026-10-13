@@ -1,17 +1,41 @@
 # Dokumentation
 
-Index der Dokumentation dieses Repos (Code der Bachelorarbeit „Einfluss von Chunking-Strategien auf die
-Retrieval- und Antwortqualität eines RAG-Systems für technische Projektdokumentation“).
+Code der Bachelorarbeit „Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
+RAG-Systems für technische Projektdokumentation“. Jede Tatsache hat genau ein Zuhause; andere Seiten verlinken dorthin.
 
-| Datei | Inhalt |
+## Anleitungen (how-to)
+
+| Seite | Wofür |
 |---|---|
-| [Ground_Truth_Projektleitfaden.md](Ground_Truth_Projektleitfaden.md) | **Verbindliche Referenz:** Forschungsfrage, Design, Korpus, Strategien, Datenformate (§10), Evaluation, Zeitplan, offene Entscheidungen (§19) |
-| [adr/](adr/README.md) | Entscheidungen D1–D18, je eine Datei mit Kontext und Folgen |
-| [development.md](development.md) | Einrichtung, Befehle, Werkzeuge (uv, ruff, pre-commit, CI), Anbindung an die Arbeit in PaperLab |
-| [methodology.md](methodology.md) | Arbeitsnotizen zur Methodik: Snapshot-Steckbrief, Modellversionen, Reproduzierbarkeits-Checkliste |
-| [prompts.md](prompts.md) | Prompt-Vorlagen, für alle Strategien konstant |
-| [corpus_manifest.csv](corpus_manifest.csv) | Korpusmanifest (Schema im Leitfaden §5.4; noch leer) |
-| [Exposee.md](Exposee.md) | Lesekopie des Exposés; Original (LaTeX) im privaten PaperLab-Repo |
+| [how-to/set-up.md](how-to/set-up.md) | Einrichten: Abhängigkeiten, API-Schlüssel, pre-commit |
+| [how-to/create-corpus-snapshot.md](how-to/create-corpus-snapshot.md) | Vue.js-Snapshot erstellen und dokumentieren |
+| [how-to/run-the-experiment.md](how-to/run-the-experiment.md) | Reihenfolge der Pipeline, Prüfliste vor jedem Evaluationslauf |
+| [how-to/deliver-results-to-thesis.md](how-to/deliver-results-to-thesis.md) | Tabellen und Abbildungen in die Arbeit (PaperLab) übernehmen |
 
-Text, Gliederung und IU-Form der Arbeit liegen nicht hier, sondern im privaten Repo
-[PaperLab](https://github.com/jonasyr/PaperLab), das dieses Repo als Submodul `code/` einbindet.
+## Nachschlagen (reference)
+
+| Seite | Inhalt |
+|---|---|
+| [reference/corpus.md](reference/corpus.md) | Korpusbereiche, Schema von `corpus_manifest.csv` |
+| [reference/data-formats.md](reference/data-formats.md) | Formate aller Datenartefakte (JSONL, CSV) |
+| [reference/question-catalogue.md](reference/question-catalogue.md) | Fragenkatalog: Umfang, Typen, Felder |
+| [reference/evaluation.md](reference/evaluation.md) | Metriken, Rubrik, Triangulation, Kosten, Statistik, Abbildungen |
+| [reference/prompts.md](reference/prompts.md) | Prompt-Vorlagen und konstante Parameter |
+| [reference/literature.md](reference/literature.md) | Literaturbasis (15 Quellen) |
+| [reference/experiment-record.md](reference/experiment-record.md) | Snapshot und Modellversionen (bei der Umsetzung ausfüllen) |
+| [reference/tooling.md](reference/tooling.md) | Tech-Stack, Repository-Struktur, Skript-Optionen, Qualitätswerkzeuge |
+| [corpus_manifest.csv](corpus_manifest.csv) | Korpusmanifest (noch leer) |
+
+## Hintergrund (explanation)
+
+- [explanation/research-design.md](explanation/research-design.md): Forschungsfrage, Hypothesen, Forschungslücke,
+  warum diese Strategien, Architektur, Validität, Prompt-Gestaltung
+
+## Entscheidungen und Plan
+
+- [adr/](adr/README.md): Entscheidungen D1–D18, je eine Datei
+- [plan.md](plan.md): Zeitplan und offene Entscheidungen (u. a. Korpus-Ausschnitt)
+- [Exposee.md](Exposee.md): Lesekopie des Exposés; Original (LaTeX) im privaten PaperLab-Repo
+
+Text, Gliederung und IU-Form der Arbeit liegen im privaten Repo PaperLab, das dieses Repo als Submodul `code/`
+einbindet; dort prüft `./paperlab check` Format und Stilregeln.
