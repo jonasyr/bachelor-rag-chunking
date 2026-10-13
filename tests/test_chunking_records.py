@@ -4,6 +4,7 @@ import pytest
 
 import tokens
 from chunking import check_chunks, chunk, fixed_size_spans, make_chunks, summary
+from config import STRATEGY_IDS
 from preprocess import clean_markdown, section_spans
 
 
@@ -66,7 +67,7 @@ def inputs(tmp_path):
     return docs, docs_file, sections_file
 
 
-@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+@pytest.mark.parametrize("key", list(STRATEGY_IDS))
 def test_chunk_writes_checked_chunks(inputs, tmp_path, key):
     docs, docs_file, sections_file = inputs
     out = tmp_path / f"chunks_{key}.jsonl"
@@ -115,7 +116,7 @@ def test_unknown_strategy(tmp_path):
         chunk("C4", tmp_path / "d.jsonl", tmp_path / "s.jsonl", tmp_path / "o.jsonl")
 
 
-@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+@pytest.mark.parametrize("key", list(STRATEGY_IDS))
 def test_raw_reingested_documents_are_rejected(inputs, tmp_path, key):
     docs, docs_file, sections_file = inputs
     raw = '# Intro {#intro}\n\n<div class="options-api">\n\nOld API.\n\n</div>\n\nShort page.\n'

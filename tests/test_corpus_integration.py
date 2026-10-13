@@ -18,6 +18,7 @@ from config import (
     EMBEDDING_FILES,
     SECTIONS_FILE,
     SNAPSHOT_INFO_FILE,
+    STRATEGY_IDS,
 )
 from preprocess import clean_markdown
 
@@ -55,7 +56,7 @@ def test_processed_artifacts_are_consistent():
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
-@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+@pytest.mark.parametrize("key", list(STRATEGY_IDS))
 def test_real_corpus_chunks(key, tmp_path):
     out = tmp_path / f"chunks_{key}.jsonl"
     count = chunk(key, out_file=out)  # chunk() checks every invariant per document
@@ -87,7 +88,7 @@ def test_c2_has_more_chunks_than_c1(tmp_path):
     assert chunk("C2", out_file=tmp_path / "c2.jsonl") > chunk("C1", out_file=tmp_path / "c1.jsonl")
 
 
-@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+@pytest.mark.parametrize("key", list(STRATEGY_IDS))
 def test_reference_vectors_match_their_chunks(key):
     if not EMBEDDING_FILES[key].exists():
         pytest.skip("not embedded; run src/embed.py")
