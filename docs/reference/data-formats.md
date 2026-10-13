@@ -18,6 +18,16 @@
 {"section_id":"D027#declaring-reactive-state-1","doc_id":"D027","anchor":"declaring-reactive-state-1","title":"Declaring Reactive State","level":2,"start_token":60,"end_token":1567}
 ```
 
+**`embeddings_c1.npz`** (analog c2/c3; `data/processed/`, nicht versioniert; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
+Arrays `ids` (Chunk-IDs in Dateireihenfolge), `texts` (Chunk-Texte), `vectors` (float32, n × 3.072).
+
+**`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
+
+**`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md))
+```json
+{"date":"2026-10-13","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":260,"vector_bytes":3194880,"inputs_sha256":{"chunks_c1.jsonl":"…"},"input_tokens":117594,"cost_usd":0.01528722,"api_called":true}
+```
+
 `start_token`/`end_token` von Chunks und Abschnitten zählen beide über `src/tokens.py` (`cl100k_base`) und sind daher direkt vergleichbar.
 
 **`questions.csv`**
@@ -31,6 +41,8 @@ Q001,"What is the difference between ref and reactive in Vue?",conceptual,medium
 question_id,expected_answer,relevant_doc_ids,relevant_section_ids
 Q001,"ref wraps any value in a reactive object with a .value property; reactive makes an object deeply reactive but only works on objects.",D027,"D027#reactive"
 ```
+
+Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `;` getrennt (`config.ID_SEPARATOR`).
 
 **`retrieved_results.csv`**
 ```

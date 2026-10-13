@@ -44,15 +44,15 @@ Sources were checked on 13.10.2026 and go to `docs/reference/literature.md` (sec
 | `src/embedding_client.py` (new) | `embed_texts(texts: list[str]) -> EmbeddingResult(vectors: np.ndarray[float32, (n, d)], input_tokens: int)`: OpenAI SDK, model `config.EMBEDDING_MODEL`, batches of `config.EMBEDDING_BATCH_SIZE`, SDK retries, order preserved; raises if `OPENAI_API_KEY` is missing (message points to `.env`, never prints the key) or if the dimension differs from `config.EMBEDDING_DIMENSIONS`. Loaded lazily so tests and other steps never need the key. |
 | `src/vector_index.py` (new) | Chroma helpers: `build_collection(client, name, ids, vectors, metadatas)` (delete + create with `{"hnsw": {"space": "cosine", "ef_search": n, "ef_construction": max(n, 100)}}`, add in order), `query(collection, vector, k)`; `exact_top_k(vectors, ids, query, k) -> list[(chunk_id, score)]` sorted by score descending, then `chunk_id`. |
 | `src/relevance.py` (new) | `overlap_tokens(chunk, section) -> int` (same document only; `[start, end)` spans, touching spans give 0); `is_relevant(chunk, sections, min_overlap) -> bool`. Used by `retrieve.py` (`config.RELEVANCE_MIN_OVERLAP`) and later by `evaluate_retrieval.py` (sensitivity, `config.SENSITIVITY_MIN_OVERLAP`). |
-| `src/embed.py` | Per strategy: if `embeddings_cN.npz` exists and its `chunk_ids` equal the chunk file's IDs in order, reuse it (no API call); if it exists but differs, stop with a hint to delete it deliberately; otherwise embed and write it. Then rebuild the Chroma collection from the stored vectors and append a run record to `embedding_runs.jsonl`. CLI unchanged: `--strategy C1|C2|C3|all`. |
+| `src/embed.py` | Per strategy: if `embeddings_cN.npz` exists and its `ids` and `texts` equal the chunk file's IDs and texts in order, reuse it (no API call); if it exists but differs, stop with a hint to delete it deliberately; otherwise embed and write it. Then rebuild the Chroma collection from the stored vectors and append a run record to `embedding_runs.jsonl`. CLI unchanged: `--strategy C1|C2|C3|all`. |
 | `src/retrieve.py` | Reads `questions.csv`, `ground_truth.csv`, `sections.jsonl` and the chunk files; refuses empty question or ground-truth files; embeds the questions once into `query_embeddings.npz` (same reuse/refusal rule, keyed by `question_id` and question text); per question (sorted by `question_id`) and strategy queries Chroma (`n_results = TOP_K`), checks the result set and scores against `exact_top_k` (score tolerance 1e-5), writes the exact ranking with ranks 1–5, `score` = cosine similarity (6 decimals) and `is_relevant` (any overlap, ADR 0019); records SHA-256 of `questions.csv` and `ground_truth.csv` in the run log. |
 
 ## Artefacts and formats (added to `docs/reference/data-formats.md`)
 
-- `data/processed/embeddings_c1.npz` (c2, c3): arrays `chunk_ids` (str), `vectors` (float32, n × 3,072). Gitignored.
-- `data/evaluation/query_embeddings.npz`: arrays `question_ids`, `questions`, `vectors`. Gitignored.
+- `data/processed/embeddings_c1.npz` (c2, c3): arrays `ids`, `texts` (str), `vectors` (float32, n × 3,072). Gitignored.
+- `data/evaluation/query_embeddings.npz`: arrays `ids` (question IDs), `texts` (questions), `vectors`. Gitignored.
 - `data/processed/embedding_runs.jsonl`: one record per embed or retrieval run:
-  `{"step","strategy","model","dimensions","date","openai_sdk","chromadb","vectors","input_tokens","cost_usd","api_called","index_bytes","inputs_sha256"}`.
+  `{"step","strategy","model","dimensions","date","openai_sdk","chromadb","vectors","input_tokens","cost_usd","api_called","vector_bytes","inputs_sha256"}`.
 - `ground_truth.csv`: several IDs in `relevant_doc_ids` / `relevant_section_ids` are separated by `;`.
 - `retrieved_results.csv`: unchanged header `question_id,strategy,rank,chunk_id,score,is_relevant`.
 

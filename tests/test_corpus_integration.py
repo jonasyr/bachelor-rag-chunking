@@ -4,14 +4,18 @@ import hashlib
 import json
 import re
 
+import numpy as np
 import pytest
 
 from chunking import chunk
 from config import (
     C3_MAX_TOKENS,
     C3_MIN_TOKENS,
+    CHUNK_FILES,
     DATA_RAW,
     DOCUMENTS_FILE,
+    EMBEDDING_DIMENSIONS,
+    EMBEDDING_FILES,
     SECTIONS_FILE,
     SNAPSHOT_INFO_FILE,
 )
@@ -81,3 +85,18 @@ def test_snapshot_matches_the_versioned_checksums():
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
 def test_c2_has_more_chunks_than_c1(tmp_path):
     assert chunk("C2", out_file=tmp_path / "c2.jsonl") > chunk("C1", out_file=tmp_path / "c1.jsonl")
+
+
+@pytest.mark.parametrize("key", ["C1", "C2", "C3"])
+def test_reference_vectors_match_their_chunks(key):
+    if not EMBEDDING_FILES[key].exists():
+        pytest.skip("not embedded; run src/embed.py")
+    chunks = [
+        json.loads(line) for line in CHUNK_FILES[key].read_text(encoding="utf-8").splitlines()
+    ]
+    with np.load(EMBEDDING_FILES[key], allow_pickle=False) as data:
+        assert data["ids"].tolist() == [c["chunk_id"] for c in chunks]
+        assert data["texts"].tolist() == [c["text"] for c in chunks]
+        vectors = data["vectors"]
+    assert vectors.shape == (len(chunks), EMBEDDING_DIMENSIONS)
+    assert np.allclose(np.linalg.norm(vectors, axis=1), 1.0, atol=1e-3)  # OpenAI: unit length
