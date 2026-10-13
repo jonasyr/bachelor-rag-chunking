@@ -65,7 +65,7 @@ bachelor-rag-chunking/
     ├── README.md                 (Index der Dokumentation)
     ├── explanation/  reference/  how-to/   (Diátaxis)
     ├── plan.md                   (Zeitplan, offene Entscheidungen)
-    ├── adr/                      (Entscheidungen D1–D19)
+    ├── adr/                      (Entscheidungen D1–D20)
     ├── Exposee.md                (Lesekopie, Original in PaperLab)
     └── corpus_manifest.csv
 ```

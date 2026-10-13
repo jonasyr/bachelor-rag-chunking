@@ -14,7 +14,7 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | Datum des Snapshots | 13.10.2026 (`data/raw/vue_docs_snapshot/SNAPSHOT.txt`) |
 | Verwendete Pfade | siehe `docs/corpus_manifest.csv` |
 | Anzahl Dateien | 52 |
-| Gesamtumfang (Tokens) | 139.500 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
+| Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
 ## Modellversionen (bei der Umsetzung eintragen)
 
