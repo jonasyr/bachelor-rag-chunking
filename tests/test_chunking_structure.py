@@ -41,3 +41,10 @@ def test_paragraph_breaks_ignore_blank_lines_inside_fences():
 )
 def test_structure_spans(n, boundaries, breaks, expected):
     assert structure_spans(n, boundaries, breaks, 800, 50) == expected
+
+
+def test_paragraph_breaks_need_the_same_fence_marker_to_close():
+    text = "# T\n\n~~~\n```\n\nstill code\n~~~\n\nEnd.\n"
+    starts = tokens.token_starts(text)
+    inside = tokens.char_to_token(starts, text.index("still code"))
+    assert inside not in paragraph_breaks(text, starts, 0, len(starts))

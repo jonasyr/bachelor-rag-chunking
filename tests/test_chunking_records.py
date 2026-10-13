@@ -3,7 +3,7 @@ import json
 import pytest
 
 import tokens
-from chunking import check_chunks, chunk, fixed_size_spans, make_chunks
+from chunking import check_chunks, chunk, fixed_size_spans, make_chunks, summary
 from preprocess import clean_markdown, section_spans
 
 
@@ -123,3 +123,26 @@ def test_raw_reingested_documents_are_rejected(inputs, tmp_path, key):
     docs_file.write_text("".join(json.dumps(d) + "\n" for d in stale), encoding="utf-8")
     with pytest.raises(ValueError, match="D002: sections.jsonl does not match"):
         chunk(key, docs_file, sections_file, tmp_path / "out.jsonl")
+
+
+def test_window_edges_inside_multi_token_characters():
+    doc, _ = doc_from_markdown("D001", "# T {#t}\n\n" + "x 𓀀 " * 40 + "\n")
+    for key, (size, overlap) in {"C1": (4, 0), "C2": (5, 2)}.items():
+        chunks = make_chunks(doc, fixed_size_spans(doc["tokens"], size, overlap), key)
+        assert all("�" not in c["text"] for c in chunks)
+    c1 = make_chunks(doc, fixed_size_spans(doc["tokens"], 4, 0), "C1")
+    assert "".join(c["text"] for c in c1) == doc["text"]
+
+
+def test_check_chunks_verifies_every_text_slice():
+    doc, _ = doc_from_markdown("D001", "# T {#t}\n\n" + "word " * 60 + "\n")
+    chunks = make_chunks(doc, fixed_size_spans(doc["tokens"], 500, 100), "C2")
+    chunks[0]["text"] = chunks[0]["text"].upper()
+    with pytest.raises(ValueError, match="not the document slice"):
+        check_chunks(doc, chunks, "C2")
+
+
+def test_summary_of_an_empty_chunk_file(tmp_path):
+    out = tmp_path / "chunks_c1.jsonl"
+    out.write_text("", encoding="utf-8")
+    assert summary("C1", out).startswith("C1: 0 chunks")

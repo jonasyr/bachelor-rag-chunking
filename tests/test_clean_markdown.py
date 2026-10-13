@@ -1,6 +1,6 @@
 import pytest
 
-from preprocess import clean_markdown
+from preprocess import clean_markdown, fence_marker
 
 DOC = "# Title {#title}\n\n"
 
@@ -175,3 +175,35 @@ def test_anomalies_raise(body, message):
 def test_missing_h1_raises():
     with pytest.raises(ValueError, match="exactly one H1"):
         clean_markdown("## A {#a}\n")
+
+
+def test_drop_block_inside_composition_wrapper():
+    body = (
+        '<div class="composition-api">\n\nKeep.\n\n'
+        '<div class="demo">\n<button>x</button>\n</div>\n\n'
+        "Also keep.\n\n</div>\n"
+    )
+    assert clean(body) == "# Title\n\nKeep.\n\nAlso keep.\n"
+
+
+def test_line_leading_autolink_is_prose():
+    assert (
+        clean("<https://vuejs.org> is the site.\n")
+        == "# Title\n\n<https://vuejs.org> is the site.\n"
+    )
+
+
+def test_encoded_url_in_autolink_keeps_closing_bracket():
+    body = "See <https://play.vuejs.org/#eNp9abc> now.\n"
+    assert clean(body) == "# Title\n\nSee <https://play.vuejs.org/> now.\n"
+
+
+def test_fence_closes_only_with_same_marker():
+    body = "~~~\n```\n\n## Not a heading\n~~~\n\nAfter\n"
+    assert clean(body) == "# Title\n\n~~~\n```\n\n## Not a heading\n~~~\n\nAfter\n"
+
+
+def test_fence_needs_at_most_three_spaces_of_indentation():
+    assert fence_marker("   ```js") == "```"
+    assert fence_marker("    ```js") is None
+    assert fence_marker("```js `x`") is None

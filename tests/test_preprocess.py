@@ -144,3 +144,17 @@ def test_anomaly_reports_document_path(files):
 def test_missing_documents_file(tmp_path):
     with pytest.raises(FileNotFoundError, match="run src/ingest.py"):
         preprocess(tmp_path / "missing.jsonl", tmp_path / "s.jsonl", tmp_path / "m.csv")
+
+
+def test_rerun_detected_even_with_anchor_text_inside_code(files):
+    docs, sections, manifest = files
+    cleaned = {
+        "doc_id": "D001",
+        "path": "guide/x.md",
+        "title": "X",
+        "text": "# X\n\n```md\n## Y {#y}\n```\n",
+        "tokens": 0,
+    }
+    write_docs(docs, [cleaned])
+    with pytest.raises(RuntimeError, match="already preprocessed"):
+        preprocess(docs, sections, manifest)

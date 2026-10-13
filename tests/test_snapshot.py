@@ -79,3 +79,28 @@ def test_snapshot_rejects_missing_subdir(origin, tmp_path):
     repo, sha = origin
     with pytest.raises(FileNotFoundError, match="docs/missing"):
         snapshot(repo.as_uri(), sha, "docs/missing", tmp_path / "raw", tmp_path / "SNAPSHOT.txt")
+
+
+def test_snapshot_keeps_an_existing_matching_record(origin, tmp_path):
+    repo, sha = origin
+    out, info = tmp_path / "raw", tmp_path / "corpus_snapshot.txt"
+    snapshot(repo.as_uri(), sha, "src/guide", out, info)
+    recorded = info.read_text(encoding="utf-8").replace(
+        "snapshot_date: ", "snapshot_date: 2000-01-01 # "
+    )
+    info.write_text(recorded, encoding="utf-8")
+
+    snapshot(repo.as_uri(), sha, "src/guide", out, info)
+
+    assert info.read_text(encoding="utf-8") == recorded
+
+
+def test_snapshot_rejects_files_that_differ_from_the_record(origin, tmp_path):
+    repo, sha = origin
+    out, info = tmp_path / "raw", tmp_path / "corpus_snapshot.txt"
+    snapshot(repo.as_uri(), sha, "src/guide", out, info)
+    info.write_text(
+        info.read_text(encoding="utf-8").replace("guide/a.md", "guide/z.md"), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="does not match the record"):
+        snapshot(repo.as_uri(), sha, "src/guide", out, info)

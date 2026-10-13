@@ -18,7 +18,7 @@ CHROMA_DIR = ROOT / "chroma_db"
 DOCS_DIR = ROOT / "docs"
 
 DOCUMENTS_FILE = DATA_PROCESSED / "documents.jsonl"
-SNAPSHOT_INFO_FILE = DATA_RAW / "SNAPSHOT.txt"
+SNAPSHOT_INFO_FILE = DOCS_DIR / "corpus_snapshot.txt"  # versioned: commit, dates, SHA-256 per file
 SECTIONS_FILE = DATA_PROCESSED / "sections.jsonl"
 CORPUS_MANIFEST_FILE = DOCS_DIR / "corpus_manifest.csv"
 CHUNKS_C1_FILE = DATA_PROCESSED / "chunks_c1.jsonl"

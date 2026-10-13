@@ -23,7 +23,8 @@ UNWRAP_CLASS = "composition-api"
 DROP_BLOCK_TAGS = ("div", "p", "ScrimbaLink", "VueSchoolLink")
 DROP_LINE_TAGS = ("img", "details", "/details", "br")
 
-FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})\s*([\w+-]*)")
+FENCE_RE = re.compile(r"^( {0,3})(`{3,}|~{3,})(.*)$")  # CommonMark: at most 3 spaces of indent
+FENCE_LANG_RE = re.compile(r"\s*([\w+-]*)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 ANCHOR_RE = re.compile(r"\s*\{#([^}]+)\}\s*$")
 API_MARKER_RE = re.compile(r"\s*(\\\*)+$")  # `\*` / `\*\*`: API-style markers on headings
@@ -47,13 +48,13 @@ CODE_TAG_RE = re.compile(r"<code(?: v-pre)?>(.*?)</code>")
 INLINE_TAG_RE = re.compile(r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>")
 # Vue tool links carry the whole demo as an encoded URL hash: noise for retrieval (ADR 0020).
 ENCODED_TOOL_URL_RE = re.compile(
-    r"(https://(?:play|sfc|explorer|template-explorer)\.vuejs\.org/)#[^)\s]*"
+    r"(https://(?:play|sfc|explorer|template-explorer)\.vuejs\.org/)#[^)\s>\"']*"
 )
 # Pre-rendered, syntax-highlighted listings (e.g. the create-vue prompts) become fenced code.
 LANGUAGE_BLOCK_RE = re.compile(r'^\s*<div class="language-([\w-]+)"><pre><code>(.*)$')
 LANGUAGE_BLOCK_END = "</code></pre></div>"
 INLINE_SELF_CLOSING_RE = re.compile(r"\s*<(sup|[A-Z][\w-]*)\b[^>]*/>")
-HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z]")
+HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z][\w-]*(?=[\s/>]|$)")  # not autolinks
 MANIFEST_HEADER = ["file_id", "path", "title", "section", "tokens", "included"]
 # Manifest `section` per folder below guide/ (pages directly in guide/ get "Guide").
 SECTION_NAMES = {
@@ -114,6 +115,39 @@ def _find_outside_code(line: str, token: str) -> int:
     return i
 
 
+def fence_marker(line: str) -> str | None:
+    """The marker (``` or ~~~, length >= 3) if line opens a code fence, else None (CommonMark)."""
+    m = FENCE_RE.match(line)
+    if m is None or (m.group(2)[0] == "`" and "`" in m.group(3)):
+        return None
+    return m.group(2)
+
+
+def closes_fence(line: str, marker: str) -> bool:
+    """True if line closes a fence opened with marker: same character, at least as long, no info."""
+    m = FENCE_RE.match(line)
+    return (
+        m is not None
+        and m.group(2)[0] == marker[0]
+        and len(m.group(2)) >= len(marker)
+        and not m.group(3).strip()
+    )
+
+
+def has_anchored_heading(text: str) -> bool:
+    """True if a heading outside code fences still carries a {#anchor}, i.e. text is not cleaned."""
+    fence: str | None = None
+    for line in text.split("\n"):
+        if fence is not None:
+            if closes_fence(line, fence):
+                fence = None
+        elif (marker := fence_marker(line)) is not None:
+            fence = marker
+        elif HEADING_RE.match(line) and ANCHOR_RE.search(line):
+            return True
+    return False
+
+
 def _strip_frontmatter(lines: list[str]) -> list[str]:
     if lines and lines[0].strip() == "---":
         for i in range(1, len(lines)):
@@ -157,17 +191,20 @@ def clean_markdown(text: str) -> CleanResult:
                 emit("```")
                 listing = None
             continue
-        m = FENCE_RE.match(line)
         if fence is not None:
-            if m and m.group(2)[0] == fence[0] and len(m.group(2)) >= len(fence) and not m.group(3):
+            if closes_fence(line, fence):
                 fence = None
             if drop is None:
                 emit(line)
             continue
-        if m:
-            fence = m.group(2)
+        marker = fence_marker(line)
+        if marker is not None:
+            fence = marker
             if drop is None:
-                emit(f"{m.group(1)}{m.group(2)}{m.group(3)}")
+                m = FENCE_RE.match(line)
+                assert m is not None
+                lang = FENCE_LANG_RE.match(m.group(3))
+                emit(f"{m.group(1)}{marker}{lang.group(1) if lang else ''}")
             continue
         if drop is not None:
             depth = drop[1] + _tag_balance(drop[0], line)
@@ -189,6 +226,11 @@ def clean_markdown(text: str) -> CleanResult:
         if u:
             unwrap.append((u.group(1), 1))
             continue
+        b = BLOCK_OPEN_RE.match(line)
+        if b:  # checked before the wrapper count: a dropped block's tags never reach it
+            depth = _tag_balance(b.group(1), line)
+            drop = (b.group(1), depth) if depth > 0 else None
+            continue
         if unwrap:
             tag, depth = unwrap[-1]
             depth += _tag_balance(tag, line)
@@ -198,11 +240,6 @@ def clean_markdown(text: str) -> CleanResult:
                     continue
                 raise ValueError(f"composition-api wrapper closed mid-line: {line!r}")
             unwrap[-1] = (tag, depth)
-        b = BLOCK_OPEN_RE.match(line)
-        if b:
-            depth = _tag_balance(b.group(1), line)
-            drop = (b.group(1), depth) if depth > 0 else None
-            continue
         tag = PAGE_TAG_RE.match(line)
         if tag:
             if f"</{tag.group(1)}>" not in line:
@@ -330,7 +367,7 @@ def preprocess(
     if not doc_file.exists():
         raise FileNotFoundError(f"{doc_file} not found; run src/ingest.py first")
     docs = [json.loads(line) for line in doc_file.read_text(encoding="utf-8").splitlines() if line]
-    if docs and all("{#" not in d["text"] for d in docs):
+    if docs and not any(has_anchored_heading(d["text"]) for d in docs):
         raise RuntimeError(f"{doc_file} is already preprocessed; run src/ingest.py first")
 
     sections: list[dict] = []

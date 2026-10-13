@@ -12,18 +12,21 @@ from pathlib import Path
 
 import tokens
 from config import DATA_RAW, DOCUMENTS_FILE, SNAPSHOT_SUBDIR
+from preprocess import closes_fence, fence_marker
 
 H1_RE = re.compile(r"^#\s+(.*?)(?:\s*\{#[^}]+\})?\s*$")
-FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 
 
 def title_of(text: str) -> str:
     """Text of the first H1 outside code fences, without its anchor."""
-    in_fence = False
+    fence: str | None = None
     for line in text.lstrip("\ufeff").split("\n"):
-        if FENCE_RE.match(line):
-            in_fence = not in_fence
-        elif not in_fence and (m := H1_RE.match(line)):
+        if fence is not None:
+            if closes_fence(line, fence):
+                fence = None
+        elif (marker := fence_marker(line)) is not None:
+            fence = marker
+        elif m := H1_RE.match(line):
             return m.group(1)
     raise ValueError("no H1 found")
 
