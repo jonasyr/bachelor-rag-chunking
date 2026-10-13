@@ -85,7 +85,8 @@ Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py
 | Skript | Optionen |
 |---|---|
 | `snapshot.py`, `ingest.py`, `preprocess.py` | keine |
-| `chunking.py`, `embed.py`, `retrieve.py`, `generate.py` | `--strategy C1\|C2\|C3\|all` (Standard `all`) |
+| `chunking.py`, `embed.py`, `generate.py` | `--strategy C1\|C2\|C3\|all` (Standard `all`; Auswahl aus `config.STRATEGY_IDS`) |
+| `retrieve.py` | keine (läuft immer über alle Strategien, [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) |
 | `evaluate_retrieval.py` | `--k` (Standard `TOP_K` = 5) |
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht) |
 

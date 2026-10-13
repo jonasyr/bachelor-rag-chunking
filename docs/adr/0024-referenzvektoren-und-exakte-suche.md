@@ -33,7 +33,9 @@ ordnen. Telemetrie und Chromas eingebaute Embedding-Funktion bleiben abgeschalte
 Wir werden vor jedem Hinzufügen neuer Vektoren (weitere Strategie oder Fragen) den ersten, mittleren und letzten
 gespeicherten Text jeder vorhandenen Vektordatei erneut einbetten und abbrechen, wenn die Kosinus-Ähnlichkeit zum
 gespeicherten Vektor unter 0,999 liegt (`CANARY_MIN_COSINE`); dann werden alle Vektordateien bewusst gelöscht und
-gemeinsam neu erzeugt. Der gemessene Wert steht im Laufprotokoll.
+gemeinsam neu erzeugt. Der gemessene Wert steht im Laufprotokoll, getrennt von den Kosten der Strategien.
+Wir werden das Retrieval immer über alle Strategien gemeinsam aus denselben Eingaben ausführen und
+`retrieved_results.csv` dabei vollständig neu schreiben; Teilläufe einzelner Strategien gibt es nicht.
 
 ## Konsequenzen
 
@@ -41,6 +43,8 @@ gemeinsam neu erzeugt. Der gemessene Wert steht im Laufprotokoll.
   exakt.
 - Neutral: Die Vektordateien sind nicht versioniert (`data/` ist ausgeschlossen) und werden für die Archivierung
   (DOI) gesondert gesichert.
+- Gut: Alle Strategien eines Ergebnisses beruhen auf demselben Lauf mit identischen Eingaben; ältere Zeilen können
+  nicht mit neuen vermischt werden (Codex-Reviews von PR #5).
 - Gut: Alle Vektoren einer Auswertung stammen nachweislich aus demselben Modellstand, auch wenn Fragen Wochen später
   eingebettet werden ([ADR 0006](0006-nur-chunking-variiert.md)).
 - Schlecht: Die zusätzlichen Prüfungen kosten etwas Laufzeit und je Prüfung wenige Tausend Tokens (unter 0,001 USD).
