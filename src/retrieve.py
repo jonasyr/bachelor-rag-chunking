@@ -120,7 +120,11 @@ def retrieve(
                 hit = is_relevant(chunk_by_id[chunk_id], relevant[qid], RELEVANCE_MIN_OVERLAP)
                 rows.append([qid, key, rank, chunk_id, f"{score:.6f}", int(hit)])
 
-    rows.sort(key=lambda r: (r[0], r[1], r[2]))
+    if out_file.exists():  # keep the rows of strategies not part of this run
+        with out_file.open(encoding="utf-8", newline="") as f:
+            rows += [r for r in csv.reader(f) if r and r != HEADER and r[1] not in strategy_keys]
+    rows = [[str(v) for v in r] for r in rows]
+    rows.sort(key=lambda r: (r[0], r[1], int(r[2])))
     out_file.parent.mkdir(parents=True, exist_ok=True)
     with out_file.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, lineterminator="\n")
