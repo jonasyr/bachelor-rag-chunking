@@ -1,12 +1,12 @@
 # Chunking C1–C3: design
 
 Date: 13.10.2026. Status: approved in chat. Decision basis: [ADR 0005](../../adr/0005-drei-chunking-strategien.md),
-[ADR 0006](../../adr/0006-nur-chunking-variiert.md), [ADR 0010](../../adr/0010-starke-baseline.md), new ADR 0020
-(C3 lower bound); formats: [data formats](../../reference/data-formats.md).
+[ADR 0006](../../adr/0006-nur-chunking-variiert.md), [ADR 0010](../../adr/0010-starke-baseline.md), new ADR 0021
+(C3 bounds); formats: [data formats](../../reference/data-formats.md).
 
 ## Goal
 
-Turn `data/processed/documents.jsonl` (cleaned corpus, 52 documents, 139,500 tokens) into `chunks_c1.jsonl`,
+Turn `data/processed/documents.jsonl` (cleaned corpus, 52 documents, 117,594 tokens) into `chunks_c1.jsonl`,
 `chunks_c2.jsonl` and `chunks_c3.jsonl` so that only the segmentation differs between strategies. No OpenAI calls.
 
 Success criteria:
@@ -34,7 +34,7 @@ different token count than `end_token − start_token` (BPE merges at the cut); 
 |---|---|
 | `fixed_size_spans(n_tokens, size, overlap) -> list[tuple[int, int]]` | Windows starting at 0 with step `size − overlap`; each window is `[start, min(start + size, n))`; stops after the window that reaches `n`. `n == 0` gives no spans; `overlap >= size` or `size <= 0` raises `ValueError`. C1 = (500, 0), C2 = (500, 100). |
 | `paragraph_breaks(text, starts, lo, hi) -> list[int]` | Token positions inside `(lo, hi)` where a paragraph starts: the first token at or after the character following a blank line, ignoring blank lines inside fenced code blocks. |
-| `structure_spans(n_tokens, boundaries, breaks, max_tokens, min_tokens) -> list[tuple[int, int]]` | C3: (1) segments between consecutive heading boundaries (H1–H3 `start_token` values from `sections.jsonl`, plus `n`); (2) merge: a segment shorter than `min_tokens` is joined with the following segment if the joined length is ≤ `max_tokens`; a short last segment is joined with the previous one under the same condition; (3) split: a segment longer than `max_tokens` is cut at paragraph breaks, packing paragraphs greedily so that each piece is ≤ `max_tokens`; a single paragraph longer than `max_tokens` is cut into consecutive pieces of `max_tokens` (the last one shorter). |
+| `structure_spans(n_tokens, boundaries, breaks, max_tokens, min_tokens) -> list[tuple[int, int]]` | C3: (1) segments between consecutive heading boundaries (H1–H3 `start_token` values from `sections.jsonl`, plus `n`); (2) merge (before splitting): a segment shorter than `min_tokens` is always joined with the following segment (chains accumulate); a short last segment is joined with the previous one; (3) split: a segment longer than `max_tokens` is cut at the furthest paragraph break that keeps the piece ≤ `max_tokens` and leaves a rest of at least `min_tokens`; without such a break the cut is hard at `min(start + max_tokens, end − min_tokens)`. Hence no C3 chunk is shorter than `min_tokens` unless its whole document is. |
 | `make_chunks(doc, spans, key) -> list[dict]` | Chunk records with `chunk_id = {key}_{doc_id}_{seq:04d}` (seq from 1 per document and strategy), `strategy = STRATEGY_IDS[key]`, `text` = character slice. |
 | `check_chunks(doc, chunks, key)` | Runtime invariants (below); raises `ValueError` naming the chunk. |
 | `chunk(key, docs_file, sections_file, out_file) -> int` | Reads inputs, builds and checks chunks for all documents, writes the JSONL file, returns the chunk count. |
@@ -53,7 +53,7 @@ span length.
 
 ## Configuration (`src/config.py`)
 
-Add `C3_MIN_TOKENS = 50` next to `C3_MAX_TOKENS` (ADR 0020). Existing `C1_*`, `C2_*`, `C3_MAX_TOKENS`, `STRATEGY_IDS`,
+Add `C3_MIN_TOKENS = 50` next to `C3_MAX_TOKENS` (ADR 0021). Existing `C1_*`, `C2_*`, `C3_MAX_TOKENS`, `STRATEGY_IDS`,
 `CHUNK_FILES` are used unchanged.
 
 ## Error handling
@@ -66,16 +66,16 @@ token 0; `ValueError` for invalid window parameters and for any violated invaria
 
 - `fixed_size_spans`: `n < size`, `n == size`, exact multiple, C2 step and final window, `n == 0`, invalid overlap.
 - `paragraph_breaks`: blank lines split; blank lines inside a fence do not.
-- `structure_spans`: plain segments, forward merge, merge blocked by the ceiling, short last segment merged backward,
-  paragraph split, oversized single paragraph cut hard, tiling.
+- `structure_spans`: plain segments, forward merge (also chains and into an oversized segment), short last segment
+  merged backward, paragraph split, no tail under the floor, oversized single paragraph cut hard, tiling.
 - `make_chunks` / `chunk`: exact keys and order, IDs, `strategy` values, text slices, written file, error hints.
 - `tests/test_corpus_integration.py`: on the real processed corpus (skipped without it), all invariants for C1–C3 and
-  plausible counts (C1 ≈ 300, C2 > C1, every C3 chunk ≤ 800 and at most a handful below 50).
+  plausible counts (C2 > C1, every C3 chunk between 50 and 800 tokens).
 
 ## Docs to update
 
-ADR 0020 (floor 50, forward merge, paragraph split, hard cut for oversized paragraphs) + ADR index;
-`docs/explanation/research-design.md` C3 note (link to ADR 0020); `docs/reference/tooling.md` status;
+ADR 0021 (floor 50, merge before split, paragraph split without short tails, hard cut as last resort) + ADR index;
+`docs/explanation/research-design.md` C3 note (link to ADR 0021); `docs/reference/tooling.md` status;
 `docs/reference/experiment-record.md` chunk counts per strategy; Serena memory `chunking`.
 
 ## Out of scope
