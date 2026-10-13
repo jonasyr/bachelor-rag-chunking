@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import vector_index
+from canary import check_vintage
 from config import (
     CHROMA_COLLECTIONS,
     CHUNK_FILES,
@@ -97,9 +98,11 @@ def retrieve(
     texts = [q["question"] for q in questions]
     query_vectors = load_vectors(query_file, qids, texts)
     input_tokens = 0
-    if query_vectors is None:
+    canary_cosine = None
+    if query_vectors is None:  # questions must share the model vintage of the chunk vectors
+        canary_cosine, input_tokens = check_vintage(embedder, list(vector_files.values()))
         result = embedder(texts)
-        query_vectors, input_tokens = result.vectors, result.input_tokens
+        query_vectors, input_tokens = result.vectors, input_tokens + result.input_tokens
         save_vectors(query_file, qids, texts, query_vectors)
 
     client = client or vector_index.open_client()
@@ -140,6 +143,7 @@ def retrieve(
                 questions_file.name: sha256_of(questions_file),
                 ground_truth_file.name: sha256_of(ground_truth_file),
             },
+            "canary_min_cosine": canary_cosine,
         },
         input_tokens,
         runs_file,

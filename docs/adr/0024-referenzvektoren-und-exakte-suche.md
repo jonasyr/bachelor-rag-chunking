@@ -13,6 +13,12 @@ Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md))
   (`chroma2026configure`).
 - OpenAI-Vektoren sind auf Länge 1 normiert; Kosinus und Skalarprodukt ergeben dieselbe Rangfolge
   (`openai2026embeddingsguide`).
+- Eine Messung am 13.10.2026 (je drei Chunks pro Strategie erneut eingebettet) ergab für denselben Text eine
+  Kosinus-Ähnlichkeit von mindestens 0,99996 zum gespeicherten Vektor, nur 7 von 9 Vektoren waren bitgleich;
+  verschiedene Chunks erreichen höchstens 0,84.
+- Die Fragevektoren entstehen erst nach dem Einfrieren der Ground Truth, Wochen nach den Chunk-Vektoren; ändert
+  OpenAI in der Zwischenzeit das Modell hinter dem Alias, lägen Fragen und Chunks in verschiedenen Vektorräumen
+  (Hinweis aus dem Codex-Review von PR #5).
 - Nichtdeterminismus in allem, was in die Evaluation eingeht, verletzt die Code-Review-Regeln (`AGENTS.md`); mit
   höchstens 493 Vektoren je Strategie ist eine exakte Suche billig.
 
@@ -24,6 +30,10 @@ bewusste Löschen der Datei.
 Wir werden Chroma mit der Metrik `cosine` und `ef_search` mindestens in Größe der Sammlung betreiben, jedes Top-k gegen
 eine exakte NumPy-Kosinus-Rangfolge prüfen (Toleranz 1e-5), bei Abweichung abbrechen und Gleichstände nach `chunk_id`
 ordnen. Telemetrie und Chromas eingebaute Embedding-Funktion bleiben abgeschaltet.
+Wir werden vor jedem Hinzufügen neuer Vektoren (weitere Strategie oder Fragen) den ersten, mittleren und letzten
+gespeicherten Text jeder vorhandenen Vektordatei erneut einbetten und abbrechen, wenn die Kosinus-Ähnlichkeit zum
+gespeicherten Vektor unter 0,999 liegt (`CANARY_MIN_COSINE`); dann werden alle Vektordateien bewusst gelöscht und
+gemeinsam neu erzeugt. Der gemessene Wert steht im Laufprotokoll.
 
 ## Konsequenzen
 
@@ -31,4 +41,6 @@ ordnen. Telemetrie und Chromas eingebaute Embedding-Funktion bleiben abgeschalte
   exakt.
 - Neutral: Die Vektordateien sind nicht versioniert (`data/` ist ausgeschlossen) und werden für die Archivierung
   (DOI) gesondert gesichert.
-- Schlecht: Die zusätzliche Prüfung kostet etwas Laufzeit; bei dieser Korpusgröße vernachlässigbar.
+- Gut: Alle Vektoren einer Auswertung stammen nachweislich aus demselben Modellstand, auch wenn Fragen Wochen später
+  eingebettet werden ([ADR 0006](0006-nur-chunking-variiert.md)).
+- Schlecht: Die zusätzlichen Prüfungen kosten etwas Laufzeit und je Prüfung wenige Tausend Tokens (unter 0,001 USD).

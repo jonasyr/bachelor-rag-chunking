@@ -26,9 +26,9 @@ Wiederverwendet wird die Datei nur, wenn Modell, IDs und Texte unverändert sind
 
 `retrieve.py --strategy` ersetzt in `retrieved_results.csv` nur die Zeilen der gewählten Strategien.
 
-**`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md))
+**`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md); `canary_min_cosine` = Ergebnis der Modellstand-Prüfung, `null` wenn keine nötig war)
 ```json
-{"date":"2026-10-13","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":260,"vector_bytes":3194880,"inputs_sha256":{"chunks_c1.jsonl":"…"},"input_tokens":117594,"cost_usd":0.01528722,"api_called":true}
+{"date":"2026-10-13","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":260,"vector_bytes":3194880,"inputs_sha256":{"chunks_c1.jsonl":"…"},"input_tokens":117594,"cost_usd":0.01528722,"api_called":true,"canary_min_cosine":null}
 ```
 
 `start_token`/`end_token` von Chunks und Abschnitten zählen beide über `src/tokens.py` (`cl100k_base`) und sind daher direkt vergleichbar.
