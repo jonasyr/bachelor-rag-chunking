@@ -13,7 +13,6 @@ Chunk schema: {"chunk_id", "doc_id", "strategy", "text", "start_token", "end_tok
 """
 
 import json
-import re
 import statistics
 from pathlib import Path
 
@@ -30,12 +29,12 @@ from config import (
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
+from preprocess import closes_fence, fence_marker
 
 Span = tuple[int, int]
 
 FIXED_WINDOWS = {"C1": (C1_CHUNK_SIZE, C1_OVERLAP), "C2": (C2_CHUNK_SIZE, C2_OVERLAP)}
 MAX_LENGTH = {"C1": C1_CHUNK_SIZE, "C2": C2_CHUNK_SIZE, "C3": C3_MAX_TOKENS}
-FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 
 
 def fixed_size_spans(n_tokens: int, size: int, overlap: int) -> list[Span]:
@@ -57,16 +56,18 @@ def paragraph_breaks(text: str, starts: list[int], lo: int, hi: int) -> list[int
     """Token positions in (lo, hi) that start a paragraph (after a blank line, outside fences)."""
     breaks: set[int] = set()
     pos = 0
-    in_fence = False
+    fence: str | None = None
     after_blank = False
     for line in text.split("\n"):
-        if not in_fence and after_blank and line.strip():
+        if fence is None and after_blank and line.strip():
             t = tokens.char_to_token(starts, pos)
             if lo < t < hi:
                 breaks.add(t)
-        if FENCE_RE.match(line):
-            in_fence = not in_fence
-        after_blank = not in_fence and not line.strip()
+        if fence is None:
+            fence = fence_marker(line)
+        elif closes_fence(line, fence):
+            fence = None
+        after_blank = fence is None and not line.strip()
         pos += len(line) + 1
     return sorted(breaks)
 
@@ -169,6 +170,14 @@ def check_chunks(doc: dict, chunks: list[dict], key: str) -> None:
         fail("chunks leave a gap or overlap")
     if key == "C3" and n >= C3_MIN_TOKENS and any(b - a < C3_MIN_TOKENS for a, b in spans):
         fail(f"a chunk is shorter than {C3_MIN_TOKENS} tokens")
+    starts = tokens.token_starts(doc["text"])
+
+    def char(t: int) -> int:
+        return starts[t] if t < len(starts) else len(doc["text"])
+
+    for c in chunks:
+        if c["text"] != doc["text"][char(c["start_token"]) : char(c["end_token"])]:
+            fail(f"{c['chunk_id']} text is not the document slice of its span")
     if key != "C2" and "".join(c["text"] for c in chunks) != doc["text"]:
         fail("chunk texts do not reassemble the document")
 
@@ -248,6 +257,8 @@ def summary(strategy_key: str, out_file: Path | None = None) -> str:
     """One line with chunk count and span lengths of a written chunk file."""
     out_file = out_file or CHUNK_FILES[strategy_key]
     lengths = [c["end_token"] - c["start_token"] for c in _read_jsonl(out_file, "run chunking")]
+    if not lengths:
+        return f"{strategy_key}: 0 chunks -> {out_file.name}"
     return (
         f"{strategy_key}: {len(lengths)} chunks, tokens min {min(lengths)} / "
         f"mean {statistics.mean(lengths):.0f} / max {max(lengths)} -> {out_file.name}"

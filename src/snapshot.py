@@ -2,10 +2,11 @@
 
 Fetches config.VUE_DOCS_COMMIT of config.VUE_DOCS_REPO_URL (shallow), replaces
 data/raw/vue_docs_snapshot/guide/ with every Markdown file below config.VUE_DOCS_SUBDIR and
-writes SNAPSHOT.txt with repository, commit, dates and a sha256 per file.
+writes docs/corpus_snapshot.txt (versioned) with repository, commit, dates and a sha256 per file.
 """
 
 import hashlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -21,6 +22,7 @@ from config import (
     VUE_DOCS_SUBDIR,
 )
 
+CHECKSUM_LINE_RE = re.compile(r"^[0-9a-f]{64}  ")
 # Byte-identical checkout on every machine: ignore the user's line-ending settings.
 GIT = ["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf"]
 
@@ -62,6 +64,12 @@ def copy_markdown(src_dir: Path, out_dir: Path) -> list[Path]:
     return copied
 
 
+def _checksums(lines: list[str]) -> dict[str, str]:
+    """File path -> SHA-256 from the checksum lines of a snapshot record."""
+    pairs = (line.split("  ", 1) for line in lines if CHECKSUM_LINE_RE.match(line))
+    return {path: digest for digest, path in pairs}
+
+
 def snapshot(
     repo_url: str = VUE_DOCS_REPO_URL,
     commit: str = VUE_DOCS_COMMIT,
@@ -69,7 +77,7 @@ def snapshot(
     out_dir: Path = DATA_RAW,
     info_file: Path = SNAPSHOT_INFO_FILE,
 ) -> int:
-    """Fetch the pinned commit, copy its Markdown files and write SNAPSHOT.txt; return the count."""
+    """Fetch the pinned commit, copy its Markdown files, then write or verify the record."""
     if shutil.which("git") is None:
         raise RuntimeError("git is required to create the snapshot")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -88,6 +96,15 @@ def snapshot(
     lines += [
         f"{hashlib.sha256((out_dir / f).read_bytes()).hexdigest()}  {f.as_posix()}" for f in files
     ]
+    if info_file.exists():
+        # The versioned record is the reference: verify against it instead of rewriting it.
+        recorded = info_file.read_text(encoding="utf-8").splitlines()
+        if f"commit: {commit}" not in recorded or _checksums(recorded) != _checksums(lines):
+            raise ValueError(
+                f"fetched snapshot does not match the record {info_file}; "
+                "delete the record to store a new snapshot"
+            )
+        return len(files)
     info_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return len(files)
 

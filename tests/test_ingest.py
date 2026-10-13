@@ -50,3 +50,8 @@ def test_ingest_assigns_ids_by_path_and_writes_exact_keys(tmp_path):
 def test_ingest_without_snapshot_points_to_snapshot_script(tmp_path):
     with pytest.raises(FileNotFoundError, match="run src/snapshot.py"):
         ingest(tmp_path / "empty", tmp_path / "documents.jsonl")
+
+
+def test_title_of_tracks_fence_markers():
+    text = "~~~\n```\n# not a title\n~~~\n\n# Real {#real}\n"
+    assert title_of(text) == "Real"
