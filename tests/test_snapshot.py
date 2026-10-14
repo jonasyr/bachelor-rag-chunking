@@ -123,3 +123,12 @@ def test_snapshot_rejects_files_that_differ_from_the_record(origin, tmp_path):
     )
     with pytest.raises(ValueError, match="does not match the record"):
         run(repo, sha, out, info)
+
+
+@pytest.mark.parametrize("entry", ["api//options-state.md", "api/./index.md", "guide/img.png"])
+def test_snapshot_rejects_an_exclusion_that_removes_no_markdown_file(origin, tmp_path, entry):
+    repo, sha = origin
+    out = tmp_path / "raw"
+    with pytest.raises(ValueError, match="match no Markdown file"):
+        run(repo, sha, out, tmp_path / "S.txt", excluded=(entry,))
+    assert not out.exists() or not any(out.rglob("*.md"))  # nothing copied before the check
