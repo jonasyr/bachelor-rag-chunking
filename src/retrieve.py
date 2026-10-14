@@ -28,6 +28,7 @@ from config import (
     CONTROL_EMBEDDING_FILES,
     CONTROL_RETRIEVED_FILE,
     CONTROL_STRATEGIES,
+    DOCUMENTS_FILE,
     EMBEDDING_FILES,
     EMBEDDING_RUNS_FILE,
     GROUND_TRUTH_FILE,
@@ -139,6 +140,7 @@ def retrieve(
     strategies: dict[str, str] = STRATEGY_IDS,
     collections: dict[str, str] = CHROMA_COLLECTIONS,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
+    documents_file: Path = DOCUMENTS_FILE,
 ) -> int:
     """Write the result file afresh for all questions and all strategies; return row count.
 
@@ -146,7 +148,7 @@ def retrieve(
     all its strategies run together from the same inputs, so no row of an older run is kept.
     """
     # ADR 0030: the main catalogue only against its freeze record, before any API call
-    require_frozen(questions_file, ground_truth_file, sections_file, freeze_file)
+    require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
     if strategies not in (STRATEGY_IDS, CONTROL_STRATEGIES):
         raise ValueError("strategies must be the experiment set or the control set (D26)")
     for name, mapping in (

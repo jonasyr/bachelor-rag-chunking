@@ -81,6 +81,7 @@ def setup(tmp_path, fake_embedder):
         "questions_file": questions,
         "ground_truth_file": truth,
         "sections_file": sections_file,
+        "documents_file": docs_file,
         "chunk_files": chunk_files,
         "vector_files": vector_files,
         "query_file": tmp_path / "query_embeddings.npz",
@@ -377,7 +378,11 @@ def test_main_catalogue_runs_when_frozen(as_main_catalogue, tmp_path):
     paths, _, _, fake = as_main_catalogue
     record = tmp_path / "freeze.json"
     freeze.write_freeze(
-        paths["questions_file"], paths["ground_truth_file"], paths["sections_file"], record
+        paths["questions_file"],
+        paths["ground_truth_file"],
+        paths["sections_file"],
+        paths["documents_file"],
+        record,
     )
     assert retrieve(embedder=fake, freeze_file=record, **paths) > 0
 
@@ -386,7 +391,11 @@ def test_main_catalogue_changed_after_freeze_is_refused(as_main_catalogue, tmp_p
     paths, _, _, fake = as_main_catalogue
     record = tmp_path / "freeze.json"
     freeze.write_freeze(
-        paths["questions_file"], paths["ground_truth_file"], paths["sections_file"], record
+        paths["questions_file"],
+        paths["ground_truth_file"],
+        paths["sections_file"],
+        paths["documents_file"],
+        record,
     )
     q = paths["questions_file"]
     q.write_text(q.read_text(encoding="utf-8").replace("How do watchers", "How do Watchers"))

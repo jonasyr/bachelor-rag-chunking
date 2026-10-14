@@ -1,10 +1,11 @@
 """Freeze record of the question catalogue (ADR 0030).
 
-`write_freeze` records the SHA-256 of questions.csv, ground_truth.csv and sections.jsonl after
-the strict coverage check passed (src/catalogue.py freeze); sections.jsonl pins what the
-annotated section IDs refer to. `require_frozen` lets retrieval use the main catalogue only
-while all three files still match that record, so the ground truth is final before any
-retrieval (ADR 0017, 0027). Other catalogues (pilot sets, tests) are not affected.
+`write_freeze` records the SHA-256 of questions.csv, ground_truth.csv, sections.jsonl and
+documents.jsonl after the strict coverage check passed (src/catalogue.py freeze); the two
+corpus files pin which text the annotated section IDs refer to. `require_frozen` lets
+retrieval use the main catalogue only while all four files still match that record, so the
+ground truth is final before any retrieval (ADR 0017, 0027). Other catalogues (pilot sets,
+tests) are not affected.
 """
 
 import json
@@ -19,6 +20,7 @@ def write_freeze(
     questions_file: Path,
     ground_truth_file: Path,
     sections_file: Path,
+    documents_file: Path,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     summary: dict | None = None,
 ) -> dict:
@@ -27,7 +29,8 @@ def write_freeze(
         "date": date.today().isoformat(),
         **(summary or {}),
         "sha256": {
-            f.name: sha256_of(f) for f in (questions_file, ground_truth_file, sections_file)
+            f.name: sha256_of(f)
+            for f in (questions_file, ground_truth_file, sections_file, documents_file)
         },
     }
     freeze_file.parent.mkdir(parents=True, exist_ok=True)
@@ -52,6 +55,7 @@ def require_frozen(
     questions_file: Path,
     ground_truth_file: Path,
     sections_file: Path,
+    documents_file: Path,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
 ) -> None:
     """Raise unless the main catalogue is frozen and unchanged; other catalogues pass."""
@@ -69,6 +73,6 @@ def require_frozen(
             raise TypeError("sha256 must map file names to hashes")
     except (ValueError, KeyError, TypeError) as error:
         raise RuntimeError(f"malformed freeze record {freeze_file} (ADR 0030): {error}") from None
-    for path in (questions_file, ground_truth_file, sections_file):
+    for path in (questions_file, ground_truth_file, sections_file, documents_file):
         if frozen.get(path.name) != sha256_of(path):
             raise RuntimeError(f"{path.name} changed since the freeze on {when} (ADR 0030)")

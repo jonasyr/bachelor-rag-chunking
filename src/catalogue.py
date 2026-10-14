@@ -437,10 +437,12 @@ def freeze_catalogue(
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     pilot_dir: Path = PILOT_DIR,
     sections_file: Path = SECTIONS_FILE,
+    documents_file: Path = DOCUMENTS_FILE,
 ) -> dict:
     """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
 
-    `sections_file` must be the file `corpus` was loaded from; its hash pins the section IDs.
+    `sections_file` and `documents_file` must be the files `corpus` was loaded from; their hashes
+    pin which text the section IDs refer to.
     """
     report = check(corpus, questions_file, ground_truth_file, pilot_dir)
     if exit_code(report, draft=False):
@@ -452,7 +454,9 @@ def freeze_catalogue(
         "types": report.types,
         "classes": report.classes,
     }
-    return write_freeze(questions_file, ground_truth_file, sections_file, freeze_file, summary)
+    return write_freeze(
+        questions_file, ground_truth_file, sections_file, documents_file, freeze_file, summary
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -509,6 +513,7 @@ def main(argv: list[str] | None = None) -> int:
             CATALOGUE_FREEZE_FILE,
             PILOT_DIR,
             SECTIONS_FILE,
+            DOCUMENTS_FILE,
         )
     except (FileExistsError, ValueError) as error:
         print(error, file=sys.stderr)
