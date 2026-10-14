@@ -21,7 +21,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import tokens
-from catalogue_plan import plan_findings, plan_summary, read_plan, write_plan
+from catalogue_plan import (
+    draw_plan,
+    plan_findings,
+    plan_integrity,
+    plan_summary,
+    read_plan,
+    too_short_errors,
+    write_plan,
+)
 from catalogue_review import ensure_review_file, read_review, review_errors, review_summary
 from config import (
     AREA_MIN_QUESTIONS,
@@ -353,6 +361,7 @@ def check(
     pilot_dir: Path = PILOT_DIR,
     plan_file: Path = CATALOGUE_PLAN_FILE,
     review_file: Path = CATALOGUE_REVIEW_FILE,
+    fresh_plan: list[dict] | None = None,
 ) -> Report:
     """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
     report = Report()
@@ -438,6 +447,14 @@ def check(
         report.errors += errors
         report.findings += findings
         plan_lines = plan_summary(plan)
+        if fresh_plan is None:
+            try:
+                fresh_plan = draw_plan(corpus)  # deterministic: the plan must match it (ADR 0031)
+            except ValueError as error:
+                report.errors.append(f"cannot redraw the plan to compare: {error}")
+        if fresh_plan is not None:
+            report.errors += plan_integrity(plan, fresh_plan)
+        report.errors += too_short_errors(plan, corpus)
     try:
         review = read_review(review_file)
     except ValueError as error:
@@ -467,13 +484,16 @@ def freeze_catalogue(
     documents_file: Path = DOCUMENTS_FILE,
     plan_file: Path = CATALOGUE_PLAN_FILE,
     review_file: Path = CATALOGUE_REVIEW_FILE,
+    fresh_plan: list[dict] | None = None,
 ) -> dict:
     """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
 
     `sections_file` and `documents_file` must be the files `corpus` was loaded from; their hashes
     pin which text the section IDs refer to.
     """
-    report = check(corpus, questions_file, ground_truth_file, pilot_dir, plan_file, review_file)
+    report = check(
+        corpus, questions_file, ground_truth_file, pilot_dir, plan_file, review_file, fresh_plan
+    )
     if exit_code(report, draft=False):
         raise ValueError(
             "the catalogue does not pass the strict check; run `src/catalogue.py check`"

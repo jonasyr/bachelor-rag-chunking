@@ -21,6 +21,7 @@ from config import (
     CATALOGUE_PLAN_STATUSES,
     CATALOGUE_RESERVE,
     CATALOGUE_SEED,
+    CATALOGUE_SKIP_MIN_TOKENS,
     CATALOGUE_SKIP_REASONS,
     QUESTION_CLASSES,
 )
@@ -180,8 +181,11 @@ def mark_used(rows: list[dict], slot_id: str, question_id: str) -> None:
     row["status"], row["question_id"] = "used", question_id
 
 
-def skip_slot(plan_file: Path, slot_id: str, reason: str) -> dict:
-    """Skip an open slot's section with a listed reason; the area's next reserve row takes over."""
+def skip_slot(plan_file: Path, slot_id: str, reason: str, corpus: Corpus) -> dict:
+    """Skip an open slot's section with a listed reason; the area's next reserve row takes over.
+
+    `too-short` is only accepted for a section under CATALOGUE_SKIP_MIN_TOKENS tokens.
+    """
     if reason not in CATALOGUE_SKIP_REASONS:
         raise ValueError(
             f"skip reason {reason!r} not allowed; use one of {list(CATALOGUE_SKIP_REASONS)}"
@@ -190,6 +194,13 @@ def skip_slot(plan_file: Path, slot_id: str, reason: str) -> dict:
     row = slot_row(rows, slot_id)
     if row["status"] != "open":
         raise ValueError(f"slot {slot_id} is not open (it holds {row['question_id']})")
+    section = corpus.by_id[row["section_id"]]
+    length = section["end_token"] - section["start_token"]
+    if reason == "too-short" and length >= CATALOGUE_SKIP_MIN_TOKENS:
+        raise ValueError(
+            f"section {row['section_id']} has {length} tokens; "
+            f"too-short needs fewer than {CATALOGUE_SKIP_MIN_TOKENS} tokens"
+        )
     spare = [r for r in rows if r["area"] == row["area"] and r["status"] == "reserve"]
     if not spare:
         raise ValueError(
@@ -253,4 +264,85 @@ def plan_summary(rows: list[dict]) -> list[str]:
             reasons[r["skip_reason"]] = reasons.get(r["skip_reason"], 0) + 1
     detail = ", ".join(f"{k} {v}" for k, v in sorted(reasons.items()))
     line = f"Slots: {status['used']} used, {status['open']} open, {status['skipped']} skipped"
-    return [line + (f" ({detail})" if detail else "")]
+    lines = [line + (f" ({detail})" if detail else "")]
+    if status["skipped"]:
+        areas = dict.fromkeys(r["area"] for r in rows)
+        per_area = ", ".join(
+            f"{a} {sum(1 for r in rows if r['area'] == a and r['status'] == 'skipped')}"
+            for a in areas
+        )
+        lines.append(f"Skipped by area: {per_area}")
+    return lines
+
+
+def plan_integrity(rows: list[dict], fresh: list[dict]) -> list[str]:
+    """Differences from a fresh draw beyond use, skips and reserve promotion (ADR 0031).
+
+    The draw is deterministic, so the drawn sections, their order and the slot/class assignment
+    must match a fresh draw exactly; only status, skip_reason, question_id and the slot/class of
+    reserve rows promoted by a skip may differ.
+    """
+
+    def key(r: dict) -> tuple[str, str, str]:
+        return r["area"], r["draw"], r["section_id"]
+
+    if [key(r) for r in rows] != [key(f) for f in fresh]:
+        return ["the plan's drawn sections differ from a fresh draw with the configured seed"]
+    errors = []
+    for r, f in zip(rows, fresh, strict=True):
+        where = f"plan row {r['area']}/{r['draw']}"
+        if f["slot_id"] and (r["slot_id"], r["class"]) != (f["slot_id"], f["class"]):
+            errors.append(
+                f"{where}: slot {r['slot_id']}/{r['class']} differs from the draw "
+                f"{f['slot_id']}/{f['class']}"
+            )
+        if r["status"] == "reserve" and (r["slot_id"] or r["class"] or r["question_id"]):
+            errors.append(f"{where}: a reserve row carries no slot, class or question")
+        if f["slot_id"] and r["status"] == "reserve":
+            errors.append(f"{where}: a drawn slot cannot become a reserve row")
+        if r["status"] == "used" and not r["question_id"]:
+            errors.append(f"{where}: used without a question")
+        if r["status"] in ("open", "skipped") and r["question_id"]:
+            errors.append(f"{where}: {r['status']} but holds {r['question_id']}")
+        if r["status"] != "skipped" and r["skip_reason"]:
+            errors.append(f"{where}: skip_reason only on skipped rows")
+    drawn = {f["slot_id"]: f["class"] for f in fresh if f["slot_id"]}
+    extra = sorted({r["slot_id"] for r in rows if r["slot_id"]} - set(drawn))
+    if extra:
+        errors.append(f"unknown slots {extra}")
+    for slot, cls in drawn.items():
+        chain = [r for r in rows if r["slot_id"] == slot]
+        active = sum(1 for r in chain if r["status"] in ("open", "used"))
+        if active != 1:
+            errors.append(f"slot {slot}: {active} open or used rows, needs exactly 1")
+        if any(r["class"] != cls for r in chain):
+            errors.append(f"slot {slot}: class changed from {cls}")
+    for area in dict.fromkeys(f["area"] for f in fresh):
+        reserve = [
+            r for r, f in zip(rows, fresh, strict=True) if f["area"] == area and not f["slot_id"]
+        ]
+        promoted = [r["status"] != "reserve" for r in reserve]
+        if promoted != sorted(promoted, reverse=True):
+            errors.append(f"area {area}: reserve sections were not used in draw order")
+        skipped = sum(1 for r in rows if r["area"] == area and r["status"] == "skipped")
+        if skipped != sum(promoted):
+            errors.append(
+                f"area {area}: {skipped} skipped but {sum(promoted)} reserve sections used"
+            )
+    return errors
+
+
+def too_short_errors(rows: list[dict], corpus: Corpus) -> list[str]:
+    """Skips as `too-short` of sections that are not under CATALOGUE_SKIP_MIN_TOKENS tokens."""
+    errors = []
+    for r in rows:
+        section = corpus.by_id.get(r["section_id"])
+        if r["status"] != "skipped" or r["skip_reason"] != "too-short" or section is None:
+            continue
+        length = section["end_token"] - section["start_token"]
+        if length >= CATALOGUE_SKIP_MIN_TOKENS:
+            errors.append(
+                f"slot {r['slot_id']}: section {r['section_id']} has {length} tokens; "
+                f"too-short needs fewer than {CATALOGUE_SKIP_MIN_TOKENS} tokens"
+            )
+    return errors

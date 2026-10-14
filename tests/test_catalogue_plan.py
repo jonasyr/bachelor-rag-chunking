@@ -7,6 +7,7 @@ from catalogue_plan import (
     draw_plan,
     mark_used,
     plan_findings,
+    plan_integrity,
     plan_summary,
     read_plan,
     save_plan,
@@ -119,10 +120,10 @@ def small_plan(corpus, tmp_path):
     return out
 
 
-def test_skip_moves_the_slot_to_the_next_reserve_section(small_plan):
+def test_skip_moves_the_slot_to_the_next_reserve_section(corpus, small_plan):
     rows = read_plan(small_plan)
     s01 = slot_row(rows, "S01")
-    new = skip_slot(small_plan, "S01", "code-or-links")
+    new = skip_slot(small_plan, "S01", "code-or-links", corpus)
     rows = read_plan(small_plan)
     skipped = next(r for r in rows if r["section_id"] == s01["section_id"])
     assert (skipped["status"], skipped["skip_reason"]) == ("skipped", "code-or-links")
@@ -135,16 +136,16 @@ def test_skip_moves_the_slot_to_the_next_reserve_section(small_plan):
     assert slot_row(rows, "S01")["section_id"] == new["section_id"] != s01["section_id"]
 
 
-def test_skip_needs_a_listed_reason_an_open_slot_and_a_reserve(small_plan):
+def test_skip_needs_a_listed_reason_an_open_slot_and_a_reserve(corpus, small_plan):
     with pytest.raises(ValueError, match="reason"):
-        skip_slot(small_plan, "S01", "boring")
+        skip_slot(small_plan, "S01", "boring", corpus)
     with pytest.raises(ValueError, match="no reserve section left in area style-guide"):
-        skip_slot(small_plan, "S02", "too-short")
+        skip_slot(small_plan, "S02", "too-short", corpus)
     rows = read_plan(small_plan)
     mark_used(rows, "S03", "Q001")
     save_plan(small_plan, rows)
     with pytest.raises(ValueError, match="S03 is not open"):
-        skip_slot(small_plan, "S03", "too-short")
+        skip_slot(small_plan, "S03", "too-short", corpus)
 
 
 def test_mark_used_accepts_open_or_same_question_only(small_plan):
@@ -186,7 +187,58 @@ def test_plan_findings_report_unknown_sections_and_bad_reasons(corpus, small_pla
     assert any("'boring'" in e for e in errors)
 
 
-def test_plan_summary_counts_skips(small_plan):
-    skip_slot(small_plan, "S01", "too-short")
+def test_plan_summary_counts_skips(corpus, small_plan):
+    skip_slot(small_plan, "S01", "too-short", corpus)
     lines = plan_summary(read_plan(small_plan))
     assert "Slots: 0 used, 3 open, 1 skipped (too-short 1)" in lines
+    assert "Skipped by area: api 1, style-guide 0, guide 0" in lines
+
+
+def test_too_short_only_for_sections_under_the_minimum(corpus, small_plan, monkeypatch):
+    monkeypatch.setattr(catalogue_plan, "CATALOGUE_SKIP_MIN_TOKENS", 1)
+    with pytest.raises(ValueError, match="too-short needs fewer than 1 tokens"):
+        skip_slot(small_plan, "S01", "too-short", corpus)
+
+
+def fresh_of(corpus):
+    return draw_plan(corpus, seed=3, **SMALL)
+
+
+def test_untouched_and_legitimately_used_plans_are_intact(corpus, small_plan):
+    assert plan_integrity(read_plan(small_plan), fresh_of(corpus)) == []
+    skip_slot(small_plan, "S01", "code-or-links", corpus)
+    rows = read_plan(small_plan)
+    mark_used(rows, "S03", "Q001")
+    assert plan_integrity(rows, fresh_of(corpus)) == []
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        (lambda rows: rows[0].update(section_id="D003#multi-word"), "differ from a fresh draw"),
+        (lambda rows: rows[0].update(**{"class": "detail"}), "differs from the draw"),
+        (
+            lambda rows: rows[1].update(slot_id="S09", status="used", question_id="Q9"),
+            "unknown slots",
+        ),
+        (
+            lambda rows: rows[1].update(status="open", slot_id="S01", **{"class": "x"}),
+            "class changed",
+        ),
+        (lambda rows: rows[0].update(status="used"), "used without a question"),
+        (lambda rows: rows[0].update(skip_reason="too-short"), "skip_reason only on skipped"),
+    ],
+)
+def test_plan_integrity_flags_hand_edits(corpus, small_plan, change, message):
+    rows = read_plan(small_plan)
+    change(rows)
+    errors = plan_integrity(rows, fresh_of(corpus))
+    assert any(message in e for e in errors), errors
+
+
+def test_plan_integrity_flags_skips_without_promotion(corpus, small_plan):
+    rows = read_plan(small_plan)
+    rows[0].update(status="skipped", skip_reason="code-or-links")  # no reserve took over
+    errors = plan_integrity(rows, fresh_of(corpus))
+    assert any("slot S01: 0 open or used rows" in e for e in errors)
+    assert any("area api: 1 skipped but 0 reserve sections used" in e for e in errors)

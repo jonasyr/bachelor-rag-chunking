@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from conftest import valid_rows, write_catalogue, write_plan_for
+from conftest import fresh_plan_for, valid_rows, write_catalogue, write_plan_for
 
 import freeze
 from catalogue import freeze_catalogue
@@ -29,6 +29,7 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         documents,
         plan_file=write_plan_for(tmp_path, valid_rows()),
         review_file=tmp_path / "catalogue_review.csv",
+        fresh_plan=fresh_plan_for(valid_rows()),
     )
     stored = json.loads(out.read_text(encoding="utf-8"))
     assert stored == record
@@ -59,6 +60,7 @@ def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
             corpus_files[0],
             plan_file=write_plan_for(tmp_path, valid_rows()[:47]),
             review_file=tmp_path / "catalogue_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()[:47]),
         )
     assert not out.exists()
 
@@ -76,6 +78,7 @@ def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_pat
         documents,
         plan_file=write_plan_for(tmp_path, valid_rows()),
         review_file=tmp_path / "catalogue_review.csv",
+        fresh_plan=fresh_plan_for(valid_rows()),
     )
     before = out.read_bytes()
     with pytest.raises(FileExistsError, match="ADR 0030"):
@@ -89,6 +92,7 @@ def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_pat
             documents,
             plan_file=write_plan_for(tmp_path, valid_rows()),
             review_file=tmp_path / "catalogue_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()),
         )
     with pytest.raises(FileExistsError, match="ADR 0030"):
         freeze.write_freeze(questions, truth, sections, documents, out)
@@ -176,6 +180,7 @@ def test_freeze_records_plan_and_review(corpus, main_catalogue, pilot, tmp_path)
         documents,
         plan_file=plan,
         review_file=review,
+        fresh_plan=fresh_plan_for(valid_rows()),
     )
     assert record["sha256"]["catalogue_plan.csv"] == sha256_of(plan)
     assert record["sha256"]["catalogue_review.csv"] == sha256_of(review)

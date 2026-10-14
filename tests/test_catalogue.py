@@ -1,5 +1,12 @@
 import pytest
-from conftest import PAGES, build_corpus, valid_rows, write_catalogue, write_plan_for
+from conftest import (
+    PAGES,
+    build_corpus,
+    fresh_plan_for,
+    valid_rows,
+    write_catalogue,
+    write_plan_for,
+)
 
 import catalogue
 import tokens
@@ -200,7 +207,15 @@ def run_check(corpus, tmp_path, rows, pilot_dir):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows)
     review = tmp_path / "catalogue_review.csv"
-    return check(corpus, questions, truth, pilot_dir=pilot_dir, plan_file=plan, review_file=review)
+    return check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot_dir,
+        plan_file=plan,
+        review_file=review,
+        fresh_plan=fresh_plan_for(rows),
+    )
 
 
 def test_valid_catalogue_passes_strictly(corpus, tmp_path, pilot):
@@ -279,6 +294,7 @@ def cli(corpus_files, tmp_path, monkeypatch, pilot):
     monkeypatch.setattr(catalogue, "CATALOGUE_FREEZE_FILE", tmp_path / "freeze.json")
     monkeypatch.setattr(catalogue, "CATALOGUE_PLAN_FILE", write_plan_for(tmp_path, valid_rows()))
     monkeypatch.setattr(catalogue, "CATALOGUE_REVIEW_FILE", tmp_path / "catalogue_review.csv")
+    monkeypatch.setattr(catalogue, "draw_plan", lambda corpus: fresh_plan_for(valid_rows()))
     return tmp_path
 
 
@@ -394,7 +410,13 @@ def test_check_applies_the_plan_rules(corpus, tmp_path, pilot):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows[1:])  # Q001 has no slot
     report = check(
-        corpus, questions, truth, pilot_dir=pilot, plan_file=plan, review_file=tmp_path / "r.csv"
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=plan,
+        review_file=tmp_path / "r.csv",
+        fresh_plan=fresh_plan_for(valid_rows()[1:]),
     )
     assert "Q001: belongs to 0 slots, needs exactly 1" in report.findings
 
@@ -414,9 +436,51 @@ def test_open_review_rows_warn_in_draft_and_fail_strictly(corpus, tmp_path, pilo
         truth,
         pilot_dir=pilot,
         plan_file=write_plan_for(tmp_path, rows),
+        fresh_plan=fresh_plan_for(rows),
         review_file=review,
     )
     assert report.errors == []
     assert "1 review suggestion(s) still open" in report.findings
     assert exit_code(report, draft=True) == 0 and exit_code(report, draft=False) == 1
     assert any(line.startswith("AI review: 1 suggestions") for line in report.lines)
+
+
+def test_check_rejects_a_hand_edited_plan(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    questions, truth = write_catalogue(tmp_path, rows)
+    plan = write_plan_for(tmp_path, rows)
+    fresh = fresh_plan_for(rows)
+    fresh[0]["class"] = "detail" if fresh[0]["class"] != "detail" else "single"  # drawn differently
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=plan,
+        review_file=tmp_path / "r.csv",
+        fresh_plan=fresh,
+    )
+    assert any("differs from the draw" in e for e in report.errors)
+
+
+def test_check_rejects_too_short_skips_of_long_sections(corpus, tmp_path, pilot, monkeypatch):
+    import catalogue_plan
+
+    rows = valid_rows()
+    questions, truth = write_catalogue(tmp_path, rows)
+    plan = write_plan_for(tmp_path, rows)
+    text = plan.read_text(encoding="utf-8")
+    plan.write_text(
+        text + "guide,49,D002#cleanup,S01,single,skipped,too-short,\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(catalogue_plan, "CATALOGUE_SKIP_MIN_TOKENS", 1)
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=plan,
+        review_file=tmp_path / "r.csv",
+        fresh_plan=None,
+    )
+    assert any("too-short needs fewer than 1 tokens" in e for e in report.errors)

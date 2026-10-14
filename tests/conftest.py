@@ -147,3 +147,24 @@ def write_plan_for(tmp_path, rows):
             area = areas.get(sids[0].split("#")[0], "guide")  # unknown IDs: format tests
             writer.writerow([area, number, sids[0], f"S{number:02d}", cls, "used", "", qid])
     return plan
+
+
+def fresh_plan_for(rows):
+    """The fresh draw that matches write_plan_for(rows): same rows, every slot still open."""
+    fresh = []
+    for number, (_, _, _, cls, _, sids) in enumerate(rows, start=1):
+        areas = {"D001": "api", "D003": "style-guide"}
+        area = areas.get(sids[0].split("#")[0], "guide")
+        fresh.append(
+            {
+                "area": area,
+                "draw": str(number),
+                "section_id": sids[0],
+                "slot_id": f"S{number:02d}",
+                "class": cls,
+                "status": "open",
+                "skip_reason": "",
+                "question_id": "",
+            }
+        )
+    return fresh
