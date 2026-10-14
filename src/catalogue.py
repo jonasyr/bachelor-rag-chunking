@@ -11,6 +11,7 @@ results, so the annotation stays blind (ADR 0027).
     freeze              strict check, then record SHA-256 of both files (ADR 0030)
 """
 
+import re
 from pathlib import Path
 
 import tokens
@@ -18,6 +19,7 @@ from config import DOCUMENTS_FILE, SECTION_INDEX_FILE, SECTIONS_FILE
 from embed import load_jsonl
 
 HEADING_SEPARATOR = " › "
+EXCERPT_CHARS = 60
 
 
 class Corpus:
@@ -102,3 +104,44 @@ def write_section_index(corpus: Corpus, out_file: Path = SECTION_INDEX_FILE) -> 
     out_file.parent.mkdir(parents=True, exist_ok=True)
     out_file.write_text(section_index(corpus), encoding="utf-8")
     return len(corpus.sections)
+
+
+def _excerpt(text: str, start: int, end: int) -> str:
+    return " ".join(text[max(0, start - EXCERPT_CHARS) : end + EXCERPT_CHARS].split())
+
+
+def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
+    """Sections whose own text contains term (literal, case-insensitive), with an excerpt.
+
+    A match inside a subsection is reported for the innermost section only, not again for its
+    parents; sections in sections.jsonl order.
+    """
+    if not term.strip():
+        raise ValueError("empty search term")
+    pattern = re.compile(re.escape(term.strip()), re.IGNORECASE)
+    hits = []
+    for s in corpus.sections:
+        start, end = corpus.char_span(s)
+        children = [
+            corpus.char_span(c)
+            for c in corpus.sections
+            if c["doc_id"] == s["doc_id"]
+            and c["level"] > s["level"]
+            and s["start_token"] <= c["start_token"]
+            and c["end_token"] <= s["end_token"]
+        ]
+        text = corpus.docs[s["doc_id"]]["text"]
+        for match in pattern.finditer(text, start, end):
+            if not any(a <= match.start() < b for a, b in children):
+                hits.append((s, _excerpt(text, match.start(), match.end())))
+                break
+    return hits
+
+
+def show(corpus: Corpus, section_id: str) -> str:
+    section = corpus.by_id.get(section_id)
+    if section is None:
+        raise ValueError(f"unknown section {section_id}")
+    length = section["end_token"] - section["start_token"]
+    head = f"{section_id}  {corpus.heading_path(section)}  ({length} tokens)"
+    return f"{head}\n\n{corpus.text(section)}"

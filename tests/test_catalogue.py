@@ -3,7 +3,7 @@ import json
 import pytest
 
 import tokens
-from catalogue import load_corpus, section_index, write_section_index
+from catalogue import find, load_corpus, section_index, show, write_section_index
 from config import (
     AREA_MIN_QUESTIONS,
     QUESTION_CLASSES,
@@ -110,3 +110,39 @@ def test_write_section_index_is_deterministic(corpus, tmp_path):
     first = out.read_bytes()
     write_section_index(corpus, out)
     assert out.read_bytes() == first
+
+
+def test_find_reports_only_the_innermost_section(corpus):
+    hits = find(corpus, "callback only")
+    assert [s["section_id"] for s, _ in hits] == ["D002#once"]
+    assert "callback only one time" in hits[0][1]
+
+
+def test_find_is_case_insensitive_and_reports_each_owning_section(corpus):
+    ids = [s["section_id"] for s, _ in find(corpus, "ONCE")]
+    assert ids == ["D002#deep", "D002#once"]  # "Use the once option" is in Deep's own text
+
+
+def test_find_matches_regex_characters_literally(corpus):
+    assert [s["section_id"] for s, _ in find(corpus, "ref()")] == ["D001#ref"]
+    assert find(corpus, "r.f") == []
+
+
+def test_find_rejects_an_empty_term(corpus):
+    with pytest.raises(ValueError, match="empty search term"):
+        find(corpus, "  ")
+
+
+def test_show_prints_heading_path_tokens_and_exact_text(corpus):
+    once = corpus.by_id["D002#once"]
+    out = show(corpus, "D002#once")
+    assert out.splitlines()[0] == (
+        f"D002#once  Watchers › Deep Watchers › Once Watchers  "
+        f"({once['end_token'] - once['start_token']} tokens)"
+    )
+    assert out.endswith(corpus.text(once))
+
+
+def test_show_rejects_an_unknown_section(corpus):
+    with pytest.raises(ValueError, match="unknown section D009#x"):
+        show(corpus, "D009#x")
