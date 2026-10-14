@@ -20,7 +20,7 @@ Fragenkatalog ist eine der wichtigsten Eigenleistungen.
 | Wert | Regel |
 |------|-------|
 | `single` | genau ein relevanter Abschnitt; dessen Hauptinhalt ist die Antwort |
-| `multi-section` | mindestens zwei relevante Abschnitte, alle für die Antwort nötig |
+| `multi-section` | mindestens zwei relevante Abschnitte, alle für die Antwort nötig; ein Abschnitt innerhalb eines anderen angegebenen zählt nicht mit |
 | `detail` | genau ein Abschnitt; die Antwort ist ein einzelnes Faktum (Referenzantwort höchstens 30 Wörter) |
 | `paraphrase` | genau ein Abschnitt; die Frage teilt kein Inhaltswort mit dem Titel des Abschnitts oder seiner Seite |
 

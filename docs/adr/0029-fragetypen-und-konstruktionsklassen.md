@@ -31,7 +31,8 @@ Wir werden 48 Fragen erstellen: `type` ∈ {`factual`, `procedural`, `conceptual
 12/12/12/6/6 Fragen und `difficulty` als Konstruktionsklasse ∈ {`single`, `multi-section`, `detail`, `paraphrase`}
 mit je 12 Fragen.
 Wir werden die Klassen so definieren: `single` genau ein relevanter Abschnitt, dessen Hauptinhalt die Antwort ist;
-`multi-section` mindestens zwei relevante Abschnitte, die alle nötig sind; `detail` genau ein Abschnitt, die Antwort
+`multi-section` mindestens zwei relevante Abschnitte, die alle nötig sind (ein Abschnitt innerhalb eines anderen
+angegebenen zählt nicht mit, er fügt keinen Text hinzu); `detail` genau ein Abschnitt, die Antwort
 ist ein einzelnes Faktum (Referenzantwort höchstens 30 Wörter); `paraphrase` genau ein Abschnitt, die Frage teilt kein
 Inhaltswort mit dem Titel des Abschnitts oder dem Titel seiner Seite (H1).
 Wir werden Wörter so vergleichen: Kleinschreibung, Wörter `[a-z0-9]+`, ohne Stoppwörter (`config.CATALOGUE_STOPWORDS`);

@@ -105,6 +105,9 @@ def relevant_sections(
         ids = split_ids(truth[qid]["relevant_section_ids"])
         if not ids:
             raise ValueError(f"{qid} has no relevant_section_ids")
+        repeated = sorted({sid for sid in ids if ids.count(sid) > 1})
+        if repeated:
+            raise ValueError(f"{qid}: duplicate section IDs {repeated}")
         unknown = [sid for sid in ids if sid not in by_id]
         if unknown:
             raise ValueError(f"{qid}: unknown section IDs {unknown}")

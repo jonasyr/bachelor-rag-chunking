@@ -111,7 +111,7 @@ Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `conf
   `question_id`.
 - Pflichtfelder nicht leer: in `questions.csv` alle außer `notes`, in `ground_truth.csv` alle.
 - Jede Frage hat eine Ground-Truth-Zeile und umgekehrt; jede Frage hat mindestens eine `relevant_section_id`, und alle
-  existieren in `sections.jsonl`.
+  existieren in `sections.jsonl`; keine ID steht in einer Zeile doppelt.
 - `relevant_doc_ids` liegen im Korpus und sind genau die Dokumente der `relevant_section_ids`.
 - Nur für den Hauptkatalog: Der Freeze-Datensatz existiert und beide Prüfsummen passen ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)).
 

@@ -298,3 +298,19 @@ def test_find_excerpt_stays_inside_the_section(corpus):
     [(section, excerpt)] = find(corpus, "one time")
     assert section["section_id"] == "D002#once"
     assert "Cleanup" not in excerpt and "Deep" not in excerpt
+
+
+def test_nested_sections_count_once_for_multi_section(corpus):
+    deep, once = corpus.by_id["D002#deep"], corpus.by_id["D002#once"]  # H3 inside its H2
+    assert class_findings(corpus, question("multi-section"), truth(), [deep, once]) == [
+        "D002#once lies inside D002#deep",
+        "multi-section needs at least 2 relevant sections, has 1",
+    ]
+
+
+def test_duplicate_section_ids_are_a_format_error(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    index = next(i for i, r in enumerate(rows) if r[3] == "multi-section")
+    rows[index] = (*rows[index][:5], ["D002#once", "D002#once"])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert any("duplicate section IDs ['D002#once']" in e for e in report.errors)

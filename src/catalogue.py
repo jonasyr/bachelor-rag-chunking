@@ -225,13 +225,32 @@ def heading_texts(corpus: Corpus, sections: list[dict]) -> list[str]:
     return [title for s in sections for title in (s["title"], corpus.page_title(s))]
 
 
+def nested_pairs(sections: list[dict]) -> list[tuple[str, str]]:
+    """(child, parent) section IDs where a listed section lies inside another listed one."""
+    return [
+        (child["section_id"], parent["section_id"])
+        for child in sections
+        for parent in sections
+        if parent["doc_id"] == child["doc_id"]
+        and parent["level"] < child["level"]
+        and parent["start_token"] <= child["start_token"]
+        and child["end_token"] <= parent["end_token"]
+    ]
+
+
 def class_findings(corpus: Corpus, question: dict, truth: dict, sections: list[dict]) -> list[str]:
-    """Violations of the construction-class rules of ADR 0029 for one question."""
+    """Violations of the construction-class rules of ADR 0029 for one question.
+
+    A section inside another listed section adds no text, so it does not count as a further
+    section for `multi-section`.
+    """
     cls, count = question["difficulty"], len(sections)
-    found = []
+    nested = nested_pairs(sections)
+    found = [f"{child} lies inside {parent}" for child, parent in nested]
     if cls == "multi-section":
-        if count < 2:
-            found.append(f"multi-section needs at least 2 relevant sections, has {count}")
+        independent = count - len({child for child, _ in nested})
+        if independent < 2:
+            found.append(f"multi-section needs at least 2 relevant sections, has {independent}")
     elif count != 1:
         found.append(f"{cls} needs exactly 1 relevant section, has {count}")
     if cls == "detail":
