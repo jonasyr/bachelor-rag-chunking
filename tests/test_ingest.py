@@ -55,3 +55,10 @@ def test_ingest_without_snapshot_points_to_snapshot_script(tmp_path):
 def test_title_of_tracks_fence_markers():
     text = "~~~\n```\n# not a title\n~~~\n\n# Real {#real}\n"
     assert title_of(text) == "Real"
+
+
+def test_title_of_normalises_api_heading_markup():
+    assert title_of("# \\<script setup> {#script-setup}\n") == "<script setup>"
+    assert title_of("# Composition API: <br>Dependency Injection {#di}\n") == (
+        "Composition API: Dependency Injection"
+    )
