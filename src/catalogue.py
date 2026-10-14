@@ -15,11 +15,21 @@ import re
 from pathlib import Path
 
 import tokens
-from config import DOCUMENTS_FILE, SECTION_INDEX_FILE, SECTIONS_FILE
+from config import (
+    CATALOGUE_FOLD_MIN_LENGTH,
+    CATALOGUE_STOPWORDS,
+    CATALOGUE_WORD_PATTERN,
+    DETAIL_MAX_ANSWER_WORDS,
+    DOCUMENTS_FILE,
+    SECTION_INDEX_FILE,
+    SECTIONS_FILE,
+)
 from embed import load_jsonl
 
 HEADING_SEPARATOR = " › "
 EXCERPT_CHARS = 60
+WORD_RE = re.compile(CATALOGUE_WORD_PATTERN)
+STOPWORDS = frozenset(CATALOGUE_STOPWORDS)
 
 
 class Corpus:
@@ -145,3 +155,59 @@ def show(corpus: Corpus, section_id: str) -> str:
     length = section["end_token"] - section["start_token"]
     head = f"{section_id}  {corpus.heading_path(section)}  ({length} tokens)"
     return f"{head}\n\n{corpus.text(section)}"
+
+
+def content_words(text: str) -> set[str]:
+    """Lowercase words of text without stopwords (ADR 0029)."""
+    return {w for w in WORD_RE.findall(text.lower()) if w not in STOPWORDS}
+
+
+def forms(word: str) -> set[str]:
+    """The word and its candidate singular forms; two words match if their forms intersect.
+
+    Errs towards a match (values -> valu as well as value), the safe side for a rule that must
+    catch shared words.
+    """
+    result = {word}
+    if len(word) >= CATALOGUE_FOLD_MIN_LENGTH:
+        if word.endswith("s"):
+            result.add(word[:-1])
+        if word.endswith("es"):
+            result.add(word[:-2])
+        if word.endswith("ies"):
+            result.add(word[:-3] + "y")
+    return result
+
+
+def shared_words(question: str, headings: list[str]) -> list[str]:
+    """Question words that match a heading word, sorted."""
+    heading_forms: set[str] = set()
+    for heading in headings:
+        for word in content_words(heading):
+            heading_forms |= forms(word)
+    return sorted(w for w in content_words(question) if forms(w) & heading_forms)
+
+
+def heading_texts(corpus: Corpus, sections: list[dict]) -> list[str]:
+    """Titles of the sections and of their pages: the heading words of a question (ADR 0029)."""
+    return [title for s in sections for title in (s["title"], corpus.page_title(s))]
+
+
+def class_findings(corpus: Corpus, question: dict, truth: dict, sections: list[dict]) -> list[str]:
+    """Violations of the construction-class rules of ADR 0029 for one question."""
+    cls, count = question["difficulty"], len(sections)
+    found = []
+    if cls == "multi-section":
+        if count < 2:
+            found.append(f"multi-section needs at least 2 relevant sections, has {count}")
+    elif count != 1:
+        found.append(f"{cls} needs exactly 1 relevant section, has {count}")
+    if cls == "detail":
+        words = len(truth["expected_answer"].split())
+        if words > DETAIL_MAX_ANSWER_WORDS:
+            found.append(f"detail answer has {words} words, at most {DETAIL_MAX_ANSWER_WORDS}")
+    if cls == "paraphrase":
+        shared = shared_words(question["question"], heading_texts(corpus, sections))
+        if shared:
+            found.append(f"paraphrase shares heading words {shared}")
+    return found

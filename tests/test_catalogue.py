@@ -3,7 +3,17 @@ import json
 import pytest
 
 import tokens
-from catalogue import find, load_corpus, section_index, show, write_section_index
+from catalogue import (
+    class_findings,
+    content_words,
+    find,
+    forms,
+    load_corpus,
+    section_index,
+    shared_words,
+    show,
+    write_section_index,
+)
 from config import (
     AREA_MIN_QUESTIONS,
     QUESTION_CLASSES,
@@ -146,3 +156,71 @@ def test_show_prints_heading_path_tokens_and_exact_text(corpus):
 def test_show_rejects_an_unknown_section(corpus):
     with pytest.raises(ValueError, match="unknown section D009#x"):
         show(corpus, "D009#x")
+
+
+def test_content_words_drop_stopwords_and_punctuation():
+    assert content_words("How do I use ref() in Vue?") == {"use", "ref"}
+
+
+def test_forms_fold_plural_endings_only_for_longer_words():
+    assert forms("values") == {"values", "value", "valu"}
+    assert forms("watches") == {"watches", "watche", "watch"}
+    assert forms("dependencies") >= {"dependency"}
+    assert forms("refs") == {"refs", "ref"}
+    assert forms("its") == {"its"}  # shorter than CATALOGUE_FOLD_MIN_LENGTH
+
+
+@pytest.mark.parametrize(
+    ("question", "heading", "shared"),
+    [
+        ("Which values can it hold?", "Value Bindings", ["values"]),
+        ("How do props work?", "Prop Validation", ["props"]),
+        ("What are refs?", "ref()", ["refs"]),
+        ("What does a dependency do?", "Optional Dependencies", ["dependency"]),
+        ("How do I skip later renders?", "v-once", []),
+    ],
+)
+def test_shared_words(question, heading, shared):
+    assert shared_words(question, [heading]) == shared
+
+
+def question(difficulty, text="Question number one"):
+    return {"question_id": "Q001", "question": text, "type": "factual", "difficulty": difficulty}
+
+
+def truth(answer="Short answer."):
+    return {"question_id": "Q001", "expected_answer": answer}
+
+
+def test_single_needs_exactly_one_section(corpus):
+    one, two = [corpus.by_id["D001#ref"]], [corpus.by_id["D001#ref"], corpus.by_id["D002#once"]]
+    assert class_findings(corpus, question("single"), truth(), one) == []
+    assert class_findings(corpus, question("single"), truth(), two) == [
+        "single needs exactly 1 relevant section, has 2"
+    ]
+
+
+def test_multi_section_needs_two_sections(corpus):
+    one, two = [corpus.by_id["D001#ref"]], [corpus.by_id["D001#ref"], corpus.by_id["D002#once"]]
+    assert class_findings(corpus, question("multi-section"), truth(), two) == []
+    assert class_findings(corpus, question("multi-section"), truth(), one) == [
+        "multi-section needs at least 2 relevant sections, has 1"
+    ]
+
+
+def test_detail_limits_the_answer_length(corpus):
+    one = [corpus.by_id["D002#once"]]
+    assert class_findings(corpus, question("detail"), truth("word " * 30), one) == []
+    assert class_findings(corpus, question("detail"), truth("word " * 31), one) == [
+        "detail answer has 31 words, at most 30"
+    ]
+
+
+def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
+    once = [corpus.by_id["D002#once"]]  # headings "Once Watchers" and page title "Watchers"
+    ok = question("paraphrase", "How do I run a callback a single time?")
+    assert class_findings(corpus, ok, truth(), once) == []
+    page_word = question("paraphrase", "How do watchers fire?")
+    assert class_findings(corpus, page_word, truth(), once) == [
+        "paraphrase shares heading words ['watchers']"
+    ]
