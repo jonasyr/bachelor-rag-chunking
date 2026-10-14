@@ -12,7 +12,7 @@ from pathlib import Path
 
 import tokens
 from config import DATA_RAW, DOCUMENTS_FILE, SNAPSHOT_SUBDIR
-from preprocess import closes_fence, fence_marker
+from preprocess import closes_fence, fence_marker, heading_title
 
 H1_RE = re.compile(r"^#\s+(.*?)(?:\s*\{#[^}]+\})?\s*$")
 
@@ -27,7 +27,7 @@ def title_of(text: str) -> str:
         elif (marker := fence_marker(line)) is not None:
             fence = marker
         elif m := H1_RE.match(line):
-            return m.group(1)
+            return heading_title(m.group(1))
     raise ValueError("no H1 found")
 
 
