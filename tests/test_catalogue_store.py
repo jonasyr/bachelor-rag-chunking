@@ -225,3 +225,11 @@ def test_highlight_splits_camel_case_like_the_rule():
     assert store.highlight("Use onMounted().", ["mounted"]) == (
         'Use <mark class="hl">onMounted</mark>().'
     )
+
+
+def test_page_html_sets_fenced_code_in_monospace_and_keeps_highlights():
+    text = "Use the hook.\n\n```ts\nonMounted(() => {})\n```\nDone."
+    out = store.page_html(text, ["mounted"])
+    code = '```ts\n<mark class="hl">onMounted</mark>(() =&gt; {})\n```'
+    assert f'<span class="code">{code}</span>' in out
+    assert out.startswith("Use the hook.") and out.endswith("Done.")

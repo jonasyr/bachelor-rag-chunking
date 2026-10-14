@@ -106,3 +106,12 @@ def test_an_accepted_section_survives_the_next_save(app):
     at.button(key="save").click().run()  # saving again must keep the accepted section
     assert not at.exception
     assert "D002#cleanup" in paths["GROUND_TRUTH_FILE"].read_text(encoding="utf-8")
+
+
+def test_saving_moves_to_the_next_open_slot(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A ref.")
+    at.button(key="save").click().run()
+    assert not at.exception
+    assert any("Slot S02" in h.value for h in at.subheader)

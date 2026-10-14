@@ -40,11 +40,16 @@ CSS = """
   line-height: 1.7; max-width: 72ch; white-space: pre-wrap; overflow-wrap: anywhere;
   padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: 6px;
   background: var(--surface); color: var(--ink);}
-.heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;}
+.heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;
+  font-family: "Source Sans 3", "Source Sans Pro", sans-serif;}
+[data-testid="stMainBlockContainer"] {padding-top: 2.5rem;}
+.source .code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.88rem;
+  line-height: 1.55;}
 mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-radius: 2px;}
 .checks {list-style: none; padding-left: 0; margin: 0.25rem 0 0.75rem;}
 .checks li {margin: 0.15rem 0;}
 .checks .ok {color: var(--ok);} .checks .problem {color: var(--problem);}
+::selection {background: var(--select);}
 </style>
 """
 LIGHT = {
@@ -53,6 +58,7 @@ LIGHT = {
     "ink": "#1F2933",
     "muted": "#616E7C",
     "marker": "#FFE58A",
+    "select": "rgba(36, 87, 166, 0.22)",
     "ok": "#2F7D4F",
     "problem": "#B3261E",
 }
@@ -62,6 +68,7 @@ DARK = {
     "ink": "#E4E8EC",
     "muted": "#9AA5B1",
     "marker": "rgba(255, 214, 90, 0.35)",
+    "select": "rgba(122, 165, 232, 0.32)",
     "ok": "#6CC48F",
     "problem": "#F2877F",
 }
@@ -79,10 +86,10 @@ def palette_css() -> str:
 
 
 def source_page(corpus: catalogue.Corpus, section: dict, words: list[str]) -> None:
+    """The section as a printed page: raw text, never rendered as Markdown (st.html)."""
     path = store.highlight(corpus.heading_path(section), words)
-    st.markdown(f'<div class="heading-path">{path}</div>', unsafe_allow_html=True)
-    body = store.highlight(corpus.text(section), words)
-    st.markdown(f'<div class="source">{body}</div>', unsafe_allow_html=True)
+    body = store.page_html(corpus.text(section), words)
+    st.html(f'<div class="heading-path">{path}</div><div class="source">{body}</div>')
 
 
 def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None:
@@ -90,17 +97,15 @@ def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None
     with st.sidebar:
         st.markdown(f"**{len(questions)} of {total} questions**")
         st.progress(min(len(questions) / total, 1.0))
-        rows = [
-            "| | " + " | ".join(QUESTION_CLASSES) + " |",
-            "|---" * (len(QUESTION_CLASSES) + 1) + "|",
-        ]
-        for qtype, quota in QUESTION_TYPES.items():
-            cells = [
-                sum(1 for q in questions if q["type"] == qtype and q["difficulty"] == c)
-                for c in QUESTION_CLASSES
-            ]
-            rows.append(f"| {qtype} ({sum(cells)}/{quota}) | " + " | ".join(map(str, cells)) + " |")
-        st.markdown("\n".join(rows))
+        for title, field, quotas in (
+            ("Type", "type", QUESTION_TYPES),
+            ("Class", "difficulty", QUESTION_CLASSES),
+        ):
+            rows = [f"| {title} | Written |", "|---|---:|"]
+            for value, quota in quotas.items():
+                done = sum(1 for q in questions if q[field] == value)
+                rows.append(f"| {value} | {done} of {quota} |")
+            st.markdown("\n".join(rows))
         used = {r["question_id"]: r["area"] for r in plan if r["status"] == "used"}
         areas = "; ".join(
             f"{AREA_NAMES[a]} {sum(1 for v in used.values() if v == a)} of at least {n}"
@@ -120,13 +125,13 @@ def checks(corpus, row, question, answer, sections, questions, qid) -> list[tupl
         "difficulty": row["class"],
     }
     found = catalogue.class_findings(corpus, draft, {"expected_answer": answer}, sections)
-    items = [(not found, "Class rule met" if not found else "; ".join(found))]
+    items = [(not found, f"class rule for {row['class']}" if not found else "; ".join(found))]
     words = len(answer.split())
     if row["class"] == "detail":
         items.append(
             (
                 words <= DETAIL_MAX_ANSWER_WORDS,
-                f"Answer has {words} words (at most {DETAIL_MAX_ANSWER_WORDS})",
+                f"answer has {words} words, at most {DETAIL_MAX_ANSWER_WORDS}",
             )
         )
     key = catalogue.normalised_question(question)
@@ -139,7 +144,14 @@ def checks(corpus, row, question, answer, sections, questions, qid) -> list[tupl
         None,
     )
     if question.strip():
-        items.append((twin is None, "No duplicate" if twin is None else f"Same wording as {twin}"))
+        items.append(
+            (
+                twin is None,
+                "no other question with this wording"
+                if twin is None
+                else f"same wording as {twin}",
+            )
+        )
     return items
 
 
@@ -150,6 +162,14 @@ def render_checks(items: list[tuple[bool, str]]) -> None:
         for ok, text in items
     )
     st.markdown(f'<ul class="checks">{lis}</ul>', unsafe_allow_html=True)
+
+
+def next_open(after: str) -> str:
+    """The first open slot after `after` in slot order, else the first open one, else `after`."""
+    plan = catalogue_plan.read_plan(store.CATALOGUE_PLAN_FILE)
+    open_slots = sorted(r["slot_id"] for r in plan if r["status"] == "open")
+    later = [s for s in open_slots if s > after]
+    return (later or open_slots or [after])[0]
 
 
 def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
@@ -163,6 +183,8 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         row = catalogue_plan.slot_row(plan, sid)
         return f"{sid}, {row['question_id']}" if row["status"] == "used" else f"{sid}, open"
 
+    if "goto" in st.session_state:  # set by Save/Skip; allowed before the widget exists
+        st.session_state["slot"] = st.session_state.pop("goto")
     sid = (
         st.selectbox("Slot", slots, index=slots.index(first_open), format_func=label, key="slot")
         or first_open
@@ -238,6 +260,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     question_id=qid,
                 )
                 st.toast(f"Saved {saved}")
+                st.session_state["goto"] = next_open(sid)
                 st.rerun()
             except (ValueError, PermissionError) as error:
                 st.error(str(error))
@@ -253,8 +276,11 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     or CATALOGUE_SKIP_REASONS[0]
                 )
                 if st.button("Skip this section", key="skip", disabled=frozen):
-                    catalogue_plan.skip_slot(store.CATALOGUE_PLAN_FILE, sid, reason, corpus)
-                    st.rerun()
+                    try:
+                        catalogue_plan.skip_slot(store.CATALOGUE_PLAN_FILE, sid, reason, corpus)
+                        st.rerun()
+                    except ValueError as error:
+                        st.error(str(error))
 
     with left:
         words = (
@@ -263,6 +289,10 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
             else []
         )
         source_page(corpus, seed, words)
+
+    # Second row: on narrow screens the search follows the question and its checks.
+    search, _ = st.columns([6, 5], gap="large")
+    with search:
         term = st.text_input(
             "Find more sections", key="find", placeholder="Search the documentation"
         )

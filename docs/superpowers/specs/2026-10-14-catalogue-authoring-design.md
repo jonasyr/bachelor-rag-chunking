@@ -96,7 +96,7 @@ long focused sessions, much reading.
   words that match heading words are marked in the source text and the heading like a highlighter stroke, so the
   paraphrase rule is visible, not just reported. Everything else is quiet.
 - **Palette (light / dark):** paper `#FAFBFC` / `#15191E`; surface `#FFFFFF` / `#1D232A`; ink `#1F2933` / `#E4E8EC`;
-  muted `#616E7C` / `#9AA5B1`; line `#D9DEE4` / `#2E3640`; accent ink blue `#2457A6` / `#7AA5E8`; highlighter
+  muted `#616E7C` / `#9AA5B1`; line `#D9DEE4` / `#2E3640`; accent ink blue `#2457A6` / `#3F72C9` (dark value raised to 4.71:1 for white button text after the audit); highlighter
   `#FFE58A` / `rgba(255, 214, 90, 0.35)`; ok `#2F7D4F`; problem `#B3261E`. Deliberately not the cream-and-terracotta
   or black-and-neon defaults.
 - **Type:** UI in Streamlit's sans-serif; the source text in a serif (Source Serif 4 with Georgia fallback, larger

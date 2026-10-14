@@ -166,3 +166,17 @@ def highlight(text: str, words: list[str]) -> str:
         last = match.end()
     out.append(html.escape(text[last:]))
     return "".join(out)
+
+
+FENCE_RE = re.compile(r"^[ \t]*```.*?^[ \t]*```[^\n]*$", re.MULTILINE | re.DOTALL)
+
+
+def page_html(text: str, words: list[str]) -> str:
+    """The section text for the source page: highlighted, fenced code blocks in monospace."""
+    out, last = [], 0
+    for match in FENCE_RE.finditer(text):
+        out.append(highlight(text[last : match.start()], words))
+        out.append(f'<span class="code">{highlight(match.group(), words)}</span>')
+        last = match.end()
+    out.append(highlight(text[last:], words))
+    return "".join(out)
