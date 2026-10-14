@@ -23,6 +23,7 @@ DOCS_DIR = ROOT / "docs"
 DOCUMENTS_FILE = DATA_PROCESSED / "documents.jsonl"
 SNAPSHOT_INFO_FILE = DOCS_DIR / "corpus_snapshot.txt"  # versioned: commit, dates, SHA-256 per file
 SECTIONS_FILE = DATA_PROCESSED / "sections.jsonl"
+SECTION_INDEX_FILE = DATA_PROCESSED / "section_index.md"  # lookup list for annotation (D29)
 CORPUS_MANIFEST_FILE = DOCS_DIR / "corpus_manifest.csv"
 CHUNKS_C1_FILE = DATA_PROCESSED / "chunks_c1.jsonl"
 CHUNKS_C2_FILE = DATA_PROCESSED / "chunks_c2.jsonl"
@@ -30,6 +31,7 @@ CHUNKS_C3_FILE = DATA_PROCESSED / "chunks_c3.jsonl"
 
 QUESTIONS_FILE = DATA_EVAL / "questions.csv"
 GROUND_TRUTH_FILE = DATA_EVAL / "ground_truth.csv"
+CATALOGUE_FREEZE_FILE = DATA_EVAL / "catalogue_freeze.json"  # SHA-256 of the frozen catalogue (D30)
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
@@ -134,6 +136,52 @@ ID_SEPARATOR = ";"  # several IDs in one ground_truth.csv field
 # this many tokens (D19).
 RELEVANCE_MIN_OVERLAP = 1
 SENSITIVITY_MIN_OVERLAP = 100  # sensitivity check for the retrieval evaluation
+
+# ---------------------------------------------------------------------------
+# Question catalogue (D17, D29, D30)
+# ---------------------------------------------------------------------------
+# Allowed values of questions.csv `type` and `difficulty` with their quotas; both sum to the
+# catalogue size (48). `difficulty` holds the construction class (D29).
+QUESTION_TYPES = {
+    "factual": 12,
+    "procedural": 12,
+    "conceptual": 12,
+    "comparative": 6,
+    "limitation": 6,
+}
+QUESTION_CLASSES = {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}
+# Minimum number of questions with a relevant section in an area (keys of VUE_DOCS_AREAS); a
+# question counts for every area it touches (D29).
+AREA_MIN_QUESTIONS = {"api": 12, "style-guide": 3}
+DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many words (D29)
+# Relevant sections per class (D29): `multi-section` at least this many independent sections
+# (a section inside another listed one does not count); single/detail/paraphrase exactly this many.
+MULTI_SECTION_MIN_SECTIONS = 2
+SINGLE_CLASS_SECTIONS = 1
+# `check` report only: count multi-section questions whose sections lie on at least this many pages
+CATALOGUE_REPORT_MIN_PAGES = 2
+CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
+CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
+# Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus
+# stopwords; camelCase identifiers also count by their parts. Words of at least
+# CATALOGUE_FOLD_MIN_LENGTH characters also match without a trailing s/es and with ies -> y, and
+# two words match if they share a prefix of at least max(CATALOGUE_PREFIX_MIN, length of the
+# shorter word - CATALOGUE_PREFIX_SLACK) characters (watch/watchers, mounted/mounting). The rule
+# errs towards reporting a shared word.
+CATALOGUE_WORD_PATTERN = r"[a-z0-9]+"
+CATALOGUE_CAMEL_BOUNDARY = r"(?<=[a-z0-9])(?=[A-Z])"
+CATALOGUE_FOLD_MIN_LENGTH = 4
+CATALOGUE_PREFIX_MIN = 4
+CATALOGUE_PREFIX_SLACK = 3
+CATALOGUE_STOPWORDS = (
+    "a", "about", "am", "an", "and", "are", "as", "at", "be", "been", "being", "but", "by",
+    "can", "could", "did", "do", "does", "done", "for", "from", "had", "has", "have", "he",
+    "here", "how", "i", "if", "in", "into", "is", "it", "its", "may", "me", "might", "must",
+    "my", "no", "not", "of", "on", "onto", "or", "our", "over", "shall", "she", "should", "so",
+    "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "those",
+    "to", "under", "v", "vue", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
+    "whose", "why", "will", "with", "without", "would", "you", "your",
+)  # fmt: skip
 
 # ---------------------------------------------------------------------------
 # LLM / Embedding (D15, D16)

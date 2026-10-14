@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen); präzisiert durch [ADR 0027](0027-blinde-annotation.md) (Relevanz-Annotation blind vor jedem Retrieval)
+Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen); präzisiert durch [ADR 0027](0027-blinde-annotation.md) (Relevanz-Annotation blind vor jedem Retrieval); Typen, Klassen und Quoten in [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md), Einfrieren in [ADR 0030](0030-einfrieren-des-fragenkatalogs.md)
 
 ## Kontext
 

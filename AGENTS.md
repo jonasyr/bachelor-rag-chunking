@@ -67,6 +67,6 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/reference/configuration.md` — every key of `src/config.py` (meaning, ADR)
 - `docs/plan.md` — status (`#stand`), schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D28
+- `docs/adr/` — decisions D1–D30
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)

@@ -7,9 +7,10 @@
 Stand 14.10.2026: Korpus festgelegt (Guide, API-Referenz, Style Guide;
 [ADR 0025](adr/0025-korpus-guide-api-styleguide.md)); Kontrolle K1 und faire Sensitivitätsregel beschlossen
 ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)). Umgesetzt und getestet: `snapshot.py`, `ingest.py`, `preprocess.py`,
-`chunking.py`, `embed.py`, `retrieve.py` (inkl. `--control` für K1). Noch Platzhalter: `generate.py`,
-`evaluate_retrieval.py`, `evaluate_answers.py`. Nächster Schritt: Werkzeuge für den Fragenkatalog (siehe
-[Offene Entscheidungen](#offene-entscheidungen--vor-beginn-zu-bestätigen)).
+`chunking.py`, `embed.py`, `retrieve.py` (inkl. `--control` für K1), Fragenkatalog-Werkzeuge `catalogue.py` und
+`freeze.py` ([ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.md)).
+Noch Platzhalter: `generate.py`, `evaluate_retrieval.py`, `evaluate_answers.py`. Nächster Schritt: 48 Fragen schreiben
+und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)), Einfrieren bis 09.11.2026.
 
 ## Zeitplan (13.10.–24.12.2026)
 
@@ -46,6 +47,6 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 - **Modell-/Versionswahl:** konkretes GPT-Modell und SDK-/API-Version zum Implementierungszeitpunkt fixieren und dokumentieren. Entschieden: Embedding-Modell sowie SDK- und Chroma-Version ([ADR 0023](adr/0023-embedding-modell.md)); offen: GPT-Modell.
 - **Embedding-Sprache:** Korpus ist englisch; Fragen/Referenzantworten englisch halten (Konsistenz mit Embedding-Raum).
 - **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität).
-- **Fragenkatalog-Werkzeuge (vereinbart 14.10.2026):** Abschnitts-Nachschlageliste und Abdeckungsprüfung (Fragetypen, Bereiche inkl. API, zu leichte Fragen) als nächster Schritt; Werte für `type` und `difficulty` noch festzulegen.
+- **Fragenkatalog:** entschieden: 48 Fragen, Typen und Konstruktionsklassen mit Quoten und Bereichsuntergrenzen ([ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md)), Einfrieren als Sperre vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.md)).
 - **C4 (semantisch):** entschieden: nur, wenn der Meilenstein 09.11. (Ground Truth eingefroren) planmäßig erreicht ist
   ([ADR 0028](adr/0028-c4-bedingung.md)).

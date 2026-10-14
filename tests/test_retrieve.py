@@ -4,6 +4,7 @@ import json
 import pytest
 from conftest import FakeEmbedder
 
+import freeze
 import tokens
 import vector_index
 from chunking import chunk
@@ -80,6 +81,7 @@ def setup(tmp_path, fake_embedder):
         "questions_file": questions,
         "ground_truth_file": truth,
         "sections_file": sections_file,
+        "documents_file": docs_file,
         "chunk_files": chunk_files,
         "vector_files": vector_files,
         "query_file": tmp_path / "query_embeddings.npz",
@@ -354,3 +356,50 @@ def test_control_files_in_the_experiment_are_refused(setup):
     mixed = {**paths, "chunk_files": {**paths["chunk_files"], "K1": paths["chunk_files"]["C1"]}}
     with pytest.raises(ValueError, match="must cover exactly the strategies"):
         retrieve(embedder=FakeEmbedder(), **mixed)
+
+
+@pytest.fixture
+def as_main_catalogue(setup, monkeypatch):
+    paths = setup[0]
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", paths["questions_file"])
+    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", paths["ground_truth_file"])
+    return setup
+
+
+def test_main_catalogue_needs_a_freeze_before_any_api_call(as_main_catalogue, tmp_path):
+    paths, _, _, fake = as_main_catalogue
+    calls = len(fake.calls)  # the setup embeds the chunks with the same fake
+    with pytest.raises(RuntimeError, match="not frozen"):
+        retrieve(embedder=fake, freeze_file=tmp_path / "freeze.json", **paths)
+    assert len(fake.calls) == calls and not paths["out_file"].exists()
+
+
+def test_main_catalogue_runs_when_frozen(as_main_catalogue, tmp_path):
+    paths, _, _, fake = as_main_catalogue
+    record = tmp_path / "freeze.json"
+    freeze.write_freeze(
+        paths["questions_file"],
+        paths["ground_truth_file"],
+        paths["sections_file"],
+        paths["documents_file"],
+        record,
+    )
+    assert retrieve(embedder=fake, freeze_file=record, **paths) > 0
+
+
+def test_main_catalogue_changed_after_freeze_is_refused(as_main_catalogue, tmp_path):
+    paths, _, _, fake = as_main_catalogue
+    record = tmp_path / "freeze.json"
+    freeze.write_freeze(
+        paths["questions_file"],
+        paths["ground_truth_file"],
+        paths["sections_file"],
+        paths["documents_file"],
+        record,
+    )
+    q = paths["questions_file"]
+    q.write_text(q.read_text(encoding="utf-8").replace("How do watchers", "How do Watchers"))
+    calls = len(fake.calls)
+    with pytest.raises(RuntimeError, match="questions.csv changed since the freeze"):
+        retrieve(embedder=fake, freeze_file=record, **paths)
+    assert len(fake.calls) == calls

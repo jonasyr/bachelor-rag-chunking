@@ -11,6 +11,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 |---|---|
 | [how-to/set-up.md](how-to/set-up.md) | Einrichten: Abhängigkeiten, API-Schlüssel (nur für API-Schritte), pre-commit |
 | [how-to/create-corpus-snapshot.md](how-to/create-corpus-snapshot.md) | Vue.js-Snapshot erstellen, Manifest erzeugen |
+| [how-to/build-the-question-catalogue.md](how-to/build-the-question-catalogue.md) | Fragenkatalog schreiben, annotieren, prüfen und einfrieren |
 | [how-to/run-the-experiment.md](how-to/run-the-experiment.md) | Schritte der Pipeline (C1–C3, Kontrolle K1), Prüfliste vor jedem Evaluationslauf |
 | [how-to/deliver-results-to-thesis.md](how-to/deliver-results-to-thesis.md) | Tabellen und Abbildungen per Pull Request und Submodul-Zeiger in die Arbeit (PaperLab) übernehmen |
 
@@ -38,7 +39,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 
 ## Entscheidungen und Plan
 
-- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0028, je eine Datei
+- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0030, je eine Datei
 - [plan.md](plan.md): Projektstand, Zeitplan und offene Entscheidungen
 - `superpowers/` (`specs/`, `plans/`): datierte Entwürfe und Umsetzungspläne einzelner Arbeitsschritte; Momentaufnahmen,
   werden nicht nachgepflegt

@@ -3,7 +3,11 @@
 Flow and layout: `docs/explanation/research-design.md`, `docs/reference/tooling.md` (repo tree, script options);
 data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`, `docs/how-to/run-the-experiment.md`.
 - Stubs (`raise NotImplementedError`): only `generate.py`, `evaluate_retrieval.py`, `evaluate_answers.py`; all other
-  `src/*.py` are implemented and tested. Next: `generate.py` (prototype: one question, top-5, answer).
+  `src/*.py` are implemented and tested. Status and next step: `docs/plan.md#stand`.
+- Question catalogue: `src/catalogue.py` (sections/find/show/check/freeze), how-to
+  `docs/how-to/build-the-question-catalogue.md`; `retrieve.py` refuses the main catalogue until
+  `catalogue_freeze.json` matches (ADR 0030) — never delete the record to get past it; tests monkeypatch
+  `freeze.QUESTIONS_FILE`/`GROUND_TRUTH_FILE` instead.
 - Section spans for relevance: `data/processed/sections.jsonl`; chunk `start_token`/`end_token` must come from
   `src/tokens.py` so chunks and sections share one index space.
 - `preprocess.py` rewrites `documents.jsonl` in place and refuses a second run (re-run `ingest.py` first);
