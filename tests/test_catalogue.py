@@ -346,3 +346,13 @@ def test_malformed_pilot_file_is_an_error_not_a_crash(corpus, tmp_path, pilot):
 def test_cli_find_with_an_empty_term_is_a_one_line_error(cli, capsys):
     assert main(["find", "  "]) == 1
     assert capsys.readouterr().err.strip() == "empty search term"
+
+
+def test_section_counts_of_the_classes_come_from_config(corpus, monkeypatch):
+    monkeypatch.setattr(catalogue, "MULTI_SECTION_MIN_SECTIONS", 3)
+    monkeypatch.setattr(catalogue, "SINGLE_CLASS_SECTIONS", 2)
+    two = [corpus.by_id["D001#ref"], corpus.by_id["D002#once"]]
+    assert class_findings(corpus, question("multi-section"), truth(), two) == [
+        "multi-section needs at least 3 relevant sections, has 2"
+    ]
+    assert class_findings(corpus, question("single"), truth(), two) == []

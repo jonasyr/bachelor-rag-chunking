@@ -35,12 +35,14 @@ from config import (
     DETAIL_MAX_ANSWER_WORDS,
     DOCUMENTS_FILE,
     GROUND_TRUTH_FILE,
+    MULTI_SECTION_MIN_SECTIONS,
     PILOT_DIR,
     QUESTION_CLASSES,
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTION_INDEX_FILE,
     SECTIONS_FILE,
+    SINGLE_CLASS_SECTIONS,
 )
 from embed import load_jsonl
 from freeze import write_freeze
@@ -252,10 +254,14 @@ def class_findings(corpus: Corpus, question: dict, truth: dict, sections: list[d
     found = [f"{child} lies inside {parent}" for child, parent in nested]
     if cls == "multi-section":
         independent = count - len({child for child, _ in nested})
-        if independent < 2:
-            found.append(f"multi-section needs at least 2 relevant sections, has {independent}")
-    elif count != 1:
-        found.append(f"{cls} needs exactly 1 relevant section, has {count}")
+        if independent < MULTI_SECTION_MIN_SECTIONS:
+            found.append(
+                f"multi-section needs at least {MULTI_SECTION_MIN_SECTIONS} relevant sections, "
+                f"has {independent}"
+            )
+    elif count != SINGLE_CLASS_SECTIONS:
+        noun = "section" if SINGLE_CLASS_SECTIONS == 1 else "sections"
+        found.append(f"{cls} needs exactly {SINGLE_CLASS_SECTIONS} relevant {noun}, has {count}")
     if cls == "detail":
         words = len(truth["expected_answer"].split())
         if words > DETAIL_MAX_ANSWER_WORDS:

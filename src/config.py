@@ -154,6 +154,10 @@ QUESTION_CLASSES = {"single": 12, "multi-section": 12, "detail": 12, "paraphrase
 # question counts for every area it touches (D29).
 AREA_MIN_QUESTIONS = {"api": 12, "style-guide": 3}
 DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many words (D29)
+# Relevant sections per class (D29): `multi-section` at least this many independent sections
+# (a section inside another listed one does not count); single/detail/paraphrase exactly this many.
+MULTI_SECTION_MIN_SECTIONS = 2
+SINGLE_CLASS_SECTIONS = 1
 CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
 CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
 # Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus
