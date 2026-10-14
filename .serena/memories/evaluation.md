@@ -4,3 +4,4 @@ Metrics, rubric, triangulation, efficiency, statistics, visualisations: `docs/re
 - k is fixed at 5 — never vary it.
 - RAGAS is secondary only; the manual rubric is primary. Report agreement between both.
 - Ground truth (`data/evaluation/ground_truth.csv`) must be final before any evaluation run; never adjust afterwards.
+- Relevance annotation is blind (before any retrieval); later additions count only as a sensitivity analysis (ADR 0027).
