@@ -20,7 +20,7 @@
 - Code edits through Serena symbolic tools (`replace_symbol_body`, `insert_after_symbol`, `replace_content`); before changing a symbol run `find_referencing_symbols` (Serena) or `trace_path` (codebase-memory, project `home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking_jonas-code`) and update every reference. Re-index codebase-memory after Task 4.
 - Every chained shell gate uses `set -e`; pre-commit failures are detected with `grep Failed`, never by eye.
 - API spend in this plan: only Task 7 (about USD 0.09), approved with the spec.
-- Scratch directory for backups and downloads: `$S=/tmp/claude-1000/-home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking-jonas-code/7aefe6cd-1c32-4c77-b439-da0889cf247d/scratchpad` (never inside the repo).
+- Scratch directory for backups and downloads: `$S=${TMPDIR:-/tmp}/rag-chunking-scratch` (any local directory, never inside the repo).
 
 ## Review Focus
 
@@ -906,7 +906,7 @@ git push
 - [ ] **Step 1: Back up the old corpus artefacts** (needed for V2, the remap and the canary)
 
 ```bash
-set -e; S=/tmp/claude-1000/-home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking-jonas-code/7aefe6cd-1c32-4c77-b439-da0889cf247d/scratchpad
+set -e; S=${TMPDIR:-/tmp}/rag-chunking-scratch
 mkdir -p $S/old_corpus
 cp data/processed/documents.jsonl data/processed/sections.jsonl data/processed/chunks_c*.jsonl docs/corpus_manifest.csv docs/corpus_snapshot.txt $S/old_corpus/
 cp data/processed/embeddings_c*.npz $S/old_corpus/
@@ -951,7 +951,7 @@ Expected: `79 documents`; preprocess prints document and section counts without 
 - [ ] **Step 5: V2 — only the 6 upstream-changed guide files differ**
 
 ```bash
-set -e; S=/tmp/claude-1000/-home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking-jonas-code/7aefe6cd-1c32-4c77-b439-da0889cf247d/scratchpad
+set -e; S=${TMPDIR:-/tmp}/rag-chunking-scratch
 uv run python - "$S/old_corpus" <<'EOF'
 import json, sys
 from pathlib import Path
@@ -1130,7 +1130,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Run it**
 
 ```bash
-set -e; S=/tmp/claude-1000/-home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking-jonas-code/7aefe6cd-1c32-4c77-b439-da0889cf247d/scratchpad
+set -e; S=${TMPDIR:-/tmp}/rag-chunking-scratch
 uv run python scripts/remap_pilot.py $S/old_corpus data/pilot data/pilot/hard | tee $S/remap.txt
 git diff --stat data/pilot
 ```
@@ -1243,7 +1243,7 @@ Docstring: add "Also runs the size-matched control K1 (ADR 0026) and prints chun
 - [ ] **Step 2: Embed with a canary against the old vectors** (V6)
 
 ```bash
-set -e; S=/tmp/claude-1000/-home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking-jonas-code/7aefe6cd-1c32-4c77-b439-da0889cf247d/scratchpad
+set -e; S=${TMPDIR:-/tmp}/rag-chunking-scratch
 rm data/processed/embeddings_c1.npz data/processed/embeddings_c2.npz data/processed/embeddings_c3.npz   # backed up in Task 5
 uv run python - "$S/old_corpus" <<'EOF'
 import sys; from pathlib import Path
