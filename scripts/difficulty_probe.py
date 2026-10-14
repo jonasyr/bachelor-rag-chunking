@@ -24,9 +24,15 @@ sys.path.insert(0, str(ROOT / "src"))
 from config import (  # noqa: E402
     CHUNK_FILES,
     CONTROL_CHUNK_FILES,
+    CONTROL_RETRIEVED_FILE,
     CONTROL_STRATEGIES,
+    GROUND_TRUTH_FILE,
     PILOT_DIR,
+    PILOT_RUNS_FILE_NAME,
+    QUERY_EMBEDDINGS_FILE,
+    QUESTIONS_FILE,
     RELEVANCE_MIN_OVERLAP,
+    RETRIEVED_RESULTS_FILE,
     SECTIONS_FILE,
     STRATEGY_IDS,
     TOP_K,
@@ -60,28 +66,36 @@ def pilot_dir(argv: list[str]) -> Path:
     return ROOT / argv[1] if len(argv) > 1 else PILOT_DIR
 
 
-def main(pilot: Path) -> None:
-    out, control_out = pilot / "retrieved_results.csv", pilot / "retrieved_results_control.csv"
-    common: dict[str, Any] = {  # Any: the keys are path parameters of retrieve()
-        "questions_file": pilot / "questions.csv",
-        "ground_truth_file": pilot / "ground_truth.csv",
-        "query_file": pilot / "query_embeddings.npz",
-        "runs_file": pilot / "runs.jsonl",
+def set_files(pilot: Path) -> dict[str, Path]:
+    """Input and output files of a pilot set, named like the evaluation artefacts in config."""
+    return {
+        "questions_file": pilot / QUESTIONS_FILE.name,
+        "ground_truth_file": pilot / GROUND_TRUTH_FILE.name,
+        "query_file": pilot / QUERY_EMBEDDINGS_FILE.name,
+        "runs_file": pilot / PILOT_RUNS_FILE_NAME,
+        "out_file": pilot / RETRIEVED_RESULTS_FILE.name,
+        "control_out_file": pilot / CONTROL_RETRIEVED_FILE.name,
     }
+
+
+def main(pilot: Path) -> None:
+    files = set_files(pilot)
+    out, control_out = files.pop("out_file"), files.pop("control_out_file")
+    common: dict[str, Any] = dict(files)  # Any: the keys are path parameters of retrieve()
     retrieve(out_file=out, **common)
     retrieve_control(out_file=control_out, **common)
     keys = [*STRATEGY_IDS, *CONTROL_STRATEGIES]
-    files = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
+    chunk_files = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
     sections = {s["section_id"]: s for s in load_jsonl(SECTIONS_FILE, "")}
     gold = {
         r["question_id"]: split_ids(r["relevant_section_ids"])
-        for r in read_csv(pilot / "ground_truth.csv")
+        for r in read_csv(common["ground_truth_file"])
     }
     kind = {
         r["question_id"]: r["notes"].removeprefix("pilot").strip() or "all"
-        for r in read_csv(pilot / "questions.csv")
+        for r in read_csv(common["questions_file"])
     }
-    chunks = {c["chunk_id"]: c for k in keys for c in load_jsonl(files[k], "")}
+    chunks = {c["chunk_id"]: c for k in keys for c in load_jsonl(chunk_files[k], "")}
     rows = read_csv(out) + read_csv(control_out)
 
     per_q: dict[tuple[str, str], tuple[float, ...]] = {}
@@ -133,7 +147,7 @@ def main(pilot: Path) -> None:
         ]
         print(f"{qid:8} {kind[qid]:14} " + " ".join(f"{c:>9}" for c in cells))
 
-    for run in [json.loads(line) for line in (pilot / "runs.jsonl").read_text().splitlines()][-2:]:
+    for run in [json.loads(line) for line in common["runs_file"].read_text().splitlines()][-2:]:
         print(
             f"\n{run['strategy']}: {run['input_tokens']} question tokens "
             f"USD {run['cost_usd']:.6f}, vintage check {run['canary_input_tokens']} tokens "

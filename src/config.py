@@ -15,6 +15,8 @@ DATA_RAW = ROOT / "data" / "raw" / "vue_docs_snapshot"
 DATA_PROCESSED = ROOT / "data" / "processed"
 DATA_EVAL = ROOT / "data" / "evaluation"
 PILOT_DIR = ROOT / "data" / "pilot"  # pilot probes, not the catalogue (scripts/difficulty_probe.py)
+PILOT_RUNS_FILE_NAME = "runs.jsonl"  # run log inside each pilot set; other pilot files reuse the
+# names of the evaluation artefacts below (QUESTIONS_FILE.name, GROUND_TRUTH_FILE.name, ...)
 CHROMA_DIR = ROOT / "chroma_db"
 DOCS_DIR = ROOT / "docs"
 

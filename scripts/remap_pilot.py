@@ -5,7 +5,8 @@ annotated section and marks those whose cleaned text changed between the corpora
 checked by hand. Aborts if a document or section no longer exists.
 
 Usage: uv run python scripts/remap_pilot.py OLD_DIR PILOT_DIR [PILOT_DIR ...]
-OLD_DIR holds documents.jsonl and sections.jsonl of the old corpus.
+OLD_DIR holds the documents and sections files of the old corpus (names as in src/config.py).
+One-shot: the ground truth is rewritten in place, so a second run aborts on the new IDs.
 """
 
 import csv
@@ -17,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 import tokens  # noqa: E402
-from config import DOCUMENTS_FILE, ID_SEPARATOR, SECTIONS_FILE  # noqa: E402
+from config import DOCUMENTS_FILE, GROUND_TRUTH_FILE, ID_SEPARATOR, SECTIONS_FILE  # noqa: E402
 from retrieve import GROUND_TRUTH_HEADER, split_ids  # noqa: E402
 
 
@@ -35,12 +36,12 @@ def section_text(doc: dict, section: dict) -> str:
 
 
 def main(old_dir: Path, pilots: list[Path]) -> None:
-    old_docs = {d["doc_id"]: d for d in load(old_dir / "documents.jsonl")}
-    old_secs = {s["section_id"]: s for s in load(old_dir / "sections.jsonl")}
+    old_docs = {d["doc_id"]: d for d in load(old_dir / DOCUMENTS_FILE.name)}
+    old_secs = {s["section_id"]: s for s in load(old_dir / SECTIONS_FILE.name)}
     new_docs = {d["path"]: d for d in load(DOCUMENTS_FILE)}
     new_secs = {s["section_id"]: s for s in load(SECTIONS_FILE)}
     for pilot in pilots:
-        path = pilot / "ground_truth.csv"
+        path = pilot / GROUND_TRUTH_FILE.name
         with path.open(encoding="utf-8", newline="") as f:
             rows = list(csv.DictReader(f))
         for row in rows:
