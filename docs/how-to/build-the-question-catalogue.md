@@ -22,7 +22,8 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    Länge in Tokens.
 
 2. Frage in `data/evaluation/questions.csv` eintragen, mit `type` und `difficulty` (Konstruktionsklasse) aus der
-   [Referenz](../reference/question-catalogue.md). Pilotfragen nicht übernehmen; die Prüfung meldet Kopien.
+   [Referenz](../reference/question-catalogue.md). Pilotfragen nicht übernehmen; die Prüfung meldet exakte Kopien (gleicher Wortlaut ohne Satzzeichen und
+   Groß-/Kleinschreibung), umformulierte Pilotfragen erkennt sie nicht.
 
 3. Alle relevanten Abschnitte suchen, auch in der API-Referenz und im Style Guide, nicht nur auf der naheliegenden Seite:
 
@@ -56,4 +57,4 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    ```
 
    Danach läuft `src/retrieve.py` auf dem Katalog; vorher bricht es ab. Ein späteres Ändern einer der beiden Dateien
-   lässt `retrieve.py` wieder abbrechen; ein erneutes Einfrieren braucht ein neues ADR.
+   oder ein neu gebautes `sections.jsonl` lässt `retrieve.py` wieder abbrechen; ein erneutes Einfrieren braucht ein neues ADR.

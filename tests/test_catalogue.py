@@ -320,3 +320,29 @@ def test_find_excerpt_width_comes_from_config(corpus, monkeypatch):
     monkeypatch.setattr(catalogue, "CATALOGUE_EXCERPT_CHARS", 4)
     [(_, excerpt)] = find(corpus, "callback")
     assert excerpt == "the callback onl"  # 4 characters on each side
+
+
+def test_find_keeps_spaces_in_the_term(corpus):
+    assert [s["section_id"] for s, _ in find(corpus, " ref")] == ["D001#ref", "D001#computed"]
+    assert find(corpus, "ref") != find(corpus, " ref")
+
+
+def test_single_letter_directive_prefix_is_not_a_shared_word():
+    assert shared_words("What does the v-if directive do?", ["v-show"]) == []
+
+
+def test_empty_catalogue_says_no_questions_yet(corpus, tmp_path, pilot):
+    report = run_check(corpus, tmp_path, [], pilot)
+    assert report.errors == ["questions.csv has no questions yet"]
+
+
+def test_malformed_pilot_file_is_an_error_not_a_crash(corpus, tmp_path, pilot):
+    (pilot / "broken").mkdir()
+    (pilot / "broken" / "questions.csv").write_text("id,text\nX,y\n", encoding="utf-8")
+    report = run_check(corpus, tmp_path, valid_rows(), pilot)
+    assert any("broken" in e and "columns" in e for e in report.errors)
+
+
+def test_cli_find_with_an_empty_term_is_a_one_line_error(cli, capsys):
+    assert main(["find", "  "]) == 1
+    assert capsys.readouterr().err.strip() == "empty search term"

@@ -12,6 +12,7 @@ results, so the annotation stays blind (ADR 0027).
 """
 
 import argparse
+import csv
 import os
 import re
 import sys
@@ -156,7 +157,7 @@ def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
     """
     if not term.strip():
         raise ValueError("empty search term")
-    pattern = re.compile(re.escape(term.strip()), re.IGNORECASE)
+    pattern = re.compile(re.escape(term), re.IGNORECASE)
     hits = []
     for s in corpus.sections:
         start, end = corpus.char_span(s)
@@ -277,6 +278,14 @@ class Report:
     classes: dict[str, int] = field(default_factory=dict)
 
 
+def _has_rows(path: Path) -> bool:
+    """False only for an existing file without any row below the header."""
+    if not path.exists():
+        return True  # read_rows reports the missing file
+    with path.open(encoding="utf-8", newline="") as f:
+        return sum(1 for record in csv.reader(f) if record) > 1
+
+
 def normalised_question(text: str) -> str:
     """Question text for the duplicate check: lowercase words only."""
     return " ".join(WORD_RE.findall(text.lower()))
@@ -331,6 +340,9 @@ def check(
 ) -> Report:
     """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
     report = Report()
+    if not _has_rows(questions_file):
+        report.errors.append(f"{questions_file.name} has no questions yet")
+        return report
     try:
         questions = read_rows(
             questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
@@ -388,7 +400,11 @@ def check(
             seen[key] = q["question_id"]
     for path in sorted(pilot_dir.rglob(QUESTIONS_FILE.name)):
         label = path.parent.relative_to(pilot_dir).as_posix()
-        rows = read_rows(path, "pilot questions", QUESTIONS_HEADER, QUESTIONS_REQUIRED)
+        try:
+            rows = read_rows(path, "pilot questions", QUESTIONS_HEADER, QUESTIONS_REQUIRED)
+        except ValueError as error:
+            report.errors.append(f"pilot set {label}: {error}")
+            continue
         for row in rows:
             key = normalised_question(row["question"])
             if key in seen:
@@ -410,8 +426,12 @@ def freeze_catalogue(
     ground_truth_file: Path = GROUND_TRUTH_FILE,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     pilot_dir: Path = PILOT_DIR,
+    sections_file: Path = SECTIONS_FILE,
 ) -> dict:
-    """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails."""
+    """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
+
+    `sections_file` must be the file `corpus` was loaded from; its hash pins the section IDs.
+    """
     report = check(corpus, questions_file, ground_truth_file, pilot_dir)
     if exit_code(report, draft=False):
         raise ValueError(
@@ -422,7 +442,7 @@ def freeze_catalogue(
         "types": report.types,
         "classes": report.classes,
     }
-    return write_freeze(questions_file, ground_truth_file, freeze_file, summary)
+    return write_freeze(questions_file, ground_truth_file, sections_file, freeze_file, summary)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -444,7 +464,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{count} sections -> {SECTION_INDEX_FILE}")
         return 0
     if args.command == "find":
-        hits = find(corpus, args.term)
+        try:
+            hits = find(corpus, args.term)
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            return 1
         for section, excerpt in hits:
             print(f"{section['section_id']}  {corpus.heading_path(section)}\n    {excerpt}")
         print(f"{len(hits)} sections")
@@ -469,7 +493,12 @@ def main(argv: list[str] | None = None) -> int:
         return code
     try:
         record = freeze_catalogue(
-            corpus, QUESTIONS_FILE, GROUND_TRUTH_FILE, CATALOGUE_FREEZE_FILE, PILOT_DIR
+            corpus,
+            QUESTIONS_FILE,
+            GROUND_TRUTH_FILE,
+            CATALOGUE_FREEZE_FILE,
+            PILOT_DIR,
+            SECTIONS_FILE,
         )
     except (FileExistsError, ValueError) as error:
         print(error, file=sys.stderr)

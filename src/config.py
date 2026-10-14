@@ -173,7 +173,7 @@ CATALOGUE_STOPWORDS = (
     "here", "how", "i", "if", "in", "into", "is", "it", "its", "may", "me", "might", "must",
     "my", "no", "not", "of", "on", "onto", "or", "our", "over", "shall", "she", "should", "so",
     "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "those",
-    "to", "under", "vue", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
+    "to", "under", "v", "vue", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
     "whose", "why", "will", "with", "without", "would", "you", "your",
 )  # fmt: skip
 

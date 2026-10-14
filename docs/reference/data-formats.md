@@ -113,7 +113,8 @@ Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `conf
 - Jede Frage hat eine Ground-Truth-Zeile und umgekehrt; jede Frage hat mindestens eine `relevant_section_id`, und alle
   existieren in `sections.jsonl`; keine ID steht in einer Zeile doppelt.
 - `relevant_doc_ids` liegen im Korpus und sind genau die Dokumente der `relevant_section_ids`.
-- Nur für den Hauptkatalog: Der Freeze-Datensatz existiert und beide Prüfsummen passen ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)).
+- Nur für den Hauptkatalog: Der Freeze-Datensatz existiert und die Prüfsummen von `questions.csv`, `ground_truth.csv`
+  und `sections.jsonl` passen ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)).
 
 **`section_index.md`** (`data/processed/`, nicht versioniert, geschrieben von `catalogue.py sections`): Markdown-Tabelle,
 eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
@@ -131,7 +132,7 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
   "questions": 48,
   "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
-  "sha256": {"questions.csv": "…", "ground_truth.csv": "…"}
+  "sha256": {"questions.csv": "…", "ground_truth.csv": "…", "sections.jsonl": "…"}
 }
 ```
 

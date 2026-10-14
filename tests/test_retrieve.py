@@ -376,14 +376,18 @@ def test_main_catalogue_needs_a_freeze_before_any_api_call(as_main_catalogue, tm
 def test_main_catalogue_runs_when_frozen(as_main_catalogue, tmp_path):
     paths, _, _, fake = as_main_catalogue
     record = tmp_path / "freeze.json"
-    freeze.write_freeze(paths["questions_file"], paths["ground_truth_file"], record)
+    freeze.write_freeze(
+        paths["questions_file"], paths["ground_truth_file"], paths["sections_file"], record
+    )
     assert retrieve(embedder=fake, freeze_file=record, **paths) > 0
 
 
 def test_main_catalogue_changed_after_freeze_is_refused(as_main_catalogue, tmp_path):
     paths, _, _, fake = as_main_catalogue
     record = tmp_path / "freeze.json"
-    freeze.write_freeze(paths["questions_file"], paths["ground_truth_file"], record)
+    freeze.write_freeze(
+        paths["questions_file"], paths["ground_truth_file"], paths["sections_file"], record
+    )
     q = paths["questions_file"]
     q.write_text(q.read_text(encoding="utf-8").replace("How do watchers", "How do Watchers"))
     calls = len(fake.calls)

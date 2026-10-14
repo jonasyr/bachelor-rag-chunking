@@ -41,7 +41,7 @@ Success criteria:
 | Area floors: ≥ 12 questions with a relevant section in `api`, ≥ 3 in `style-guide`; a question counts for every area it touches (ADR 0029) | Corpus tokens (ADR 0025): guide 117,694 (71 %), API 42,488 (26 %), style guide 5,541 (3 %). 26 % of 48 ≈ 12; 3 % of 48 ≈ 1, raised to 3 so the area is measurable. Without a floor, questions drift to the guide. | Strict proportional split (1 style-guide question is not measurable; many answers span guide and API); report only. |
 | Class rules (below) check only the annotation and the wording (ADR 0029) | Blind annotation (ADR 0027): nothing derived from retrieval may shape questions or judgements. Pilot measurements: H2/H3 sections median 211 tokens (p25 120, p75 356); pilot `detail` sections 22–546 tokens, so "detail" is about the answer, not the section length; 5 of 7 pilot paraphrases share no heading word, 2 share one. | Thresholds from retrieval results (circular); section-length rule for `detail` (contradicted by the pilot). |
 | Lexical `find` over cleaned section texts (this spec) | Equal for all strategies, uses no chunk, vector or rank; it only helps Jonas look beyond the obvious page (rule in `question-catalogue.md`: search the whole corpus including the API). | Embedding search (would be retrieval before the freeze, ADR 0027). |
-| Freeze lock: `freeze` writes SHA-256 of `questions.csv` and `ground_truth.csv`; `retrieve.py` refuses the main catalogue unless both hashes match (ADR 0030) | ADR 0017 and 0027 require the ground truth to be final before any retrieval; a recorded hash turns this into a check the code enforces and gives the 09.11. milestone (ADR 0028) a citable record. | Convention only (a promise, not evidence). |
+| Freeze lock: `freeze` writes SHA-256 of `questions.csv`, `ground_truth.csv` and `sections.jsonl`; `retrieve.py` refuses the main catalogue unless all three hashes match (ADR 0030) | ADR 0017 and 0027 require the ground truth to be final before any retrieval; a recorded hash turns this into a check the code enforces and gives the 09.11. milestone (ADR 0028) a citable record. | Convention only (a promise, not evidence). |
 
 ## Class rules
 
@@ -75,11 +75,11 @@ All in `src/catalogue.py` (CLI with subcommands, like the other steps); paramete
 | `find TERM` | same | sections whose cleaned text contains `TERM` (case-insensitive, plain substring), in `sections.jsonl` order, with `section_id`, heading path and a one-line excerpt around the first match. Innermost section wins: a match inside an H3 is reported for the H3, not again for its H2/H1 parents. |
 | `show SECTION_ID` | same | the section's heading path, token count and exact text (the same slice `relevance.py` uses). Unknown ID: error, exit 1. |
 | `check [--draft]` | `questions.csv`, `ground_truth.csv`, `sections.jsonl`, `documents.jsonl`, pilot `questions.csv` files under `config.PILOT_DIR` | format validation as `retrieve.py` (shared functions, not a copy); allowed values; class rules; quotas; area floors; duplicate questions (normalised text equal) within the catalogue and against every pilot set. Prints a type × class table, the area split and every finding with its `question_id`. Strict mode exits 1 on any finding; `--draft` exits 1 only on format errors and unknown values/IDs, and reports quota and rule findings as warnings. |
-| `freeze` | as `check` | runs `check` strictly; on success writes `config.CATALOGUE_FREEZE_FILE` = `data/evaluation/catalogue_freeze.json` with `date`, `questions` and `sha256` of both files and the counts per type and class. Refuses to overwrite an existing record (a re-freeze needs a new ADR and a manual delete). |
+| `freeze` | as `check` | runs `check` strictly; on success writes `config.CATALOGUE_FREEZE_FILE` = `data/evaluation/catalogue_freeze.json` with `date`, `questions`, the counts per type and class and `sha256` of both CSV files and `sections.jsonl` (added after the final review: the record alone shows which segmentation the section IDs refer to). Refuses to overwrite an existing record (a re-freeze needs a new ADR and a manual delete). |
 
-`retrieve.py`: when `questions_file` and `ground_truth_file` resolve to `config.QUESTIONS_FILE` and
-`config.GROUND_TRUTH_FILE`, it reads the freeze record and aborts before embedding the questions unless both hashes
-match ("catalogue not frozen" / "catalogue changed since freeze"). Other files (pilot sets, `difficulty_probe.py`,
+`retrieve.py`: when `questions_file` or `ground_truth_file` resolves to `config.QUESTIONS_FILE` or
+`config.GROUND_TRUTH_FILE`, it reads the freeze record and aborts before embedding the questions unless the hashes of
+both CSV files and `sections.jsonl` match ("catalogue not frozen" / "catalogue changed since freeze"). Other files (pilot sets, `difficulty_probe.py`,
 tests) are not affected.
 
 ## Configuration (new keys, all in `configuration.md`)

@@ -145,7 +145,8 @@ def retrieve(
     `strategies` is the experiment set (C1-C3) or the control set (K1, D26), always complete;
     all its strategies run together from the same inputs, so no row of an older run is kept.
     """
-    require_frozen(questions_file, ground_truth_file, freeze_file)  # ADR 0030, before any API call
+    # ADR 0030: the main catalogue only against its freeze record, before any API call
+    require_frozen(questions_file, ground_truth_file, sections_file, freeze_file)
     if strategies not in (STRATEGY_IDS, CONTROL_STRATEGIES):
         raise ValueError("strategies must be the experiment set or the control set (D26)")
     for name, mapping in (

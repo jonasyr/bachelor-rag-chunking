@@ -104,7 +104,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `vue` | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `v` (Präfix der Direktiven) und `vue` | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 
 ## LLM und Embedding
 
