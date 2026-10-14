@@ -36,7 +36,7 @@ uv tool install pre-commit && pre-commit install   # ruff and checks before each
 ## Pipeline (run in order)
 
 ```bash
-# 1. Fetch the pinned Vue.js snapshot (ADR 0019; docs/how-to/create-corpus-snapshot.md)
+# 1. Fetch the pinned Vue.js snapshot: guide, API reference, style guide (ADR 0025; docs/how-to/create-corpus-snapshot.md)
 python src/snapshot.py
 
 # 2. Ingest
@@ -45,14 +45,15 @@ python src/ingest.py
 # 3. Preprocess
 python src/preprocess.py
 
-# 4. Chunk (all three strategies)
+# 4. Chunk (C1-C3 and the size-matched control K1, ADR 0026)
 python src/chunking.py
 
 # 5. Embed + build Chroma indices
 python src/embed.py
 
-# 6. Retrieve
+# 6. Retrieve (C1-C3; then the control K1)
 python src/retrieve.py
+python src/retrieve.py --control
 
 # 7. Generate answers
 python src/generate.py

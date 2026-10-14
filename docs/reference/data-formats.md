@@ -13,19 +13,22 @@
 {"chunk_id":"C1_D001_0001","doc_id":"D001","strategy":"fixed_500_no_overlap","text":"...","start_token":0,"end_token":500}
 ```
 
+**`chunks_k1.jsonl`** (Kontrolle K1, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)): gleiches Schema, `chunk_id` `K1_…`, `strategy` `fixed_<K1_CHUNK_SIZE>_no_overlap` (derzeit `fixed_231_no_overlap`).
+
 **`sections.jsonl`** (ein Eintrag je H1–H3-Abschnitt; Spanne in Tokens des bereinigten `text`, Ende exklusiv; ein Abschnitt reicht bis zur nächsten Überschrift gleicher oder höherer Ebene; [ADR 0019](../adr/0019-korpus-ausschnitt.md))
 ```json
 {"section_id":"D027#declaring-reactive-state-1","doc_id":"D027","anchor":"declaring-reactive-state-1","title":"Declaring Reactive State","level":2,"start_token":60,"end_token":1567}
 ```
 
-**`embeddings_c1.npz`** (analog c2/c3; `data/processed/`, nicht versioniert; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
+**`embeddings_c1.npz`** (analog c2/c3 und `embeddings_k1.npz`; `data/processed/`, nicht versioniert; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
 Arrays `model` (Embedding-Modell), `ids` (Chunk-IDs in Dateireihenfolge), `texts` (Chunk-Texte), `vectors` (float32, n × 3.072).
 Wiederverwendet wird die Datei nur, wenn Modell, IDs und Texte unverändert sind.
 
 **`query_embeddings.npz`** (`data/evaluation/`, nicht versioniert): Arrays `model`, `ids` (Frage-IDs), `texts` (Fragen), `vectors`.
 
 `retrieve.py` läuft immer über alle Strategien und schreibt `retrieved_results.csv` vollständig neu
-([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
+([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)); `retrieve.py --control` läuft über die Kontrolle K1
+und schreibt `retrieved_results_control.csv` ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
 
 **`embedding_runs.jsonl`** (ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach [ADR 0008](../adr/0008-kosten-als-variable.md))
 
@@ -72,6 +75,9 @@ Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `;` g
 question_id,strategy,rank,chunk_id,score,is_relevant
 Q001,C1,1,C1_D001_0001,0.84,1
 ```
+
+**`retrieved_results_control.csv`**: gleiche Spalten wie `retrieved_results.csv`, `strategy` immer `K1`; in
+`embedding_runs.jsonl` steht der Lauf mit `"strategy":"K1"`.
 
 **`generated_answers.csv`**
 ```

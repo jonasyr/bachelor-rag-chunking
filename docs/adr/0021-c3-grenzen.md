@@ -27,3 +27,9 @@ entsteht; Absätze in Codeblöcken werden nicht getrennt; ohne passendes Absatze
 - Gut: Chunk-Texte bleiben exakte Ausschnitte des Dokuments; die Relevanz über Token-Überlappung bleibt gültig.
 - Neutral: Untergrenze, Obergrenze und Teilungsregel werden im Methodikkapitel genannt.
 - Schlecht: Ein Chunk kann mehrere kurze Abschnitte umfassen und ist damit nicht immer genau ein Abschnitt.
+
+## Nachtrag (14.10.2026): Begründung der Obergrenze 800
+
+- Die Eingabegrenze des Embedding-Modells (8.192 Tokens) ist ein technisches Maximum, keine Empfehlung. Längere Chunks verdünnen den Vektor eines Chunks (Smith & Troynikov, 2024) und gäben C3 bei festem `top_k` mehr Kontext als C1/C2 ([ADR 0006](0006-nur-chunking-variiert.md)).
+- Gemessen auf dem Korpus nach [ADR 0025](0025-korpus-guide-api-styleguide.md): Ohne Obergrenze wäre der längste Chunk 1.467 Tokens lang; die Grenze 800 teilt 12 von 706 Segmenten. Sie wirkt also nur auf wenige lange Abschnitte.
+- Größeneffekte gegenüber C1/C2 kontrolliert [ADR 0026](0026-c3-vergleichbarkeit.md).

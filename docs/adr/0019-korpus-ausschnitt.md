@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (13.10.2026; konkretisiert [ADR 0001](0001-korpus-vuejs.md), ersetzt den Vorschlag der vier Unterordner in [Korpus](../reference/corpus.md))
+Angenommen (13.10.2026); Ausschnitt und Commit ersetzt durch [ADR 0025](0025-korpus-guide-api-styleguide.md) (14.10.2026), übrige Regeln gelten weiter (ursprünglich: konkretisiert [ADR 0001](0001-korpus-vuejs.md), ersetzt den Vorschlag der vier Unterordner in [Korpus](../reference/corpus.md))
 
 ## Kontext
 

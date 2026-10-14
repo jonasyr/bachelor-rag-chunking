@@ -38,3 +38,12 @@ Abgerufen am 13.10.2026; Grundlage von [ADR 0023](../adr/0023-embedding-modell.m
 | `openai2026te3large` | OpenAI. (o. J.). *text-embedding-3-large* [Modellseite]. https://developers.openai.com/api/docs/models/text-embedding-3-large | Preis 0,13 USD je 1 Mio. Tokens, Snapshot nur als Alias |
 | `openai2026embeddingsapi` | OpenAI. (o. J.). *Create embeddings* [API-Referenz]. https://developers.openai.com/api/reference/resources/embeddings/methods/create | ≤ 2.048 Eingaben und ≤ 300.000 Tokens je Anfrage, `usage.prompt_tokens` |
 | `chroma2026configure` | Chroma. (o. J.). *Configure collections*. https://docs.trychroma.com/docs/collections/configure | HNSW ist approximativ; Standard `l2`, `ef_search` = 100 |
+
+Abgerufen am 14.10.2026; Grundlage von [ADR 0021](../adr/0021-c3-grenzen.md) (Nachtrag),
+[ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und [ADR 0026](../adr/0026-c3-vergleichbarkeit.md).
+
+| Kurzname | Quelle (APA 7) | Belegt |
+|----------|----------------|--------|
+| `smith2024chunking` | Smith, B., & Troynikov, A. (2024, 3. Juli). *Evaluating chunking strategies for retrieval*. Chroma. https://www.trychroma.com/research/evaluating-chunking | `text-embedding-3-large`, fünf abgerufene Chunks; kleinere Chunks (800 → 200 Tokens) erhöhen die Precision deutlich bei etwa gleichem Recall (rund 85–89 %) |
+| `bhat2025chunksize` | Bhat, S. R., Rudat, M., Spiekermann, J., & Flores-Herr, N. (2025). *Rethinking chunk size for long-document retrieval: A multi-dataset analysis* (arXiv:2505.21700). https://arxiv.org/abs/2505.21700 | beste Chunk-Größe hängt vom Datensatz und Fragetyp ab (64–128 Tokens für knappe Fakten, 512–1.024 für breiten Kontext) und vom Embedding-Modell |
+| `vuejs2026compare` | vuejs/docs. (2026). *Compare b75d188…40aa88a* [GitHub-Vergleich]. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien |
