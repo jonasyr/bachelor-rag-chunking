@@ -3,26 +3,32 @@
 > Seitentyp: Anleitung (how-to). Übersicht: [Dokumentation](../README.md).
 
 Voraussetzungen: [Einrichten](set-up.md), [Korpus-Snapshot](create-corpus-snapshot.md), Fragenkatalog und Ground Truth
-fertig ([Fragenkatalog](../reference/question-catalogue.md)). Nur das Chunking variiert
-([ADR 0006](../adr/0006-nur-chunking-variiert.md)).
+fertig und eingefroren ([Fragenkatalog](../reference/question-catalogue.md),
+[ADR 0017](../adr/0017-fragenkatalog.md), [ADR 0027](../adr/0027-blinde-annotation.md)). Nur das Chunking variiert
+([ADR 0006](../adr/0006-nur-chunking-variiert.md)). Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 
-## Reihenfolge
+## Schritte
 
-**Phase 1 – Vorbereitung:** Thema/Forschungsfrage finalisieren, Korpus (Vue.js) festlegen, Snapshot erstellen, Literaturbasis aufbauen.
-**Phase 2 – Korpus und Ground Truth:** Dokumente sichten, relevante Bereiche wählen, bereinigen, Fragenkatalog erstellen, Referenzantworten formulieren, relevante Stellen annotieren.
-**Phase 3 – Implementierung:** Preprocessing, Chunking C1/C2/C3, Embeddings, Vektorindizes pro Strategie, Retrieval, Antwortgenerierung, Datenspeicherung.
-**Phase 4 – Evaluation:** Retrieval-Metriken berechnen, Antworten generieren und nach Rubrik bewerten, RAGAS-Sekundärbewertung, Übereinstimmung prüfen, Effizienz erfassen, Visualisierungen.
-**Phase 5 – Schreiben:** Einleitung, Grundlagen, Verwandte Arbeiten, Methodik, Implementierung, Evaluation, Diskussion, Fazit.
+1. Snapshot, Ingest, Preprocessing: siehe [Korpus-Snapshot erstellen](create-corpus-snapshot.md).
+2. Chunking für C1–C3 und die Kontrolle K1: `uv run python src/chunking.py`
+3. Embeddings und ein Chroma-Index je Strategie (und für K1): `uv run python src/embed.py` (braucht `OPENAI_API_KEY`)
+4. Retrieval für C1–C3, danach für die Kontrolle K1 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)):
+   `uv run python src/retrieve.py` und `uv run python src/retrieve.py --control`
+5. Antworten generieren (nur C1–C3, K1 nicht): `uv run python src/generate.py` (noch nicht umgesetzt)
+6. Auswerten (noch nicht umgesetzt): `uv run python src/evaluate_retrieval.py`; für die Rubrik
+   `uv run python src/evaluate_answers.py --mode scaffold`, `data/evaluation/scores.csv` von Hand ausfüllen (0–2), dann
+   `uv run python src/evaluate_answers.py --mode summarise`.
 
-**Minimaler Prototyp zuerst:** Markdown laden → C1/C2/C3 erzeugen → embedden → Chroma-Index pro Strategie → eine Frage abfragen → Top-5 anzeigen → Antwort generieren. Erst wenn das läuft, die große Evaluation.
-
-Befehle je Schritt: [README](../../README.md#pipeline-run-in-order); Optionen: [Werkzeuge](../reference/tooling.md).
+Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Datenformate](../reference/data-formats.md).
 
 ## Vor jedem Evaluationslauf prüfen
 
-- [ ] Commit des Snapshots im [Experiment-Protokoll](../reference/experiment-record.md) und in `docs/corpus_manifest.csv`
+- [ ] Snapshot-Commit in `docs/corpus_snapshot.txt` und im [Experiment-Protokoll](../reference/experiment-record.md)
 - [ ] Exakte Modellversionen im Experiment-Protokoll eingetragen
-- [ ] `ground_truth.csv` vor jedem Evaluationslauf fertig und danach unverändert
-- [ ] Alle Zwischenstände gespeichert (`documents.jsonl`, `chunks_*.jsonl`, `retrieved_results.csv`, `generated_answers.csv`)
+- [ ] `questions.csv` und `ground_truth.csv` fertig und danach unverändert (der Retrieval-Lauf protokolliert ihre
+      SHA-256)
+- [ ] Jedes Zwischenartefakt gespeichert, nicht nur das Endergebnis (alle Dateien aus
+      [Datenformate](../reference/data-formats.md), auch `retrieved_results_control.csv` und die Lauf-Protokolle)
 - [ ] Prompts in allen Strategieläufen unverändert ([Prompts](../reference/prompts.md))
-- [ ] `LLM_TEMPERATURE = 0.0` in `src/config.py`
+- [ ] `LLM_TEMPERATURE` und `TOP_K` in `src/config.py` unverändert ([Konfiguration](../reference/configuration.md),
+      [ADR 0014](../adr/0014-temperatur-und-topk.md))

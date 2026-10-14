@@ -1,9 +1,9 @@
 # Literaturbasis
 
-> Seitentyp: Nachschlagen (reference). Stand: aus dem Projektleitfaden (Juni 2026, aktualisiert 13.10.2026). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
 
 
-Alle Quellen sind im Exposé zitiert; die BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. APA 7 / biblatex / biber.
+Die 15 Quellen der ersten Tabelle ([ADR 0018](../adr/0018-literaturbasis.md)) sind im Exposé zitiert; nur ihre BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. Die Webquellen der folgenden Abschnitte sind dort noch nicht enthalten. Zitierstil: APA 7 / biblatex / biber ([ADR 0002](../adr/0002-zitierstil-apa.md)).
 
 | BibTeX-Key | Rolle in der Argumentation | Typ |
 |------------|----------------------------|-----|
@@ -39,8 +39,9 @@ Abgerufen am 13.10.2026; Grundlage von [ADR 0023](../adr/0023-embedding-modell.m
 | `openai2026embeddingsapi` | OpenAI. (o. J.). *Create embeddings* [API-Referenz]. https://developers.openai.com/api/reference/resources/embeddings/methods/create | ≤ 2.048 Eingaben und ≤ 300.000 Tokens je Anfrage, `usage.prompt_tokens` |
 | `chroma2026configure` | Chroma. (o. J.). *Configure collections*. https://docs.trychroma.com/docs/collections/configure | HNSW ist approximativ; Standard `l2`, `ef_search` = 100 |
 
-Abgerufen am 14.10.2026; Grundlage von [ADR 0021](../adr/0021-c3-grenzen.md) (Nachtrag),
-[ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und [ADR 0026](../adr/0026-c3-vergleichbarkeit.md).
+Abgerufen am 14.10.2026; Grundlage von [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und
+[ADR 0026](../adr/0026-c3-vergleichbarkeit.md) (dort auch die Begründung der C3-Obergrenze aus
+[ADR 0021](../adr/0021-c3-grenzen.md)).
 
 | Kurzname | Quelle (APA 7) | Belegt |
 |----------|----------------|--------|
