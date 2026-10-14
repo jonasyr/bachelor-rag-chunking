@@ -6,6 +6,8 @@ against the exact cosine ranking and writes retrieved_results.csv with relevance
 (data/evaluation/query_embeddings.npz); SHA-256 of questions.csv and ground_truth.csv go
 into the run log, so the frozen ground truth can be checked later (ADR 0017).
 
+`--control` runs the size-matched control K1 into retrieved_results_control.csv (ADR 0026).
+
 Output schema: question_id, strategy, rank, chunk_id, score, is_relevant
 """
 
@@ -18,6 +20,11 @@ from canary import check_vintage
 from config import (
     CHROMA_COLLECTIONS,
     CHUNK_FILES,
+    CONTROL_CHUNK_FILES,
+    CONTROL_COLLECTIONS,
+    CONTROL_EMBEDDING_FILES,
+    CONTROL_RETRIEVED_FILE,
+    CONTROL_STRATEGIES,
     EMBEDDING_FILES,
     EMBEDDING_RUNS_FILE,
     GROUND_TRUTH_FILE,
@@ -122,15 +129,24 @@ def retrieve(
     query_file: Path = QUERY_EMBEDDINGS_FILE,
     out_file: Path = RETRIEVED_RESULTS_FILE,
     runs_file: Path = EMBEDDING_RUNS_FILE,
+    strategies: dict[str, str] = STRATEGY_IDS,
+    collections: dict[str, str] = CHROMA_COLLECTIONS,
 ) -> int:
-    """Write retrieved_results.csv afresh for all questions and all strategies; return row count.
+    """Write the result file afresh for all questions and all strategies; return row count.
 
-    All strategies always run together from the same inputs, so no row of an older run is kept.
+    `strategies` is the experiment set (C1-C3) or the control set (K1, D26), always complete;
+    all its strategies run together from the same inputs, so no row of an older run is kept.
     """
-    for name, mapping in (("chunk_files", chunk_files), ("vector_files", vector_files)):
-        if sorted(mapping) != sorted(STRATEGY_IDS):
+    if strategies not in (STRATEGY_IDS, CONTROL_STRATEGIES):
+        raise ValueError("strategies must be the experiment set or the control set (D26)")
+    for name, mapping in (
+        ("chunk_files", chunk_files),
+        ("vector_files", vector_files),
+        ("collections", collections),
+    ):
+        if sorted(mapping) != sorted(strategies):
             raise ValueError(
-                f"{name} must cover exactly the strategies {sorted(STRATEGY_IDS)}, "
+                f"{name} must cover exactly the strategies {sorted(strategies)}, "
                 f"got {sorted(mapping)}"
             )
     questions = sorted(
@@ -143,7 +159,7 @@ def retrieve(
     sections = load_jsonl(sections_file, "run src/preprocess.py first")
     relevant = relevant_sections(questions, ground_truth, sections)
 
-    missing = [str(vector_files[key]) for key in STRATEGY_IDS if not vector_files[key].exists()]
+    missing = [str(vector_files[key]) for key in strategies if not vector_files[key].exists()]
     if missing:  # before any API call, so the vintage check always covers every strategy
         raise FileNotFoundError(f"{', '.join(missing)} not found; run src/embed.py first")
 
@@ -159,15 +175,15 @@ def retrieve(
         save_vectors(query_file, qids, texts, query_vectors)
 
     client = client or vector_index.open_client()
-    strategies = list(STRATEGY_IDS)  # the experiment is always the complete configured set
+    keys = list(strategies)  # always the complete set
     rows: list[list] = []
-    for key in strategies:
+    for key in keys:
         chunks = load_jsonl(chunk_files[key], "run src/chunking.py first")
         ids = [c["chunk_id"] for c in chunks]
         vectors = load_vectors(vector_files[key], ids, [c["text"] for c in chunks])
         if vectors is None:
             raise FileNotFoundError(f"{vector_files[key]} not found; run src/embed.py first")
-        collection = client.get_collection(CHROMA_COLLECTIONS[key])
+        collection = client.get_collection(collections[key])
         if collection.count() != len(ids):
             raise ValueError(f"collection {collection.name} is out of date; run src/embed.py")
         chunk_by_id = {c["chunk_id"]: c for c in chunks}
@@ -185,11 +201,11 @@ def retrieve(
         writer.writerows(rows)
     # Provenance of every input the rows depend on (frozen ground truth, ADR 0017).
     sources = [questions_file, ground_truth_file, sections_file, query_file]
-    sources += [files[key] for files in (chunk_files, vector_files) for key in strategies]
+    sources += [files[key] for files in (chunk_files, vector_files) for key in keys]
     append_run(
         {
             "step": "retrieve",
-            "strategy": ",".join(strategies),
+            "strategy": ",".join(keys),
             "dimensions": int(query_vectors.shape[1]),
             "vectors": len(qids),
             "inputs_sha256": {f.name: sha256_of(f) for f in sources},
@@ -202,10 +218,31 @@ def retrieve(
     return len(rows)
 
 
+def retrieve_control(embedder: Embedder = embed_texts, client: Any = None, **paths: Any) -> int:
+    """Retrieval for the size-matched control K1 (ADR 0026): same questions, query vectors and
+    ground truth as the experiment, own chunk, vector, index and result files."""
+    defaults: dict[str, Any] = {
+        "chunk_files": CONTROL_CHUNK_FILES,
+        "vector_files": CONTROL_EMBEDDING_FILES,
+        "out_file": CONTROL_RETRIEVED_FILE,
+    }
+    return retrieve(
+        embedder,
+        client,
+        strategies=CONTROL_STRATEGIES,
+        collections=CONTROL_COLLECTIONS,
+        **{**defaults, **paths},
+    )
+
+
 if __name__ == "__main__":
     import argparse
 
-    argparse.ArgumentParser(
+    p = argparse.ArgumentParser(
         description="Retrieve the top-k chunks per question for all strategies at once."
-    ).parse_args()
-    print(f"{retrieve()} rows -> {RETRIEVED_RESULTS_FILE}")
+    )
+    p.add_argument("--control", action="store_true", help="the size-matched control K1 instead")
+    if p.parse_args().control:
+        print(f"{retrieve_control()} rows -> {CONTROL_RETRIEVED_FILE}")
+    else:
+        print(f"{retrieve()} rows -> {RETRIEVED_RESULTS_FILE}")

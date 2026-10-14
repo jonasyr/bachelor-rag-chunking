@@ -104,5 +104,6 @@ def test_cli_strategies_come_from_the_config(monkeypatch):
     import embed
 
     monkeypatch.setattr(embed, "STRATEGY_IDS", {"C1": "a", "C2": "b", "C3": "c", "C4": "d"})
-    assert embed.strategy_keys("all") == ["C1", "C2", "C3", "C4"]
-    assert embed.strategy_keys("C2") == ["C2"]
+    monkeypatch.setattr(embed, "CONTROL_STRATEGIES", {"K1": "k"})
+    assert embed.strategy_keys("all") == ["C1", "C2", "C3", "C4", "K1"]
+    assert embed.strategy_keys("K1") == ["K1"]

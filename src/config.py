@@ -28,6 +28,7 @@ CHUNKS_C3_FILE = DATA_PROCESSED / "chunks_c3.jsonl"
 QUESTIONS_FILE = DATA_EVAL / "questions.csv"
 GROUND_TRUTH_FILE = DATA_EVAL / "ground_truth.csv"
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
+CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 SCORES_FILE = DATA_EVAL / "scores.csv"
 
@@ -69,6 +70,13 @@ C2_OVERLAP = 100  # tokens
 C3_MAX_TOKENS = 800  # hard cap per chunk; oversized sections split by paragraph
 C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 
+# Size-matched control (D26): fixed windows of the rounded mean C3 chunk length, no overlap;
+# retrieval only. Not in STRATEGY_IDS: the experiment compares C1-C3 (D5). chunking.py aborts if
+# this value no longer equals the rule (round half up of the mean C3 chunk length).
+K1_CHUNK_SIZE = 239  # tokens; rounded mean of the C3 chunks at b75d188 (re-set for the new corpus)
+K1_OVERLAP = 0
+CONTROL_STRATEGIES = {"K1": f"fixed_{K1_CHUNK_SIZE}_no_overlap"}
+
 STRATEGY_IDS = {
     "C1": "fixed_500_no_overlap",
     "C2": "fixed_500_overlap_100",
@@ -94,6 +102,11 @@ CHROMA_COLLECTIONS = {
     "C2": "rag_c2",
     "C3": "rag_c3",
 }
+
+# Files and index of the control K1 (D26), kept apart from the experiment mappings above.
+CONTROL_CHUNK_FILES = {"K1": DATA_PROCESSED / "chunks_k1.jsonl"}
+CONTROL_EMBEDDING_FILES = {"K1": DATA_PROCESSED / "embeddings_k1.npz"}
+CONTROL_COLLECTIONS = {"K1": "rag_k1"}
 
 # ---------------------------------------------------------------------------
 # Retrieval parameters (D14)
