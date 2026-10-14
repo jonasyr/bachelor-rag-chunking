@@ -22,6 +22,7 @@ from config import (
     AREA_MIN_QUESTIONS,
     CATALOGUE_CAMEL_BOUNDARY,
     CATALOGUE_FOLD_MIN_LENGTH,
+    CATALOGUE_FREEZE_FILE,
     CATALOGUE_PREFIX_MIN,
     CATALOGUE_PREFIX_SLACK,
     CATALOGUE_STOPWORDS,
@@ -37,6 +38,7 @@ from config import (
     SECTIONS_FILE,
 )
 from embed import load_jsonl
+from freeze import write_freeze
 from retrieve import (
     GROUND_TRUTH_HEADER,
     QUESTIONS_HEADER,
@@ -375,3 +377,24 @@ def check(
 def exit_code(report: Report, draft: bool) -> int:
     """1 on any error; findings fail only the strict check (and therefore the freeze)."""
     return int(bool(report.errors) or (not draft and bool(report.findings)))
+
+
+def freeze_catalogue(
+    corpus: Corpus,
+    questions_file: Path = QUESTIONS_FILE,
+    ground_truth_file: Path = GROUND_TRUTH_FILE,
+    freeze_file: Path = CATALOGUE_FREEZE_FILE,
+    pilot_dir: Path = PILOT_DIR,
+) -> dict:
+    """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails."""
+    report = check(corpus, questions_file, ground_truth_file, pilot_dir)
+    if exit_code(report, draft=False):
+        raise ValueError(
+            "the catalogue does not pass the strict check; run `src/catalogue.py check`"
+        )
+    summary = {
+        "questions": sum(report.classes.values()),
+        "types": report.types,
+        "classes": report.classes,
+    }
+    return write_freeze(questions_file, ground_truth_file, freeze_file, summary)

@@ -5,6 +5,8 @@ against the exact cosine ranking and writes retrieved_results.csv with relevance
 (any token overlap with the annotated sections). Questions are embedded once and stored
 (data/evaluation/query_embeddings.npz); SHA-256 of questions.csv and ground_truth.csv go
 into the run log, so the frozen ground truth can be checked later (ADR 0017).
+The main catalogue (config.QUESTIONS_FILE/GROUND_TRUTH_FILE) is used only while it matches its
+freeze record (src/freeze.py, ADR 0030).
 
 `--control` runs the size-matched control K1 into retrieved_results_control.csv (ADR 0026).
 
@@ -18,6 +20,7 @@ from typing import Any
 import vector_index
 from canary import check_vintage
 from config import (
+    CATALOGUE_FREEZE_FILE,
     CHROMA_COLLECTIONS,
     CHUNK_FILES,
     CONTROL_CHUNK_FILES,
@@ -39,6 +42,7 @@ from config import (
 )
 from embed import load_jsonl, load_vectors, save_vectors
 from embedding_client import Embedder, embed_texts
+from freeze import require_frozen
 from relevance import is_relevant
 from run_log import append_run, sha256_of
 
@@ -131,12 +135,14 @@ def retrieve(
     runs_file: Path = EMBEDDING_RUNS_FILE,
     strategies: dict[str, str] = STRATEGY_IDS,
     collections: dict[str, str] = CHROMA_COLLECTIONS,
+    freeze_file: Path = CATALOGUE_FREEZE_FILE,
 ) -> int:
     """Write the result file afresh for all questions and all strategies; return row count.
 
     `strategies` is the experiment set (C1-C3) or the control set (K1, D26), always complete;
     all its strategies run together from the same inputs, so no row of an older run is kept.
     """
+    require_frozen(questions_file, ground_truth_file, freeze_file)  # ADR 0030, before any API call
     if strategies not in (STRATEGY_IDS, CONTROL_STRATEGIES):
         raise ValueError("strategies must be the experiment set or the control set (D26)")
     for name, mapping in (

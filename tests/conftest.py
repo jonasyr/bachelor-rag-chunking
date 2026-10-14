@@ -1,9 +1,16 @@
+import csv
 import hashlib
+import json
 
 import numpy as np
 import pytest
 
+import tokens
+from catalogue import load_corpus
+from config import AREA_MIN_QUESTIONS, QUESTION_CLASSES, QUESTION_TYPES
 from embedding_client import EmbeddingResult
+from preprocess import clean_markdown, section_spans
+from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
 FAKE_DIMENSIONS = 16
 
@@ -28,3 +35,101 @@ class FakeEmbedder:
 @pytest.fixture
 def fake_embedder():
     return FakeEmbedder()
+
+
+PAGES = {
+    "api/reactivity-core.md": (
+        "# Reactivity API: Core {#core}\n\n## ref() {#ref}\n\n"
+        "Takes an inner value and returns a reactive ref object.\n\n## computed() {#computed}\n\n"
+        "Takes a getter function and returns a readonly ref.\n"
+    ),
+    "guide/essentials/watchers.md": (
+        "# Watchers {#watchers}\n\nWatchers run side effects.\n\n## Deep Watchers {#deep}\n\n"
+        "A deep watcher tracks nested props. Use the once option.\n\n### Once Watchers {#once}\n\n"
+        "Set once: true to run the callback only one time.\n\n## Side Effect Cleanup {#cleanup}\n\n"
+        "Register cleanup with onWatcherCleanup.\n"
+    ),
+    "style-guide/rules-essential.md": (
+        "# Priority A Rules: Essential {#essential}\n\n"
+        "## Use multi-word component names {#multi-word}\n\n"
+        "User component names should always be multi-word, except for root App components.\n"
+    ),
+}
+
+
+def build_corpus(tmp_path, pages):
+    docs, sections = [], []
+    for number, (path, page) in enumerate(sorted(pages.items()), start=1):
+        doc_id = f"D{number:03d}"
+        result = clean_markdown(page)
+        spans = section_spans(doc_id, result)
+        docs.append(
+            {
+                "doc_id": doc_id,
+                "path": path,
+                "title": spans[0]["title"],
+                "text": result.text,
+                "tokens": tokens.count(result.text),
+            }
+        )
+        sections.extend(spans)
+    docs_file, sections_file = tmp_path / "documents.jsonl", tmp_path / "sections.jsonl"
+    docs_file.write_text("".join(json.dumps(d) + "\n" for d in docs), encoding="utf-8")
+    sections_file.write_text("".join(json.dumps(s) + "\n" for s in sections), encoding="utf-8")
+    return docs_file, sections_file
+
+
+@pytest.fixture
+def corpus_files(tmp_path):
+    return build_corpus(tmp_path, PAGES)
+
+
+@pytest.fixture
+def corpus(corpus_files):
+    return load_corpus(*corpus_files)
+
+
+def write_catalogue(tmp_path, rows):
+    """rows: (question_id, question, type, difficulty, expected_answer, [section_ids])."""
+    questions, truth_file = tmp_path / "questions.csv", tmp_path / "ground_truth.csv"
+    with (
+        questions.open("w", encoding="utf-8", newline="") as qf,
+        truth_file.open("w", encoding="utf-8", newline="") as tf,
+    ):
+        qw, tw = csv.writer(qf, lineterminator="\n"), csv.writer(tf, lineterminator="\n")
+        qw.writerow(QUESTIONS_HEADER)
+        tw.writerow(GROUND_TRUTH_HEADER)
+        for qid, text, qtype, cls, answer, sids in rows:
+            qw.writerow([qid, text, qtype, cls, ""])
+            docs = ";".join(dict.fromkeys(sid.split("#")[0] for sid in sids))
+            tw.writerow([qid, answer, docs, ";".join(sids)])
+    return questions, truth_file
+
+
+def valid_rows():
+    """A catalogue that meets every quota, floor and rule on the test corpus."""
+    types = [t for t, n in QUESTION_TYPES.items() for _ in range(n)]
+    classes = [c for c, n in QUESTION_CLASSES.items() for _ in range(n)]
+    rows = []
+    for i, (qtype, cls) in enumerate(zip(types, classes, strict=True)):
+        if i < AREA_MIN_QUESTIONS["api"]:
+            first = "D001#ref"
+        elif i < AREA_MIN_QUESTIONS["api"] + AREA_MIN_QUESTIONS["style-guide"]:
+            first = "D003#multi-word"
+        else:
+            first = "D002#once"
+        sids = [first, "D002#cleanup"] if cls == "multi-section" else [first]
+        rows.append((f"Q{i + 1:03d}", f"Question number zq{i}", qtype, cls, "Short answer.", sids))
+    return rows
+
+
+@pytest.fixture
+def pilot(tmp_path):
+    pilot_dir = tmp_path / "pilot"
+    (pilot_dir / "hard").mkdir(parents=True)
+    (pilot_dir / "hard" / "questions.csv").write_text(
+        "question_id,question,type,difficulty,notes\n"
+        "H01,How do I copy a pilot question?,factual,hard,pilot detail\n",
+        encoding="utf-8",
+    )
+    return pilot_dir
