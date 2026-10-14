@@ -1,11 +1,14 @@
+import csv
 import json
 
 import pytest
 
 import tokens
 from catalogue import (
+    check,
     class_findings,
     content_words,
+    exit_code,
     find,
     forms,
     load_corpus,
@@ -21,6 +24,7 @@ from config import (
     VUE_DOCS_AREAS,
 )
 from preprocess import clean_markdown, section_spans
+from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
 PAGES = {
     "api/reactivity-core.md": (
@@ -224,3 +228,116 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
     assert class_findings(corpus, page_word, truth(), once) == [
         "paraphrase shares heading words ['watchers']"
     ]
+
+
+def write_catalogue(tmp_path, rows):
+    """rows: (question_id, question, type, difficulty, expected_answer, [section_ids])."""
+    questions, truth_file = tmp_path / "questions.csv", tmp_path / "ground_truth.csv"
+    with (
+        questions.open("w", encoding="utf-8", newline="") as qf,
+        truth_file.open("w", encoding="utf-8", newline="") as tf,
+    ):
+        qw, tw = csv.writer(qf, lineterminator="\n"), csv.writer(tf, lineterminator="\n")
+        qw.writerow(QUESTIONS_HEADER)
+        tw.writerow(GROUND_TRUTH_HEADER)
+        for qid, text, qtype, cls, answer, sids in rows:
+            qw.writerow([qid, text, qtype, cls, ""])
+            docs = ";".join(dict.fromkeys(sid.split("#")[0] for sid in sids))
+            tw.writerow([qid, answer, docs, ";".join(sids)])
+    return questions, truth_file
+
+
+def valid_rows():
+    """A catalogue that meets every quota, floor and rule on the test corpus."""
+    types = [t for t, n in QUESTION_TYPES.items() for _ in range(n)]
+    classes = [c for c, n in QUESTION_CLASSES.items() for _ in range(n)]
+    rows = []
+    for i, (qtype, cls) in enumerate(zip(types, classes, strict=True)):
+        if i < AREA_MIN_QUESTIONS["api"]:
+            first = "D001#ref"
+        elif i < AREA_MIN_QUESTIONS["api"] + AREA_MIN_QUESTIONS["style-guide"]:
+            first = "D003#multi-word"
+        else:
+            first = "D002#once"
+        sids = [first, "D002#cleanup"] if cls == "multi-section" else [first]
+        rows.append((f"Q{i + 1:03d}", f"Question number zq{i}", qtype, cls, "Short answer.", sids))
+    return rows
+
+
+@pytest.fixture
+def pilot(tmp_path):
+    pilot_dir = tmp_path / "pilot"
+    (pilot_dir / "hard").mkdir(parents=True)
+    (pilot_dir / "hard" / "questions.csv").write_text(
+        "question_id,question,type,difficulty,notes\n"
+        "H01,How do I copy a pilot question?,factual,hard,pilot detail\n",
+        encoding="utf-8",
+    )
+    return pilot_dir
+
+
+def run_check(corpus, tmp_path, rows, pilot_dir):
+    return check(corpus, *write_catalogue(tmp_path, rows), pilot_dir=pilot_dir)
+
+
+def test_valid_catalogue_passes_strictly(corpus, tmp_path, pilot):
+    report = run_check(corpus, tmp_path, valid_rows(), pilot)
+    assert report.errors == [] and report.findings == []
+    assert exit_code(report, draft=False) == 0
+    assert report.types == QUESTION_TYPES and report.classes == QUESTION_CLASSES
+    text = "\n".join(report.lines)
+    assert "| total |" in text and "api 12 (at least 12)" in text
+
+
+def test_format_errors_fail_even_in_draft(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    rows[0] = (*rows[0][:5], ["D009#missing"])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert any("unknown section IDs ['D009#missing']" in e for e in report.errors)
+    assert exit_code(report, draft=True) == 1
+
+
+def test_unknown_values_are_errors_by_question(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    rows[0] = (rows[0][0], rows[0][1], "trivia", "hard", *rows[0][4:])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert "Q001: unknown type 'trivia'" in "\n".join(report.errors)
+    assert "Q001: unknown difficulty 'hard'" in "\n".join(report.errors)
+    assert exit_code(report, draft=True) == 1
+
+
+def test_quota_and_floor_findings_are_warnings_in_draft(corpus, tmp_path, pilot):
+    report = run_check(corpus, tmp_path, valid_rows()[:20], pilot)
+    assert report.errors == []
+    joined = "\n".join(report.findings)
+    assert "type factual: 12 questions, quota 12" not in joined
+    assert "type procedural: 8 questions, quota 12" in joined
+    assert "difficulty multi-section: 8 questions, quota 12" in joined
+    assert "area style-guide: 3 questions, at least 3" not in joined
+    assert exit_code(report, draft=True) == 0
+    assert exit_code(report, draft=False) == 1
+
+
+def test_area_floor_counts_cross_area_questions_for_each_area(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    rows = [r for r in rows if not r[5][0].startswith("D003")]  # drop the style-guide questions
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert "area style-guide: 0 questions, at least 3" in report.findings
+
+
+def test_class_rule_findings_carry_the_question_id(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    index = next(i for i, r in enumerate(rows) if r[3] == "paraphrase")
+    qid = rows[index][0]
+    rows[index] = (qid, "How do watchers fire?", *rows[index][2:])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert f"{qid}: paraphrase shares heading words ['watchers']" in report.findings
+
+
+def test_duplicates_within_the_catalogue_and_against_pilots(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    rows[1] = (rows[1][0], "question NUMBER zq0!", *rows[1][2:])
+    rows[2] = (rows[2][0], "How do I copy a pilot question", *rows[2][2:])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert "Q002: same question as Q001" in report.findings
+    assert "Q003: same question as pilot hard/H01" in report.findings

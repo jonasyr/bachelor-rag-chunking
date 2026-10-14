@@ -12,19 +12,34 @@ results, so the annotation stays blind (ADR 0027).
 """
 
 import re
+from collections import Counter
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import tokens
 from config import (
+    AREA_MIN_QUESTIONS,
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_STOPWORDS,
     CATALOGUE_WORD_PATTERN,
     DETAIL_MAX_ANSWER_WORDS,
     DOCUMENTS_FILE,
+    GROUND_TRUTH_FILE,
+    PILOT_DIR,
+    QUESTION_CLASSES,
+    QUESTION_TYPES,
+    QUESTIONS_FILE,
     SECTION_INDEX_FILE,
     SECTIONS_FILE,
 )
 from embed import load_jsonl
+from retrieve import (
+    GROUND_TRUTH_HEADER,
+    QUESTIONS_HEADER,
+    QUESTIONS_REQUIRED,
+    read_rows,
+    relevant_sections,
+)
 
 HEADING_SEPARATOR = " › "
 EXCERPT_CHARS = 60
@@ -211,3 +226,141 @@ def class_findings(corpus: Corpus, question: dict, truth: dict, sections: list[d
         if shared:
             found.append(f"paraphrase shares heading words {shared}")
     return found
+
+
+@dataclass
+class Report:
+    """Result of the coverage check: errors always fail, findings only in strict mode."""
+
+    errors: list[str] = field(default_factory=list)
+    findings: list[str] = field(default_factory=list)
+    lines: list[str] = field(default_factory=list)
+    types: dict[str, int] = field(default_factory=dict)
+    classes: dict[str, int] = field(default_factory=dict)
+
+
+def normalised_question(text: str) -> str:
+    """Question text for the duplicate check: lowercase words only."""
+    return " ".join(WORD_RE.findall(text.lower()))
+
+
+def _table(questions: list[dict]) -> list[str]:
+    cells = Counter((q["type"], q["difficulty"]) for q in questions)
+    head = f"| type \\ difficulty | {' | '.join(QUESTION_CLASSES)} | total | quota |"
+    lines = [head, "|---" * (len(QUESTION_CLASSES) + 3) + "|"]
+    for qtype, quota in QUESTION_TYPES.items():
+        counts = [cells[(qtype, cls)] for cls in QUESTION_CLASSES]
+        lines.append(f"| {qtype} | {' | '.join(map(str, counts))} | {sum(counts)} | {quota} |")
+    totals = [sum(cells[(t, cls)] for t in QUESTION_TYPES) for cls in QUESTION_CLASSES]
+    lines.append(f"| total | {' | '.join(map(str, totals))} | {sum(totals)} | |")
+    quotas = " | ".join(str(n) for n in QUESTION_CLASSES.values())
+    lines.append(f"| quota | {quotas} | {sum(QUESTION_CLASSES.values())} | |")
+    return lines
+
+
+def _overview(
+    corpus: Corpus, questions: list[dict], truth: dict, relevant: dict, areas: Counter
+) -> list[str]:
+    lines = [f"Questions: {len(questions)} (quota {sum(QUESTION_TYPES.values())})", ""]
+    lines += _table(questions)
+    split = ", ".join(
+        f"{a} {areas[a]}"
+        + (f" (at least {AREA_MIN_QUESTIONS[a]})" if a in AREA_MIN_QUESTIONS else "")
+        for a in sorted(set(areas) | set(AREA_MIN_QUESTIONS))
+    )
+    lines += ["", f"Areas (questions with a relevant section there): {split}"]
+    multi = [q for q in questions if q["difficulty"] == "multi-section"]
+    spread = sum(1 for q in multi if len({s["doc_id"] for s in relevant[q["question_id"]]}) > 1)
+    lines.append(f"multi-section on at least 2 pages: {spread} of {len(multi)}")
+    for q in questions:
+        qid, sections = q["question_id"], relevant[q["question_id"]]
+        if q["difficulty"] == "detail":
+            length = sum(s["end_token"] - s["start_token"] for s in sections)
+            words = len(truth[qid]["expected_answer"].split())
+            lines.append(f"detail {qid}: section {length} tokens, answer {words} words")
+        if q["difficulty"] in ("detail", "multi-section"):
+            shared = shared_words(q["question"], heading_texts(corpus, sections))
+            if shared:
+                lines.append(f"heading words in {q['difficulty']} {qid}: {shared}")
+    return lines
+
+
+def check(
+    corpus: Corpus,
+    questions_file: Path = QUESTIONS_FILE,
+    ground_truth_file: Path = GROUND_TRUTH_FILE,
+    pilot_dir: Path = PILOT_DIR,
+) -> Report:
+    """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
+    report = Report()
+    try:
+        questions = read_rows(
+            questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
+        )
+        truth_rows = read_rows(
+            ground_truth_file, "ground truth", GROUND_TRUTH_HEADER, GROUND_TRUTH_HEADER
+        )
+        relevant = relevant_sections(questions, truth_rows, corpus.sections)
+    except (FileNotFoundError, ValueError) as error:
+        report.errors.append(str(error))
+        return report
+    questions.sort(key=lambda q: q["question_id"])
+    truth = {row["question_id"]: row for row in truth_rows}
+
+    for q in questions:
+        qid = q["question_id"]
+        if q["type"] not in QUESTION_TYPES:
+            report.errors.append(
+                f"{qid}: unknown type {q['type']!r}; allowed {list(QUESTION_TYPES)}"
+            )
+        if q["difficulty"] not in QUESTION_CLASSES:
+            report.errors.append(
+                f"{qid}: unknown difficulty {q['difficulty']!r}; allowed {list(QUESTION_CLASSES)}"
+            )
+            continue
+        report.findings += [
+            f"{qid}: {m}" for m in class_findings(corpus, q, truth[qid], relevant[qid])
+        ]
+
+    types = Counter(q["type"] for q in questions)
+    classes = Counter(q["difficulty"] for q in questions)
+    report.types = {t: types[t] for t in QUESTION_TYPES}
+    report.classes = {c: classes[c] for c in QUESTION_CLASSES}
+    for name, quotas, counts in (
+        ("type", QUESTION_TYPES, types),
+        ("difficulty", QUESTION_CLASSES, classes),
+    ):
+        for value, quota in quotas.items():
+            if counts[value] != quota:
+                report.findings.append(f"{name} {value}: {counts[value]} questions, quota {quota}")
+
+    areas = Counter(
+        area for q in questions for area in {corpus.area(s) for s in relevant[q["question_id"]]}
+    )
+    for area, floor in AREA_MIN_QUESTIONS.items():
+        if areas[area] < floor:
+            report.findings.append(f"area {area}: {areas[area]} questions, at least {floor}")
+
+    seen: dict[str, str] = {}
+    for q in questions:
+        key = normalised_question(q["question"])
+        if key in seen:
+            report.findings.append(f"{q['question_id']}: same question as {seen[key]}")
+        else:
+            seen[key] = q["question_id"]
+    for path in sorted(pilot_dir.rglob(QUESTIONS_FILE.name)):
+        label = path.parent.relative_to(pilot_dir).as_posix()
+        rows = read_rows(path, "pilot questions", QUESTIONS_HEADER, QUESTIONS_REQUIRED)
+        for row in rows:
+            key = normalised_question(row["question"])
+            if key in seen:
+                where = f"{label}/{row['question_id']}" if label != "." else row["question_id"]
+                report.findings.append(f"{seen[key]}: same question as pilot {where}")
+
+    report.lines = _overview(corpus, questions, truth, relevant, areas)
+    return report
+
+
+def exit_code(report: Report, draft: bool) -> int:
+    """1 on any error; findings fail only the strict check (and therefore the freeze)."""
+    return int(bool(report.errors) or (not draft and bool(report.findings)))
