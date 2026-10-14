@@ -76,6 +76,8 @@ def test_section_spans_nest_and_cover_document():
         ("guide/best-practices/performance.md", "Best Practices"),
         ("guide/typescript/overview.md", "TypeScript"),
         ("guide/introduction.md", "Guide"),
+        ("api/reactivity-core.md", "API Reference"),
+        ("style-guide/rules-essential.md", "Style Guide"),
     ],
 )
 def test_manifest_section(path, section):
@@ -85,6 +87,11 @@ def test_manifest_section(path, section):
 def test_manifest_section_unknown_folder_raises():
     with pytest.raises(ValueError, match="no manifest section"):
         manifest_section("guide/new-folder/page.md")
+
+
+def test_manifest_section_unknown_area_raises():
+    with pytest.raises(ValueError, match="no manifest section"):
+        manifest_section("tutorial/step-1.md")
 
 
 def test_preprocess_writes_documents_sections_and_manifest(files):

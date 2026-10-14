@@ -34,7 +34,7 @@ def test_ingest_assigns_ids_by_path_and_writes_exact_keys(tmp_path):
         },
     )
     out = tmp_path / "processed" / "documents.jsonl"
-    assert ingest(snap, out) == 3
+    assert ingest(snap, out, areas=("guide",)) == 3
 
     docs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
     assert [(d["doc_id"], d["path"], d["title"]) for d in docs] == [
@@ -62,3 +62,29 @@ def test_title_of_normalises_api_heading_markup():
     assert title_of("# Composition API: <br>Dependency Injection {#di}\n") == (
         "Composition API: Dependency Injection"
     )
+
+
+def test_ingest_orders_all_areas_by_path(tmp_path):
+    snap = tmp_path / "snap"
+    make_snapshot(
+        snap,
+        {
+            "style-guide/rules.md": "# Rules {#rules}\n",
+            "guide/intro.md": "# Intro {#intro}\n",
+            "api/core.md": "# Core {#core}\n",
+        },
+    )
+    out = tmp_path / "documents.jsonl"
+    assert ingest(snap, out, areas=("api", "guide", "style-guide")) == 3
+    docs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    assert [(d["doc_id"], d["path"]) for d in docs] == [
+        ("D001", "api/core.md"),
+        ("D002", "guide/intro.md"),
+        ("D003", "style-guide/rules.md"),
+    ]
+
+
+def test_ingest_requires_every_area(tmp_path):
+    make_snapshot(tmp_path / "snap", {"guide/intro.md": "# Intro {#intro}\n"})
+    with pytest.raises(FileNotFoundError, match="api"):
+        ingest(tmp_path / "snap", tmp_path / "d.jsonl", areas=("api", "guide"))

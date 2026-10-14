@@ -32,13 +32,25 @@ GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 SCORES_FILE = DATA_EVAL / "scores.csv"
 
 # ---------------------------------------------------------------------------
-# Corpus (D19, docs/adr/0019-korpus-ausschnitt.md)
+# Corpus (D19, D25)
 # ---------------------------------------------------------------------------
 VUE_DOCS_REPO_URL = "https://github.com/vuejs/docs.git"
 VUE_DOCS_COMMIT = "b75d188ab16bf83bd1f364a77dfd2315be8f3fa4"
-VUE_DOCS_SUBDIR = "src/guide"
+VUE_DOCS_ROOT = "src"  # documentation root in the repository
+# Areas below VUE_DOCS_ROOT; the snapshot mirrors them below DATA_RAW (D25).
+VUE_DOCS_AREAS = ("api", "guide", "style-guide")
+# Paths below VUE_DOCS_ROOT left out of the corpus (D25): Options-API-only reference pages and the
+# generated API index. Each must exist at the commit, so the list cannot rot silently.
+VUE_DOCS_EXCLUDED = (
+    "api/component-instance.md",
+    "api/index.md",
+    "api/options-composition.md",
+    "api/options-lifecycle.md",
+    "api/options-misc.md",
+    "api/options-rendering.md",
+    "api/options-state.md",
+)
 TOKEN_ENCODING = "cl100k_base"  # tiktoken 0.13.0, pinned in pyproject.toml
-SNAPSHOT_SUBDIR = "guide"  # folder below DATA_RAW: snapshot.py writes it, ingest.py reads it
 SECTION_MAX_LEVEL = 3  # H1-H3 headings become sections (sections.jsonl, C3 boundaries; D19, D21)
 
 # ---------------------------------------------------------------------------

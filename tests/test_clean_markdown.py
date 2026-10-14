@@ -231,3 +231,8 @@ def test_inline_line_break_becomes_a_space():
 def test_v_pre_span_around_inline_code_with_tags():
     body = "(ie. <span v-pre>`<span>Keep {{x}}</span>`</span>).\n"
     assert clean(body) == "# Title\n\n(ie. `<span>Keep {{x}}</span>`).\n"
+
+
+def test_escaped_backslash_before_a_real_tag_still_raises():
+    with pytest.raises(ValueError, match="unhandled inline HTML"):
+        clean('x \\\\<img src="a"> y\n')  # `\\` is a literal backslash, then a real tag
