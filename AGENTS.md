@@ -6,9 +6,7 @@
 
 Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
 RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
-Vue.js documentation in which only the chunking strategy (C1/C2/C3) varies. Status 14.10.2026: corpus = Vue guide + API
-reference (Composition) + style guide (ADR 0025), size-matched control K1 (ADR 0026); snapshot to retrieval
-(`snapshot.py` … `retrieve.py`) implemented and tested, later steps are stubs (`docs/plan.md`).
+Vue.js documentation in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
 Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
 ## Commands
@@ -25,7 +23,8 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 - All parameters (paths, chunk sizes, models, top-k, temperature) live only in `src/config.py`.
 - Invariants: only chunking varies; `temperature = 0`, `top_k = 5`; prompt constant (`docs/reference/prompts.md`); ground
   truth final before any evaluation (ADR 0006, 0014, 0017).
-- Strategy keys `C1`/`C2`/`C3`; strategy field values and IDs as in `config.STRATEGY_IDS`; data formats exactly as in
+- Strategy keys `C1`/`C2`/`C3`; strategy field values and IDs from `config.STRATEGY_IDS` (experiment C1–C3) or
+  `config.CONTROL_STRATEGIES` (control K1, ADR 0026); data formats exactly as in
   `docs/reference/data-formats.md` (`questions.csv` includes `notes`).
 - Corpus, questions and answers in English; thesis text in German (lives in PaperLab).
 - Conventional Commits; no AI attribution lines. Never commit `.env`. Plans go to `docs/superpowers/plans/` (versioned).
@@ -51,7 +50,8 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 ### Configuration and formats
 - A parameter hard-coded outside `src/config.py` (path, size, model, `top_k`, temperature) is P1.
 - Data artefacts deviating from `docs/reference/data-formats.md`, or strategy keys/IDs not taken from
-  `config.STRATEGY_IDS`, are P1: later steps and the thesis tables depend on them.
+  `config.STRATEGY_IDS` (experiment C1–C3) or `config.CONTROL_STRATEGIES` (control K1, ADR 0026), are P1: later steps
+  and the thesis tables depend on them. K1 inside `STRATEGY_IDS` or in answer generation is P1.
 
 ### Secrets and privacy
 - `.env`, API keys and personal data (e-mail, matriculation number) never appear in committed files, logs or output;
@@ -65,7 +65,8 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 
 - `docs/README.md` — documentation index (single source of truth)
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
-- `docs/plan.md` — schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D26
+- `docs/reference/configuration.md` — every key of `src/config.py` (meaning, ADR)
+- `docs/plan.md` — status (`#stand`), schedule (to 24.12.2026) and open decisions
+- `docs/adr/` — decisions D1–D28
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)
