@@ -137,8 +137,8 @@ Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (Commit-Datum 31.07.2026) |
-| Datum des Snapshots | 13.10.2026 (Datensatz in der Git-Historie: `git show 7d6cc13:docs/corpus_snapshot.txt`) |
-| Verwendete Pfade | `src/guide/` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)); Dateiliste: `git show 7d6cc13:docs/corpus_manifest.csv` |
+| Datum des Snapshots | 13.10.2026 (Datensatz in der Git-Historie: `git show fe371c1:docs/corpus_snapshot.txt`) |
+| Verwendete Pfade | `src/guide/` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)); Dateiliste: `git show fe371c1:docs/corpus_manifest.csv` |
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
