@@ -25,7 +25,8 @@ DROP_LINE_TAGS = ("img", "details", "/details", "br")
 
 FENCE_RE = re.compile(r"^( {0,3})(`{3,}|~{3,})(.*)$")  # CommonMark: at most 3 spaces of indent
 FENCE_LANG_RE = re.compile(r"\s*([\w+-]*)")
-HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
+# CommonMark ATX heading: up to 3 spaces of indent (API pages indent headings inside list items)
+HEADING_RE = re.compile(r"^ {0,3}(#{1,6})\s+(.*?)\s*$")
 ANCHOR_RE = re.compile(r"\s*\{#([^}]+)\}\s*$")
 API_MARKER_RE = re.compile(r"\s*(\\\*)+$")  # `\*` / `\*\*`: API-style markers on headings
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
