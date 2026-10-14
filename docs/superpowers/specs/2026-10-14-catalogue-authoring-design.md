@@ -86,6 +86,44 @@ editor only calls them.
   and 1280 px, exercises the main flows (write, add section, save, skip, review decision) and reads the console,
   then the `impeccable` skill's `audit` and `polish`. The editor is not done before that browser check.
 
+### Visual design (frontend-design, approved goal: professional for a thesis, modern, pleasing, not cluttered)
+
+Subject: a workbench for writing one well-formed question per slot without losing sight of the source. One user,
+long focused sessions, much reading.
+
+- **Concept, "reading desk":** the starting section is set like a printed page on the left (serif, comfortable
+  measure under 80 characters); the form sits on the right. **The one memorable element:** while typing, question
+  words that match heading words are marked in the source text and the heading like a highlighter stroke, so the
+  paraphrase rule is visible, not just reported. Everything else is quiet.
+- **Palette (light / dark):** paper `#FAFBFC` / `#15191E`; surface `#FFFFFF` / `#1D232A`; ink `#1F2933` / `#E4E8EC`;
+  muted `#616E7C` / `#9AA5B1`; line `#D9DEE4` / `#2E3640`; accent ink blue `#2457A6` / `#7AA5E8`; highlighter
+  `#FFE58A` / `rgba(255, 214, 90, 0.35)`; ok `#2F7D4F`; problem `#B3261E`. Deliberately not the cream-and-terracotta
+  or black-and-neon defaults.
+- **Type:** UI in Streamlit's sans-serif; the source text in a serif (Source Serif 4 with Georgia fallback, larger
+  line-height); code in the source keeps monospace. Sentence case everywhere, no all-caps labels.
+- **Layout:**
+
+  ```
+  1280 px                                                     320 px
+  ┌ progress ┐┌ Slot S07: API reference, paraphrase ─────────┐ ┌ Slot S07 ┐
+  │ 21 of 48 ││ Write | Review (3)                            │ │ source   │
+  │ grid     ││ ┌ source page ─────────┐ ┌ your question ────┐ │ │ question │
+  │ areas    ││ │ heading path          │ │ question          │ │ │ checks   │
+  │ slots    ││ │ text with highlights  │ │ type, answer      │ │ │ find     │
+  │          ││ └──────────────────────┘ │ sections, checks  │ │ └──────────┘
+  │          ││ find more sections        │ Save · Skip       │ │
+  └──────────┘└──────────────────────────────────────────────────┘
+  ```
+
+  Left-aligned throughout; on narrow screens the columns stack (source, question, checks, find) and the sidebar
+  collapses.
+- **Checks** are a short plain list (met / not met with the reason), not badges or cards. **Copy:** plain verbs that
+  say what happens ("Save question", "Skip this section", "Accept", "Reject"); errors say what is wrong and how to fix
+  it; an empty Review tab says "No open suggestions."
+- **Motion:** none except Streamlit's own feedback on save.
+- Theme via `.streamlit/config.toml` (`[theme.light]`, `[theme.dark]`); custom CSS only for the source page and the
+  highlight; visible keyboard focus kept.
+
 ## Review log
 
 `data/evaluation/catalogue_review.csv` (versioned):
