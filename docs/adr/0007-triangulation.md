@@ -6,7 +6,7 @@ Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGA
 
 ## Kontext
 
-- Die manuelle, referenzbasierte Bewertung beruht auf einer eigenen Ground Truth, ist nicht zirkulär und verteidigbar ([Leitfaden §12.3](../reference/evaluation.md#triangulation-verbindlich)).
+- Die manuelle, referenzbasierte Bewertung beruht auf einer eigenen Ground Truth, ist nicht zirkulär und verteidigbar ([Leitfaden §12.3](../reference/evaluation.md)).
 - Ein automatisiertes Framework wie RAGAS ist skalierbar und reproduzierbar, LLM-as-a-Judge hat aber bekannte Zuverlässigkeitsgrenzen (Leitfaden §12.3).
 - Eine rein automatische Bewertung ohne menschliche Kontrolle liegt außerhalb des Scopes (Leitfaden §3).
 

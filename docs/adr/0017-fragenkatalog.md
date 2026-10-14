@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
+Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen); präzisiert durch [ADR 0027](0027-blinde-annotation.md) (Relevanz-Annotation blind vor jedem Retrieval)
 
 ## Kontext
 

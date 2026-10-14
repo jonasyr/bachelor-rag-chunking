@@ -6,7 +6,7 @@ Angenommen (D10 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-- Qu, Bao & Tu (2025) zeigen, dass semantisch oder strukturell motiviertes Chunking größenbasiertes Chunking nicht konsistent übertrifft und der Mehraufwand oft nicht gerechtfertigt ist ([Leitfaden §4.4](../explanation/research-design.md#warum-das-thema-nicht-trivial-ist)).
+- Qu, Bao & Tu (2025) zeigen, dass semantisch oder strukturell motiviertes Chunking größenbasiertes Chunking nicht konsistent übertrifft und der Mehraufwand oft nicht gerechtfertigt ist ([Leitfaden §4.4](../explanation/research-design.md)).
 - Ohne diese Einordnung könnte die Arbeit als trivialer Vergleich gelten (Leitfaden §3).
 
 ## Entscheidung

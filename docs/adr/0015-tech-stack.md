@@ -6,7 +6,7 @@ Angenommen (D15 im Leitfaden; Quelle: Baseline, übernommen)
 
 ## Kontext
 
-- Der Leitfaden nennt für die Werkzeugwahl keinen Grund; sie ist aus der Baseline übernommen ([Leitfaden §8](../reference/tooling.md#tech-stack)).
+- Der Leitfaden nennt für die Werkzeugwahl keinen Grund; sie ist aus der Baseline übernommen ([Leitfaden §8](../reference/tooling.md)).
 - Die Pipeline braucht je Strategie einen eigenen Vektorindex sowie Embeddings, Token-Zählung, Auswertung und Diagramme (Leitfaden §7).
 
 ## Entscheidung

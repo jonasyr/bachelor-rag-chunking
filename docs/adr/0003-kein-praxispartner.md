@@ -6,8 +6,8 @@ Angenommen (D3 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
 
 ## Kontext
 
-- Der Leitfaden nennt für diese Entscheidung keinen Grund; sie stammt aus dem Chat, die Baseline sah dazu nichts vor ([Leitfaden §2](README.md)).
-- Private Firmendaten liegen ausdrücklich außerhalb des Scopes ([Leitfaden §3](../explanation/research-design.md#was-sich-gegenüber-der-ursprünglichen-baseline-geändert-hat)).
+- Der Leitfaden nennt für diese Entscheidung keinen Grund; sie stammt aus dem Chat, die Baseline sah dazu nichts vor (Leitfaden §2: Ground-Truth-Leitfaden, Juni 2026, in der Git-Historie).
+- Private Firmendaten liegen ausdrücklich außerhalb des Scopes ([Leitfaden §3](../explanation/research-design.md)).
 
 ## Entscheidung
 

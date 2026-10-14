@@ -8,6 +8,8 @@ Angenommen (14.10.2026; ergänzt [ADR 0005](0005-drei-chunking-strategien.md), [
 
 - C3 unterscheidet sich von C1/C2 in Struktur und Größe: auf dem Korpus nach [ADR 0025](0025-korpus-guide-api-styleguide.md) Median 190 gegen 500 Tokens; bei top 5 erhält das Sprachmodell mit C3 nur etwa halb so viel Kontext. Ohne Kontrolle ist nicht trennbar, ob ein Unterschied aus der Struktur oder aus der Größe kommt.
 - Kleinere Chunks erhöhen die Precision bei etwa gleichem Recall (Smith & Troynikov, 2024, mit `text-embedding-3-large` und fünf abgerufenen Chunks); die beste Größe hängt vom Fragetyp ab (Bhat et al., 2025).
+- Begründung der C3-Obergrenze 800 ([ADR 0021](0021-c3-grenzen.md)): Die Eingabegrenze des Embedding-Modells (8.192 Tokens) ist ein technisches Maximum, keine Empfehlung. Längere Chunks verdünnen den Vektor eines Chunks (Smith & Troynikov, 2024) und gäben C3 bei festem `top_k` mehr Kontext als C1/C2 ([ADR 0006](0006-nur-chunking-variiert.md)).
+- Gemessen auf dem Korpus nach ADR 0025: Ohne Obergrenze wäre der längste C3-Chunk 1.467 Tokens lang; die Grenze 800 teilt 12 von 706 Segmenten. Sie wirkt also nur auf wenige lange Abschnitte.
 - Die geplante Sensitivitätsprüfung (Mindestüberlappung 100 Tokens) hätte jeden Chunk unter 100 Tokens grundsätzlich ausgeschlossen, auch einen vollständig im relevanten Abschnitt liegenden; das benachteiligt C3 systematisch.
 - Die Entscheidung fällt vor dem Einfrieren der Ground Truth ([ADR 0017](0017-fragenkatalog.md)). Zwei Pilotproben existieren und sind im [Experiment-Protokoll](../reference/experiment-record.md) offengelegt; die Begründung stützt sich auf das Design-Argument und die Literatur, nicht auf Pilotwerte.
 
