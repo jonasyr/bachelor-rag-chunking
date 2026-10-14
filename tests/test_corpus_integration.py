@@ -12,6 +12,7 @@ from config import (
     C3_MAX_TOKENS,
     C3_MIN_TOKENS,
     CHUNK_FILES,
+    CONTROL_STRATEGIES,
     DATA_RAW,
     DOCUMENTS_FILE,
     EMBEDDING_DIMENSIONS,
@@ -19,16 +20,23 @@ from config import (
     SECTIONS_FILE,
     SNAPSHOT_INFO_FILE,
     STRATEGY_IDS,
+    VUE_DOCS_AREAS,
+    VUE_DOCS_EXCLUDED,
 )
-from preprocess import clean_markdown
+from preprocess import ESCAPED_LT_RE, clean_markdown
 
-GUIDE = DATA_RAW / "guide"
-EXPECTED_FILES = 52  # ADR 0019
+SNAPSHOT_DIRS = [DATA_RAW / area for area in VUE_DOCS_AREAS]
+HAS_SNAPSHOT = all(d.is_dir() for d in SNAPSHOT_DIRS)
+EXPECTED_FILES = 79  # ADR 0025: guide 52, API 22, style guide 5
 
 
-@pytest.mark.skipif(not GUIDE.is_dir(), reason="no snapshot; run src/snapshot.py")
+def snapshot_files():
+    return sorted(p for d in SNAPSHOT_DIRS for p in d.rglob("*.md"))
+
+
+@pytest.mark.skipif(not HAS_SNAPSHOT, reason="no snapshot; run src/snapshot.py")
 def test_every_snapshot_file_cleans():
-    files = sorted(GUIDE.rglob("*.md"))
+    files = snapshot_files()
     assert len(files) == EXPECTED_FILES
     for path in files:
         result = clean_markdown(path.read_text(encoding="utf-8"))
@@ -46,6 +54,7 @@ def test_processed_artifacts_are_consistent():
     for d in docs:
         prose = re.sub(r"^\s*(`{3,}|~{3,}).*?^\s*\1\s*$", "", d["text"], flags=re.S | re.M)
         prose = re.sub(r"`[^`\n]*`", "", prose)
+        prose = ESCAPED_LT_RE.sub(r"\1", prose)  # an escaped `\<` is text, not a tag
         leftover = re.search(
             r'</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|class="options-api"|\{#|vuejs\.org/#', prose
         )
@@ -56,7 +65,7 @@ def test_processed_artifacts_are_consistent():
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
-@pytest.mark.parametrize("key", list(STRATEGY_IDS))
+@pytest.mark.parametrize("key", [*STRATEGY_IDS, *CONTROL_STRATEGIES])
 def test_real_corpus_chunks(key, tmp_path):
     out = tmp_path / f"chunks_{key}.jsonl"
     count = chunk(key, out_file=out)  # chunk() checks every invariant per document
@@ -69,7 +78,7 @@ def test_real_corpus_chunks(key, tmp_path):
         assert all(C3_MIN_TOKENS <= n <= C3_MAX_TOKENS for n in lengths)
 
 
-@pytest.mark.skipif(not GUIDE.is_dir(), reason="no snapshot; run src/snapshot.py")
+@pytest.mark.skipif(not HAS_SNAPSHOT, reason="no snapshot; run src/snapshot.py")
 def test_snapshot_matches_the_versioned_checksums():
     lines = SNAPSHOT_INFO_FILE.read_text(encoding="utf-8").splitlines()
     recorded: dict[str, str] = {}
@@ -77,10 +86,18 @@ def test_snapshot_matches_the_versioned_checksums():
         if re.match(r"^[0-9a-f]{64}  ", line):
             digest, rel = line.split("  ", 1)
             recorded[rel] = digest
-    files = {p.relative_to(DATA_RAW).as_posix(): p for p in GUIDE.rglob("*.md")}
+    files = {p.relative_to(DATA_RAW).as_posix(): p for p in snapshot_files()}
     assert set(recorded) == set(files)
     for rel, path in files.items():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == recorded[rel], rel
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+def test_corpus_areas_and_exclusions():
+    docs = [json.loads(line) for line in DOCUMENTS_FILE.read_text(encoding="utf-8").splitlines()]
+    areas = [d["path"].split("/", 1)[0] for d in docs]
+    assert {a: areas.count(a) for a in VUE_DOCS_AREAS} == {"api": 22, "guide": 52, "style-guide": 5}
+    assert not {d["path"] for d in docs} & set(VUE_DOCS_EXCLUDED)
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
