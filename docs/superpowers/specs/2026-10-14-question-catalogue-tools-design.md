@@ -46,12 +46,13 @@ Success criteria:
 ## Class rules
 
 Words are compared after a fixed normalisation: lowercase, words matched by `[a-z0-9]+`, words in
-`config.CATALOGUE_STOPWORDS` dropped. Each remaining word longer than three characters stands for a set of candidate
-forms: itself, without a trailing `s`, without a trailing `es`, and with a trailing `ies` replaced by `y`
-(`values` → {values, value, valu}, `watches` → {watches, watche, watch}, `dependencies` → {…, dependency}). Two words
-match if their candidate sets intersect. This errs towards reporting an overlap, the safe direction for a check that
-must catch overlap; cutting a fixed suffix alone would miss `values`/`value`. The heading words of a question are the words of the `title` of each
-relevant section plus the `title` of the H1 section of its document.
+`config.CATALOGUE_STOPWORDS` dropped; a camelCase identifier also counts by its parts (`defineProps` → `defineprops`,
+`define`, `props`). Two words match if (a) their plural forms intersect: each word of at least four characters also
+stands for itself without a trailing `s`, without `es`, and with `ies` → `y`; or (b) they share a common prefix of at
+least max(4, length of the shorter word − 3) characters (`watch`/`watchers`, `mounted`/`mounting`,
+`reactive`/`reactivity`; not `compiler`/`computed`). The rule errs towards reporting a shared word, the safe direction
+for a check that must catch overlap; plural folding alone missed derivations (task 3 review, 14.10.2026), and with (b)
+5 of the 7 pilot paraphrase questions would fail.
 
 | Class | Rule | Checked by `check` |
 |---|---|---|
