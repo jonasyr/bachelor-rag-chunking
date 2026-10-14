@@ -2,13 +2,13 @@
 
 ## Status
 
-Angenommen (D16 im Leitfaden; Quelle: Baseline, übernommen)
+Angenommen (D16 im Leitfaden; Quelle: Baseline, übernommen); Embedding-Modell sowie SDK- und Chroma-Version entschieden in [ADR 0023](0023-embedding-modell.md)
 
 ## Kontext
 
-- Im Exposé und in der Arbeit wird neutral formuliert; konkrete Versionsnummern (Modell, SDK, API) werden erst bei der tatsächlichen Implementierung festgeschrieben ([Leitfaden §8](../reference/tooling.md#tech-stack)).
+- Im Exposé und in der Arbeit wird neutral formuliert; konkrete Versionsnummern (Modell, SDK, API) werden erst bei der tatsächlichen Implementierung festgeschrieben ([Leitfaden §8](../reference/tooling.md)).
 - Zur Reliabilität gehört, die Modellversion zu dokumentieren (Leitfaden §13).
-- Modell, Embedding-Modell (`-large` oder `-small`) und SDK-/API-Version sind noch offen ([Leitfaden §19](../plan.md#offene-entscheidungen--vor-beginn-zu-bestätigen)).
+- Modell, Embedding-Modell (`-large` oder `-small`) und SDK-/API-Version sind noch offen ([Leitfaden §19](../plan.md)).
 
 ## Entscheidung
 

@@ -6,7 +6,7 @@ Angenommen (D2 im Leitfaden; Quelle: Chat, konkretisiert die Baseline)
 
 ## Kontext
 
-- Der Leitfaden nennt für diese Entscheidung keinen Grund; sie stammt aus dem Chat ([Leitfaden §2](README.md)).
+- Der Leitfaden nennt für diese Entscheidung keinen Grund; sie stammt aus dem Chat (Leitfaden §2: Ground-Truth-Leitfaden, Juni 2026, in der Git-Historie).
 - Die 15 Quellen der Literaturbasis sind im Exposé zitiert, ihre BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` (Leitfaden §18).
 - Form- und Stilregeln der Arbeit kommen aus der IU Source of Truth im PaperLab-Repo (Leitfaden §20).
 
