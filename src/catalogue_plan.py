@@ -21,6 +21,7 @@ from config import (
     CATALOGUE_PLAN_STATUSES,
     CATALOGUE_RESERVE,
     CATALOGUE_SEED,
+    CATALOGUE_SKIP_REASONS,
     QUESTION_CLASSES,
 )
 
@@ -162,3 +163,94 @@ def write_plan(corpus: Corpus, plan_file: Path = CATALOGUE_PLAN_FILE, **draw_arg
     plan_file.parent.mkdir(parents=True, exist_ok=True)
     save_plan(plan_file, rows)
     return len(rows)
+
+
+def slot_row(rows: list[dict], slot_id: str) -> dict:
+    """The current (open or used) row of a slot."""
+    for row in rows:
+        if row["slot_id"] == slot_id and row["status"] in ("open", "used"):
+            return row
+    raise ValueError(f"no slot {slot_id} in the plan")
+
+
+def mark_used(rows: list[dict], slot_id: str, question_id: str) -> None:
+    row = slot_row(rows, slot_id)
+    if row["status"] == "used" and row["question_id"] != question_id:
+        raise ValueError(f"slot {slot_id} already holds {row['question_id']}")
+    row["status"], row["question_id"] = "used", question_id
+
+
+def skip_slot(plan_file: Path, slot_id: str, reason: str) -> dict:
+    """Skip an open slot's section with a listed reason; the area's next reserve row takes over."""
+    if reason not in CATALOGUE_SKIP_REASONS:
+        raise ValueError(
+            f"skip reason {reason!r} not allowed; use one of {list(CATALOGUE_SKIP_REASONS)}"
+        )
+    rows = read_plan(plan_file)
+    row = slot_row(rows, slot_id)
+    if row["status"] != "open":
+        raise ValueError(f"slot {slot_id} is not open (it holds {row['question_id']})")
+    spare = [r for r in rows if r["area"] == row["area"] and r["status"] == "reserve"]
+    if not spare:
+        raise ValueError(
+            f"no reserve section left in area {row['area']}; "
+            "a larger reserve needs a new ADR (ADR 0031)"
+        )
+    new = min(spare, key=lambda r: int(r["draw"]))
+    new["slot_id"], new["class"], new["status"] = row["slot_id"], row["class"], "open"
+    row["status"], row["skip_reason"] = "skipped", reason
+    save_plan(plan_file, rows)
+    return new
+
+
+def plan_findings(
+    rows: list[dict],
+    questions: list[dict],
+    relevant: dict[str, list[dict]],
+    section_ids: set[str],
+) -> tuple[list[str], list[str]]:
+    """Errors (plan format) and findings (slot rules) of ADR 0031."""
+    errors = [
+        f"plan row {r['area']}/{r['draw']}: section {r['section_id']} is not in sections.jsonl"
+        for r in rows
+        if r["section_id"] not in section_ids
+    ]
+    errors += [
+        f"slot {r['slot_id']}: skip reason {r['skip_reason']!r} not allowed"
+        for r in rows
+        if r["status"] == "skipped" and r["skip_reason"] not in CATALOGUE_SKIP_REASONS
+    ]
+    findings = []
+    used = [r for r in rows if r["status"] == "used"]
+    known = {q["question_id"] for q in questions}
+    findings += [
+        f"slot {r['slot_id']}: question {r['question_id']} is not in the catalogue"
+        for r in used
+        if r["question_id"] not in known
+    ]
+    for q in questions:
+        qid = q["question_id"]
+        own = [r for r in used if r["question_id"] == qid]
+        if len(own) != 1:
+            findings.append(f"{qid}: belongs to {len(own)} slots, needs exactly 1")
+            continue
+        row = own[0]
+        if q["difficulty"] != row["class"]:
+            findings.append(
+                f"{qid}: difficulty {q['difficulty']} but slot {row['slot_id']} is {row['class']}"
+            )
+        if row["section_id"] not in {s["section_id"] for s in relevant.get(qid, [])}:
+            start, slot = row["section_id"], row["slot_id"]
+            findings.append(f"{qid}: starting section {start} of slot {slot} is not annotated")
+    return errors, findings
+
+
+def plan_summary(rows: list[dict]) -> list[str]:
+    status = {s: sum(1 for r in rows if r["status"] == s) for s in ("used", "open", "skipped")}
+    reasons = {}
+    for r in rows:
+        if r["status"] == "skipped":
+            reasons[r["skip_reason"]] = reasons.get(r["skip_reason"], 0) + 1
+    detail = ", ".join(f"{k} {v}" for k, v in sorted(reasons.items()))
+    line = f"Slots: {status['used']} used, {status['open']} open, {status['skipped']} skipped"
+    return [line + (f" ({detail})" if detail else "")]

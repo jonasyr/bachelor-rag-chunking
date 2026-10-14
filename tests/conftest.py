@@ -143,6 +143,7 @@ def write_plan_for(tmp_path, rows):
         writer = csv.writer(f, lineterminator="\n")
         writer.writerow(PLAN_HEADER)
         for number, (qid, _, _, cls, _, sids) in enumerate(rows, start=1):
-            area = {"D001": "api", "D002": "guide", "D003": "style-guide"}[sids[0].split("#")[0]]
+            areas = {"D001": "api", "D003": "style-guide"}
+            area = areas.get(sids[0].split("#")[0], "guide")  # unknown IDs: format tests
             writer.writerow([area, number, sids[0], f"S{number:02d}", cls, "used", "", qid])
     return plan

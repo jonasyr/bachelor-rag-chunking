@@ -1,5 +1,5 @@
 import pytest
-from conftest import PAGES, build_corpus, valid_rows, write_catalogue
+from conftest import PAGES, build_corpus, valid_rows, write_catalogue, write_plan_for
 
 import catalogue
 import tokens
@@ -197,7 +197,9 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
 
 
 def run_check(corpus, tmp_path, rows, pilot_dir):
-    return check(corpus, *write_catalogue(tmp_path, rows), pilot_dir=pilot_dir)
+    questions, truth = write_catalogue(tmp_path, rows)
+    plan = write_plan_for(tmp_path, rows)
+    return check(corpus, questions, truth, pilot_dir=pilot_dir, plan_file=plan)
 
 
 def test_valid_catalogue_passes_strictly(corpus, tmp_path, pilot):
@@ -274,6 +276,7 @@ def cli(corpus_files, tmp_path, monkeypatch, pilot):
     monkeypatch.setattr(catalogue, "GROUND_TRUTH_FILE", truth)
     monkeypatch.setattr(catalogue, "PILOT_DIR", pilot)
     monkeypatch.setattr(catalogue, "CATALOGUE_FREEZE_FILE", tmp_path / "freeze.json")
+    monkeypatch.setattr(catalogue, "CATALOGUE_PLAN_FILE", write_plan_for(tmp_path, valid_rows()))
     return tmp_path
 
 
@@ -369,3 +372,17 @@ def test_page_spread_report_uses_the_configured_minimum(corpus, tmp_path, pilot,
         "multi-section on at least 3 pages: 0 of 12"
         in run_check(corpus, tmp_path, rows, pilot).lines
     )
+
+
+def test_check_reports_a_missing_plan(corpus, tmp_path, pilot):
+    questions, truth = write_catalogue(tmp_path, valid_rows())
+    report = check(corpus, questions, truth, pilot_dir=pilot, plan_file=tmp_path / "none.csv")
+    assert any("catalogue.py plan" in e for e in report.errors)
+
+
+def test_check_applies_the_plan_rules(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    questions, truth = write_catalogue(tmp_path, rows)
+    plan = write_plan_for(tmp_path, rows[1:])  # Q001 has no slot
+    report = check(corpus, questions, truth, pilot_dir=pilot, plan_file=plan)
+    assert "Q001: belongs to 0 slots, needs exactly 1" in report.findings

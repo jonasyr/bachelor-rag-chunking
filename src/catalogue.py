@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import tokens
+from catalogue_plan import plan_findings, plan_summary, read_plan, write_plan
 from config import (
     AREA_MIN_QUESTIONS,
     CATALOGUE_CAMEL_BOUNDARY,
@@ -28,6 +29,7 @@ from config import (
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_FREEZE_FILE,
     CATALOGUE_HEADING_SEPARATOR,
+    CATALOGUE_PLAN_FILE,
     CATALOGUE_PREFIX_MIN,
     CATALOGUE_PREFIX_SLACK,
     CATALOGUE_REPORT_MIN_PAGES,
@@ -347,6 +349,7 @@ def check(
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
     pilot_dir: Path = PILOT_DIR,
+    plan_file: Path = CATALOGUE_PLAN_FILE,
 ) -> Report:
     """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
     report = Report()
@@ -421,7 +424,18 @@ def check(
                 where = f"{label}/{row['question_id']}" if label != "." else row["question_id"]
                 report.findings.append(f"{seen[key]}: same question as pilot {where}")
 
-    report.lines = _overview(corpus, questions, truth, relevant, areas)
+    try:
+        plan = read_plan(plan_file)
+    except (FileNotFoundError, ValueError) as error:
+        report.errors.append(str(error))
+        plan = None
+    plan_lines: list[str] = []
+    if plan is not None:
+        errors, findings = plan_findings(plan, questions, relevant, set(corpus.by_id))
+        report.errors += errors
+        report.findings += findings
+        plan_lines = plan_summary(plan)
+    report.lines = _overview(corpus, questions, truth, relevant, areas) + plan_lines
     return report
 
 
@@ -438,13 +452,14 @@ def freeze_catalogue(
     pilot_dir: Path = PILOT_DIR,
     sections_file: Path = SECTIONS_FILE,
     documents_file: Path = DOCUMENTS_FILE,
+    plan_file: Path = CATALOGUE_PLAN_FILE,
 ) -> dict:
     """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
 
     `sections_file` and `documents_file` must be the files `corpus` was loaded from; their hashes
     pin which text the section IDs refer to.
     """
-    report = check(corpus, questions_file, ground_truth_file, pilot_dir)
+    report = check(corpus, questions_file, ground_truth_file, pilot_dir, plan_file)
     if exit_code(report, draft=False):
         raise ValueError(
             "the catalogue does not pass the strict check; run `src/catalogue.py check`"
@@ -470,6 +485,7 @@ def main(argv: list[str] | None = None) -> int:
     check_cmd = commands.add_parser("check", help="coverage check of the catalogue")
     check_cmd.add_argument("--draft", action="store_true", help="fail only on errors")
     commands.add_parser("freeze", help="strict check, then write the freeze record")
+    commands.add_parser("plan", help="draw the sampling plan once (ADR 0031)")
     args = parser.parse_args(argv)
 
     corpus = load_corpus(DOCUMENTS_FILE, SECTIONS_FILE)
@@ -495,7 +511,16 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return 0
 
-    report = check(corpus, QUESTIONS_FILE, GROUND_TRUTH_FILE, PILOT_DIR)
+    if args.command == "plan":
+        try:
+            count = write_plan(corpus, CATALOGUE_PLAN_FILE)
+        except (FileExistsError, ValueError) as error:
+            print(error, file=sys.stderr)
+            return 1
+        print(f"{count} plan rows -> {CATALOGUE_PLAN_FILE}")
+        return 0
+
+    report = check(corpus, QUESTIONS_FILE, GROUND_TRUTH_FILE, PILOT_DIR, CATALOGUE_PLAN_FILE)
     draft = args.command == "check" and args.draft
     print("\n".join(report.lines))
     for error in report.errors:
@@ -514,6 +539,7 @@ def main(argv: list[str] | None = None) -> int:
             PILOT_DIR,
             SECTIONS_FILE,
             DOCUMENTS_FILE,
+            CATALOGUE_PLAN_FILE,
         )
     except (FileExistsError, ValueError) as error:
         print(error, file=sys.stderr)

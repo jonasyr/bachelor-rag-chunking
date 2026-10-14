@@ -1,7 +1,19 @@
 import pytest
 
 import catalogue_plan
-from catalogue_plan import candidates, draw_area, draw_plan, read_plan, save_plan, write_plan
+from catalogue_plan import (
+    candidates,
+    draw_area,
+    draw_plan,
+    mark_used,
+    plan_findings,
+    plan_summary,
+    read_plan,
+    save_plan,
+    skip_slot,
+    slot_row,
+    write_plan,
+)
 from config import CATALOGUE_AREA_SLOTS, CATALOGUE_RESERVE, QUESTION_CLASSES
 
 SMALL = {
@@ -98,3 +110,83 @@ def test_read_plan_rejects_bad_files(tmp_path):
     )
     with pytest.raises(ValueError, match="unknown status 'done'"):
         read_plan(status)
+
+
+@pytest.fixture
+def small_plan(corpus, tmp_path):
+    out = tmp_path / "catalogue_plan.csv"
+    write_plan(corpus, out, seed=3, **SMALL)
+    return out
+
+
+def test_skip_moves_the_slot_to_the_next_reserve_section(small_plan):
+    rows = read_plan(small_plan)
+    s01 = slot_row(rows, "S01")
+    new = skip_slot(small_plan, "S01", "code-or-links")
+    rows = read_plan(small_plan)
+    skipped = next(r for r in rows if r["section_id"] == s01["section_id"])
+    assert (skipped["status"], skipped["skip_reason"]) == ("skipped", "code-or-links")
+    assert (new["slot_id"], new["class"], new["status"], new["area"]) == (
+        "S01",
+        s01["class"],
+        "open",
+        "api",
+    )
+    assert slot_row(rows, "S01")["section_id"] == new["section_id"] != s01["section_id"]
+
+
+def test_skip_needs_a_listed_reason_an_open_slot_and_a_reserve(small_plan):
+    with pytest.raises(ValueError, match="reason"):
+        skip_slot(small_plan, "S01", "boring")
+    with pytest.raises(ValueError, match="no reserve section left in area style-guide"):
+        skip_slot(small_plan, "S02", "too-short")
+    rows = read_plan(small_plan)
+    mark_used(rows, "S03", "Q001")
+    save_plan(small_plan, rows)
+    with pytest.raises(ValueError, match="S03 is not open"):
+        skip_slot(small_plan, "S03", "too-short")
+
+
+def test_mark_used_accepts_open_or_same_question_only(small_plan):
+    rows = read_plan(small_plan)
+    mark_used(rows, "S01", "Q001")
+    mark_used(rows, "S01", "Q001")  # editing the same question
+    with pytest.raises(ValueError, match="S01 already holds Q001"):
+        mark_used(rows, "S01", "Q002")
+
+
+def q(qid, cls):
+    return {"question_id": qid, "question": "x", "type": "factual", "difficulty": cls}
+
+
+def test_plan_findings(corpus, small_plan):
+    rows = read_plan(small_plan)
+    s01 = slot_row(rows, "S01")
+    mark_used(rows, "S01", "Q001")
+    questions = [
+        q("Q001", "single" if s01["class"] != "single" else "paraphrase"),
+        q("Q002", "single"),
+    ]
+    relevant = {"Q001": [corpus.by_id["D002#cleanup"]], "Q002": [corpus.by_id["D002#cleanup"]]}
+    errors, findings = plan_findings(rows, questions, relevant, set(corpus.by_id))
+    assert errors == []
+    assert (
+        f"Q001: difficulty {questions[0]['difficulty']} but slot S01 is {s01['class']}" in findings
+    )
+    assert f"Q001: starting section {s01['section_id']} of slot S01 is not annotated" in findings
+    assert "Q002: belongs to 0 slots, needs exactly 1" in findings
+
+
+def test_plan_findings_report_unknown_sections_and_bad_reasons(corpus, small_plan):
+    rows = read_plan(small_plan)
+    rows[0]["section_id"] = "D099#gone"
+    rows[1]["status"], rows[1]["skip_reason"] = "skipped", "boring"
+    errors, _ = plan_findings(rows, [], {}, set(corpus.by_id))
+    assert any("D099#gone" in e for e in errors)
+    assert any("'boring'" in e for e in errors)
+
+
+def test_plan_summary_counts_skips(small_plan):
+    skip_slot(small_plan, "S01", "too-short")
+    lines = plan_summary(read_plan(small_plan))
+    assert "Slots: 0 used, 3 open, 1 skipped (too-short 1)" in lines

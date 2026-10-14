@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from conftest import valid_rows, write_catalogue
+from conftest import valid_rows, write_catalogue, write_plan_for
 
 import freeze
 from catalogue import freeze_catalogue
@@ -19,7 +19,16 @@ def main_catalogue(tmp_path, monkeypatch, corpus_files):
 def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp_path):
     questions, truth, sections, documents = main_catalogue
     out = tmp_path / "catalogue_freeze.json"
-    record = freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+    record = freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=write_plan_for(tmp_path, valid_rows()),
+    )
     stored = json.loads(out.read_text(encoding="utf-8"))
     assert stored == record
     assert stored["sha256"] == {
@@ -38,17 +47,44 @@ def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
     questions, truth = write_catalogue(tmp_path, valid_rows()[:47])
     out = tmp_path / "catalogue_freeze.json"
     with pytest.raises(ValueError, match="strict check"):
-        freeze_catalogue(corpus, questions, truth, out, pilot, corpus_files[1], corpus_files[0])
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            corpus_files[1],
+            corpus_files[0],
+            plan_file=write_plan_for(tmp_path, valid_rows()[:47]),
+        )
     assert not out.exists()
 
 
 def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_path):
     questions, truth, sections, documents = main_catalogue
     out = tmp_path / "catalogue_freeze.json"
-    freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+    freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=write_plan_for(tmp_path, valid_rows()),
+    )
     before = out.read_bytes()
     with pytest.raises(FileExistsError, match="ADR 0030"):
-        freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            sections,
+            documents,
+            plan_file=write_plan_for(tmp_path, valid_rows()),
+        )
     with pytest.raises(FileExistsError, match="ADR 0030"):
         freeze.write_freeze(questions, truth, sections, documents, out)
     assert out.read_bytes() == before
