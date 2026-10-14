@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. Übertragen aus dem Decision Log des
-früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0030 sind seit
+früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0031 sind seit
 der Umsetzung hinzugekommen. Hintergrund: [Forschungsdesign](../explanation/research-design.md); offene Entscheidungen: [Plan](../plan.md).
 Format: Michael Nygard (Status, Kontext, Entscheidung, Konsequenzen), Nummern und Dateinamen bleiben fest.
 Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte auf „ersetzt durch …“ setzen.
@@ -38,5 +38,6 @@ bleibt unverändert.
 | [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen |
 | [0027](0027-blinde-annotation.md) | Relevanz-Annotation blind vor jedem Retrieval; nachträgliche Ergänzungen nur als Sensitivität | Angenommen |
 | [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen |
-| [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragenkatalog: 48 Fragen, Fragetypen und Konstruktionsklassen mit Quoten, Bereichsuntergrenzen | Angenommen |
-| [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre vor dem Retrieval | Angenommen |
+| [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragenkatalog: 48 Fragen, Fragetypen und Konstruktionsklassen mit Quoten, Bereichsuntergrenzen | Angenommen; ergänzt durch 0031 |
+| [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre vor dem Retrieval | Angenommen; erweitert durch 0031 |
+| [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan der Slots und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen |

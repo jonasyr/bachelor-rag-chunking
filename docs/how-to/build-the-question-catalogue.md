@@ -4,7 +4,8 @@
 
 Ziel: 48 Fragen mit Referenzantwort und relevanten Abschnitten, geprüft und eingefroren, bevor irgendein Retrieval auf
 ihnen läuft. Regeln, Werte und Quoten: [Fragenkatalog](../reference/question-catalogue.md),
-[ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md); blinde Annotation:
+[ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md); Themenauswahl und KI-Durchsicht:
+[ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md); blinde Annotation:
 [ADR 0027](../adr/0027-blinde-annotation.md); Einfrieren: [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md).
 Formate: [Datenartefakte und Formate](../reference/data-formats.md#fragen-und-ground-truth).
 
@@ -12,49 +13,59 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
 
 ## Schritte
 
-1. Nachschlageliste erzeugen und öffnen:
+1. Den Stichprobenplan einmal ziehen und sofort committen:
 
    ```bash
-   uv run python src/catalogue.py sections
+   uv run python src/catalogue.py plan
+   git add data/evaluation/catalogue_plan.csv data/evaluation/catalogue_review.csv
+   git commit -m "chore(data): Stichprobenplan des Fragenkatalogs gezogen"
    ```
 
-   `data/processed/section_index.md` listet alle Abschnitte mit `section_id`, Bereich, Seite, Überschriftenpfad und
-   Länge in Tokens.
+   Der Plan legt für 48 Slots je einen Ausgangsabschnitt und eine Konstruktionsklasse fest (12 API, 3 Style Guide,
+   33 Guide) und wird nie überschrieben.
 
-2. Frage in `data/evaluation/questions.csv` eintragen, mit `type` und `difficulty` (Konstruktionsklasse) aus der
-   [Referenz](../reference/question-catalogue.md). Pilotfragen nicht übernehmen; die Prüfung meldet exakte Kopien (gleicher Wortlaut ohne Satzzeichen und
-   Groß-/Kleinschreibung), umformulierte Pilotfragen erkennt sie nicht.
-
-3. Alle relevanten Abschnitte suchen, auch in der API-Referenz und im Style Guide, nicht nur auf der naheliegenden Seite:
+2. Den Editor starten (nur auf diesem Rechner erreichbar):
 
    ```bash
-   uv run python src/catalogue.py find "v-model"
-   uv run python src/catalogue.py show "D046#lazy"
+   uv run streamlit run app/catalogue_editor.py
    ```
 
-   `find` sucht wörtlich und meldet nur den innersten Abschnitt eines Treffers; `show` zeigt den genauen Text, den
-   auch die Relevanzregel verwendet. Referenzantwort, `relevant_section_ids` und `relevant_doc_ids` in
-   `data/evaluation/ground_truth.csv` eintragen. Kein Retrieval und keine Embedding-Suche auf den Fragen, bevor der
-   Katalog eingefroren ist.
+   Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über
+   „Find more sections“ suchen und hinzufügen, auch in der API-Referenz und im Style Guide. Der Ausgangsabschnitt gehört
+   immer zur Annotation. Während des Schreibens markiert der Editor Wörter der Frage, die in den Überschriften
+   vorkommen; bei `paraphrase` müssen sie umformuliert werden, bei `detail` zeigt die Prüfung die Länge der Antwort.
+   „Save question“ schreibt `questions.csv` und `ground_truth.csv` und springt zum nächsten offenen Slot. Passt ein
+   Abschnitt nicht, „Skip this section“ mit einem der vier Gründe; der nächste Reserveabschnitt desselben Bereichs
+   übernimmt den Slot. Pilotfragen nicht übernehmen; die Prüfung meldet exakte Kopien (gleicher Wortlaut ohne
+   Satzzeichen und Groß-/Kleinschreibung), umformulierte erkennt sie nicht. Ohne Editor helfen
+   `catalogue.py sections`, `find` und `show` (Nachschlageliste, Suche, Abschnittstext).
 
-4. Nach jedem Block von Fragen prüfen:
+3. Nach jedem Block von 8 Fragen: Claude bitten, „Block N durchzusehen“. Claude liest nur Fragen, Annotation und
+   Korpustext und trägt Vorschläge als offene Zeilen in `catalogue_review.csv` ein; im Tab „Review“ jeden Vorschlag
+   annehmen oder mit Grund ablehnen. Ein angenommener fehlender Abschnitt wird der Annotation hinzugefügt; Formulierungen
+   und Fakten ändert man selbst im Tab „Write“.
+
+4. Jederzeit prüfen:
 
    ```bash
    uv run python src/catalogue.py check --draft
    ```
 
-   `ERROR` (Format, unbekannte Werte oder IDs) sofort beheben; `WARNING` (Quoten, Bereiche, Klassenregeln, Dubletten)
-   zeigt, was bis zum Ende noch fehlt. Bei `paraphrase` die gemeldeten Überschriftswörter umformulieren; bei `detail`
-   die angezeigte Abschnitts- und Antwortlänge prüfen.
+   `ERROR` (Format, unbekannte Werte oder IDs, veränderter Plan) sofort beheben; `WARNING` (Quoten, Bereiche,
+   Klassenregeln, Dubletten, offene Vorschläge) zeigt, was bis zum Ende fehlt. Kein Retrieval und keine
+   Embedding-Suche auf den Fragen, bevor der Katalog eingefroren ist.
 
-5. Wenn alle 48 Fragen fertig sind: streng prüfen und einfrieren, dann alle drei Dateien zusammen committen.
+5. Wenn alle 48 Fragen fertig und alle Vorschläge entschieden sind: streng prüfen, einfrieren und alle Katalogdateien
+   zusammen committen.
 
    ```bash
    uv run python src/catalogue.py check
    uv run python src/catalogue.py freeze
-   git add data/evaluation/questions.csv data/evaluation/ground_truth.csv data/evaluation/catalogue_freeze.json
+   git add data/evaluation/questions.csv data/evaluation/ground_truth.csv data/evaluation/catalogue_plan.csv \
+     data/evaluation/catalogue_review.csv data/evaluation/catalogue_freeze.json
    git commit -m "chore(data): Fragenkatalog eingefroren"
    ```
 
-   Danach läuft `src/retrieve.py` auf dem Katalog; vorher bricht es ab. Ein späteres Ändern einer der beiden Dateien
-   oder ein neu gebautes `sections.jsonl` bzw. `documents.jsonl` lässt `retrieve.py` wieder abbrechen; ein erneutes Einfrieren braucht ein neues ADR.
+   Danach läuft `src/retrieve.py` auf dem Katalog; vorher bricht es ab. Ein späteres Ändern einer der beiden
+   Katalogdateien oder ein neu gebautes `sections.jsonl` bzw. `documents.jsonl` lässt `retrieve.py` wieder abbrechen;
+   der Editor ist nach dem Einfrieren schreibgeschützt; ein erneutes Einfrieren braucht ein neues ADR.

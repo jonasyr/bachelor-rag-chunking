@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (14.10.2026; setzt [ADR 0017](0017-fragenkatalog.md) und [ADR 0027](0027-blinde-annotation.md) technisch um)
+Angenommen (14.10.2026; setzt [ADR 0017](0017-fragenkatalog.md) und [ADR 0027](0027-blinde-annotation.md) technisch um; erweitert um Plan und Durchsicht durch [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md))
 
 ## Kontext
 

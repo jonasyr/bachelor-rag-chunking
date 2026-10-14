@@ -21,7 +21,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | Umgebung | `python-dotenv` (`.env`) |
 | Datenanalyse | Pandas |
 | Diagramme | Matplotlib / Plotly |
-| App/Dashboard | Streamlit (`app/streamlit_app.py`) |
+| App/Dashboard | Streamlit (`app/catalogue_editor.py`, später `app/streamlit_app.py`) |
 | Evaluation | eigene Skripte + optional RAGAS |
 
 Pandas, Matplotlib/Plotly, Streamlit und RAGAS sind deklariert, werden aber erst in der Auswertung genutzt.
@@ -46,7 +46,8 @@ bachelor-rag-chunking/
 │   ├── chunking.py
 │   ├── embedding_client.py  canary.py  embed.py  run_log.py
 │   ├── vector_index.py  relevance.py  retrieve.py  freeze.py
-│   ├── catalogue.py                         (Fragenkatalog: Nachschlageliste, Suche, Prüfung, Einfrieren)
+│   ├── catalogue.py                         (Fragenkatalog: Plan, Nachschlageliste, Suche, Prüfung, Einfrieren)
+│   ├── catalogue_plan.py  catalogue_review.py  catalogue_store.py  atomic_csv.py
 │   └── generate.py  evaluate_retrieval.py  evaluate_answers.py
 ├── scripts/
 │   ├── difficulty_probe.py                  (Pilotproben)
@@ -60,12 +61,14 @@ bachelor-rag-chunking/
 ├── chroma_db/                               (Chroma-Index, entsteht beim ersten embed.py)
 ├── output/                                  (tables/*.tex, figures/*.pdf; entsteht mit der Auswertung)
 ├── notebooks/analysis.ipynb
-├── app/streamlit_app.py
+├── app/catalogue_editor.py                  (Editor des Fragenkatalogs, nur localhost)
+├── app/streamlit_app.py                     (spätere RAG-Demo)
+├── .streamlit/config.toml                   (Thema und localhost-Bindung des Editors)
 └── docs/
     ├── README.md                            (Index der Dokumentation)
     ├── plan.md                              (Zeitplan, Stand, offene Entscheidungen)
     ├── explanation/  how-to/  reference/    (Diátaxis; reference/configuration.md = config.py)
-    ├── adr/                                 (Entscheidungen 0001–0030)
+    ├── adr/                                 (Entscheidungen 0001–0031)
     ├── superpowers/specs/  superpowers/plans/   (datierte Entwürfe und Umsetzungspläne; Momentaufnahmen)
     ├── corpus_snapshot.txt                  (Snapshot-Datensatz)
     └── corpus_manifest.csv                  (Korpusmanifest)
@@ -82,7 +85,7 @@ Nach `.gitignore`:
 | `data/raw/vue_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
 | `chroma_db/` | ignoriert (ganzer Ordner, kein `.gitkeep`; entsteht beim ersten `embed.py`) |
 | `data/evaluation/retrieved_results.csv`, `generated_answers.csv`, `scores.csv`, `query_embeddings.npz` | ignoriert |
-| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_freeze.json` | versioniert |
+| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `catalogue_freeze.json` | versioniert |
 | `data/pilot/**/query_embeddings.npz` | ignoriert; alle übrigen Pilotdateien versioniert |
 | `*.pdf` | ignoriert, außer `output/figures/*.pdf` |
 | `docs/corpus_snapshot.txt`, `docs/corpus_manifest.csv` | versioniert |
@@ -98,7 +101,8 @@ Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. 
 | `snapshot.py`, `ingest.py`, `preprocess.py` | keine |
 | `chunking.py`, `embed.py` | `--strategy C1\|C2\|C3\|K1\|all` (Standard `all` = C1–C3, dann die Kontrolle K1; [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) |
 | `retrieve.py` | ohne Option alle Strategien C1–C3 ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)); `--control` nur die Kontrolle K1; bricht auf dem Hauptkatalog ohne passenden Freeze-Datensatz ab ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) |
-| `catalogue.py` | `sections` (Nachschlageliste schreiben), `find TERM` (wörtliche Suche, Groß-/Kleinschreibung egal, nur der innerste Abschnitt), `show SECTION_ID`, `check [--draft]` (Abdeckungsprüfung; `--draft` scheitert nur an Fehlern), `freeze` (strenge Prüfung, dann Freeze-Datensatz); [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
+| `catalogue.py` | `plan` (Stichprobenplan einmal ziehen, [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)), `sections` (Nachschlageliste schreiben), `find TERM` (wörtliche Suche, Groß-/Kleinschreibung egal, nur der innerste Abschnitt), `show SECTION_ID`, `check [--draft]` (Abdeckungsprüfung; `--draft` scheitert nur an Fehlern), `freeze` (strenge Prüfung, dann Freeze-Datensatz); [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
+| `app/catalogue_editor.py` | `uv run streamlit run app/catalogue_editor.py`; nur `localhost` (`.streamlit/config.toml`); schreibgeschützt nach dem Einfrieren ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)) |
 | `generate.py` (Gerüst) | `--strategy C1\|C2\|C3\|all` (nur das Experiment; K1 wird nicht generiert) |
 | `evaluate_retrieval.py` (Gerüst) | `--k` (Standard `config.TOP_K`) |
 | `evaluate_answers.py` (Gerüst) | `--mode scaffold\|summarise` (Pflicht) |
