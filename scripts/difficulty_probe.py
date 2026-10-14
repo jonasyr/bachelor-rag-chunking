@@ -16,6 +16,7 @@ import json
 import statistics
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
@@ -55,7 +56,7 @@ def length(chunk: dict) -> int:
 
 def main(pilot: Path) -> None:
     out, control_out = pilot / "retrieved_results.csv", pilot / "retrieved_results_control.csv"
-    common = {
+    common: dict[str, Any] = {  # Any: the keys are path parameters of retrieve()
         "questions_file": pilot / "questions.csv",
         "ground_truth_file": pilot / "ground_truth.csv",
         "query_file": pilot / "query_embeddings.npz",
