@@ -612,7 +612,6 @@ für technische Projektdokumentation
 Jonas Weirauch
 
 
-[entfernt]
 
 Betreuer/in: Prof. Klaus Quibeldey-Cirkel
 
