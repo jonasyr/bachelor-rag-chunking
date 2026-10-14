@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md) und [ADR 0016](0016-modell-neutralitaet.md))
+Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md) und [ADR 0016](0016-modell-neutralitaet.md)); Zahlen im Kontext: Korpus `b75d188` (13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md)
 
 ## Kontext
 

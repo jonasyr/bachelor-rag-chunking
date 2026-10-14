@@ -1,7 +1,8 @@
 """Ingest Vue.js snapshot.
 
-Reads guide/**/*.md from data/raw/vue_docs_snapshot/ sorted by path, assigns D001, D002, ...
-in that order and writes data/processed/documents.jsonl with the raw text.
+Reads <area>/**/*.md for every area in config.VUE_DOCS_AREAS from data/raw/vue_docs_snapshot/,
+sorted by path, assigns D001, D002, ... in that order and writes data/processed/documents.jsonl
+with the raw text.
 
 Output schema: {"doc_id", "path", "title", "text", "tokens"}
 """
@@ -11,8 +12,8 @@ import re
 from pathlib import Path
 
 import tokens
-from config import DATA_RAW, DOCUMENTS_FILE, SNAPSHOT_SUBDIR
-from preprocess import closes_fence, fence_marker
+from config import DATA_RAW, DOCUMENTS_FILE, VUE_DOCS_AREAS
+from preprocess import closes_fence, fence_marker, heading_title
 
 H1_RE = re.compile(r"^#\s+(.*?)(?:\s*\{#[^}]+\})?\s*$")
 
@@ -27,20 +28,25 @@ def title_of(text: str) -> str:
         elif (marker := fence_marker(line)) is not None:
             fence = marker
         elif m := H1_RE.match(line):
-            return m.group(1)
+            return heading_title(m.group(1))
     raise ValueError("no H1 found")
 
 
-def ingest(snapshot_dir: Path = DATA_RAW, out_file: Path = DOCUMENTS_FILE) -> int:
-    """Load all guide Markdown files, count tokens, write documents.jsonl; return the count."""
-    files = sorted(
-        snapshot_dir.glob(f"{SNAPSHOT_SUBDIR}/**/*.md"),
-        key=lambda p: p.relative_to(snapshot_dir).as_posix(),
-    )
-    if not files:
-        raise FileNotFoundError(
-            f"no Markdown files under {snapshot_dir / SNAPSHOT_SUBDIR}; run src/snapshot.py first"
-        )
+def ingest(
+    snapshot_dir: Path = DATA_RAW,
+    out_file: Path = DOCUMENTS_FILE,
+    areas: tuple[str, ...] = VUE_DOCS_AREAS,
+) -> int:
+    """Load the Markdown files of all areas, count tokens, write documents.jsonl; return count."""
+    files: list[Path] = []
+    for area in areas:
+        found = list((snapshot_dir / area).glob("**/*.md"))
+        if not found:
+            raise FileNotFoundError(
+                f"no Markdown files under {snapshot_dir / area}; run src/snapshot.py first"
+            )
+        files += found
+    files.sort(key=lambda p: p.relative_to(snapshot_dir).as_posix())
     out_file.parent.mkdir(parents=True, exist_ok=True)
     with out_file.open("w", encoding="utf-8") as f:
         for i, path in enumerate(files, start=1):

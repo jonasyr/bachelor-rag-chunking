@@ -207,3 +207,44 @@ def test_fence_needs_at_most_three_spaces_of_indentation():
     assert fence_marker("   ```js") == "```"
     assert fence_marker("    ```js") is None
     assert fence_marker("```js `x`") is None
+
+
+def test_escaped_angle_brackets_are_text_not_html():
+    result = clean_markdown(
+        "# \\<script setup> {#script-setup}\n\n## PropType\\<T> {#proptype-t}\n\nUse `a\\<b`.\n"
+    )
+    assert result.text == "# \\<script setup>\n\n## PropType\\<T>\n\nUse `a\\<b`.\n"
+    assert [h.title for h in result.headings] == ["<script setup>", "PropType<T>"]
+
+
+def test_real_html_next_to_an_escape_still_raises():
+    with pytest.raises(ValueError, match="unhandled inline HTML"):
+        clean("Keep \\<this> but <em>not</em> this.\n")
+
+
+def test_inline_line_break_becomes_a_space():
+    result = clean_markdown("# Composition API: <br>Dependency Injection {#di}\n\nA<br/>B\n")
+    assert result.text == "# Composition API: Dependency Injection\n\nA B\n"
+    assert result.headings[0].title == "Composition API: Dependency Injection"
+
+
+def test_v_pre_span_around_inline_code_with_tags():
+    body = "(ie. <span v-pre>`<span>Keep {{x}}</span>`</span>).\n"
+    assert clean(body) == "# Title\n\n(ie. `<span>Keep {{x}}</span>`).\n"
+
+
+def test_escaped_backslash_before_a_real_tag_still_raises():
+    with pytest.raises(ValueError, match="unhandled inline HTML"):
+        clean('x \\\\<img src="a"> y\n')  # `\\` is a literal backslash, then a real tag
+
+
+def test_heading_indented_up_to_three_spaces_is_a_section():
+    result = clean_markdown(
+        "# T {#t}\n\n- Item\n\n  ### Function Signature {#function-signature}\n\n  Text\n"
+    )
+    assert result.text == "# T\n\n- Item\n\n### Function Signature\n\n  Text\n"
+    assert [(h.level, h.anchor) for h in result.headings] == [(1, "t"), (3, "function-signature")]
+
+
+def test_four_spaces_are_not_a_heading():
+    assert clean("    ### not a heading\n") == "# Title\n\n    ### not a heading\n"

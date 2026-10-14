@@ -1,0 +1,9 @@
+question_id,expected_answer,relevant_doc_ids,relevant_section_ids
+P01,"Use the built-in <Teleport> component; its `to` prop names the target, e.g. to=""body"".",D029,D029#basic-usage
+P02,"With the defineProps() macro, which needs no import; it takes an array of prop names or an object with types.",D035,D035#props-declaration
+P03,A function that uses the Composition API to encapsulate and reuse stateful logic between components.,D063,D063#what-is-a-composable
+P04,Computed properties are cached and only re-evaluate when their reactive dependencies change; a method runs on every re-render.,D043,D043#computed-caching-vs-methods
+P05,"Props are read-only (one-way data flow): use a local ref initialised from the prop or a computed property, or emit an event so the parent changes it.",D035,D035#one-way-data-flow
+P06,"Watching a reactive object directly creates a deep watcher; for a getter, pass the { deep: true } option.",D052,D052#deep-watchers
+P07,Prop drilling: passing props through many component layers; an ancestor provides data that any descendant can inject.,D036,D036#prop-drilling
+P08,"Templates are compiled to JavaScript, so user-provided templates allow arbitrary code execution and XSS.",D026,D026#rule-no-1-never-use-non-trusted-templates

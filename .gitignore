@@ -35,7 +35,9 @@ chroma_db/
 
 # Generated / binary docs
 *.pdf
+!output/figures/*.pdf
 
 
 # OS
 .DS_Store
+data/pilot/**/query_embeddings.npz

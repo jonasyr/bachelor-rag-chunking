@@ -4,7 +4,7 @@
 --mode summarise Read completed scores.csv and print summary statistics.
 
 Rubric criteria: correctness, completeness, groundedness, no_hallucination, clarity
-Output schema (§10 Ground Truth): question_id, strategy, correctness, completeness,
+Output schema (docs/reference/data-formats.md): question_id, strategy, correctness, completeness,
                                    groundedness, no_hallucination, clarity, total_score
 """
 

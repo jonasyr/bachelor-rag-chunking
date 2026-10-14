@@ -5,113 +5,55 @@
 Bachelor's thesis — B.Sc. Informatik, IU Internationale Hochschule.  
 Author: Jonas Weirauch · Supervisor: Prof. Klaus Quibeldey-Cirkel · Deadline: 24.12.2026
 
----
+Status: [`docs/plan.md`](docs/plan.md#stand). Documentation index: [`docs/README.md`](docs/README.md).
 
 ## Overview
 
-Controlled comparison of three chunking strategies on the Vue.js documentation corpus.
-Only the chunking strategy varies; all other pipeline components are held constant.
+Controlled comparison of chunking strategies in a RAG pipeline on the Vue.js documentation. Only the chunking strategy
+varies; every other component is held constant ([ADR 0006](docs/adr/0006-nur-chunking-variiert.md)).
 
-| Strategy | Description | Params |
-|----------|-------------|--------|
-| C1 | Fixed-size, no overlap | 500 tokens, overlap 0 |
-| C2 | Fixed-size, with overlap (strong baseline) | 500 tokens, overlap 100 |
-| C3 | Structure-based (Markdown H2/H3) | max 800 tokens per section |
+| Strategy | Description |
+|----------|-------------|
+| C1 | Fixed-size windows, no overlap |
+| C2 | Fixed-size windows with overlap (strong baseline) |
+| C3 | Structure-based: sections between H1–H3 headings, 50–800 tokens per chunk |
 
----
+Decisions: [ADR 0005](docs/adr/0005-drei-chunking-strategien.md), [ADR 0021](docs/adr/0021-c3-grenzen.md); parameter
+values: [`docs/reference/configuration.md`](docs/reference/configuration.md) (set only in `src/config.py`). K1 is a
+size-matched control for C3, used in retrieval only ([ADR 0026](docs/adr/0026-c3-vergleichbarkeit.md)).
 
-## Setup
+## Install
 
 ```bash
-uv sync                  # installs all dependencies + dev group into .venv
-cp .env.example .env
-# Add your OPENAI_API_KEY to .env
-source .venv/bin/activate
-uv tool install pre-commit && pre-commit install   # ruff and checks before each commit
+uv sync                  # dependencies + dev group into .venv
+cp .env.example .env     # then add your OPENAI_API_KEY
 ```
 
-`snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py` and `retrieve.py` are implemented and tested (`uv run pytest`); the later steps are still stubs. Tooling, CI and the link to the thesis repo:
-[`docs/README.md`](docs/README.md).
+Full setup (pre-commit, check): [`docs/how-to/set-up.md`](docs/how-to/set-up.md).
 
 ## Pipeline (run in order)
 
-```bash
-# 1. Fetch the pinned Vue.js snapshot (ADR 0019; docs/how-to/create-corpus-snapshot.md)
-python src/snapshot.py
-
-# 2. Ingest
-python src/ingest.py
-
-# 3. Preprocess
-python src/preprocess.py
-
-# 4. Chunk (all three strategies)
-python src/chunking.py
-
-# 5. Embed + build Chroma indices
-python src/embed.py
-
-# 6. Retrieve
-python src/retrieve.py
-
-# 7. Generate answers
-python src/generate.py
-
-# 8a. Retrieval evaluation
-python src/evaluate_retrieval.py
-
-# 8b. Answer evaluation — scaffold score sheet, fill manually, then summarise
-python src/evaluate_answers.py --mode scaffold
-# open data/evaluation/scores.csv, fill in rubric scores (0–2)
-python src/evaluate_answers.py --mode summarise
-```
-
-## Minimal prototype (run this first)
+Run from the repository root; options of every script: [`docs/reference/tooling.md`](docs/reference/tooling.md).
+Procedure and checks before an evaluation run: [`docs/how-to/run-the-experiment.md`](docs/how-to/run-the-experiment.md).
 
 ```bash
-python src/snapshot.py && python src/ingest.py && python src/preprocess.py && python src/chunking.py
-python src/embed.py
-python src/retrieve.py   # always all strategies (ADR 0024)
-python src/generate.py --strategy C1
+uv run python src/snapshot.py      # 1. fetch the pinned Vue.js snapshot (docs/how-to/create-corpus-snapshot.md)
+uv run python src/ingest.py        # 2. ingest
+uv run python src/preprocess.py    # 3. clean, extract sections
+uv run python src/chunking.py      # 4. chunk C1–C3 and the control K1
+uv run python src/embed.py         # 5. embed, build Chroma indices
+uv run python src/retrieve.py      # 6. retrieve (all strategies), then the control:
+uv run python src/retrieve.py --control
+uv run python src/generate.py      # 7. generate answers            (stub)
+uv run python src/evaluate_retrieval.py                          # 8a. (stub)
+uv run python src/evaluate_answers.py --mode scaffold            # 8b. score sheet, fill by hand (stub)
+uv run python src/evaluate_answers.py --mode summarise
 ```
 
-## Interactive demo
+Analysis notebook (skeleton, runs after the pipeline): `notebooks/analysis.ipynb`. The Streamlit demo
+(`app/streamlit_app.py`) is a placeholder and not implemented.
 
-```bash
-streamlit run app/streamlit_app.py
-```
-
-## Analysis
-
-```bash
-jupyter notebook notebooks/analysis.ipynb
-```
-
----
-
-## Repository structure
-
-```
-├── tests/            pytest suite (uv run pytest)
-├── src/              Pipeline scripts (snapshot → ingest → preprocess → chunking → embed → retrieve → generate → evaluate)
-├── data/raw/         Vue.js snapshot (not committed)
-├── data/processed/   Intermediate artefacts — documents.jsonl, sections.jsonl, chunks_*.jsonl (not committed)
-├── data/evaluation/  questions.csv, ground_truth.csv, scores.csv
-├── docs/             Documentation index (docs/README.md), master reference, ADRs, methodology, prompts
-├── notebooks/        Analysis and visualisation
-├── app/              Streamlit demo
-└── chroma_db/        Persistent vector store (not committed)
-```
-
-## Key constraints (never change without updating methodology)
-
-- `temperature = 0` — all LLM calls
-- `top_k = 5` — retrieval, constant across strategies
-- All parameters live in `src/config.py`
-- Ground truth must be finalised **before** running evaluation
-- Every intermediate artefact is saved to disk
-
-Details and reasons: [`docs/README.md`](docs/README.md) (master reference, decisions in `docs/adr/`).
+Repository layout: [`docs/reference/tooling.md`](docs/reference/tooling.md).
 
 ## License
 
@@ -122,4 +64,4 @@ Details and reasons: [`docs/README.md`](docs/README.md) (master reference, decis
   contributors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It is downloaded at run time
   (`src/snapshot.py`, commit in `src/config.py`) and not redistributed here; derived artefacts such as
   `docs/corpus_manifest.csv` refer to it. It is modified before use; the cleaning steps are listed in
-  [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0020).
+  [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0020; scope: ADR 0025).

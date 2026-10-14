@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (13.10.2026; konkretisiert [ADR 0005](0005-drei-chunking-strategien.md))
+Angenommen (13.10.2026; konkretisiert [ADR 0005](0005-drei-chunking-strategien.md)); ergänzt durch [ADR 0026](0026-c3-vergleichbarkeit.md) (Größenkontrolle K1); Begründung der Obergrenze 800: [ADR 0026](0026-c3-vergleichbarkeit.md), Kontext. Zahlen in Kontext und Konsequenzen: Korpus `b75d188` (13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md)
 
 ## Kontext
 

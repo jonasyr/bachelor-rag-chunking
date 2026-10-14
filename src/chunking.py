@@ -5,6 +5,7 @@ Reads documents.jsonl (and sections.jsonl for C3), writes chunks_c1/c2/c3.jsonl.
 C1: fixed-size 500 tokens, overlap 0       (config.C1_CHUNK_SIZE / C1_OVERLAP)
 C2: fixed-size 500 tokens, overlap 100     (config.C2_CHUNK_SIZE / C2_OVERLAP)
 C3: structure-based H1-H3, 50-800 tokens   (config.C3_MIN_TOKENS / C3_MAX_TOKENS, ADR 0021)
+K1: control, fixed-size = rounded mean C3 length, overlap 0 (config.K1_CHUNK_SIZE, ADR 0026)
 
 Spans are [start_token, end_token) in the token space of src/tokens.py (the same as
 sections.jsonl); every chunk's text is the exact slice of its document for its span.
@@ -13,6 +14,7 @@ Chunk schema: {"chunk_id", "doc_id", "strategy", "text", "start_token", "end_tok
 """
 
 import json
+import math
 import statistics
 from pathlib import Path
 
@@ -25,7 +27,11 @@ from config import (
     C3_MAX_TOKENS,
     C3_MIN_TOKENS,
     CHUNK_FILES,
+    CONTROL_CHUNK_FILES,
+    CONTROL_STRATEGIES,
     DOCUMENTS_FILE,
+    K1_CHUNK_SIZE,
+    K1_OVERLAP,
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
@@ -33,8 +39,14 @@ from preprocess import closes_fence, fence_marker
 
 Span = tuple[int, int]
 
-FIXED_WINDOWS = {"C1": (C1_CHUNK_SIZE, C1_OVERLAP), "C2": (C2_CHUNK_SIZE, C2_OVERLAP)}
-MAX_LENGTH = {"C1": C1_CHUNK_SIZE, "C2": C2_CHUNK_SIZE, "C3": C3_MAX_TOKENS}
+ALL_STRATEGIES = {**STRATEGY_IDS, **CONTROL_STRATEGIES}  # experiment + control (D26)
+ALL_CHUNK_FILES = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
+FIXED_WINDOWS = {
+    "C1": (C1_CHUNK_SIZE, C1_OVERLAP),
+    "C2": (C2_CHUNK_SIZE, C2_OVERLAP),
+    "K1": (K1_CHUNK_SIZE, K1_OVERLAP),
+}
+MAX_LENGTH = {"C1": C1_CHUNK_SIZE, "C2": C2_CHUNK_SIZE, "C3": C3_MAX_TOKENS, "K1": K1_CHUNK_SIZE}
 
 
 def fixed_size_spans(n_tokens: int, size: int, overlap: int) -> list[Span]:
@@ -123,6 +135,28 @@ def structure_spans(
     return spans
 
 
+def rounded_mean(values: list[int]) -> int:
+    """Mean rounded half up (the K1 size rule, D26)."""
+    return math.floor(statistics.mean(values) + 0.5)
+
+
+def _spans(key: str, doc: dict, doc_sections: list[dict]) -> list[Span]:
+    """Spans of one document for strategy key."""
+    n = doc["tokens"]
+    if key in FIXED_WINDOWS:
+        return fixed_size_spans(n, *FIXED_WINDOWS[key])
+    heads = [s["start_token"] for s in doc_sections]
+    if min(heads) != 0:
+        raise ValueError(f"{doc['doc_id']}: the first section does not start at token 0")
+    breaks = paragraph_breaks(doc["text"], tokens.token_starts(doc["text"]), 0, n)
+    return structure_spans(n, heads, breaks, C3_MAX_TOKENS, C3_MIN_TOKENS)
+
+
+def control_size(docs: list[dict], sections: dict[str, list[dict]]) -> int:
+    """K1 window size by rule: rounded mean length of the C3 chunks of these documents."""
+    return rounded_mean([b - a for d in docs for a, b in _spans("C3", d, sections[d["doc_id"]])])
+
+
 def make_chunks(doc: dict, spans: list[Span], key: str) -> list[dict]:
     """Chunk records for one document; text is the exact character slice of each span."""
     text = doc["text"]
@@ -135,7 +169,7 @@ def make_chunks(doc: dict, spans: list[Span], key: str) -> list[dict]:
         {
             "chunk_id": f"{key}_{doc['doc_id']}_{i:04d}",
             "doc_id": doc["doc_id"],
-            "strategy": STRATEGY_IDS[key],
+            "strategy": ALL_STRATEGIES[key],
             "text": text[char(a) : char(b)],
             "start_token": a,
             "end_token": b,
@@ -224,24 +258,23 @@ def chunk(
     sections_file: Path = SECTIONS_FILE,
     out_file: Path | None = None,
 ) -> int:
-    """Produce the chunk file for strategy_key ('C1', 'C2' or 'C3'); return the chunk count."""
-    if strategy_key not in STRATEGY_IDS:
+    """Produce the chunk file for strategy_key (C1-C3 or the control K1); return the count."""
+    if strategy_key not in ALL_STRATEGIES:
         raise ValueError(f"unknown strategy {strategy_key!r}")
-    out_file = out_file or CHUNK_FILES[strategy_key]
+    out_file = out_file or ALL_CHUNK_FILES[strategy_key]
     docs = _read_jsonl(docs_file, "run src/preprocess.py first")
     sections = _sections_by_doc(docs, sections_file)
+    if strategy_key in CONTROL_STRATEGIES:
+        measured = control_size(docs, sections)
+        if measured != K1_CHUNK_SIZE:
+            raise ValueError(
+                f"K1_CHUNK_SIZE is {K1_CHUNK_SIZE}, the C3 chunks have a rounded mean of "
+                f"{measured} tokens; set config.K1_CHUNK_SIZE = {measured}"
+            )
 
     chunks: list[dict] = []
     for doc in docs:
-        n = doc["tokens"]
-        if strategy_key in FIXED_WINDOWS:
-            spans = fixed_size_spans(n, *FIXED_WINDOWS[strategy_key])
-        else:
-            heads = [s["start_token"] for s in sections[doc["doc_id"]]]
-            if min(heads) != 0:
-                raise ValueError(f"{doc['doc_id']}: the first section does not start at token 0")
-            breaks = paragraph_breaks(doc["text"], tokens.token_starts(doc["text"]), 0, n)
-            spans = structure_spans(n, heads, breaks, C3_MAX_TOKENS, C3_MIN_TOKENS)
+        spans = _spans(strategy_key, doc, sections[doc["doc_id"]])
         doc_chunks = make_chunks(doc, spans, strategy_key)
         check_chunks(doc, doc_chunks, strategy_key)
         chunks.extend(doc_chunks)
@@ -255,7 +288,7 @@ def chunk(
 
 def summary(strategy_key: str, out_file: Path | None = None) -> str:
     """One line with chunk count and span lengths of a written chunk file."""
-    out_file = out_file or CHUNK_FILES[strategy_key]
+    out_file = out_file or ALL_CHUNK_FILES[strategy_key]
     lengths = [c["end_token"] - c["start_token"] for c in _read_jsonl(out_file, "run chunking")]
     if not lengths:
         return f"{strategy_key}: 0 chunks -> {out_file.name}"
@@ -268,10 +301,10 @@ def summary(strategy_key: str, out_file: Path | None = None) -> str:
 if __name__ == "__main__":
     import argparse
 
-    p = argparse.ArgumentParser(description="Chunk documents.jsonl with C1, C2 and/or C3.")
-    p.add_argument("--strategy", choices=[*STRATEGY_IDS, "all"], default="all")
+    p = argparse.ArgumentParser(description="Chunk documents.jsonl with C1-C3 and the control K1.")
+    p.add_argument("--strategy", choices=[*ALL_STRATEGIES, "all"], default="all")
     args = p.parse_args()
-    keys = list(STRATEGY_IDS) if args.strategy == "all" else [args.strategy]
+    keys = list(ALL_STRATEGIES) if args.strategy == "all" else [args.strategy]
     for k in keys:
         chunk(k)
         print(summary(k))

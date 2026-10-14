@@ -1,0 +1,9 @@
+question_id,question,type,difficulty,notes
+P01,"Which built-in component lets a component render part of its template somewhere else in the DOM, for example directly under the body element?",factual,easy,pilot
+P02,How does a component declare which props it accepts when it uses <script setup>?,procedural,easy,pilot
+P03,What is a composable in Vue and what is it used for?,conceptual,easy,pilot
+P04,Why should you prefer a computed property over calling a method in the template?,comparative,medium,pilot
+P05,What should a child component do if it needs to change a value it received as a prop?,limitation,medium,pilot
+P06,How can a watcher react to changes in nested properties of an object?,procedural,medium,pilot
+P07,Which problem do provide and inject solve?,conceptual,medium,pilot
+P08,Why must you never use user-provided content as a component template?,limitation,hard,pilot

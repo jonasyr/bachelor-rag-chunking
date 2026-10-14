@@ -31,3 +31,24 @@ def test_is_relevant_thresholds():
     assert not is_relevant(c, [SECTION], 100)
     assert is_relevant(c, [chunk("D009", 0, 10), SECTION], 1)
     assert not is_relevant(c, [], 1)
+
+
+def test_short_chunk_fully_inside_meets_the_sensitivity_threshold():
+    assert is_relevant(chunk("D001", 120, 180), [SECTION], 100)  # 60 tokens, all inside
+
+
+def test_long_chunk_needs_the_full_threshold():
+    assert not is_relevant(chunk("D001", 160, 660), [SECTION], 100)  # 500 tokens, 40 overlap
+
+
+def test_short_chunk_partly_outside_does_not_count():
+    assert not is_relevant(chunk("D001", 170, 230), [SECTION], 100)  # 60 tokens, 30 overlap
+
+
+def test_short_chunk_of_another_document_never_counts():
+    assert not is_relevant(chunk("D002", 120, 180), [SECTION], 100)
+
+
+def test_main_rule_unchanged_for_short_chunks():
+    assert is_relevant(chunk("D001", 199, 230), [SECTION], 1)  # one shared token
+    assert not is_relevant(chunk("D001", 200, 230), [SECTION], 1)  # touching only

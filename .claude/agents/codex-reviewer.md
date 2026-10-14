@@ -119,6 +119,8 @@ OUTPUT FORMAT:
 - Run only read-only commands: `git diff`, `log`, `show`, `status`, `rev-parse`, `merge-base`, `ls-files`; reading and
   searching files; and
   `PYTHONDONTWRITEBYTECODE=1 uv run --frozen --offline --no-sync pytest -p no:cacheprovider <files>`. Never run any
-  script under `src/`: they rewrite `data/` and `docs/corpus_manifest.csv`, download the corpus or call the OpenAI API.
+  script under `src/` or `scripts/`: they rewrite `data/` and `docs/corpus_manifest.csv` (`src/snapshot.py` also
+  `docs/corpus_snapshot.txt` and `data/raw/`), download the corpus or call the OpenAI API;
+  `scripts/difficulty_probe.py` runs retrieval and writes `data/pilot/`, `scripts/remap_pilot.py` rewrites ground truth.
   Never edit files, and never change the working tree, the index or refs (no checkout, stash, reset, fetch or commit).
 - Output exactly the JSON the rubric specifies, nothing else.

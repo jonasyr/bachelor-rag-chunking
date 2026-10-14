@@ -1,0 +1,17 @@
+question_id,expected_answer,relevant_doc_ids,relevant_section_ids
+H01,Use the defineModel() macro in the child (Vue 3.4+); the compiler expands it to a modelValue prop and an update:modelValue event that is emitted when the local ref is mutated.,D039,D039#basic-usage;D039#under-the-hood
+H02,"No: computed getters must be free of side effects such as async requests; use a watcher (watch), which runs a callback with side effects when reactive state changes.",D043;D052,D043#getters-should-be-side-effect-free;D052#basic-example
+H03,"Use the v-html directive, since mustaches render plain text; rendering untrusted HTML enables XSS, so only use v-html on content known to be safe.",D051;D026,D051#raw-html;D026#html-injection
+H04,"Yes: export a reactive() object from a module and import it in each component; with SSR this singleton store is shared across requests, which causes cross-request state pollution.",D069;D068,D069#simple-state-management-with-reactivity-api;D069#ssr-considerations;D068#cross-request-state-pollution
+H05,"defineAsyncComponent accepts a loadingComponent option, but async components are suspensible: inside <Suspense> their own loading, error, delay and timeout options are ignored and the Suspense #fallback slot is shown, unless suspensible: false is set.",D032;D028,D032#loading-and-error-states;D028#async-components;D028#loading-state
+H06,Reactive props destructure is supported from Vue 3.5 on.,D035,D035#reactive-props-destructure
+H07,Pass the option { once: true } (Vue 3.4+).,D052,D052#once-watchers
+H08,"Name composables in camelCase starting with ""use"", e.g. useMouse.",D063,D063#naming
+H09,"Use defineEmits with a runtime declaration or a type declaration, e.g. defineEmits<{ (e: 'change', id: number): void }>() or the named tuple syntax.",D072,D072#typing-component-emits
+H10,Pass flush: 'post' to watch or watchEffect (or use watchPostEffect) so the callback runs after Vue has updated the DOM; alternatively await nextTick() inside the callback.,D052;D049,D052#post-watchers;D049#dom-update-timing
+H11,Add the .lazy modifier: v-model.lazy syncs on the change event instead of input.,D046,D046#lazy
+H12,"Give inject() a default value as its second argument, so the injection works without a provider.",D036,D036#injection-default-values
+H13,By default v-for patches elements in place and keeps DOM/child state per position; give each item a unique key so Vue can track and reorder the elements.,D048,D048#maintaining-state-with-key
+H14,Use the v-once directive; the whole sub-tree is skipped on all future updates.,D024,D024#v-once
+H15,Register an onMounted() hook in setup; it runs after the initial render once the DOM nodes are created.,D047,D047#registering-lifecycle-hooks
+H16,"Destructuring a primitive property from a reactive() object (or assigning it to a local variable) disconnects it from reactivity tracking, which works over property access; keep the object or use refs.",D049;D055,D049#limitations-of-reactive;D055#how-reactivity-works-in-vue
