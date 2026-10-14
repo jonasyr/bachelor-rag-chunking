@@ -1,6 +1,6 @@
 # Prompt-Vorlagen
 
-> Seitentyp: Nachschlagen (reference). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026; die Vorlagen werden mit `generate.py` umgesetzt. Übersicht: [Dokumentation](../README.md).
 
 Die Prompts sind für alle Chunking-Strategien gleich ([ADR 0006](../adr/0006-nur-chunking-variiert.md)); jede Änderung
 macht die Läufe der Strategien unvergleichbar. Die Vorlagen sind Englisch, weil Korpus und Fragen Englisch sind.
@@ -32,11 +32,8 @@ Answer:
 `{context}` ist die Verkettung der top-k gefundenen Chunks, getrennt durch eine Zeile `---`; jeder Chunk beginnt mit
 `[Excerpt N]`.
 
-## Parameter (konstant, aus `src/config.py`)
+## Parameter
 
-| Parameter | Wert |
-|---|---|
-| `LLM_MODEL` | Platzhalter in `config.py`, wird bei der Implementierung festgelegt ([ADR 0016](../adr/0016-modell-neutralitaet.md)) |
-| `LLM_TEMPERATURE` | 0.0 |
-| `LLM_MAX_TOKENS` | 1024 |
-| `TOP_K` | 5 |
+Konstant für alle Strategien: `LLM_MODEL` (noch Platzhalter, [ADR 0016](../adr/0016-modell-neutralitaet.md)),
+`LLM_TEMPERATURE` und `TOP_K` ([ADR 0014](../adr/0014-temperatur-und-topk.md)), `LLM_MAX_TOKENS`. Werte:
+[Konfiguration](configuration.md#llm-und-embedding).

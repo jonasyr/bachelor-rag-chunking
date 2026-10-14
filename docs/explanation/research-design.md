@@ -1,105 +1,161 @@
 # Forschungsdesign
 
-> Seitentyp: Hintergrund (explanation). Stand: aus dem Projektleitfaden (Juni 2026, aktualisiert 13.10.2026). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Hintergrund (explanation). Übersicht: [Dokumentation](../README.md).
 
-## Rangfolge bei Widersprüchen
+Diese Seite erklärt, was die Arbeit untersucht und warum sie so angelegt ist. Sie legt nichts fest.
 
-Diese Seite erklärt, was die Arbeit untersucht und warum sie so angelegt ist. Verbindliche Entscheidungen stehen
-einzeln in den [ADRs](../adr/README.md), Formate und Definitionen unter [Nachschlagen](../README.md), der Zeitplan
-und offene Punkte im [Plan](../plan.md).
+**Was gilt bei Widersprüchen:** Die [ADRs](../adr/README.md) sind verbindlich; danach gelten die Seiten unter
+[Nachschlagen](../README.md#nachschlagen-reference). Das Exposé legt nur Forschungsfrage und Vorgehen fest. Frühere
+Grundsatzentscheidungen gegenüber der ursprünglichen Projekt-Baseline (Korpus, Hypothesen, Triangulation, Kosten,
+Zeitplan) stehen mit ihrer Begründung in den ADRs. Zeitplan und Projektstand: [Plan](../plan.md).
 
-**Prioritätsregel bei Widersprüchen:**
+## Forschungsfrage
 
-1. Finales Exposé und spätere Präzisierungen im Chat (höchste Priorität)
-2. Konkret bestätigte Entscheidungen aus dem Chatverlauf
-3. Ursprüngliche Projekt-Baseline
-4. Allgemeine Best Practices
+Thema der Arbeit: **Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
+Retrieval-Augmented-Generation-Systems für technische Projektdokumentation**
 
-Wo die ursprüngliche Baseline und das Exposé sich unterscheiden, gilt das Exposé. Die wichtigsten Abweichungen sind im Abschnitt „Was sich gegenüber der ursprünglichen Baseline geändert hat“ unten aufgeführt.
+Forschungsfrage, wörtlich aus dem Exposé:
 
+> *Wie beeinflussen unterschiedliche Chunking-Strategien die Retrieval- und Antwortqualität eines
+> Retrieval-Augmented-Generation-Systems bei der Beantwortung projektspezifischer Fragen auf Basis technischer
+> Open-Source-Dokumentation?*
 
-## Finale Projektdefinition (verbindlich)
+Das Exposé ist final und bei der IU angemeldet. Das Original (LaTeX) liegt im privaten Repo PaperLab, nicht in
+diesem Repo. Es legt nur die Forschungsfrage und das Vorgehen fest (experimenteller Vergleich, nur die Segmentierung
+variiert); alle konkreten Festlegungen stehen in den ADRs.
 
-### Titel
-**Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines Retrieval-Augmented-Generation-Systems für technische Projektdokumentation**
+### Unterfragen (Arbeitsfragen)
 
-### Hauptforschungsfrage
-**Wie beeinflussen unterschiedliche Chunking-Strategien die Retrieval- und Antwortqualität eines Retrieval-Augmented-Generation-Systems bei der Beantwortung projektspezifischer Fragen auf Basis technischer Open-Source-Dokumentation?**
+Die Unterfragen stammen aus dem Projektleitfaden (Juni 2026, in der Git-Historie), nicht aus dem angemeldeten Exposé.
+Sie gliedern die Auswertung, sind aber keine angemeldeten Forschungsfragen.
 
-### Unterfragen
-1. Welche Chunking-Strategien eignen sich für die Aufbereitung technischer Projektdokumentation im Kontext eines RAG-Systems?
-2. Wie unterscheiden sich die Strategien hinsichtlich der Retrieval-Qualität (Recall@k, Precision@k, MRR)?
-3. Wie wirken sie sich auf die Antwortqualität aus (Korrektheit, Vollständigkeit, Quellenbezug, Halluzinationsfreiheit)?
-4. Welche Trade-offs ergeben sich zwischen Chunk-Größe, Kontextabdeckung, Redundanz, Retrieval-Präzision, Kosten und Antwortqualität?
+1. Welche Chunking-Strategien eignen sich für die Aufbereitung technischer Projektdokumentation im Kontext eines
+   RAG-Systems?
+2. Wie unterscheiden sich die Strategien hinsichtlich der Retrieval-Qualität (Recall@k, Precision@k, MRR; dazu Hit@k,
+   [ADR 0012](../adr/0012-retrieval-metriken.md))?
+3. Wie wirken sie sich auf die Antwortqualität aus (Korrektheit, Vollständigkeit, Quellenbezug,
+   Halluzinationsfreiheit, Verständlichkeit; die fünf Kriterien der Rubrik, [ADR 0013](../adr/0013-antwort-rubrik.md))?
+4. Welche Trade-offs ergeben sich zwischen Chunk-Größe, Kontextabdeckung, Redundanz, Retrieval-Präzision, Kosten und
+   Antwortqualität?
 5. Welche Empfehlungen lassen sich für die Gestaltung von RAG-Systemen auf technischer Dokumentation ableiten?
 
-### Ziel in einem Satz
-Konzeption, Implementierung und Evaluation einer RAG-Pipeline für technische Open-Source-Dokumentation, bei der ausschließlich die Chunking-Strategie variiert wird, um deren Einfluss auf Retrieval- und Antwortqualität isoliert zu bestimmen und daraus praktische Empfehlungen abzuleiten.
+### Abgrenzung des Umfangs
 
-### Dozenten-taugliche Kurzbeschreibung
-Die Arbeit vergleicht drei Chunking-Strategien für ein RAG-System auf Basis der Vue.js-Dokumentation. Dazu wird ein Dokumentationssnapshot fixiert, ein Fragenkatalog mit Referenzantworten und relevanten Quellen kuratiert und eine RAG-Pipeline mit konstantem Modell-, Embedding- und Retrieval-Setup implementiert. Bewertet werden Retrieval-Qualität (Recall@k, Precision@k, MRR) und Antwortqualität (referenzbasierte Rubrik), ergänzt um eine automatisierte Sekundärbewertung und eine Effizienzbetrachtung.
-
-
-## Was sich gegenüber der ursprünglichen Baseline geändert hat
-
-Dieser Abschnitt ist bewusst explizit, damit keine veralteten Baseline-Punkte versehentlich übernommen werden.
-
-### Geändert / ersetzt
-- **Korpus FastAPI → Vue.js.** Grund: Abgrenzung. Ein Praktiker-Blogbeitrag (Mai 2026) hat ein nahezu identisches Setup (FastAPI/Supabase/Stripe, eingefrorenes QA-Set, eine Variable pro Experiment, RAGAS, überschriftenbasiertes Chunking) bereits umgesetzt. Vue.js grenzt Korpus und Domäne klar ab und behält die Fragetyp-Vielfalt.
-- **Alle FastAPI-spezifischen Beispiele entfallen** (Path Parameters, Dependency Injection, Pydantic) und werden durch Vue-Beispiele ersetzt (Reaktivität, Composition API, Komponenten, Props, Composables; siehe [Fragenkatalog](../reference/question-catalogue.md)).
-- **Repository-Pfad** `data/raw/fastapi_docs_snapshot/` → `data/raw/vue_docs_snapshot/`.
-- **Hypothesen** der Baseline (alte H1–H3) → durch geschärfte H1–H3 ersetzt (Abschnitt „Hypothesen“ unten), die die nicht-offensichtlichen Dimensionen betonen.
-- **RAGAS-Rolle** von „optional/Zusatz" → fester Bestandteil der **Triangulation** mit explizitem Übereinstimmungsabgleich.
-
-### Konkretisiert / ergänzt
-- **Kosten/Effizienz** wird zur eigenständigen abhängigen Variable.
-- **Fixed-size + Overlap** wird ausdrücklich als leistungsfähige Baseline positioniert (belegt durch Qu et al. 2025), wodurch die Arbeit gegen den Vorwurf der Trivialität abgesichert ist.
-- **Forschungslücke** wird domänenspezifisch geschärft (fachfremde Vergleiche existieren; Softwaredokumentation ist die Lücke).
-- **Zeitplan** auf konkrete Kalenderdaten Juli–Dezember 2026 gelegt.
-
-### Bewusst nicht Teil der Arbeit (Scope-Schutz, unverändert)
-Bester LLM-/Embedding-Vergleich; RAG vs. kein RAG als Hauptfrage; Fine-Tuning; lokale LLMs; rein automatische Bewertung ohne menschliche Kontrolle; private Firmendaten; multimodale Dokumente/PDFs mit Diagrammen.
-
+Nicht Teil der Arbeit: bester LLM- oder Embedding-Vergleich; RAG gegen kein RAG als Hauptfrage; Fine-Tuning; lokale
+LLMs; rein automatische Bewertung ohne menschliche Kontrolle; private Firmendaten; multimodale Dokumente (PDFs mit
+Diagrammen).
 
 ## Wissenschaftlicher Rahmen
 
 ### Problem und Ansatz
-Technische Dokumentation enthält umfangreiches projektspezifisches Wissen, das über viele Dateien verteilt ist. LLMs beantworten Fragen, verfügen aber ohne Kontext nicht zuverlässig über projektspezifisches Wissen und neigen zu unbelegten Aussagen. RAG ruft relevante Dokumentstellen zur Laufzeit ab und stellt sie als Kontext bereit. Die Qualität hängt maßgeblich von der **Segmentierung (Chunking)** ab.
+
+Technische Dokumentation enthält umfangreiches projektspezifisches Wissen, das über viele Dateien verteilt ist. LLMs
+beantworten Fragen, verfügen aber ohne Kontext nicht zuverlässig über projektspezifisches Wissen und neigen zu
+unbelegten Aussagen. RAG ruft relevante Dokumentstellen zur Laufzeit ab und stellt sie als Kontext bereit. Die
+Qualität hängt maßgeblich von der **Segmentierung (Chunking)** ab: Zu kleine Segmente verlieren Kontext, zu große
+tragen irrelevante Information mit, und eine Zerlegung quer zur Dokumentstruktur trennt Zusammengehöriges.
 
 ### Forschungslücke und Abgrenzung (drei Säulen)
-1. **Anderer Korpus:** Vue.js statt der bereits informell untersuchten FastAPI/Supabase/Stripe-Doku.
-2. **Andere Domäne:** entwicklerorientierte Frontend-Framework-Dokumentation; kontrollierte Chunking-Vergleiche existieren bislang vor allem fachfremd (Unternehmensdokumente, klinische Entscheidungsunterstützung).
-3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung, Reproduzierbarkeit über Snapshot.
+
+Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
+
+1. **Anderer Korpus:** Vue.js statt der bereits informell untersuchten FastAPI/Supabase/Stripe-Dokumentation.
+2. **Andere Domäne:** entwicklerorientierte Frontend-Framework-Dokumentation; kontrollierte Chunking-Vergleiche gibt
+   es bislang vor allem fachfremd (Unternehmensdokumente, klinische Entscheidungsunterstützung).
+3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
+   Reproduzierbarkeit über einen fixierten Snapshot.
 
 ### Hypothesen (verbindlich, explorativ)
-- **H1 — Starke Baseline:** Strukturbasiertes Chunking erzielt gegenüber größenbasiertem Chunking **ohne** Overlap eine höhere Retrieval-Qualität, übertrifft größenbasiertes Chunking **mit** Overlap jedoch **nicht durchgängig**, da der Overlap den Verlust an Segmentgrenzen weitgehend kompensiert.
-- **H2 — Entkopplung Retrieval/Antwort:** Unterschiede in der Retrieval-Qualität übertragen sich **nur teilweise** auf die Antwortqualität, da das Sprachmodell moderate Retrieval-Defizite ausgleicht.
-- **H3 — Fragetyp-Interaktion:** Die relative Eignung der Strategien **variiert nach Fragetyp**; strukturbasiertes Chunking begünstigt konzeptuelle, abschnittsübergreifende Fragen, während größenbasierte Verfahren für eng umgrenzte faktische Fragen ausreichen.
+
+Wortlaut aus dem Exposé; Entscheidung, sie explorativ und deskriptiv auszuwerten:
+[ADR 0009](../adr/0009-hypothesen.md).
+
+- **H1 (starke Baseline):** Strukturbasiertes Chunking übertrifft größenbasiertes ohne Überlappung hinsichtlich der
+  Retrieval-Qualität, nicht aber durchgängig größenbasiertes mit Überlappung, da diese den Informationsverlust an
+  Segmentgrenzen weitgehend kompensiert.
+- **H2 (Entkopplung Retrieval/Antwort):** Retrieval-Unterschiede übertragen sich nur teilweise auf die
+  Antwortqualität, da das Sprachmodell moderate Defizite ausgleichen kann.
+- **H3 (Fragetyp-Interaktion):** Die relative Eignung der Strategien variiert nach Fragetyp, wobei strukturbasiertes
+  Chunking insbesondere konzeptuelle, abschnittsübergreifende Fragen begünstigt, während größenbasierte Verfahren für
+  eng umgrenzte faktische Fragen ausreichen.
+
+Die Hypothesen werden nicht inferenzstatistisch bestätigt, sondern dienen als Leitannahmen für die deskriptive
+Auswertung.
 
 ### Warum das Thema nicht trivial ist
-Die Annahme „strukturiert schlägt naiv offensichtlich" ist empirisch nicht gesichert: Qu, Bao & Tu (2025) zeigen, dass semantisch/strukturell motiviertes Chunking größenbasiertes Chunking **nicht konsistent** übertrifft und der Mehraufwand oft nicht gerechtfertigt ist. Der eigentliche Erkenntnisgewinn liegt nicht in „wer gewinnt", sondern in **Effektgröße, Kosten, Metrik-Abhängigkeit, der Retrieval-Antwort-Entkopplung und der Fragetyp-Interaktion**.
+
+Die Annahme „strukturiert schlägt naiv offensichtlich“ ist empirisch nicht gesichert: Qu, Bao & Tu (2025) zeigen,
+dass semantisch oder strukturell motiviertes Chunking größenbasiertes Chunking nicht konsistent übertrifft und der
+Mehraufwand oft nicht gerechtfertigt ist ([ADR 0010](../adr/0010-starke-baseline.md)). Der Erkenntnisgewinn liegt
+daher nicht in „wer gewinnt“, sondern in Effektgröße, Kosten, Metrik-Abhängigkeit, der Entkopplung von Retrieval und
+Antwort und der Wechselwirkung mit dem Fragetyp.
 
 ### Verwandte Arbeiten (Hinweis)
-Der erwähnte Praktiker-Blogbeitrag (Mai 2026) ist **keine zitierfähige wissenschaftliche Quelle**, sollte aber im Kapitel „Verwandte Arbeiten" kurz als informeller Vorläufer eingeordnet werden — das wirkt souveräner, als ihn auszulassen, und unterstreicht die Abgrenzung (peer-review-fähige Methodik, anderer Korpus, deutschsprachige wissenschaftliche Arbeit).
 
+Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup ist keine zitierfähige wissenschaftliche Quelle, wird
+aber im Kapitel „Verwandte Arbeiten“ kurz als informeller Vorläufer eingeordnet; das unterstreicht die Abgrenzung
+(siehe [ADR 0011](../adr/0011-forschungsluecke.md)).
 
 ## Korpus: Begründung der Wahl
-Vue.js bietet entwicklerorientierte, didaktisch hochwertige Dokumentation mit konzeptueller und prozeduraler Tiefe, liegt im Quellrepository durchgängig als **Markdown** vor (VitePress) und ist öffentlich und stabil. Damit ist sie sauber snapshot- und parsebar und erlaubt viele Fragetypen.
+
+Vue.js bietet entwicklerorientierte, didaktisch hochwertige Dokumentation mit konzeptueller und prozeduraler Tiefe,
+liegt im Quellrepository durchgängig als Markdown vor (VitePress) und ist öffentlich und stabil. Damit ist sie sauber
+snapshot- und parsebar und erlaubt viele Fragetypen ([ADR 0001](../adr/0001-korpus-vuejs.md)). Welche Bereiche und
+welcher Commit genutzt werden, legt [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) fest; Einzelheiten:
+[Korpus](../reference/corpus.md).
 
 ## Chunking-Strategien
 
-| ID | Strategie | Parameter | Vorteil | Nachteil |
-|----|-----------|-----------|---------|----------|
-| **C1** | Fixed-size ohne Overlap | 500 Tokens, Overlap 0 | einfach, reproduzierbar, Baseline | Kontextbruch an Grenzen |
-| **C2** | Fixed-size mit Overlap | 500 Tokens, Overlap 100 | bessere Abdeckung, **starke Baseline** | mehr Chunks, mehr Redundanz, höhere Kosten |
-| **C3** | Strukturbasiert | Abschnitt unter H1–H3, 50–800 Tokens (kurze verschmelzen, lange an Absätzen teilen; [ADR 0021](../adr/0021-c3-grenzen.md)) | erhält semantische Einheiten | uneinheitliche Chunkgrößen (auf Vue relevant: lange Abschnitte) |
-| K1 | Kontrolle (keine Strategie) | Fixed-size ohne Overlap, Fenster = gerundetes Mittel der C3-Chunklängen (derzeit 231 Tokens); nur Retrieval ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) | trennt Struktur- von Größeneffekt | eine zusätzliche Retrieval-Reihe |
-| C4 | Semantisch (optional) | Trennung nach semantischer Ähnlichkeit | theoretisch spannend | Mehraufwand, weitere Modellabhängigkeit, nur falls Zeit |
+Entscheidungen: [ADR 0005](../adr/0005-drei-chunking-strategien.md) (Auswahl),
+[ADR 0021](../adr/0021-c3-grenzen.md) (Grenzen von C3), [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) (Kontrolle
+K1), [ADR 0028](../adr/0028-c4-bedingung.md) (Bedingung für C4). Parameterwerte stehen nur in `src/config.py`,
+erklärt in [Konfiguration](../reference/configuration.md).
 
-**Konstant halten (nur Chunking variiert):** Korpus/Snapshot, Sprache (Englisch), Embedding-Modell, LLM, Temperatur (0), top-k (5), Prompt, Fragenset, Bewertungsrubrik, Vector Store, Retrieval-Art (Dense), Antwortformat.
+| ID | Strategie | Vorteil | Nachteil |
+|----|-----------|---------|----------|
+| **C1** | größenbasiert ohne Overlap | einfach, reproduzierbar, Baseline | Kontextbruch an Grenzen |
+| **C2** | größenbasiert mit Overlap | bessere Abdeckung, **starke Baseline** | mehr Chunks, mehr Redundanz, höhere Kosten |
+| **C3** | strukturbasiert an Markdown-Überschriften, mit Unter- und Obergrenze | erhält semantische Einheiten | uneinheitliche Chunkgrößen (auf Vue relevant: lange Abschnitte) |
+| K1 | Kontrolle, keine Strategie: größenbasiert ohne Overlap in der mittleren C3-Größe, nur Retrieval | trennt Struktur- von Größeneffekt | eine zusätzliche Retrieval-Reihe |
+| C4 | semantisch (optional) | theoretisch spannend | Mehraufwand, weitere Modellabhängigkeit |
 
-> C3 auf Vue ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)): 718 Chunks, Median 190 Tokens gegen 500 bei C1/C2; ohne Obergrenze wären 12 von 706 Segmenten länger als 800. Regeln und Begründung in [ADR 0021](../adr/0021-c3-grenzen.md); weil C3 auch in der Größe abweicht, gibt es die Kontrolle K1 und eine faire Sensitivitätsregel (min(100, Chunk-Länge) Tokens Überlappung, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
+**Warum diese drei.** C1 ist die naive, reproduzierbare Untergrenze. C2 ist die Variante, die in der Praxis oft
+genügt; sie als starke Baseline ernst zu nehmen, schützt die Arbeit gegen den Vorwurf der Trivialität (H1). C3 nutzt
+die Markdown-Struktur, die technische Dokumentation ohnehin mitbringt, und ist die Strategie, deren Mehrwert in Frage
+steht. C4 bringt eine weitere Modellabhängigkeit und kommt nur, wenn der Zeitplan es zulässt.
 
+**Warum die Kontrolle K1.** C3 unterscheidet sich von C1/C2 nicht nur in der Struktur, sondern auch in der Größe:
+Seine Chunks sind deutlich kleiner, und bei konstantem top-k erhält das Sprachmodell weniger Kontext. Ohne Kontrolle
+wäre ein Unterschied zwischen C3 und C1 nicht zuzuordnen. K1 hat die Größe von C3, aber keine Struktur: Schlägt C3
+C1, K1 aber ebenso, liegt der Effekt in der Größe; schlägt C3 auch K1, in der Struktur. Aus demselben Grund wertet die
+Sensitivitätsprüfung kleine Chunks nicht konstruktionsbedingt ab. K1 erzeugt keine Antworten, weil es nur die
+Retrieval-Frage klären soll; es wird als Kontrollanalyse berichtet, nicht als vierte Strategie. Gemessene
+Chunk-Zahlen und -Längen: [Experiment-Protokoll](../reference/experiment-record.md).
+
+## Warum nur das Chunking variiert
+
+Die Forschungsfrage zielt auf einen kausal interpretierbaren Einfluss der Segmentierung. Das trägt nur, wenn sich die
+Läufe in nichts anderem unterscheiden: Korpus, Embedding-Modell, Sprachmodell, Temperatur, top-k, Prompt,
+Fragenkatalog, Rubrik und Vektorindex bleiben für alle Strategien gleich. Die vollständige Liste steht in
+[ADR 0006](../adr/0006-nur-chunking-variiert.md), Temperatur und top-k in
+[ADR 0014](../adr/0014-temperatur-und-topk.md).
+
+## Warum die Evaluation so angelegt ist
+
+- **Ground Truth vorab:** Fragen, Referenzantworten und relevante Abschnitte stehen fest, bevor irgendein Ergebnis
+  vorliegt ([ADR 0017](../adr/0017-fragenkatalog.md)); sonst könnte die Bewertungsgrundlage unbemerkt den Ergebnissen
+  folgen. Deshalb wird die Relevanz auch blind annotiert, also vor jedem Retrieval; nachträgliche Ergänzungen zählen
+  nur als Sensitivität ([ADR 0027](../adr/0027-blinde-annotation.md)).
+- **Retrieval und Antwort getrennt:** Retrieval-Metriken ([ADR 0012](../adr/0012-retrieval-metriken.md)) und die
+  Antwort-Rubrik ([ADR 0013](../adr/0013-antwort-rubrik.md)) werden getrennt erhoben, weil H2 gerade fragt, ob sich
+  Unterschiede im Retrieval auf die Antworten übertragen.
+- **Triangulation:** Die manuelle, referenzbasierte Bewertung ist primär, weil sie auf der eigenen Ground Truth beruht
+  und nicht zirkulär ist; ein automatisiertes Framework (RAGAS) ist sekundär, und die Übereinstimmung beider ist
+  selbst ein Befund ([ADR 0007](../adr/0007-triangulation.md)).
+- **Kosten:** Strategien unterscheiden sich im Aufwand; Qualität wird deshalb den Kosten gegenübergestellt
+  ([ADR 0008](../adr/0008-kosten-als-variable.md)).
+
+Metriken, Formeln und Rubrik im Einzelnen: [Evaluation](../reference/evaluation.md).
 
 ## RAG-Pipeline-Architektur
 
@@ -108,13 +164,13 @@ Documentation Snapshot (Vue.js)
         ↓
 Preprocessing (Markdown Cleaning)
         ↓
-Chunking Strategy  → C1 / C2 / C3
+Chunking Strategy  → C1 / C2 / C3   (+ Kontrolle K1)
         ↓
 Embedding (OpenAI Embeddings)
         ↓
-Vector Store (Chroma, ein Index pro Strategie)
+Vector Store (Chroma, ein Index pro Strategie und für K1)
         ↓
-Question → Retriever (Top-k = 5)
+Question → Retriever (Top-k)        ← K1 endet hier (nur Retrieval)
         ↓
 Prompt Assembly (Question + Context, identisch für alle Strategien)
         ↓
@@ -123,13 +179,18 @@ LLM Answer (Answer + Sources)
 Evaluation (Retrieval-Metriken + Antwort-Rubrik + Effizienz)
 ```
 
+Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 
 ## Validität und Grenzen
 
-- **Interne Validität:** Misst die Arbeit wirklich den Chunking-Einfluss? Absicherung über Konstanthaltung aller anderen Parameter, gleicher Korpus/Fragen/Prompts/Modelle, temperature 0.
-- **Externe Validität:** begrenzt — ein Korpus (Vue.js), Ergebnisse liefern Hinweise, keine universelle Aussage.
-- **Konstruktvalidität:** etablierte Metriken, transparente Rubrik, Bewertungsbeispiele zeigen, optional Zweitbewertung.
-- **Reliabilität:** temperature 0, Rohdaten speichern, Modellversion dokumentieren, Snapshot verwenden, Prompts veröffentlichen.
+- **Interne Validität:** Misst die Arbeit wirklich den Chunking-Einfluss? Absicherung über Konstanthaltung aller
+  anderen Parameter (gleicher Korpus, gleiche Fragen, Prompts und Modelle, Temperatur 0) und die Kontrolle K1.
+- **Externe Validität:** begrenzt; ein Korpus (Vue.js, nur Composition API, [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)).
+  Die Ergebnisse liefern Hinweise, keine universelle Aussage.
+- **Konstruktvalidität:** etablierte Metriken, transparente Rubrik, Bewertungsbeispiele; eine Zweitbewertung von
+  10–20 % der Antworten wird empfohlen ([ADR 0007](../adr/0007-triangulation.md)).
+- **Reliabilität:** Temperatur 0, Rohdaten speichern, Modellversionen dokumentieren, fixierter Snapshot, Prompts
+  veröffentlichen.
 
 ## Prompt-Gestaltung
 

@@ -1,9 +1,10 @@
 # Experiment-Protokoll
 
-> Seitentyp: Nachschlagen (reference). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
 
-Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt:
-[Korpus](corpus.md) ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)).
+Messwerte aller Läufe (Chunking, Embedding, Pilotproben) mit Datum; wird mit jedem Lauf fortgeschrieben und ist die
+Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus: [Korpus](corpus.md)
+([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)); Parameter: [Konfiguration](configuration.md).
 
 ## Snapshot
 
@@ -12,9 +13,7 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `40aa88af0094f7bab4aaf786e55c748a6a251d88` (Commit-Datum 15.09.2026; [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
 | Datum des Snapshots | 14.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, Bereiche, Ausschlüsse, SHA-256 je Datei) |
-| Verwendete Pfade | `src/guide/`, `src/api/`, `src/style-guide/` ohne sieben Ausschlüsse; Liste in `docs/corpus_manifest.csv` |
-| Anzahl Dateien | 79 (Guide 52, API 22, Style Guide 5) |
-| Gesamtumfang (Tokens) | 165.723 nach Preprocessing (`cl100k_base`; Guide 117.694, API 42.488, Style Guide 5.541); 813 Abschnitte (79 H1, 467 H2, 267 H3) |
+| Pfade, Dateien, Tokens, Abschnitte | [Korpus](corpus.md#quelle-und-ausschnitt); Dateiliste in `docs/corpus_manifest.csv` |
 
 ## Chunking
 
@@ -26,7 +25,8 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | K1 (Kontrolle, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) | 758 | 3 / 219 / 231 | 231 |
 
 K1-Fenster = kaufmännisch gerundetes Mittel der C3-Chunklängen (230,8 → 231). C3 ohne Obergrenze: 706 Segmente,
-davon 12 über 800 Tokens, längstes 1.467 ([ADR 0021](../adr/0021-c3-grenzen.md), Nachtrag).
+davon 12 über 800 Tokens, längstes 1.467 (Obergrenze nach [ADR 0021](../adr/0021-c3-grenzen.md), begründet in
+[ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
 
 ## Embedding
 
@@ -38,11 +38,15 @@ bleiben davon unberührt.
 
 | Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
 |---|---:|---:|---:|---:|---:|
-| C1 | 369 | 165.723 | 0,0215 | 8,5 MB | 0,99991 (gegen die Vektoren vom 13.10.2026) |
+| C1 | 369 | 165.723 | 0,0215 | 8,5 MB | 0,99991¹ |
 | C2 | 435 | 201.323 | 0,0262 | 10,0 MB | 0,99987 |
 | C3 | 718 | 165.723 | 0,0215 | 18,9 MB | 0,99987 |
 | K1 | 758 | 165.722 | 0,0215 | 14,3 MB | 0,99963 |
-| Summe | 2.280 | 698.491 | 0,0907 (+ 0,0013 Prüfung = 0,0921) | 51,7 MB | alle ≥ 0,999 |
+| Summe | 2.280 | 698.491 | 0,0908 (+ 0,0013 Prüfung = 0,0921) | 51,8 MB | alle ≥ 0,999 |
+
+¹ Die Prüfung vergleicht mit den jeweils schon gespeicherten übrigen Vektordateien: bei C1 (zuerst eingebettet) mit
+den Vektoren vom 13.10.2026 (alter Korpus), bei C2, C3 und K1 teils schon mit den neuen vom 14.10.2026.
+Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
 
 Die Modellstand-Prüfung von K1 (0,99963) liegt unter dem am 13.10.2026 gemessenen Wert für gleiche Texte
 (≥ 0,99996), aber deutlich über dem Schwellwert 0,999 und weit über der Ähnlichkeit verschiedener Chunks (≤ 0,84).
@@ -50,7 +54,8 @@ Die Modellstand-Prüfung von K1 (0,99963) liegt unter dem am 13.10.2026 gemessen
 ## Korpuserweiterung (14.10.2026): Prüfungen
 
 Umstellung nach [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und [ADR 0026](../adr/0026-c3-vergleichbarkeit.md);
-Spezifikation und Plan in `docs/superpowers/`.
+Spezifikation und Plan: `docs/superpowers/specs/2026-10-14-corpus-extension-design.md`,
+`docs/superpowers/plans/2026-10-14-corpus-extension.md`.
 
 | Prüfung | Ergebnis |
 |---|---|
@@ -70,8 +75,8 @@ Gefunden und behoben dabei: Die Integrationsprüfung entdeckte in zwei API-Seite
 ## Pilotproben auf dem erweiterten Korpus (14.10.2026)
 
 Gleiche Fragen und Annotationen wie in den Proben unten (IDs abgebildet, V8); `scripts/difficulty_probe.py`,
-jetzt mit der Kontrolle K1. Keine API-Kosten (gespeicherte Fragevektoren). Kontext@5 = mittlere Tokens der fünf
-Treffer je Frage.
+jetzt mit der Kontrolle K1. Keine API-Kosten (gespeicherte Fragevektoren). Kontext@5 = Mittel über die Fragen der
+summierten Tokens der fünf Treffer ([Evaluation](evaluation.md#effizienzkosten-abhängige-variable)).
 
 Probe 1 (8 einfache Fragen):
 
@@ -82,7 +87,8 @@ Probe 1 (8 einfache Fragen):
 | C3 | 1,00 | 0,94 | 0,23 | 1,00 | 1.302 |
 | K1 | 1,00 | 0,94 | 0,38 | 1,00 | 1.082 |
 
-Probe 2 (16 schwere Fragen), Annotation blind, also vor jedem Retrieval festgelegt (`data/pilot/hard/`):
+Probe 2 (16 schwere Fragen), Annotation blind, also vor jedem Retrieval festgelegt (`data/pilot/hard/`; Hauptwerte nach
+[ADR 0027](../adr/0027-blinde-annotation.md)):
 
 | Strategie | Hit@5 | MRR | Precision@5 | Recall@5 | Kontext@5 |
 |---|---:|---:|---:|---:|---:|
@@ -99,7 +105,7 @@ Nach Fragenart (MRR / Recall@5, blind):
 | detail (n = 4) | 0,88 / 1,00 | 0,62 / 0,75 | 0,75 / 1,00 | 0,62 / 0,75 |
 | paraphrase (n = 7) | 0,43 / 1,00 | 0,44 / 0,71 | 0,60 / 0,86 | 0,63 / 1,00 |
 
-Post-hoc-Sensitivität, **keine Evidenz** (Annotation nach Sicht der Ergebnisse um drei Abschnitte ergänzt, siehe
+Post-hoc-Sensitivität, **keine Evidenz** ([ADR 0027](../adr/0027-blinde-annotation.md); Annotation nach Sicht der Ergebnisse um drei Abschnitte ergänzt, siehe
 Probe 2 im vorherigen Stand; `data/pilot/hard_posthoc/`): C1 1,00 / 0,76 / 0,34 / 0,92, C2 0,81 / 0,66 / 0,36 / 0,73,
 C3 1,00 / 0,69 / 0,28 / 0,89, K1 0,94 / 0,67 / 0,36 / 0,80 (Hit@5 / MRR / P@5 / R@5). Sie zeigt nur, wie stark eine
 unvollständige Annotation die Werte verschiebt.
@@ -113,13 +119,13 @@ Befund (Pilot, blinde Annotation, n klein, keine Signifikanz):
   des C3-Verhaltens geht also auf die Größe zurück, ein Teil auf die Struktur; ob das trägt, zeigt erst der Katalog.
 - Kontext je Antwort: C3 und K1 liefern dem Sprachmodell nur etwa halb so viele Tokens wie C1/C2.
 
-Zur Annotation (Codex-Review von PR #6): Ergänzungen nach Sicht der Ergebnisse lassen das Retrieval auf die
-Relevanzurteile zurückwirken; offengelegte Korrekturen machen solche Werte nicht zu gültiger Evidenz. Deshalb sind
-die blinden Annotationen die Hauptwerte. Die blinde Fassung wurde aus der ursprünglichen Datei Byte für Byte
-wiederhergestellt; ihre SHA-256 (`f9ddb34b…7e860`) ist gleich der im ersten API-Lauf protokollierten
+Zur Annotation: Blinde Annotationen sind die Hauptwerte, nachträgliche Ergänzungen nur Sensitivität (Begründung:
+[ADR 0027](../adr/0027-blinde-annotation.md), ausgelöst durch das Codex-Review von PR #6). Die blinde Fassung wurde
+aus der ursprünglichen Datei Byte für Byte wiederhergestellt; ihre SHA-256 (`f9ddb34b…7e860`) ist gleich der im ersten API-Lauf protokollierten
 (`data/pilot/hard/runs.jsonl`, erste Zeile). Sie liegt mit alten IDs in
 `data/pilot/hard/history/ground_truth_b75d188.csv` und wurde wie die übrigen Pilotdateien über Pfad und Anker
-abgebildet. Für den echten Fragenkatalog gilt: Annotation vollständig vor jedem Retrieval (ADR 0017).
+abgebildet. Regeln für den echten Fragenkatalog, auch die Folgerungen aus beiden Proben:
+[Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau).
 
 ## Vorheriger Stand (13.10.2026, `b75d188`, nur Guide)
 
@@ -131,8 +137,8 @@ Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `b75d188ab16bf83bd1f364a77dfd2315be8f3fa4` (Commit-Datum 31.07.2026) |
-| Datum des Snapshots | 13.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, SHA-256 je Datei) |
-| Verwendete Pfade | siehe `docs/corpus_manifest.csv` |
+| Datum des Snapshots | 13.10.2026 (Datensatz in der Git-Historie: `git show 7d6cc13:docs/corpus_snapshot.txt`) |
+| Verwendete Pfade | `src/guide/` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)); Dateiliste: `git show 7d6cc13:docs/corpus_manifest.csv` |
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
@@ -147,8 +153,8 @@ Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden
 ### Embedding
 
 Einmaliger Lauf am 13.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI
-abgerechneten Tokens stimmen exakt mit der eigenen Zählung (`cl100k_base`, `src/tokens.py`) überein. Ein zweiter Lauf
-nutzte die gespeicherten Referenzvektoren ohne API-Aufruf ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
+abgerechneten Tokens stimmen exakt mit der eigenen Zählung (`cl100k_base`, `src/tokens.py`) überein. Weitere Läufe
+am selben Tag nutzten die gespeicherten Referenzvektoren ohne API-Aufruf ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
 | Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei |
 |---|---:|---:|---:|---:|
@@ -178,8 +184,7 @@ Abschnitt); sie sind **nicht** Teil des Fragenkatalogs. Auswertung: `scripts/dif
 
 Befund: Bei einfachen Fragen mit genau einem passenden Abschnitt finden alle Strategien die Antwort (Hit@5 und
 Recall@5 = 1,00, Deckeneffekt); Unterschiede zeigen sich nur in Rang und Präzision (MRR, Precision@5). Folgerung für den
-Fragenkatalog: anspruchsvollere Fragen (mehrere Abschnitte oder Seiten, Detailfragen, Fragen ohne wörtliche Nähe zur
-Überschrift) und MRR/Precision@5 als zentrale Kennzahlen.
+Fragenkatalog: [Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau).
 
 ### Schwierigkeitsprobe 2: schwere Fragen (Pilot, 14.10.2026, alter Korpus)
 
@@ -192,8 +197,7 @@ Fragenkatalogs, drei Arten (Feld `notes`):
 - **paraphrase** (7): Die Frage beschreibt ein Symptom ohne die Begriffe der Überschrift.
 
 Auswertung: `uv run python scripts/difficulty_probe.py data/pilot/hard`; Kosten 0,0004 USD (391 Frage-Tokens plus
-2.706 Tokens Modellstand-Prüfung, Kosinus 0,99996). Recall@5 = Anteil der relevanten Abschnitte einer Frage, die ein
-Top-5-Chunk überlappt.
+2.706 Tokens Modellstand-Prüfung, Kosinus 0,99996). Metriken: [Evaluation](evaluation.md#retrieval-evaluation).
 
 Werte mit der blinden Annotation (vor dem Retrieval festgelegt; Hauptwerte):
 
@@ -211,8 +215,8 @@ Nach Fragenart (MRR / Recall@5, blind):
 | detail (n = 4) | 0,88 / 1,00 | 0,71 / 1,00 | 0,88 / 1,00 |
 | paraphrase (n = 7) | 0,58 / 1,00 | 0,52 / 0,86 | 0,67 / 0,86 |
 
-Annotation nachträglich ergänzt (nur Sensitivität, keine Evidenz; siehe Hinweis zur Annotation in den Proben auf dem
-erweiterten Korpus): Die Durchsicht aller Chunks, die vor
+Annotation nachträglich ergänzt (nur Sensitivität, keine Evidenz; [ADR 0027](../adr/0027-blinde-annotation.md)):
+Die Durchsicht aller Chunks, die vor
 dem ersten relevanten Treffer rangierten, ergab drei Abschnitte, die eine richtige (Teil-)Antwort enthalten, aber
 fehlten: `D046#cross-request-state-pollution` (H04), `D027#dom-update-timing` (H10, `nextTick()` als Alternative) und
 `D033#how-reactivity-works-in-vue` (H16, nennt den Verlust der Reaktivität beim Destrukturieren wörtlich). Regel: Ein
@@ -231,9 +235,9 @@ Befund:
 - C2 verfehlt bei H11 (`v-model.lazy`, 72-Token-Abschnitt) als einzige Strategie jeden relevanten Chunk.
 - n = 16 ist zu klein für Signifikanzaussagen; die Werte zeigen nur, dass der Katalog die Strategien trennen kann.
 
-Folgerung für den Fragenkatalog: einen festen Anteil schwerer Fragen (mehrere Abschnitte, Paraphrase, Detail) vorsehen;
-Relevanz-Annotation über den ganzen Korpus suchen, nicht nur auf der naheliegenden Seite (die Lücken oben fand erst die
-Durchsicht); MRR und Recall@5 neben Hit@5 berichten.
+Folgerung für den Fragenkatalog (fester Anteil schwerer Fragen, Annotation über den ganzen Korpus, MRR und Recall@5
+neben Hit@5): [Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau). Die Lücken oben fand erst die
+Durchsicht nach dem Retrieval.
 
 Zwischenfall: Der erste Lauf brach ab, weil Chroma für eine C3-Frage einen echten Top-5-Treffer (`C3_D034_0006`,
 Kosinus 0,325) nicht lieferte; die Prüfung gegen die exakte NumPy-Rangfolge ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
