@@ -8,7 +8,7 @@ classes, refines [ADR 0017](../../adr/0017-fragenkatalog.md)), new ADR 0030 (fre
 
 ## Goal
 
-Give Jonas the tools to write and annotate the question catalogue (about 40 questions, ADR 0017) against the
+Give Jonas the tools to write and annotate the question catalogue (48 questions, ADR 0029 within the range of ADR 0017) against the
 813 sections of the corpus, and make the catalogue's composition a checked, pre-registered property instead of a
 judgement made while writing:
 
@@ -34,10 +34,11 @@ Success criteria:
 
 | Decision | Evidence | Alternatives rejected |
 |---|---|---|
-| `type` ∈ {`factual`, `procedural`, `conceptual`, `comparative`, `limitation`}, quotas 10/10/10/5/5 (ADR 0029) | ADR 0017 fixes the five types and the counts; the spellings are those the pilot sets already use. H3 needs the type (ADR 0009). | New names (pilot files would disagree). |
+| 48 questions (ADR 0029) | ADR 0017 allows 30–60 and the reference page names 40–50 as optimal; the exposé says "etwa 40". The standard error of a mean falls with √n: 48 instead of 40 lowers it by about 9 %, 60 by about 18 %. Power (paired t-test, 80 %, two-sided α = 0.05, computed with SciPy's noncentral t): with 12 questions per class only large effects (d ≈ 0.89; 10 per class: 1.00) are detectable, so per-class results stay exploratory (ADR 0009); over all 48 questions d ≈ 0.41 (40: 0.45). Cost is Jonas' time: about 8 more hours of writing and blind annotation and 24 more answers to score by hand than with 40; the freeze milestone 09.11. stays reachable (ADR 0028). The thesis states the deviation from the exposé. | 40 (no gain, but safest for the milestone); 60 (about 20 more hours and 60 more answers to score; type quotas no longer divide cleanly; puts the milestone at risk). |
+| `type` ∈ {`factual`, `procedural`, `conceptual`, `comparative`, `limitation`}, quotas 12/12/12/6/6 (ADR 0029) | ADR 0017 fixes the five types and the ratio 2:2:2:1:1 (10/10/10/5/5 for 40); the spellings are those the pilot sets already use. H3 needs the type (ADR 0009). | New names (pilot files would disagree). |
 | `difficulty` holds the construction class ∈ {`single`, `multi-section`, `detail`, `paraphrase`} (ADR 0029) | Pilot probe 2 (experiment record, 14.10.2026): easy questions reach Hit@5 = 1.0 for every strategy (ceiling), while the construction classes separate C3 and K1 (multi-section and detail favour C3, paraphrase favours K1). H3 names "abschnittsübergreifende" questions, which is a construction property. The class is assigned when the question is written and checked against Jonas' own annotation, never against results. | Subjective easy/medium/hard (judgement a grader can question; class only in `notes`, fragile to analyse); an additional column (format change, `difficulty` stays subjective). |
-| Class quotas 10/10/10/10 (ADR 0029) | Equal group sizes give the most reliable per-class comparison with n = 40; a 25 % share of `single` questions keeps realistic everyday questions and shows the ceiling effect openly. | Hard-heavy 6/12/10/12 (less representative, small `single` group); floors only (split decided while writing). |
-| Area floors: ≥ 10 questions with a relevant section in `api`, ≥ 3 in `style-guide`; a question counts for every area it touches (ADR 0029) | Corpus tokens (ADR 0025): guide 117,694 (71 %), API 42,488 (26 %), style guide 5,541 (3 %). 26 % of 40 ≈ 10; 3 % of 40 ≈ 1, raised to 3 so the area is measurable. Without a floor, questions drift to the guide. | Strict proportional split (1 style-guide question is not measurable; many answers span guide and API); report only. |
+| Class quotas 12/12/12/12 (ADR 0029) | Equal group sizes give the most reliable per-class comparison with n = 48; a 25 % share of `single` questions keeps realistic everyday questions and shows the ceiling effect openly. | Hard-heavy 6/12/10/12 (less representative, small `single` group); floors only (split decided while writing). |
+| Area floors: ≥ 12 questions with a relevant section in `api`, ≥ 3 in `style-guide`; a question counts for every area it touches (ADR 0029) | Corpus tokens (ADR 0025): guide 117,694 (71 %), API 42,488 (26 %), style guide 5,541 (3 %). 26 % of 48 ≈ 12; 3 % of 48 ≈ 1, raised to 3 so the area is measurable. Without a floor, questions drift to the guide. | Strict proportional split (1 style-guide question is not measurable; many answers span guide and API); report only. |
 | Class rules (below) check only the annotation and the wording (ADR 0029) | Blind annotation (ADR 0027): nothing derived from retrieval may shape questions or judgements. Pilot measurements: H2/H3 sections median 211 tokens (p25 120, p75 356); pilot `detail` sections 22–546 tokens, so "detail" is about the answer, not the section length; 5 of 7 pilot paraphrases share no heading word, 2 share one. | Thresholds from retrieval results (circular); section-length rule for `detail` (contradicted by the pilot). |
 | Lexical `find` over cleaned section texts (this spec) | Equal for all strategies, uses no chunk, vector or rank; it only helps Jonas look beyond the obvious page (rule in `question-catalogue.md`: search the whole corpus including the API). | Embedding search (would be retrieval before the freeze, ADR 0027). |
 | Freeze lock: `freeze` writes SHA-256 of `questions.csv` and `ground_truth.csv`; `retrieve.py` refuses the main catalogue unless both hashes match (ADR 0030) | ADR 0017 and 0027 require the ground truth to be final before any retrieval; a recorded hash turns this into a check the code enforces and gives the 09.11. milestone (ADR 0028) a citable record. | Convention only (a promise, not evidence). |
@@ -79,9 +80,9 @@ tests) are not affected.
 ## Configuration (new keys, all in `configuration.md`)
 
 `QUESTION_TYPES` (dict value → quota), `QUESTION_CLASSES` (dict value → quota), `AREA_MIN_QUESTIONS`
-(`{"api": 10, "style-guide": 3}`), `DETAIL_MAX_ANSWER_WORDS = 30`, `CATALOGUE_STOPWORDS` (tuple, English function
-words and question words, listed in the ADR), `SECTION_INDEX_FILE`, `CATALOGUE_FREEZE_FILE`. Catalogue size limits
-stay as in ADR 0017 (30–60); with the quotas the strict check requires exactly 40.
+(`{"api": 12, "style-guide": 3}`), `DETAIL_MAX_ANSWER_WORDS = 30`, `CATALOGUE_STOPWORDS` (tuple, English function
+words and question words, listed in the ADR), `SECTION_INDEX_FILE`, `CATALOGUE_FREEZE_FILE`. The quotas sum to 48, so
+the strict check requires exactly 48 questions.
 
 ## Documentation
 
