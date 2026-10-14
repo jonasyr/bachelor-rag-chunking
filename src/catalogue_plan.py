@@ -15,6 +15,7 @@ from bisect import bisect_right
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from atomic_csv import write_csv
 from config import (
     CATALOGUE_AREA_SLOTS,
     CATALOGUE_PLAN_FILE,
@@ -148,10 +149,7 @@ def read_plan(path: Path = CATALOGUE_PLAN_FILE) -> list[dict]:
 
 
 def save_plan(path: Path, rows: list[dict]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=PLAN_HEADER, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
+    write_csv(path, PLAN_HEADER, rows)  # atomic: never a truncated file
 
 
 def write_plan(corpus: Corpus, plan_file: Path = CATALOGUE_PLAN_FILE, **draw_args) -> int:

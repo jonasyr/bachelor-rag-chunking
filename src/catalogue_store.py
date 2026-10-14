@@ -5,11 +5,11 @@ Paths are module globals from config, read at call time, so the editor and its t
 Every write is refused once the freeze record exists (ADR 0030).
 """
 
-import csv
 import html
 import re
 
-from catalogue import Corpus, same_word
+from atomic_csv import read_csv, write_csv
+from catalogue import CAMEL_RE, Corpus, same_word
 from catalogue_plan import mark_used, read_plan, save_plan, slot_row
 from catalogue_review import decide, read_review
 from config import (
@@ -20,6 +20,8 @@ from config import (
     GROUND_TRUTH_FILE,
     ID_SEPARATOR,
     PILOT_DIR,
+    QUESTION_ID_FORMAT,
+    QUESTION_ID_PATTERN,
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTIONS_FILE,
@@ -27,23 +29,21 @@ from config import (
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+QUESTION_ID_RE = re.compile(QUESTION_ID_PATTERN)
 
 
 def _read(path, header: list[str]) -> list[dict]:
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        if reader.fieldnames and list(reader.fieldnames) != header:
-            raise ValueError(f"{path} has columns {reader.fieldnames}, expected {header}")
-        return [dict(r) for r in reader]
+    rows = read_csv(path, header)
+    ids = [r["question_id"] for r in rows]
+    repeated = sorted({qid for qid in ids if ids.count(qid) > 1})
+    if repeated:
+        raise ValueError(f"{path}: duplicate question_id {repeated}")
+    return rows
 
 
-def _write(path, header: list[str], rows: list[dict]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=header, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(sorted(rows, key=lambda r: r["question_id"]))
+def write_rows(path, header: list[str], rows: list[dict]) -> None:
+    """Atomic write, rows sorted by question_id (deterministic)."""
+    write_csv(path, header, sorted(rows, key=lambda r: r["question_id"]))
 
 
 def load_catalogue() -> tuple[list[dict], dict[str, dict]]:
@@ -53,9 +53,12 @@ def load_catalogue() -> tuple[list[dict], dict[str, dict]]:
     return questions, truth
 
 
-def next_question_id(questions: list[dict]) -> str:
-    numbers = [int(q["question_id"][1:]) for q in questions if q["question_id"][1:].isdigit()]
-    return f"Q{max(numbers, default=0) + 1:03d}"
+def next_question_id(questions: list[dict], plan: list[dict] | None = None) -> str:
+    """One above the highest ID in the catalogue or in a used plan row, so no ID is reused."""
+    ids = [q["question_id"] for q in questions]
+    ids += [r["question_id"] for r in plan or [] if r["status"] == "used"]
+    numbers = [int(i[1:]) for i in ids if QUESTION_ID_RE.fullmatch(i)]
+    return QUESTION_ID_FORMAT.format(max(numbers, default=0) + 1)
 
 
 def is_frozen() -> bool:
@@ -101,7 +104,7 @@ def save_question(
     docs = list(dict.fromkeys(corpus.by_id[s]["doc_id"] for s in ids))
     questions, truth = load_catalogue()
     qid = question_id or (
-        row["question_id"] if row["status"] == "used" else next_question_id(questions)
+        row["question_id"] if row["status"] == "used" else next_question_id(questions, plan)
     )
     mark_used(plan, slot_id, qid)
     questions = [q for q in questions if q["question_id"] != qid] + [
@@ -119,9 +122,10 @@ def save_question(
         "relevant_doc_ids": ID_SEPARATOR.join(docs),
         "relevant_section_ids": ID_SEPARATOR.join(ids),
     }
-    _write(QUESTIONS_FILE, QUESTIONS_HEADER, questions)
-    _write(GROUND_TRUTH_FILE, GROUND_TRUTH_HEADER, list(truth.values()))
+    # Plan first: if a later write fails, the slot already names the ID and a retry reuses it.
     save_plan(CATALOGUE_PLAN_FILE, plan)
+    write_rows(GROUND_TRUTH_FILE, GROUND_TRUTH_HEADER, list(truth.values()))
+    write_rows(QUESTIONS_FILE, QUESTIONS_HEADER, questions)
     return qid
 
 
@@ -139,7 +143,7 @@ def accept_suggestion(corpus: Corpus, index: int, reason: str, today: str) -> di
         entry["relevant_doc_ids"] = ID_SEPARATOR.join(
             dict.fromkeys(corpus.by_id[s]["doc_id"] for s in ids)
         )
-        _write(GROUND_TRUTH_FILE, GROUND_TRUTH_HEADER, list(truth.values()))
+        write_rows(GROUND_TRUTH_FILE, GROUND_TRUTH_HEADER, list(truth.values()))
     return decide(CATALOGUE_REVIEW_FILE, index, "accepted", reason, today)
 
 
@@ -154,7 +158,8 @@ def highlight(text: str, words: list[str]) -> str:
     for match in TOKEN_RE.finditer(text):
         out.append(html.escape(text[last : match.start()]))
         token = match.group()
-        if any(same_word(token.lower(), w) for w in words):
+        forms = {token.lower(), *CAMEL_RE.sub(" ", token).lower().split()}  # like content_words
+        if any(same_word(f, w) for f in forms for w in words):
             out.append(f'<mark class="hl">{html.escape(token)}</mark>')
         else:
             out.append(html.escape(token))

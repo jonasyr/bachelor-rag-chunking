@@ -177,6 +177,9 @@ CATALOGUE_PLAN_STATUSES = ("open", "used", "skipped", "reserve")
 # AI review log (D31): kinds of suggestions and their decisions
 CATALOGUE_REVIEW_KINDS = ("missing_section", "wording", "fact", "class")
 CATALOGUE_REVIEW_DECISIONS = ("open", "accepted", "rejected")
+# Question IDs written by the editor: pattern for existing IDs and format of new ones
+QUESTION_ID_PATTERN = r"Q\d+"
+QUESTION_ID_FORMAT = "Q{:03d}"
 # Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus
 # stopwords; camelCase identifiers also count by their parts. Words of at least
 # CATALOGUE_FOLD_MIN_LENGTH characters also match without a trailing s/es and with ies -> y, and

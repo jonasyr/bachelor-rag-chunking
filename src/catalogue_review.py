@@ -9,6 +9,7 @@ summary line goes into the AI disclosure of the thesis.
 import csv
 from pathlib import Path
 
+from atomic_csv import write_csv
 from config import CATALOGUE_REVIEW_DECISIONS, CATALOGUE_REVIEW_FILE, CATALOGUE_REVIEW_KINDS
 
 REVIEW_HEADER = [
@@ -31,10 +32,7 @@ def read_review(path: Path = CATALOGUE_REVIEW_FILE) -> list[dict]:
 
 
 def save_review(path: Path, rows: list[dict]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=REVIEW_HEADER, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
+    write_csv(path, REVIEW_HEADER, rows)  # atomic: never a truncated file
 
 
 def ensure_review_file(path: Path = CATALOGUE_REVIEW_FILE) -> None:

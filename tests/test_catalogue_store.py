@@ -154,3 +154,74 @@ def test_a_question_cannot_move_to_another_slot(corpus, files):
     store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", [])
     with pytest.raises(ValueError, match="Q001 belongs to slot S01"):
         store.save_question(corpus, "S02", "Q two?", "factual", "B.", "", [], question_id="Q001")
+
+
+@pytest.mark.parametrize(
+    "line",
+    ["Q002,Too many?,factual,single,,extra", "Q002,too short"],
+)
+def test_malformed_rows_are_refused_and_nothing_is_rewritten(corpus, files, line):
+    store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", [])
+    path = files["QUESTIONS_FILE"]
+    path.write_text(path.read_text(encoding="utf-8") + line + "\n", encoding="utf-8")
+    before = path.read_bytes()
+    with pytest.raises(ValueError, match="fields"):
+        store.load_catalogue()
+    with pytest.raises(ValueError, match="fields"):
+        store.save_question(
+            corpus, "S01", "Q one, edited?", "factual", "A.", "", [], question_id="Q001"
+        )
+    assert path.read_bytes() == before
+
+
+def test_duplicate_ids_are_refused(corpus, files):
+    store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", [])
+    path = files["GROUND_TRUTH_FILE"]
+    lines = path.read_text(encoding="utf-8").splitlines()
+    path.write_text("\n".join([*lines, lines[1]]) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate question_id"):
+        store.load_catalogue()
+
+
+def test_a_failed_write_keeps_the_old_file(corpus, files, monkeypatch):
+    import atomic_csv
+
+    store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", [])
+    before = files["QUESTIONS_FILE"].read_bytes()
+
+    def broken(*args):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(atomic_csv.os, "replace", broken)
+    with pytest.raises(OSError):
+        store.save_question(
+            corpus, "S01", "Q one, edited?", "factual", "A.", "", [], question_id="Q001"
+        )
+    assert files["QUESTIONS_FILE"].read_bytes() == before
+    assert not list(files["QUESTIONS_FILE"].parent.glob("*.tmp"))
+
+
+def test_the_plan_is_written_first_so_a_retry_reuses_the_id(corpus, files, monkeypatch):
+    real = store.write_rows
+
+    def fail_on_truth(path, header, rows):
+        if path == files["GROUND_TRUTH_FILE"]:
+            raise OSError("disk full")
+        real(path, header, rows)
+
+    monkeypatch.setattr(store, "write_rows", fail_on_truth)
+    with pytest.raises(OSError):
+        store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", [])
+    monkeypatch.setattr(store, "write_rows", real)
+    assert store.save_question(corpus, "S01", "Q one?", "factual", "A.", "", []) == "Q001"
+
+
+def test_next_question_id_also_counts_the_plan():
+    plan = [{"status": "used", "question_id": "Q005"}, {"status": "open", "question_id": ""}]
+    assert store.next_question_id([{"question_id": "Q002"}], plan) == "Q006"
+
+
+def test_highlight_splits_camel_case_like_the_rule():
+    assert store.highlight("Use onMounted().", ["mounted"]) == (
+        'Use <mark class="hl">onMounted</mark>().'
+    )
