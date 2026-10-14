@@ -7,6 +7,7 @@ import pytest
 
 import tokens
 from catalogue import load_corpus
+from catalogue_plan import PLAN_HEADER
 from config import AREA_MIN_QUESTIONS, QUESTION_CLASSES, QUESTION_TYPES
 from embedding_client import EmbeddingResult
 from preprocess import clean_markdown, section_spans
@@ -133,3 +134,15 @@ def pilot(tmp_path):
         encoding="utf-8",
     )
     return pilot_dir
+
+
+def write_plan_for(tmp_path, rows):
+    """A plan with one used slot per catalogue row (starting section = first annotated section)."""
+    plan = tmp_path / "catalogue_plan.csv"
+    with plan.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(PLAN_HEADER)
+        for number, (qid, _, _, cls, _, sids) in enumerate(rows, start=1):
+            area = {"D001": "api", "D002": "guide", "D003": "style-guide"}[sids[0].split("#")[0]]
+            writer.writerow([area, number, sids[0], f"S{number:02d}", cls, "used", "", qid])
+    return plan

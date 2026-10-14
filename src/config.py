@@ -32,6 +32,10 @@ CHUNKS_C3_FILE = DATA_PROCESSED / "chunks_c3.jsonl"
 QUESTIONS_FILE = DATA_EVAL / "questions.csv"
 GROUND_TRUTH_FILE = DATA_EVAL / "ground_truth.csv"
 CATALOGUE_FREEZE_FILE = DATA_EVAL / "catalogue_freeze.json"  # SHA-256 of the frozen catalogue (D30)
+CATALOGUE_PLAN_FILE = DATA_EVAL / "catalogue_plan.csv"  # random sampling plan of the slots (D31)
+CATALOGUE_REVIEW_FILE = (
+    DATA_EVAL / "catalogue_review.csv"
+)  # AI review suggestions and decisions (D31)
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
@@ -162,6 +166,17 @@ SINGLE_CLASS_SECTIONS = 1
 CATALOGUE_REPORT_MIN_PAGES = 2
 CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
 CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
+# Random sampling plan (D31): one starting section per slot, drawn by text length from the
+# innermost H2/H3 sections of an area with SHA-256 of "{seed}:{area}:{k}" (version-independent).
+CATALOGUE_SEED = 20261014  # fixed on 14.10.2026, the date of the decision; never tuned
+CATALOGUE_AREA_SLOTS = {"api": 12, "style-guide": 3, "guide": 33}  # sums to the catalogue size
+CATALOGUE_RESERVE = {"api": 12, "style-guide": 3, "guide": 33}  # replacement sections per area
+CATALOGUE_SKIP_REASONS = ("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")
+CATALOGUE_SKIP_MIN_TOKENS = 50  # `too-short`: starting section under this many tokens
+CATALOGUE_PLAN_STATUSES = ("open", "used", "skipped", "reserve")
+# AI review log (D31): kinds of suggestions and their decisions
+CATALOGUE_REVIEW_KINDS = ("missing_section", "wording", "fact", "class")
+CATALOGUE_REVIEW_DECISIONS = ("open", "accepted", "rejected")
 # Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus
 # stopwords; camelCase identifiers also count by their parts. Words of at least
 # CATALOGUE_FOLD_MIN_LENGTH characters also match without a trailing s/es and with ies -> y, and
