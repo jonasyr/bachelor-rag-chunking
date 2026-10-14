@@ -17,6 +17,10 @@ from canary import check_vintage
 from config import (
     CHROMA_COLLECTIONS,
     CHUNK_FILES,
+    CONTROL_CHUNK_FILES,
+    CONTROL_COLLECTIONS,
+    CONTROL_EMBEDDING_FILES,
+    CONTROL_STRATEGIES,
     EMBEDDING_FILES,
     EMBEDDING_MODEL,
     EMBEDDING_RUNS_FILE,
@@ -26,10 +30,15 @@ from config import (
 from embedding_client import Embedder, embed_texts
 from run_log import append_run, sha256_of
 
+# Experiment strategies and the control K1 (D26) share the embedding code path.
+ALL_CHUNK_FILES = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
+ALL_EMBEDDING_FILES = {**EMBEDDING_FILES, **CONTROL_EMBEDDING_FILES}
+ALL_COLLECTIONS = {**CHROMA_COLLECTIONS, **CONTROL_COLLECTIONS}
+
 
 def strategy_keys(choice: str) -> list[str]:
-    """CLI choice -> strategy keys from config.STRATEGY_IDS ("all" means every strategy)."""
-    return list(STRATEGY_IDS) if choice == "all" else [choice]
+    """CLI choice -> keys: "all" means every experiment strategy, then the control (D26)."""
+    return [*STRATEGY_IDS, *CONTROL_STRATEGIES] if choice == "all" else [choice]
 
 
 def load_jsonl(path: Path, hint: str) -> list[dict]:
@@ -81,10 +90,10 @@ def embed_and_store(
     siblings: other stored vector files whose model vintage must match before new vectors are
     added (default: the other strategies and the question vectors).
     """
-    chunk_file = chunk_file or CHUNK_FILES[strategy_key]
-    vector_file = vector_file or EMBEDDING_FILES[strategy_key]
+    chunk_file = chunk_file or ALL_CHUNK_FILES[strategy_key]
+    vector_file = vector_file or ALL_EMBEDDING_FILES[strategy_key]
     if siblings is None:
-        siblings = [f for k, f in EMBEDDING_FILES.items() if k != strategy_key]
+        siblings = [f for k, f in ALL_EMBEDDING_FILES.items() if k != strategy_key]
         siblings.append(QUERY_EMBEDDINGS_FILE)
     chunks = load_jsonl(chunk_file, "run src/chunking.py first")
     ids = [c["chunk_id"] for c in chunks]
@@ -102,7 +111,7 @@ def embed_and_store(
         for c in chunks
     ]
     client = client or vector_index.open_client()
-    vector_index.build_collection(client, CHROMA_COLLECTIONS[strategy_key], ids, vectors, metadatas)
+    vector_index.build_collection(client, ALL_COLLECTIONS[strategy_key], ids, vectors, metadatas)
     return append_run(
         {
             "step": "embed",
@@ -123,7 +132,7 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="Embed chunks and build one Chroma index per strategy.")
-    p.add_argument("--strategy", choices=[*STRATEGY_IDS, "all"], default="all")
+    p.add_argument("--strategy", choices=[*STRATEGY_IDS, *CONTROL_STRATEGIES, "all"], default="all")
     args = p.parse_args()
     for k in strategy_keys(args.strategy):
         run = embed_and_store(k)

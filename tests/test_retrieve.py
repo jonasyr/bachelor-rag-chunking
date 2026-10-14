@@ -7,7 +7,7 @@ from conftest import FakeEmbedder
 import tokens
 import vector_index
 from chunking import chunk
-from config import STRATEGY_IDS
+from config import CHROMA_COLLECTIONS, CONTROL_STRATEGIES, STRATEGY_IDS
 from embed import embed_and_store, load_jsonl
 from preprocess import clean_markdown, section_spans
 from relevance import is_relevant
@@ -318,3 +318,39 @@ def test_a_missing_vector_file_stops_before_any_api_call(setup):
     with pytest.raises(FileNotFoundError, match="run src/embed.py first"):
         retrieve(embedder=fake, **paths)
     assert len(fake.calls) == calls_before and not paths["query_file"].exists()
+
+
+def control_paths(paths, tmp_path):
+    return {
+        **paths,
+        "chunk_files": {"K1": paths["chunk_files"]["C1"]},
+        "vector_files": {"K1": paths["vector_files"]["C1"]},
+        "out_file": tmp_path / "retrieved_results_control.csv",
+    }
+
+
+def test_control_retrieval_writes_only_the_control(setup, tmp_path):
+    paths, *_ = setup
+    n = retrieve(
+        embedder=FakeEmbedder(),
+        strategies=CONTROL_STRATEGIES,
+        collections={"K1": CHROMA_COLLECTIONS["C1"]},
+        **control_paths(paths, tmp_path),
+    )
+    rows = read_out(tmp_path / "retrieved_results_control.csv")
+    assert rows[0] == HEADER and n == 2 * 5 == len(rows) - 1
+    assert {r[1] for r in rows[1:]} == {"K1"}
+    assert json.loads(paths["runs_file"].read_text().splitlines()[-1])["strategy"] == "K1"
+
+
+def test_a_partial_strategy_set_is_refused(setup):
+    paths, *_ = setup
+    with pytest.raises(ValueError, match="experiment set or the control set"):
+        retrieve(embedder=FakeEmbedder(), strategies={"C1": STRATEGY_IDS["C1"]}, **paths)
+
+
+def test_control_files_in_the_experiment_are_refused(setup):
+    paths, *_ = setup
+    mixed = {**paths, "chunk_files": {**paths["chunk_files"], "K1": paths["chunk_files"]["C1"]}}
+    with pytest.raises(ValueError, match="must cover exactly the strategies"):
+        retrieve(embedder=FakeEmbedder(), **mixed)
