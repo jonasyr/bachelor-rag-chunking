@@ -1,0 +1,349 @@
+"""Catalogue editor (ADR 0029, 0031): write and annotate the question catalogue.
+
+Run: uv run streamlit run app/catalogue_editor.py
+
+Shows only the corpus and the catalogue files; never chunks, strategies, retrieval results or
+scores (ADR 0027). All reading and writing goes through src/catalogue_store.py.
+"""
+
+import html
+import sys
+from datetime import date
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+import streamlit as st  # noqa: E402
+
+import catalogue  # noqa: E402
+import catalogue_plan  # noqa: E402
+import catalogue_review  # noqa: E402
+import catalogue_store as store  # noqa: E402
+from config import (  # noqa: E402
+    AREA_MIN_QUESTIONS,
+    CATALOGUE_SKIP_REASONS,
+    DETAIL_MAX_ANSWER_WORDS,
+    QUESTION_CLASSES,
+    QUESTION_TYPES,
+)
+
+AREA_NAMES = {"api": "API reference", "guide": "Guide", "style-guide": "Style guide"}
+SKIP_LABELS = {
+    "code-or-links": "Only code or links",
+    "too-short": "Too short to ask about",
+    "duplicate-topic": "Same topic as an earlier slot",
+    "no-answerable-content": "Nothing a question could ask",
+}
+CSS = """
+<style>
+.source {font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
+  line-height: 1.7; max-width: 72ch; white-space: pre-wrap; overflow-wrap: anywhere;
+  padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink);}
+.heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;}
+mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-radius: 2px;}
+.checks {list-style: none; padding-left: 0; margin: 0.25rem 0 0.75rem;}
+.checks li {margin: 0.15rem 0;}
+.checks .ok {color: var(--ok);} .checks .problem {color: var(--problem);}
+</style>
+"""
+LIGHT = {
+    "line": "#D9DEE4",
+    "surface": "#FFFFFF",
+    "ink": "#1F2933",
+    "muted": "#616E7C",
+    "marker": "#FFE58A",
+    "ok": "#2F7D4F",
+    "problem": "#B3261E",
+}
+DARK = {
+    "line": "#2E3640",
+    "surface": "#1D232A",
+    "ink": "#E4E8EC",
+    "muted": "#9AA5B1",
+    "marker": "rgba(255, 214, 90, 0.35)",
+    "ok": "#6CC48F",
+    "problem": "#F2877F",
+}
+
+
+@st.cache_resource
+def load_corpus(documents: str, sections: str) -> catalogue.Corpus:
+    return catalogue.load_corpus(Path(documents), Path(sections))
+
+
+def palette_css() -> str:
+    dark = getattr(getattr(st.context, "theme", None), "type", "light") == "dark"
+    tokens = DARK if dark else LIGHT
+    return "<style>:root {" + "".join(f"--{k}: {v};" for k, v in tokens.items()) + "}</style>"
+
+
+def source_page(corpus: catalogue.Corpus, section: dict, words: list[str]) -> None:
+    path = store.highlight(corpus.heading_path(section), words)
+    st.markdown(f'<div class="heading-path">{path}</div>', unsafe_allow_html=True)
+    body = store.highlight(corpus.text(section), words)
+    st.markdown(f'<div class="source">{body}</div>', unsafe_allow_html=True)
+
+
+def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None:
+    total = sum(QUESTION_CLASSES.values())
+    with st.sidebar:
+        st.markdown(f"**{len(questions)} of {total} questions**")
+        st.progress(min(len(questions) / total, 1.0))
+        rows = [
+            "| | " + " | ".join(QUESTION_CLASSES) + " |",
+            "|---" * (len(QUESTION_CLASSES) + 1) + "|",
+        ]
+        for qtype, quota in QUESTION_TYPES.items():
+            cells = [
+                sum(1 for q in questions if q["type"] == qtype and q["difficulty"] == c)
+                for c in QUESTION_CLASSES
+            ]
+            rows.append(f"| {qtype} ({sum(cells)}/{quota}) | " + " | ".join(map(str, cells)) + " |")
+        st.markdown("\n".join(rows))
+        used = {r["question_id"]: r["area"] for r in plan if r["status"] == "used"}
+        areas = "; ".join(
+            f"{AREA_NAMES[a]} {sum(1 for v in used.values() if v == a)} of at least {n}"
+            for a, n in AREA_MIN_QUESTIONS.items()
+        )
+        st.caption(f"Areas: {areas}")
+        for line in catalogue_plan.plan_summary(plan):
+            st.caption(line)
+        st.caption(catalogue_review.review_summary(review))
+
+
+def checks(corpus, row, question, answer, sections, questions, qid) -> list[tuple[bool, str]]:
+    draft = {
+        "question_id": qid or "new",
+        "question": question,
+        "type": "",
+        "difficulty": row["class"],
+    }
+    found = catalogue.class_findings(corpus, draft, {"expected_answer": answer}, sections)
+    items = [(not found, "Class rule met" if not found else "; ".join(found))]
+    words = len(answer.split())
+    if row["class"] == "detail":
+        items.append(
+            (
+                words <= DETAIL_MAX_ANSWER_WORDS,
+                f"Answer has {words} words (at most {DETAIL_MAX_ANSWER_WORDS})",
+            )
+        )
+    key = catalogue.normalised_question(question)
+    twin = next(
+        (
+            q["question_id"]
+            for q in questions
+            if q["question_id"] != qid and catalogue.normalised_question(q["question"]) == key
+        ),
+        None,
+    )
+    if question.strip():
+        items.append((twin is None, "No duplicate" if twin is None else f"Same wording as {twin}"))
+    return items
+
+
+def render_checks(items: list[tuple[bool, str]]) -> None:
+    lis = "".join(
+        f'<li class="{"ok" if ok else "problem"}">'
+        f"{'Met' if ok else 'Not met'}: {html.escape(text)}</li>"
+        for ok, text in items
+    )
+    st.markdown(f'<ul class="checks">{lis}</ul>', unsafe_allow_html=True)
+
+
+def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
+    slots = sorted({r["slot_id"] for r in plan if r["status"] in ("open", "used")})
+    first_open = next(
+        (r["slot_id"] for r in sorted(plan, key=lambda r: r["slot_id"]) if r["status"] == "open"),
+        slots[0],
+    )
+
+    def label(sid: str) -> str:
+        row = catalogue_plan.slot_row(plan, sid)
+        return f"{sid}, {row['question_id']}" if row["status"] == "used" else f"{sid}, open"
+
+    sid = (
+        st.selectbox("Slot", slots, index=slots.index(first_open), format_func=label, key="slot")
+        or first_open
+    )
+    row = catalogue_plan.slot_row(plan, sid)
+    seed = corpus.by_id[row["section_id"]]
+    qid = row["question_id"] if row["status"] == "used" else None
+    saved_q = next((q for q in questions if q["question_id"] == qid), None)
+    saved_t = truth.get(qid or "", {})
+    st.subheader(f"Slot {sid}: {AREA_NAMES[row['area']]}, {row['class']}")
+
+    extra_key = f"extra_{sid}"
+    if extra_key not in st.session_state:
+        saved_ids = saved_t.get("relevant_section_ids", "").split(";") if saved_t else []
+        st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
+
+    left, right = st.columns([6, 5], gap="large")
+    with right:
+        question = (
+            st.text_area(
+                "Question",
+                value=saved_q["question"] if saved_q else "",
+                key=f"question_{sid}",
+                height=110,
+            )
+            or ""
+        )
+        types = list(QUESTION_TYPES)
+        qtype = (
+            st.selectbox(
+                "Type",
+                types,
+                key=f"qtype_{sid}",
+                index=types.index(saved_q["type"]) if saved_q else 0,
+            )
+            or types[0]
+        )
+        answer = (
+            st.text_area(
+                "Reference answer",
+                value=saved_t.get("expected_answer", ""),
+                key=f"answer_{sid}",
+                height=130,
+            )
+            or ""
+        )
+        notes = (
+            st.text_input("Notes", value=saved_q["notes"] if saved_q else "", key=f"notes_{sid}")
+            or ""
+        )
+        ids = [seed["section_id"], *st.session_state[extra_key]]
+        sections = [corpus.by_id[s] for s in ids]
+        st.markdown("**Relevant sections**")
+        for s in sections:
+            cols = st.columns([5, 1])
+            cols[0].markdown(f"`{s['section_id']}` {corpus.heading_path(s)}")
+            if s["section_id"] != seed["section_id"] and cols[1].button(
+                "Remove", key=f"remove_{s['section_id']}", disabled=frozen
+            ):
+                st.session_state[extra_key].remove(s["section_id"])
+                st.rerun()
+        render_checks(checks(corpus, row, question, answer, sections, questions, qid))
+        if st.button("Save question", type="primary", key="save", disabled=frozen):
+            try:
+                saved = store.save_question(
+                    corpus,
+                    sid,
+                    question,
+                    qtype,
+                    answer,
+                    notes,
+                    st.session_state[extra_key],
+                    question_id=qid,
+                )
+                st.toast(f"Saved {saved}")
+                st.rerun()
+            except (ValueError, PermissionError) as error:
+                st.error(str(error))
+        if row["status"] == "open":
+            with st.expander("Skip this section"):
+                reason = (
+                    st.selectbox(
+                        "Reason",
+                        list(CATALOGUE_SKIP_REASONS),
+                        key="skip_reason",
+                        format_func=lambda r: str(SKIP_LABELS.get(r, r)),
+                    )
+                    or CATALOGUE_SKIP_REASONS[0]
+                )
+                if st.button("Skip this section", key="skip", disabled=frozen):
+                    catalogue_plan.skip_slot(store.CATALOGUE_PLAN_FILE, sid, reason, corpus)
+                    st.rerun()
+
+    with left:
+        words = (
+            catalogue.shared_words(question, catalogue.heading_texts(corpus, sections))
+            if question
+            else []
+        )
+        source_page(corpus, seed, words)
+        term = st.text_input(
+            "Find more sections", key="find", placeholder="Search the documentation"
+        )
+        if term.strip():
+            hits = catalogue.find(corpus, term)
+            if not hits:
+                st.caption("No section contains this text.")
+            else:
+                options = {h[0]["section_id"]: h for h in hits}
+                pick = st.selectbox(
+                    f"{len(hits)} sections",
+                    list(options),
+                    key="hit",
+                    format_func=lambda s: f"{s}  {corpus.heading_path(options[s][0])}",
+                ) or next(iter(options))
+                source_page(corpus, options[pick][0], words)
+                if st.button("Add this section", key="add_section", disabled=frozen or pick in ids):
+                    st.session_state[extra_key].append(pick)
+                    st.rerun()
+
+
+def forget_section_lists() -> None:
+    """Drop cached section lists so they are reloaded from the ground truth file."""
+    for key in [k for k in st.session_state if str(k).startswith("extra_")]:
+        del st.session_state[key]
+
+
+def review_tab(corpus, review: list[dict], questions: list[dict], frozen: bool) -> None:
+    text = {q["question_id"]: q["question"] for q in questions}
+    pending = [(i, r) for i, r in enumerate(review) if r["decision"] == "open"]
+    if not pending:
+        st.info("No open suggestions.")
+    for i, r in pending:
+        with st.container(border=True):
+            st.markdown(f"**{r['question_id']}**: {text.get(r['question_id'], '')}")
+            st.markdown(f"{r['kind'].replace('_', ' ').capitalize()}: {r['suggestion']}")
+            if r["section_id"]:
+                source_page(corpus, corpus.by_id[r["section_id"]], [])
+            reason = st.text_input("Reason", key=f"reason_{i}")
+            a, b = st.columns(2)
+            today = date.today().isoformat()
+            if a.button("Accept", key=f"accept_{i}", disabled=frozen):
+                store.accept_suggestion(corpus, i, reason or "", today)
+                forget_section_lists()
+                st.rerun()
+            if b.button("Reject", key=f"reject_{i}", disabled=frozen):
+                try:
+                    store.reject_suggestion(i, reason or "", today)
+                    forget_section_lists()
+                    st.rerun()
+                except ValueError as error:
+                    st.error(str(error))
+    decided = [r for r in review if r["decision"] != "open"]
+    if decided:
+        with st.expander(f"Decided ({len(decided)})"):
+            for r in decided:
+                reason = r["reason"] or "no reason"
+                st.markdown(f"{r['question_id']}, {r['kind']}: {r['decision']} ({reason})")
+
+
+def main() -> None:
+    st.set_page_config(page_title="Question catalogue", layout="wide")
+    st.markdown(CSS + palette_css(), unsafe_allow_html=True)
+    corpus = load_corpus(str(store.DOCUMENTS_FILE), str(store.SECTIONS_FILE))
+    try:
+        plan = catalogue_plan.read_plan(store.CATALOGUE_PLAN_FILE)
+    except (FileNotFoundError, ValueError) as error:
+        st.error(str(error))
+        return
+    questions, truth = store.load_catalogue()
+    review = catalogue_review.read_review(store.CATALOGUE_REVIEW_FILE)
+    frozen = store.is_frozen()
+    sidebar(questions, plan, review)
+    if frozen:
+        st.info("The catalogue is frozen (ADR 0030). You can read it, but not change it.")
+    open_count = sum(1 for r in review if r["decision"] == "open")
+    write, rev = st.tabs(["Write", f"Review ({open_count})" if open_count else "Review"])
+    with write:
+        write_tab(corpus, plan, questions, truth, frozen)
+    with rev:
+        review_tab(corpus, review, questions, frozen)
+
+
+main()
