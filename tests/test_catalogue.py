@@ -199,7 +199,8 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
 def run_check(corpus, tmp_path, rows, pilot_dir):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows)
-    return check(corpus, questions, truth, pilot_dir=pilot_dir, plan_file=plan)
+    review = tmp_path / "catalogue_review.csv"
+    return check(corpus, questions, truth, pilot_dir=pilot_dir, plan_file=plan, review_file=review)
 
 
 def test_valid_catalogue_passes_strictly(corpus, tmp_path, pilot):
@@ -277,6 +278,7 @@ def cli(corpus_files, tmp_path, monkeypatch, pilot):
     monkeypatch.setattr(catalogue, "PILOT_DIR", pilot)
     monkeypatch.setattr(catalogue, "CATALOGUE_FREEZE_FILE", tmp_path / "freeze.json")
     monkeypatch.setattr(catalogue, "CATALOGUE_PLAN_FILE", write_plan_for(tmp_path, valid_rows()))
+    monkeypatch.setattr(catalogue, "CATALOGUE_REVIEW_FILE", tmp_path / "catalogue_review.csv")
     return tmp_path
 
 
@@ -376,7 +378,14 @@ def test_page_spread_report_uses_the_configured_minimum(corpus, tmp_path, pilot,
 
 def test_check_reports_a_missing_plan(corpus, tmp_path, pilot):
     questions, truth = write_catalogue(tmp_path, valid_rows())
-    report = check(corpus, questions, truth, pilot_dir=pilot, plan_file=tmp_path / "none.csv")
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=tmp_path / "none.csv",
+        review_file=tmp_path / "r.csv",
+    )
     assert any("catalogue.py plan" in e for e in report.errors)
 
 
@@ -384,5 +393,30 @@ def test_check_applies_the_plan_rules(corpus, tmp_path, pilot):
     rows = valid_rows()
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows[1:])  # Q001 has no slot
-    report = check(corpus, questions, truth, pilot_dir=pilot, plan_file=plan)
+    report = check(
+        corpus, questions, truth, pilot_dir=pilot, plan_file=plan, review_file=tmp_path / "r.csv"
+    )
     assert "Q001: belongs to 0 slots, needs exactly 1" in report.findings
+
+
+def test_open_review_rows_warn_in_draft_and_fail_strictly(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    questions, truth = write_catalogue(tmp_path, rows)
+    review = tmp_path / "catalogue_review.csv"
+    review.write_text(
+        "round,question_id,kind,suggestion,section_id,decision,reason,date\n"
+        "1,Q001,wording,Say which hook.,,open,,\n",
+        encoding="utf-8",
+    )
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=write_plan_for(tmp_path, rows),
+        review_file=review,
+    )
+    assert report.errors == []
+    assert "1 review suggestion(s) still open" in report.findings
+    assert exit_code(report, draft=True) == 0 and exit_code(report, draft=False) == 1
+    assert any(line.startswith("AI review: 1 suggestions") for line in report.lines)

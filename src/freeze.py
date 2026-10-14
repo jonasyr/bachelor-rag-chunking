@@ -23,14 +23,19 @@ def write_freeze(
     documents_file: Path,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     summary: dict | None = None,
+    recorded: tuple[Path, ...] = (),
 ) -> dict:
-    """Write the record once; an existing record is never overwritten (exclusive create)."""
+    """Write the record once; an existing record is never overwritten (exclusive create).
+
+    Further files (`recorded`) are hashed for the record only; `require_frozen` checks the four
+    retrieval inputs.
+    """
     record = {
         "date": date.today().isoformat(),
         **(summary or {}),
         "sha256": {
             f.name: sha256_of(f)
-            for f in (questions_file, ground_truth_file, sections_file, documents_file)
+            for f in (questions_file, ground_truth_file, sections_file, documents_file, *recorded)
         },
     }
     freeze_file.parent.mkdir(parents=True, exist_ok=True)

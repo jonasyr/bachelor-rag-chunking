@@ -28,6 +28,7 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         sections,
         documents,
         plan_file=write_plan_for(tmp_path, valid_rows()),
+        review_file=tmp_path / "catalogue_review.csv",
     )
     stored = json.loads(out.read_text(encoding="utf-8"))
     assert stored == record
@@ -36,6 +37,7 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         "ground_truth.csv": sha256_of(truth),
         "sections.jsonl": sha256_of(sections),
         "documents.jsonl": sha256_of(documents),
+        "catalogue_plan.csv": sha256_of(tmp_path / "catalogue_plan.csv"),
     }
     assert stored["questions"] == 48 and stored["types"]["comparative"] == 6
     assert set(stored) == {"date", "questions", "types", "classes", "sha256"}
@@ -56,6 +58,7 @@ def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
             corpus_files[1],
             corpus_files[0],
             plan_file=write_plan_for(tmp_path, valid_rows()[:47]),
+            review_file=tmp_path / "catalogue_review.csv",
         )
     assert not out.exists()
 
@@ -72,6 +75,7 @@ def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_pat
         sections,
         documents,
         plan_file=write_plan_for(tmp_path, valid_rows()),
+        review_file=tmp_path / "catalogue_review.csv",
     )
     before = out.read_bytes()
     with pytest.raises(FileExistsError, match="ADR 0030"):
@@ -84,6 +88,7 @@ def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_pat
             sections,
             documents,
             plan_file=write_plan_for(tmp_path, valid_rows()),
+            review_file=tmp_path / "catalogue_review.csv",
         )
     with pytest.raises(FileExistsError, match="ADR 0030"):
         freeze.write_freeze(questions, truth, sections, documents, out)
@@ -153,3 +158,24 @@ def test_require_frozen_refuses_changed_document_text(main_catalogue, tmp_path):
     documents.write_text(documents.read_text(encoding="utf-8").replace("Takes", "Gets"))
     with pytest.raises(RuntimeError, match="documents.jsonl changed since the freeze"):
         freeze.require_frozen(questions, truth, sections, documents, out)
+
+
+def test_freeze_records_plan_and_review(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    plan = write_plan_for(tmp_path, valid_rows())
+    review = tmp_path / "catalogue_review.csv"
+    review.write_text("round,question_id,kind,suggestion,section_id,decision,reason,date\n")
+    out = tmp_path / "catalogue_freeze.json"
+    record = freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=plan,
+        review_file=review,
+    )
+    assert record["sha256"]["catalogue_plan.csv"] == sha256_of(plan)
+    assert record["sha256"]["catalogue_review.csv"] == sha256_of(review)
