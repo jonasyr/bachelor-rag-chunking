@@ -57,4 +57,4 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    ```
 
    Danach läuft `src/retrieve.py` auf dem Katalog; vorher bricht es ab. Ein späteres Ändern einer der beiden Dateien
-   oder ein neu gebautes `sections.jsonl` lässt `retrieve.py` wieder abbrechen; ein erneutes Einfrieren braucht ein neues ADR.
+   oder ein neu gebautes `sections.jsonl` bzw. `documents.jsonl` lässt `retrieve.py` wieder abbrechen; ein erneutes Einfrieren braucht ein neues ADR.
