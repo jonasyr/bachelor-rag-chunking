@@ -52,25 +52,38 @@ def copy_markdown(
     src_root: Path, out_dir: Path, areas: tuple[str, ...], excluded: tuple[str, ...]
 ) -> list[Path]:
     """Replace out_dir/<area> with the *.md files below src_root/<area>, minus `excluded`
-    (paths relative to src_root); return the copied paths relative to out_dir."""
+    (paths relative to src_root); return the copied paths relative to out_dir.
+
+    Everything is checked before anything is copied: every exclusion must lie in an area, exist
+    in the checkout and remove exactly one Markdown file, so the list cannot rot silently.
+    """
     outside = [e for e in excluded if e.split("/", 1)[0] not in areas]
     if outside:
         raise ValueError(f"excluded files outside the areas {list(areas)}: {outside}")
     missing = [e for e in excluded if not (src_root / e).is_file()]
     if missing:
         raise FileNotFoundError(f"excluded files not in the checkout: {missing}")
-    copied: list[Path] = []
+    selected: dict[str, list[Path]] = {}
+    matched: set[str] = set()
     for area in areas:
         src_dir = src_root / area
         if not src_dir.is_dir():
             raise FileNotFoundError(f"{src_dir} not found in the checkout")
-        files = [
-            p
-            for p in sorted(src_dir.rglob("*.md"))
-            if p.relative_to(src_root).as_posix() not in excluded
-        ]
+        files = []
+        for p in sorted(src_dir.rglob("*.md")):
+            rel = p.relative_to(src_root).as_posix()
+            if rel in excluded:
+                matched.add(rel)
+            else:
+                files.append(p)
         if not files:
             raise FileNotFoundError(f"no Markdown files below {src_dir}")
+        selected[area] = files
+    unmatched = [e for e in excluded if e not in matched]
+    if unmatched:
+        raise ValueError(f"exclusions that match no Markdown file: {unmatched}")
+    copied: list[Path] = []
+    for area, files in selected.items():
         target = out_dir / area
         if target.exists():
             shutil.rmtree(target)
