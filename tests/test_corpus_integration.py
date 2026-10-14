@@ -7,6 +7,7 @@ import re
 import numpy as np
 import pytest
 
+from catalogue import find, load_corpus, section_index
 from chunking import chunk
 from config import (
     C3_MAX_TOKENS,
@@ -118,3 +119,14 @@ def test_reference_vectors_match_their_chunks(key):
         vectors = data["vectors"]
     assert vectors.shape == (len(chunks), EMBEDDING_DIMENSIONS)
     assert np.allclose(np.linalg.norm(vectors, axis=1), 1.0, atol=1e-3)  # OpenAI: unit length
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+def test_section_index_covers_the_real_corpus():
+    corpus = load_corpus()
+    rows = [line for line in section_index(corpus).splitlines() if line.startswith("| `")]
+    ids = [row.split("`")[1] for row in rows]
+    assert len(rows) == len(corpus.sections) == 813
+    assert all(sid in corpus.by_id for sid in ids)
+    assert {row.split(" | ")[1] for row in rows} == {"api", "guide", "style-guide"}
+    assert any(s["section_id"].startswith("D") for s, _ in find(corpus, "defineProps"))

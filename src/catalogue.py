@@ -11,8 +11,10 @@ results, so the annotation stays blind (ADR 0027).
     freeze              strict check, then record SHA-256 of both files (ADR 0030)
 """
 
+import argparse
 import os
 import re
+import sys
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -138,8 +140,10 @@ def write_section_index(corpus: Corpus, out_file: Path = SECTION_INDEX_FILE) -> 
     return len(corpus.sections)
 
 
-def _excerpt(text: str, start: int, end: int) -> str:
-    return " ".join(text[max(0, start - EXCERPT_CHARS) : end + EXCERPT_CHARS].split())
+def _excerpt(text: str, start: int, end: int, lower: int, upper: int) -> str:
+    """Match with up to EXCERPT_CHARS of context, never beyond the section [lower, upper)."""
+    window = text[max(lower, start - EXCERPT_CHARS) : min(upper, end + EXCERPT_CHARS)]
+    return " ".join(window.split())
 
 
 def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
@@ -165,7 +169,7 @@ def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
         text = corpus.docs[s["doc_id"]]["text"]
         for match in pattern.finditer(text, start, end):
             if not any(a <= match.start() < b for a, b in children):
-                hits.append((s, _excerpt(text, match.start(), match.end())))
+                hits.append((s, _excerpt(text, match.start(), match.end(), start, end)))
                 break
     return hits
 
@@ -398,3 +402,60 @@ def freeze_catalogue(
         "classes": report.classes,
     }
     return write_freeze(questions_file, ground_truth_file, freeze_file, summary)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Question catalogue tools (ADR 0029, 0030).")
+    commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("sections", help=f"write the lookup list ({SECTION_INDEX_FILE.name})")
+    find_cmd = commands.add_parser("find", help="sections whose own text contains TERM")
+    find_cmd.add_argument("term")
+    show_cmd = commands.add_parser("show", help="heading path, tokens and text of a section")
+    show_cmd.add_argument("section_id")
+    check_cmd = commands.add_parser("check", help="coverage check of the catalogue")
+    check_cmd.add_argument("--draft", action="store_true", help="fail only on errors")
+    commands.add_parser("freeze", help="strict check, then write the freeze record")
+    args = parser.parse_args(argv)
+
+    corpus = load_corpus(DOCUMENTS_FILE, SECTIONS_FILE)
+    if args.command == "sections":
+        count = write_section_index(corpus, SECTION_INDEX_FILE)
+        print(f"{count} sections -> {SECTION_INDEX_FILE}")
+        return 0
+    if args.command == "find":
+        hits = find(corpus, args.term)
+        for section, excerpt in hits:
+            print(f"{section['section_id']}  {corpus.heading_path(section)}\n    {excerpt}")
+        print(f"{len(hits)} sections")
+        return 0
+    if args.command == "show":
+        try:
+            print(show(corpus, args.section_id))
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            return 1
+        return 0
+
+    report = check(corpus, QUESTIONS_FILE, GROUND_TRUTH_FILE, PILOT_DIR)
+    draft = args.command == "check" and args.draft
+    print("\n".join(report.lines))
+    for error in report.errors:
+        print(f"ERROR {error}")
+    for finding in report.findings:
+        print(f"{'WARNING' if draft else 'FINDING'} {finding}")
+    code = exit_code(report, draft)
+    if args.command == "check" or code:
+        return code
+    try:
+        record = freeze_catalogue(
+            corpus, QUESTIONS_FILE, GROUND_TRUTH_FILE, CATALOGUE_FREEZE_FILE, PILOT_DIR
+        )
+    except (FileExistsError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 1
+    print(f"frozen on {record['date']} -> {CATALOGUE_FREEZE_FILE}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

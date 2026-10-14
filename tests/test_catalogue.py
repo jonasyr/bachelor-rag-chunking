@@ -1,6 +1,7 @@
 import pytest
 from conftest import PAGES, build_corpus, valid_rows, write_catalogue
 
+import catalogue
 import tokens
 from catalogue import (
     check,
@@ -10,6 +11,7 @@ from catalogue import (
     find,
     forms,
     load_corpus,
+    main,
     section_index,
     shared_words,
     show,
@@ -259,3 +261,40 @@ def test_duplicates_within_the_catalogue_and_against_pilots(corpus, tmp_path, pi
     report = run_check(corpus, tmp_path, rows, pilot)
     assert "Q002: same question as Q001" in report.findings
     assert "Q003: same question as pilot hard/H01" in report.findings
+
+
+@pytest.fixture
+def cli(corpus_files, tmp_path, monkeypatch, pilot):
+    docs_file, sections_file = corpus_files
+    monkeypatch.setattr(catalogue, "DOCUMENTS_FILE", docs_file)
+    monkeypatch.setattr(catalogue, "SECTIONS_FILE", sections_file)
+    monkeypatch.setattr(catalogue, "SECTION_INDEX_FILE", tmp_path / "section_index.md")
+    questions, truth = write_catalogue(tmp_path, valid_rows())
+    monkeypatch.setattr(catalogue, "QUESTIONS_FILE", questions)
+    monkeypatch.setattr(catalogue, "GROUND_TRUTH_FILE", truth)
+    monkeypatch.setattr(catalogue, "PILOT_DIR", pilot)
+    monkeypatch.setattr(catalogue, "CATALOGUE_FREEZE_FILE", tmp_path / "freeze.json")
+    return tmp_path
+
+
+def test_cli_sections_find_show(cli, capsys):
+    assert main(["sections"]) == 0
+    assert (cli / "section_index.md").exists()
+    assert main(["find", "callback only"]) == 0
+    assert "D002#once" in capsys.readouterr().out
+    assert main(["show", "D009#x"]) == 1
+    assert "unknown section D009#x" in capsys.readouterr().err
+
+
+def test_cli_check_and_freeze(cli, capsys):
+    assert main(["check"]) == 0
+    assert main(["freeze"]) == 0
+    assert (cli / "freeze.json").exists()
+    assert main(["freeze"]) == 1
+    assert "ADR 0030" in capsys.readouterr().err
+
+
+def test_find_excerpt_stays_inside_the_section(corpus):
+    [(section, excerpt)] = find(corpus, "one time")
+    assert section["section_id"] == "D002#once"
+    assert "Cleanup" not in excerpt and "Deep" not in excerpt
