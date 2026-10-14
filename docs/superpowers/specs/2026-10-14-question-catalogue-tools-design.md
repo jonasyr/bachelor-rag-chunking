@@ -52,7 +52,8 @@ stands for itself without a trailing `s`, without `es`, and with `ies` → `y`; 
 least max(4, length of the shorter word − 3) characters (`watch`/`watchers`, `mounted`/`mounting`,
 `reactive`/`reactivity`; not `compiler`/`computed`). The rule errs towards reporting a shared word, the safe direction
 for a check that must catch overlap; plural folding alone missed derivations (task 3 review, 14.10.2026), and with (b)
-5 of the 7 pilot paraphrase questions would fail.
+5 of the 7 pilot paraphrase questions would fail. The heading words of a question are the words of the `title` of each
+relevant section plus the `title` of the H1 section of its document.
 
 | Class | Rule | Checked by `check` |
 |---|---|---|
