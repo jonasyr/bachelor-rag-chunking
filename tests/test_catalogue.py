@@ -182,6 +182,21 @@ def test_forms_fold_plural_endings_only_for_longer_words():
         ("What are refs?", "ref()", ["refs"]),
         ("What does a dependency do?", "Optional Dependencies", ["dependency"]),
         ("How do I skip later renders?", "v-once", []),
+        # derivations keep the stem: not a paraphrase (task 3 review)
+        ("How do I watch nested objects deeply?", "Deep Watchers", ["deeply", "watch"]),
+        ("When is a component mounted?", "Mounting", ["mounted"]),
+        ("What does watching do?", "Watchers", ["watching"]),
+        ("What is a reactive object?", "Reactivity Fundamentals", ["reactive"]),
+        ("What happens on update?", "Updated", ["update"]),
+        ("Which emitted events exist?", "Emitting Events", ["emitted", "events"]),
+        ("Which props are passed?", "Props Passing", ["passed", "props"]),
+        ("How do I bind it?", "Bindings", ["bind"]),
+        # code identifiers are also compared by their camelCase parts
+        ("How do I define props?", "defineProps()", ["define", "props"]),
+        ("What does defineProps return?", "Define Props", ["define", "defineprops", "props"]),
+        # unrelated words with a short common start stay apart
+        ("Is the compiler involved?", "Computed Properties", []),
+        ("Which template is used?", "Temporary State", []),
     ],
 )
 def test_shared_words(question, heading, shared):
@@ -224,6 +239,10 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
     once = [corpus.by_id["D002#once"]]  # headings "Once Watchers" and page title "Watchers"
     ok = question("paraphrase", "How do I run a callback a single time?")
     assert class_findings(corpus, ok, truth(), once) == []
+    section_word = question("paraphrase", "Does it fire only once?")  # "Once" is section-only
+    assert class_findings(corpus, section_word, truth(), once) == [
+        "paraphrase shares heading words ['once']"
+    ]
     page_word = question("paraphrase", "How do watchers fire?")
     assert class_findings(corpus, page_word, truth(), once) == [
         "paraphrase shares heading words ['watchers']"

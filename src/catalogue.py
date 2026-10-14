@@ -11,6 +11,7 @@ results, so the annotation stays blind (ADR 0027).
     freeze              strict check, then record SHA-256 of both files (ADR 0030)
 """
 
+import os
 import re
 from collections import Counter
 from dataclasses import dataclass, field
@@ -19,7 +20,10 @@ from pathlib import Path
 import tokens
 from config import (
     AREA_MIN_QUESTIONS,
+    CATALOGUE_CAMEL_BOUNDARY,
     CATALOGUE_FOLD_MIN_LENGTH,
+    CATALOGUE_PREFIX_MIN,
+    CATALOGUE_PREFIX_SLACK,
     CATALOGUE_STOPWORDS,
     CATALOGUE_WORD_PATTERN,
     DETAIL_MAX_ANSWER_WORDS,
@@ -44,6 +48,7 @@ from retrieve import (
 HEADING_SEPARATOR = " › "
 EXCERPT_CHARS = 60
 WORD_RE = re.compile(CATALOGUE_WORD_PATTERN)
+CAMEL_RE = re.compile(CATALOGUE_CAMEL_BOUNDARY)
 STOPWORDS = frozenset(CATALOGUE_STOPWORDS)
 
 
@@ -173,8 +178,9 @@ def show(corpus: Corpus, section_id: str) -> str:
 
 
 def content_words(text: str) -> set[str]:
-    """Lowercase words of text without stopwords (ADR 0029)."""
-    return {w for w in WORD_RE.findall(text.lower()) if w not in STOPWORDS}
+    """Lowercase words of text without stopwords; camelCase also by its parts (ADR 0029)."""
+    words = WORD_RE.findall(text.lower()) + WORD_RE.findall(CAMEL_RE.sub(" ", text).lower())
+    return {w for w in words if w not in STOPWORDS}
 
 
 def forms(word: str) -> set[str]:
@@ -194,13 +200,18 @@ def forms(word: str) -> set[str]:
     return result
 
 
+def same_word(a: str, b: str) -> bool:
+    """Plural forms intersect, or a long enough common prefix (watch/watchers, mounted/mounting)."""
+    if forms(a) & forms(b):
+        return True
+    prefix = len(os.path.commonprefix([a, b]))
+    return prefix >= max(CATALOGUE_PREFIX_MIN, min(len(a), len(b)) - CATALOGUE_PREFIX_SLACK)
+
+
 def shared_words(question: str, headings: list[str]) -> list[str]:
     """Question words that match a heading word, sorted."""
-    heading_forms: set[str] = set()
-    for heading in headings:
-        for word in content_words(heading):
-            heading_forms |= forms(word)
-    return sorted(w for w in content_words(question) if forms(w) & heading_forms)
+    heading_words = {w for heading in headings for w in content_words(heading)}
+    return sorted(w for w in content_words(question) if any(same_word(w, h) for h in heading_words))
 
 
 def heading_texts(corpus: Corpus, sections: list[dict]) -> list[str]:

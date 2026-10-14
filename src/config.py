@@ -155,10 +155,16 @@ QUESTION_CLASSES = {"single": 12, "multi-section": 12, "detail": 12, "paraphrase
 AREA_MIN_QUESTIONS = {"api": 12, "style-guide": 3}
 DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many words (D29)
 # Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus
-# stopwords; words of at least CATALOGUE_FOLD_MIN_LENGTH characters also match without a
-# trailing s/es and with ies -> y.
+# stopwords; camelCase identifiers also count by their parts. Words of at least
+# CATALOGUE_FOLD_MIN_LENGTH characters also match without a trailing s/es and with ies -> y, and
+# two words match if they share a prefix of at least max(CATALOGUE_PREFIX_MIN, length of the
+# shorter word - CATALOGUE_PREFIX_SLACK) characters (watch/watchers, mounted/mounting). The rule
+# errs towards reporting a shared word.
 CATALOGUE_WORD_PATTERN = r"[a-z0-9]+"
+CATALOGUE_CAMEL_BOUNDARY = r"(?<=[a-z0-9])(?=[A-Z])"
 CATALOGUE_FOLD_MIN_LENGTH = 4
+CATALOGUE_PREFIX_MIN = 4
+CATALOGUE_PREFIX_SLACK = 3
 CATALOGUE_STOPWORDS = (
     "a", "about", "am", "an", "and", "are", "as", "at", "be", "been", "being", "but", "by",
     "can", "could", "did", "do", "does", "done", "for", "from", "had", "has", "have", "he",
