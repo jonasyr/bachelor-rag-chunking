@@ -1,0 +1,17 @@
+question_id,question,type,difficulty,notes
+H01,"How do I let a parent bind v-model to my own input component, and which prop and event does Vue generate for it behind the scenes?",procedural,hard,pilot multi-section
+H02,"My derived value should trigger an API request whenever its inputs change. Can I do that inside a computed property, or what should I use instead?",comparative,hard,pilot multi-section
+H03,"How can I render an HTML string that comes from my data as real markup, and what is the security risk of doing so?",procedural,hard,pilot multi-section
+H04,"Can several components share one piece of state without installing a library, and what goes wrong with that approach when the app is rendered on the server?",limitation,hard,pilot multi-section
+H05,"I show a spinner while a lazily loaded component downloads. Why does my loading component stop appearing once a <Suspense> wraps it, and what shows instead?",limitation,hard,pilot multi-section
+H06,"From which Vue version on do variables destructured from defineProps stay reactive?",factual,hard,pilot detail
+H07,"Which option makes a watch() callback run only the first time its source changes?",factual,hard,pilot detail
+H08,"What naming convention should a function that encapsulates reusable stateful logic follow?",factual,hard,pilot detail
+H09,"How do I declare types for the events a component emits when I use TypeScript with <script setup>?",procedural,hard,pilot detail
+H10,"Inside my watcher callback the DOM still shows the old state. How do I make the callback see the updated DOM?",procedural,hard,pilot paraphrase
+H11,"How can I update the bound variable only when the user leaves a text field instead of on every keystroke?",procedural,hard,pilot paraphrase
+H12,"A component asks an ancestor for a value that no ancestor supplies, and the console prints a warning. How do I make this dependency optional?",procedural,hard,pilot paraphrase
+H13,"After I sort an array, the text typed into inputs rendered in a loop stays attached to the wrong rows. Why, and how do I fix it?",conceptual,hard,pilot paraphrase
+H14,"A block of my template shows data that is set once at startup and never changes. How can I tell Vue to skip it on all later re-renders?",procedural,hard,pilot paraphrase
+H15,"How can I run code as soon as a component's DOM elements exist for the first time?",procedural,hard,pilot paraphrase
+H16,"I copied a property out of a reactive object into a local variable, and the variable no longer updates. Why?",conceptual,hard,pilot paraphrase
