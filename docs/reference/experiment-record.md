@@ -82,31 +82,44 @@ Probe 1 (8 einfache Fragen):
 | C3 | 1,00 | 0,94 | 0,23 | 1,00 | 1.302 |
 | K1 | 1,00 | 0,94 | 0,38 | 1,00 | 1.082 |
 
-Probe 2 (16 schwere Fragen):
+Probe 2 (16 schwere Fragen), Annotation blind, also vor jedem Retrieval festgelegt (`data/pilot/hard/`):
 
 | Strategie | Hit@5 | MRR | Precision@5 | Recall@5 | Kontext@5 |
 |---|---:|---:|---:|---:|---:|
-| C1 | 1,00 | 0,76 | 0,34 | 0,92 | 2.388 |
-| C2 | 0,81 | 0,66 | 0,36 | 0,73 | 2.402 |
-| C3 | 1,00 | 0,69 | 0,28 | 0,89 | 1.263 |
-| K1 | 0,94 | 0,67 | 0,36 | 0,80 | 1.129 |
+| C1 | 1,00 | 0,68 | 0,29 | 0,95 | 2.388 |
+| C2 | 0,81 | 0,61 | 0,31 | 0,76 | 2.402 |
+| C3 | 0,94 | 0,66 | 0,24 | 0,85 | 1.263 |
+| K1 | 0,94 | 0,59 | 0,33 | 0,82 | 1.129 |
 
-Nach Fragenart (MRR / Recall@5):
+Nach Fragenart (MRR / Recall@5, blind):
 
 | Art | C1 | C2 | C3 | K1 |
 |---|---|---|---|---|
-| multi-section (n = 5) | 1,00 / 0,83 | 1,00 / 0,83 | 0,67 / 0,73 | 0,63 / 0,67 |
+| multi-section (n = 5) | 0,87 / 0,83 | 0,85 / 0,83 | 0,67 / 0,73 | 0,50 / 0,63 |
 | detail (n = 4) | 0,88 / 1,00 | 0,62 / 0,75 | 0,75 / 1,00 | 0,62 / 0,75 |
-| paraphrase (n = 7) | 0,52 / 0,93 | 0,44 / 0,64 | 0,67 / 0,93 | 0,73 / 0,93 |
+| paraphrase (n = 7) | 0,43 / 1,00 | 0,44 / 0,71 | 0,60 / 0,86 | 0,63 / 1,00 |
 
-Befund (Pilot, n klein, keine Signifikanz):
+Post-hoc-Sensitivität, **keine Evidenz** (Annotation nach Sicht der Ergebnisse um drei Abschnitte ergänzt, siehe
+Probe 2 im vorherigen Stand; `data/pilot/hard_posthoc/`): C1 1,00 / 0,76 / 0,34 / 0,92, C2 0,81 / 0,66 / 0,36 / 0,73,
+C3 1,00 / 0,69 / 0,28 / 0,89, K1 0,94 / 0,67 / 0,36 / 0,80 (Hit@5 / MRR / P@5 / R@5). Sie zeigt nur, wie stark eine
+unvollständige Annotation die Werte verschiebt.
 
-- Der größere Korpus macht das Retrieval schwerer: In Probe 2 sinken Hit@5 und Recall@5 vor allem bei C2
-  (0,94 → 0,81 bzw. 0,85 → 0,73); Guide- und API-Seiten konkurrieren um dieselben Plätze.
-- Die Kontrolle wirkt wie vorgesehen: K1 erhält gleich große Chunks wie C3, aber ohne Struktur. Bei Mehrabschnitts-
-  und Detailfragen liegt C3 vor K1 (Recall@5 0,73 gegen 0,67 bzw. 1,00 gegen 0,75), bei Paraphrasen gleich im Recall@5, K1 mit höherem MRR; ein Teil
-  des C3-Verhaltens geht also auf die Größe zurück, ein Teil auf die Struktur. Ob das trägt, zeigt erst der Katalog.
+Befund (Pilot, blinde Annotation, n klein, keine Signifikanz):
+
+- Der größere Korpus macht das Retrieval schwerer: Gegenüber dem alten Korpus sinken in Probe 2 Hit@5 und Recall@5
+  vor allem bei C2 (0,94 → 0,81 bzw. 0,89 → 0,76); Guide- und API-Seiten konkurrieren um dieselben Plätze.
+- Die Kontrolle wirkt wie vorgesehen und zeigt kein einheitliches Bild: Bei Mehrabschnitts- und Detailfragen liegt C3
+  vor K1 (Recall@5 0,73 gegen 0,63 bzw. 1,00 gegen 0,75), bei Paraphrasen liegt K1 vorn (1,00 gegen 0,86). Ein Teil
+  des C3-Verhaltens geht also auf die Größe zurück, ein Teil auf die Struktur; ob das trägt, zeigt erst der Katalog.
 - Kontext je Antwort: C3 und K1 liefern dem Sprachmodell nur etwa halb so viele Tokens wie C1/C2.
+
+Zur Annotation (Codex-Review von PR #6): Ergänzungen nach Sicht der Ergebnisse lassen das Retrieval auf die
+Relevanzurteile zurückwirken; offengelegte Korrekturen machen solche Werte nicht zu gültiger Evidenz. Deshalb sind
+die blinden Annotationen die Hauptwerte. Die blinde Fassung wurde aus der ursprünglichen Datei Byte für Byte
+wiederhergestellt; ihre SHA-256 (`f9ddb34b…7e860`) ist gleich der im ersten API-Lauf protokollierten
+(`data/pilot/hard/runs.jsonl`, erste Zeile). Sie liegt mit alten IDs in
+`data/pilot/hard/history/ground_truth_b75d188.csv` und wurde wie die übrigen Pilotdateien über Pfad und Anker
+abgebildet. Für den echten Fragenkatalog gilt: Annotation vollständig vor jedem Retrieval (ADR 0017).
 
 ## Vorheriger Stand (13.10.2026, `b75d188`, nur Guide)
 
@@ -182,33 +195,36 @@ Auswertung: `uv run python scripts/difficulty_probe.py data/pilot/hard`; Kosten 
 2.706 Tokens Modellstand-Prüfung, Kosinus 0,99996). Recall@5 = Anteil der relevanten Abschnitte einer Frage, die ein
 Top-5-Chunk überlappt.
 
+Werte mit der blinden Annotation (vor dem Retrieval festgelegt; Hauptwerte):
+
 | Strategie | Hit@5 | MRR | Precision@5 | Recall@5 |
 |---|---:|---:|---:|---:|
-| C1 | 1,00 | 0,83 | 0,35 | 0,94 |
-| C2 | 0,94 | 0,72 | 0,40 | 0,85 |
-| C3 | 1,00 | 0,75 | 0,28 | 0,89 |
+| C1 | 1,00 | 0,74 | 0,30 | 0,97 |
+| C2 | 0,94 | 0,67 | 0,35 | 0,89 |
+| C3 | 0,94 | 0,72 | 0,24 | 0,85 |
 
-Nach Fragenart (MRR / Recall@5):
+Nach Fragenart (MRR / Recall@5, blind):
 
 | Art | C1 | C2 | C3 |
 |---|---|---|---|
-| multi-section (n = 5) | 1,00 / 0,90 | 1,00 / 0,83 | 0,67 / 0,73 |
+| multi-section (n = 5) | 0,87 / 0,90 | 0,85 / 0,83 | 0,67 / 0,73 |
 | detail (n = 4) | 0,88 / 1,00 | 0,71 / 1,00 | 0,88 / 1,00 |
-| paraphrase (n = 7) | 0,68 / 0,93 | 0,52 / 0,79 | 0,74 / 0,93 |
+| paraphrase (n = 7) | 0,58 / 1,00 | 0,52 / 0,86 | 0,67 / 0,86 |
 
-Annotation nachträglich korrigiert (offengelegt, weil nach Sicht der Ergebnisse): Die Durchsicht aller Chunks, die vor
+Annotation nachträglich ergänzt (nur Sensitivität, keine Evidenz; siehe Hinweis zur Annotation in den Proben auf dem
+erweiterten Korpus): Die Durchsicht aller Chunks, die vor
 dem ersten relevanten Treffer rangierten, ergab drei Abschnitte, die eine richtige (Teil-)Antwort enthalten, aber
 fehlten: `D046#cross-request-state-pollution` (H04), `D027#dom-update-timing` (H10, `nextTick()` als Alternative) und
 `D033#how-reactivity-works-in-vue` (H16, nennt den Verlust der Reaktivität beim Destrukturieren wörtlich). Regel: Ein
 Abschnitt ist relevant, wenn er eine richtige Antwort oder Teilantwort enthält; nicht ergänzt wurden daher
-`D004#potential-dangers` (allgemein, ohne `v-html`) und `D034` (veraltete Reactivity Transform). Werte vor der Korrektur:
-C1 1,00 / 0,74 / 0,30 / 0,97, C2 0,94 / 0,67 / 0,35 / 0,89, C3 0,94 / 0,72 / 0,24 / 0,85 (Hit@5 / MRR / P@5 / R@5).
-Beide Läufe stehen in `data/pilot/hard/runs.jsonl` (verschiedene SHA-256 der Ground Truth).
+`D004#potential-dangers` (allgemein, ohne `v-html`) und `D034` (veraltete Reactivity Transform). Werte nach der
+Ergänzung: C1 1,00 / 0,83 / 0,35 / 0,94, C2 0,94 / 0,72 / 0,40 / 0,85, C3 1,00 / 0,75 / 0,28 / 0,89
+(Hit@5 / MRR / P@5 / R@5). Beide Läufe stehen in `data/pilot/hard/runs.jsonl` (verschiedene SHA-256 der Ground Truth).
 
 Befund:
 
 - Der Deckeneffekt liegt an den Fragen, nicht am Korpus: Auf demselben Korpus trennen schwere Fragen die Strategien
-  (MRR 0,72–0,83, Recall@5 0,85–0,94 statt 0,79–0,94 und 1,00 in Probe 1). Hit@5 bleibt nahe 1 und taugt allein nicht
+  (blind: MRR 0,67–0,74, Recall@5 0,85–0,97 statt 0,79–0,94 und 1,00 in Probe 1). Hit@5 bleibt nahe 1 und taugt allein nicht
   zur Unterscheidung.
 - Fragen mit mehreren Abschnitten sind für C3 am schwersten (Recall@5 0,73): Strukturtreue Chunks sind kleiner und
   zahlreicher, sodass fünf Plätze seltener alle Teilantworten abdecken.

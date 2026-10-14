@@ -90,7 +90,7 @@ Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py
 | `retrieve.py` | ohne Option alle Strategien C1–C3 ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)); `--control` nur die Kontrolle K1 |
 | `evaluate_retrieval.py` | `--k` (Standard `TOP_K` = 5) |
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht) |
-| `scripts/difficulty_probe.py` | Pilot-Fragenset als Ordner (Standard `data/pilot`, z. B. `data/pilot/hard`); läuft auch die Kontrolle K1 |
+| `scripts/difficulty_probe.py` | Pilot-Fragenset als Ordner (Standard `config.PILOT_DIR` = `data/pilot`; `data/pilot/hard` mit blinder Annotation, `data/pilot/hard_posthoc` nur als Post-hoc-Sensitivität); läuft auch die Kontrolle K1 |
 | `scripts/remap_pilot.py` | einmalig: `ALT_ORDNER PILOT_ORDNER …` bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
 
 ## Qualitätswerkzeuge
