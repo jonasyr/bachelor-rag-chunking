@@ -85,10 +85,13 @@ Umgesetzt: `snapshot.py`, `ingest.py`, `preprocess.py`, `chunking.py`, `embed.py
 | Skript | Optionen |
 |---|---|
 | `snapshot.py`, `ingest.py`, `preprocess.py` | keine |
-| `chunking.py`, `embed.py`, `generate.py` | `--strategy C1\|C2\|C3\|all` (Standard `all`; Auswahl aus `config.STRATEGY_IDS`) |
-| `retrieve.py` | keine (läuft immer über alle Strategien, [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) |
+| `chunking.py`, `embed.py` | `--strategy C1\|C2\|C3\|K1\|all` (Standard `all` = C1–C3, dann die Kontrolle K1; [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) |
+| `generate.py` | `--strategy C1\|C2\|C3\|all` (nur das Experiment; K1 wird nicht generiert) |
+| `retrieve.py` | ohne Option alle Strategien C1–C3 ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)); `--control` nur die Kontrolle K1 |
 | `evaluate_retrieval.py` | `--k` (Standard `TOP_K` = 5) |
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht) |
+| `scripts/difficulty_probe.py` | Pilot-Fragenset als Ordner (Standard `data/pilot`, z. B. `data/pilot/hard`); läuft auch die Kontrolle K1 |
+| `scripts/remap_pilot.py` | einmalig: `ALT_ORDNER PILOT_ORDNER …` bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
 
 ## Qualitätswerkzeuge
 

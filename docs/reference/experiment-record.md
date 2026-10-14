@@ -3,9 +3,116 @@
 > Seitentyp: Nachschlagen (reference). Übersicht: [Dokumentation](../README.md).
 
 Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt:
-[Korpus](corpus.md) ([ADR 0019](../adr/0019-korpus-ausschnitt.md)).
+[Korpus](corpus.md) ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)).
 
 ## Snapshot
+
+| Feld | Wert |
+|---|---|
+| Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
+| Commit | `40aa88af0094f7bab4aaf786e55c748a6a251d88` (Commit-Datum 15.09.2026; [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
+| Datum des Snapshots | 14.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, Bereiche, Ausschlüsse, SHA-256 je Datei) |
+| Verwendete Pfade | `src/guide/`, `src/api/`, `src/style-guide/` ohne sieben Ausschlüsse; Liste in `docs/corpus_manifest.csv` |
+| Anzahl Dateien | 79 (Guide 52, API 22, Style Guide 5) |
+| Gesamtumfang (Tokens) | 165.723 nach Preprocessing (`cl100k_base`; Guide 117.694, API 42.488, Style Guide 5.541); 813 Abschnitte (79 H1, 467 H2, 267 H3) |
+
+## Chunking
+
+| Strategie | Chunks | Tokens min / Mittel / max | Median |
+|---|---:|---|---:|
+| C1 | 369 | 17 / 449 / 500 | 500 |
+| C2 | 435 | 108 / 463 / 500 | 500 |
+| C3 | 718 | 50 / 231 / 799 | 190 |
+| K1 (Kontrolle, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) | 758 | 3 / 219 / 231 | 231 |
+
+K1-Fenster = kaufmännisch gerundetes Mittel der C3-Chunklängen (230,8 → 231). C3 ohne Obergrenze: 706 Segmente,
+davon 12 über 800 Tokens, längstes 1.467 ([ADR 0021](../adr/0021-c3-grenzen.md), Nachtrag).
+
+## Embedding
+
+Lauf am 14.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI abgerechneten
+Tokens stimmen für alle vier Strategien exakt mit der eigenen Zählung der gesendeten Texte überein (`src/tokens.py`).
+Bei K1 ist ein Chunk (`K1_D057_0015`) 231 Token-Positionen lang, sein Text kodiert aber zu 230 Tokens: Der feste
+Fensterschnitt trennt ein Token-Paar, das der Tokenizer beim erneuten Kodieren zusammenführt. Spannen und Relevanz
+bleiben davon unberührt.
+
+| Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
+|---|---:|---:|---:|---:|---:|
+| C1 | 369 | 165.723 | 0,0215 | 8,5 MB | 0,99991 (gegen die Vektoren vom 13.10.2026) |
+| C2 | 435 | 201.323 | 0,0262 | 10,0 MB | 0,99987 |
+| C3 | 718 | 165.723 | 0,0215 | 18,9 MB | 0,99987 |
+| K1 | 758 | 165.722 | 0,0215 | 14,3 MB | 0,99963 |
+| Summe | 2.280 | 698.491 | 0,0907 (+ 0,0013 Prüfung = 0,0921) | 51,7 MB | alle ≥ 0,999 |
+
+Die Modellstand-Prüfung von K1 (0,99963) liegt unter dem am 13.10.2026 gemessenen Wert für gleiche Texte
+(≥ 0,99996), aber deutlich über dem Schwellwert 0,999 und weit über der Ähnlichkeit verschiedener Chunks (≤ 0,84).
+
+## Korpuserweiterung (14.10.2026): Prüfungen
+
+Umstellung nach [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und [ADR 0026](../adr/0026-c3-vergleichbarkeit.md);
+Spezifikation und Plan in `docs/superpowers/`.
+
+| Prüfung | Ergebnis |
+|---|---|
+| V1 Guide-Bereinigung unverändert | Der alte Guide (`b75d188`, neu geholt und gegen den alten Prüfsummen-Datensatz verifiziert) ergibt mit dem neuen Code Byte für Byte dieselben `documents.jsonl`, `sections.jsonl` und dasselbe Manifest. |
+| V2 nur geänderte Guide-Dateien weichen ab | 47 von 52 Guide-Seiten unverändert; geändert (Tokens alt → neu): `transition-group` 823 → 834, `slots` 3.657 → 3.740, `component-basics` 3.666 → 3.583, `lifecycle` 447 → 530, `render-function` 4.511 → 4.517. Bei `teleport.md` entfiel upstream nur ein Werbelink, den die Bereinigung schon vorher entfernte. |
+| V3 Dateiliste unabhängig geprüft | 79 lokale Dateien = GitHub-Baum des Commits ohne die Ausschlüsse (79). |
+| V4 API-Sonderfälle von Hand gelesen | Titel `<script setup>` und `Composition API: Dependency Injection`; Überschriften `\<script setup>`, `PropType\<T>`; die `v-text`-Zeile endet sauber mit `` `<span>…</span>`). `` |
+| V5 Chunk-Invarianten | Alle Prüfungen von `chunking.py` für C1–C3 und K1 bestanden; K1-Größe gleich der Regel. |
+| V6 Tokens | abgerechnet = gesendete Texte für alle vier Strategien (siehe Embedding). |
+| V7 Reproduzierbarkeit | Zweiter Probenlauf ohne API-Aufruf, alle vier Ergebnisdateien Byte für Byte gleich. |
+| V8 Pilot-Ground-Truth | 33 annotierte Abschnitte über Pfad und Anker abgebildet; Titel, Ebene und Text unverändert, keine Annotation geändert; unabhängig von einem zweiten Prüfer nachgerechnet. |
+
+Gefunden und behoben dabei: Die Integrationsprüfung entdeckte in zwei API-Seiten eingerückte Überschriften
+(`  ### Function Signature`), die als Text durchgerutscht wären; drei Abschnitte wurden erst mit der CommonMark-Regel
+(bis zu drei Leerzeichen Einrückung) erkannt.
+
+## Pilotproben auf dem erweiterten Korpus (14.10.2026)
+
+Gleiche Fragen und Annotationen wie in den Proben unten (IDs abgebildet, V8); `scripts/difficulty_probe.py`,
+jetzt mit der Kontrolle K1. Keine API-Kosten (gespeicherte Fragevektoren). Kontext@5 = mittlere Tokens der fünf
+Treffer je Frage.
+
+Probe 1 (8 einfache Fragen):
+
+| Strategie | Hit@5 | MRR | Precision@5 | Recall@5 | Kontext@5 |
+|---|---:|---:|---:|---:|---:|
+| C1 | 1,00 | 0,88 | 0,23 | 1,00 | 2.406 |
+| C2 | 1,00 | 0,76 | 0,28 | 1,00 | 2.441 |
+| C3 | 1,00 | 0,94 | 0,23 | 1,00 | 1.302 |
+| K1 | 1,00 | 0,94 | 0,38 | 1,00 | 1.082 |
+
+Probe 2 (16 schwere Fragen):
+
+| Strategie | Hit@5 | MRR | Precision@5 | Recall@5 | Kontext@5 |
+|---|---:|---:|---:|---:|---:|
+| C1 | 1,00 | 0,76 | 0,34 | 0,92 | 2.388 |
+| C2 | 0,81 | 0,66 | 0,36 | 0,73 | 2.402 |
+| C3 | 1,00 | 0,69 | 0,28 | 0,89 | 1.263 |
+| K1 | 0,94 | 0,67 | 0,36 | 0,80 | 1.129 |
+
+Nach Fragenart (MRR / Recall@5):
+
+| Art | C1 | C2 | C3 | K1 |
+|---|---|---|---|---|
+| multi-section (n = 5) | 1,00 / 0,83 | 1,00 / 0,83 | 0,67 / 0,73 | 0,63 / 0,67 |
+| detail (n = 4) | 0,88 / 1,00 | 0,62 / 0,75 | 0,75 / 1,00 | 0,62 / 0,75 |
+| paraphrase (n = 7) | 0,52 / 0,93 | 0,44 / 0,64 | 0,67 / 0,93 | 0,73 / 0,93 |
+
+Befund (Pilot, n klein, keine Signifikanz):
+
+- Der größere Korpus macht das Retrieval schwerer: In Probe 2 sinken Hit@5 und Recall@5 vor allem bei C2
+  (0,94 → 0,81 bzw. 0,85 → 0,73); Guide- und API-Seiten konkurrieren um dieselben Plätze.
+- Die Kontrolle wirkt wie vorgesehen: K1 erhält gleich große Chunks wie C3, aber ohne Struktur. Bei Mehrabschnitts-
+  und Detailfragen liegt C3 vor K1 (Recall@5 0,73 gegen 0,67 bzw. 1,00 gegen 0,75), bei Paraphrasen gleich im Recall@5, K1 mit höherem MRR; ein Teil
+  des C3-Verhaltens geht also auf die Größe zurück, ein Teil auf die Struktur. Ob das trägt, zeigt erst der Katalog.
+- Kontext je Antwort: C3 und K1 liefern dem Sprachmodell nur etwa halb so viele Tokens wie C1/C2.
+
+## Vorheriger Stand (13.10.2026, `b75d188`, nur Guide)
+
+Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden Proben unten liefen auf diesem Stand.
+
+### Snapshot
 
 | Feld | Wert |
 |---|---|
@@ -16,7 +123,7 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
-## Chunking
+### Chunking
 
 | Strategie | Chunks | Tokens min / Mittel / max |
 |---|---:|---|
@@ -24,7 +131,7 @@ Wird bei der Umsetzung ausgefüllt und ist die Quelle für das Methodik- und Imp
 | C2 | 305 | 108 / 469 / 500 |
 | C3 | 493 | 50 / 239 / 799 |
 
-## Embedding
+### Embedding
 
 Einmaliger Lauf am 13.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI
 abgerechneten Tokens stimmen exakt mit der eigenen Zählung (`cl100k_base`, `src/tokens.py`) überein. Ein zweiter Lauf
@@ -44,7 +151,7 @@ Wiederholungsmessung (13.10.2026, 2.706 Tokens, 0,00035 USD): je drei Chunks pro
 Kosinus zum gespeicherten Vektor ≥ 0,99996 (7 von 9 bitgleich), ähnlichster anderer Chunk ≤ 0,84. Daraus der
 Schwellwert 0,999 der Modellstand-Prüfung ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
-## Schwierigkeitsprobe 1: einfache Fragen (Pilot, 14.10.2026)
+### Schwierigkeitsprobe 1: einfache Fragen (Pilot, 14.10.2026, alter Korpus)
 
 Zweck: prüfen, ob das Retrieval auf dem Korpus schwer genug ist, um die Strategien zu unterscheiden (kein
 Deckeneffekt). Acht Pilotfragen in `data/pilot/` (alle fünf Fragetypen, fünf Korpusbereiche, je ein relevanter
@@ -61,7 +168,7 @@ Recall@5 = 1,00, Deckeneffekt); Unterschiede zeigen sich nur in Rang und Präzis
 Fragenkatalog: anspruchsvollere Fragen (mehrere Abschnitte oder Seiten, Detailfragen, Fragen ohne wörtliche Nähe zur
 Überschrift) und MRR/Precision@5 als zentrale Kennzahlen.
 
-## Schwierigkeitsprobe 2: schwere Fragen (Pilot, 14.10.2026)
+### Schwierigkeitsprobe 2: schwere Fragen (Pilot, 14.10.2026, alter Korpus)
 
 Zweck: prüfen, ob der Deckeneffekt aus Probe 1 an den Fragen oder am Korpus liegt, bevor über eine Erweiterung des
 Korpus (ADR 0019) entschieden wird. 16 bewusst schwere Pilotfragen in `data/pilot/hard/`, **nicht** Teil des
