@@ -46,8 +46,11 @@ Success criteria:
 ## Class rules
 
 Words are compared after a fixed normalisation: lowercase, words matched by `[a-z0-9]+`, words in
-`config.CATALOGUE_STOPWORDS` dropped, and a trailing `es` or `s` folded (`props` → `prop`, `watches` → `watch`) when
-the word is longer than three characters. The heading words of a question are the words of the `title` of each
+`config.CATALOGUE_STOPWORDS` dropped. Each remaining word longer than three characters stands for a set of candidate
+forms: itself, without a trailing `s`, without a trailing `es`, and with a trailing `ies` replaced by `y`
+(`values` → {values, value, valu}, `watches` → {watches, watche, watch}, `dependencies` → {…, dependency}). Two words
+match if their candidate sets intersect. This errs towards reporting an overlap, the safe direction for a check that
+must catch overlap; cutting a fixed suffix alone would miss `values`/`value`. The heading words of a question are the words of the `title` of each
 relevant section plus the `title` of the H1 section of its document.
 
 | Class | Rule | Checked by `check` |
@@ -66,7 +69,7 @@ All in `src/catalogue.py` (CLI with subcommands, like the other steps); paramete
 
 | Subcommand | Reads | Writes / prints |
 |---|---|---|
-| `sections` | `documents.jsonl`, `sections.jsonl` | `config.SECTION_INDEX_FILE` = `data/processed/section_index.md`: Markdown table, one row per section in `sections.jsonl` order: `section_id`, area (manifest name), page path, heading path (`H1 › H2 › H3`), tokens. Deterministic; header states source and that it is generated. |
+| `sections` | `documents.jsonl`, `sections.jsonl` | `config.SECTION_INDEX_FILE` = `data/processed/section_index.md`: Markdown table, one row per section in `sections.jsonl` order: `section_id`, area (first path segment: `api`, `guide`, `style-guide`, the keys of the area floors), page path, heading path (`H1 › H2 › H3`), tokens. Deterministic; header states source and that it is generated. |
 | `find TERM` | same | sections whose cleaned text contains `TERM` (case-insensitive, plain substring), in `sections.jsonl` order, with `section_id`, heading path and a one-line excerpt around the first match. Innermost section wins: a match inside an H3 is reported for the H3, not again for its H2/H1 parents. |
 | `show SECTION_ID` | same | the section's heading path, token count and exact text (the same slice `relevance.py` uses). Unknown ID: error, exit 1. |
 | `check [--draft]` | `questions.csv`, `ground_truth.csv`, `sections.jsonl`, `documents.jsonl`, pilot `questions.csv` files under `config.PILOT_DIR` | format validation as `retrieve.py` (shared functions, not a copy); allowed values; class rules; quotas; area floors; duplicate questions (normalised text equal) within the catalogue and against every pilot set. Prints a type × class table, the area split and every finding with its `question_id`. Strict mode exits 1 on any finding; `--draft` exits 1 only on format errors and unknown values/IDs, and reports quota and rule findings as warnings. |
