@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_RAW = ROOT / "data" / "raw" / "vue_docs_snapshot"
 DATA_PROCESSED = ROOT / "data" / "processed"
 DATA_EVAL = ROOT / "data" / "evaluation"
+PILOT_DIR = ROOT / "data" / "pilot"  # pilot probes, not the catalogue (scripts/difficulty_probe.py)
 CHROMA_DIR = ROOT / "chroma_db"
 DOCS_DIR = ROOT / "docs"
 

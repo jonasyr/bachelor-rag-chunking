@@ -8,7 +8,7 @@ The kind of a question is its `notes` field without the leading "pilot". Also ru
 size-matched control K1 (ADR 0026) and prints chunk size and context tokens per strategy.
 
 Usage: uv run python scripts/difficulty_probe.py [SET_DIR]
-(SET_DIR defaults to data/pilot; the hard set is data/pilot/hard)
+(SET_DIR defaults to config.PILOT_DIR = data/pilot; the hard set is data/pilot/hard)
 """
 
 import csv
@@ -25,6 +25,7 @@ from config import (  # noqa: E402
     CHUNK_FILES,
     CONTROL_CHUNK_FILES,
     CONTROL_STRATEGIES,
+    PILOT_DIR,
     RELEVANCE_MIN_OVERLAP,
     SECTIONS_FILE,
     STRATEGY_IDS,
@@ -52,6 +53,11 @@ def scores(flags: list[bool], wanted: list[str], covered: set[str]) -> tuple[flo
 
 def length(chunk: dict) -> int:
     return chunk["end_token"] - chunk["start_token"]
+
+
+def pilot_dir(argv: list[str]) -> Path:
+    """The pilot set to probe: SET_DIR relative to the repo root, default config.PILOT_DIR."""
+    return ROOT / argv[1] if len(argv) > 1 else PILOT_DIR
 
 
 def main(pilot: Path) -> None:
@@ -136,4 +142,4 @@ def main(pilot: Path) -> None:
 
 
 if __name__ == "__main__":
-    main(ROOT / (sys.argv[1] if len(sys.argv) > 1 else "data/pilot"))
+    main(pilot_dir(sys.argv))
