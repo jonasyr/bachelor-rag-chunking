@@ -612,7 +612,6 @@ für technische Projektdokumentation
 Jonas Weirauch
 
 
-Im Wiesengrund 19, 55286 Sulzheim
 
 Betreuer/in: Prof. Klaus Quibeldey-Cirkel
 
