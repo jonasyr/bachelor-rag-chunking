@@ -58,7 +58,7 @@ TOKEN_ENCODING = "cl100k_base"  # tiktoken 0.13.0, pinned in pyproject.toml
 SECTION_MAX_LEVEL = 3  # H1-H3 headings become sections (sections.jsonl, C3 boundaries; D19, D21)
 
 # ---------------------------------------------------------------------------
-# Chunking parameters (D5, D6)
+# Chunking parameters (D5, D6, D21, D26)
 # ---------------------------------------------------------------------------
 
 # C1: fixed-size, no overlap
