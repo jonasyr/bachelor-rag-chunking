@@ -314,3 +314,9 @@ def test_duplicate_section_ids_are_a_format_error(corpus, tmp_path, pilot):
     rows[index] = (*rows[index][:5], ["D002#once", "D002#once"])
     report = run_check(corpus, tmp_path, rows, pilot)
     assert any("duplicate section IDs ['D002#once']" in e for e in report.errors)
+
+
+def test_find_excerpt_width_comes_from_config(corpus, monkeypatch):
+    monkeypatch.setattr(catalogue, "CATALOGUE_EXCERPT_CHARS", 4)
+    [(_, excerpt)] = find(corpus, "callback")
+    assert excerpt == "the callback onl"  # 4 characters on each side

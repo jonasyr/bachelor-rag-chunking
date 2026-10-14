@@ -98,6 +98,8 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `QUESTION_CLASSES` | `{"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}` | erlaubte Werte von `difficulty` (Konstruktionsklasse) mit Quote; Summe 48 | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `AREA_MIN_QUESTIONS` | `{"api": 12, "style-guide": 3}` | Mindestzahl Fragen mit einem relevanten Abschnitt im Bereich | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `DETAIL_MAX_ANSWER_WORDS` | `30` | `detail`: Referenzantwort höchstens so viele Wörter | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext je Seite eines Treffers (nie über den Abschnitt hinaus) | – |
+| `CATALOGUE_HEADING_SEPARATOR` | `" › "` | Trenner im Überschriftenpfad (`section_index.md`, `find`, `show`) | – |
 | `CATALOGUE_WORD_PATTERN` | `r"[a-z0-9]+"` | Wörter für den Paraphrase-Vergleich (nach Kleinschreibung) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |

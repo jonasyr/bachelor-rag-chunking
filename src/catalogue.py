@@ -23,8 +23,10 @@ import tokens
 from config import (
     AREA_MIN_QUESTIONS,
     CATALOGUE_CAMEL_BOUNDARY,
+    CATALOGUE_EXCERPT_CHARS,
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_FREEZE_FILE,
+    CATALOGUE_HEADING_SEPARATOR,
     CATALOGUE_PREFIX_MIN,
     CATALOGUE_PREFIX_SLACK,
     CATALOGUE_STOPWORDS,
@@ -49,8 +51,6 @@ from retrieve import (
     relevant_sections,
 )
 
-HEADING_SEPARATOR = " › "
-EXCERPT_CHARS = 60
 WORD_RE = re.compile(CATALOGUE_WORD_PATTERN)
 CAMEL_RE = re.compile(CATALOGUE_CAMEL_BOUNDARY)
 STOPWORDS = frozenset(CATALOGUE_STOPWORDS)
@@ -103,7 +103,7 @@ class Corpus:
         return sorted(outer, key=lambda s: s["level"]) + [section]
 
     def heading_path(self, section: dict) -> str:
-        return HEADING_SEPARATOR.join(s["title"] for s in self.enclosing(section))
+        return CATALOGUE_HEADING_SEPARATOR.join(s["title"] for s in self.enclosing(section))
 
 
 def load_corpus(
@@ -141,8 +141,10 @@ def write_section_index(corpus: Corpus, out_file: Path = SECTION_INDEX_FILE) -> 
 
 
 def _excerpt(text: str, start: int, end: int, lower: int, upper: int) -> str:
-    """Match with up to EXCERPT_CHARS of context, never beyond the section [lower, upper)."""
-    window = text[max(lower, start - EXCERPT_CHARS) : min(upper, end + EXCERPT_CHARS)]
+    """Match with up to CATALOGUE_EXCERPT_CHARS of context, never beyond [lower, upper)."""
+    window = text[
+        max(lower, start - CATALOGUE_EXCERPT_CHARS) : min(upper, end + CATALOGUE_EXCERPT_CHARS)
+    ]
     return " ".join(window.split())
 
 
