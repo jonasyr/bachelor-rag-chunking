@@ -30,6 +30,7 @@ from config import (
     CATALOGUE_HEADING_SEPARATOR,
     CATALOGUE_PREFIX_MIN,
     CATALOGUE_PREFIX_SLACK,
+    CATALOGUE_REPORT_MIN_PAGES,
     CATALOGUE_STOPWORDS,
     CATALOGUE_WORD_PATTERN,
     DETAIL_MAX_ANSWER_WORDS,
@@ -323,8 +324,11 @@ def _overview(
     )
     lines += ["", f"Areas (questions with a relevant section there): {split}"]
     multi = [q for q in questions if q["difficulty"] == "multi-section"]
-    spread = sum(1 for q in multi if len({s["doc_id"] for s in relevant[q["question_id"]]}) > 1)
-    lines.append(f"multi-section on at least 2 pages: {spread} of {len(multi)}")
+    pages = CATALOGUE_REPORT_MIN_PAGES
+    spread = sum(
+        1 for q in multi if len({s["doc_id"] for s in relevant[q["question_id"]]}) >= pages
+    )
+    lines.append(f"multi-section on at least {pages} pages: {spread} of {len(multi)}")
     for q in questions:
         qid, sections = q["question_id"], relevant[q["question_id"]]
         if q["difficulty"] == "detail":

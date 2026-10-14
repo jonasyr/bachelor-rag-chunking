@@ -158,6 +158,9 @@ DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many wor
 # (a section inside another listed one does not count); single/detail/paraphrase exactly this many.
 MULTI_SECTION_MIN_SECTIONS = 2
 SINGLE_CLASS_SECTIONS = 1
+CATALOGUE_REPORT_MIN_PAGES = (
+    2  # `check` report: multi-section questions on at least this many pages
+)
 CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
 CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
 # Word comparison for the paraphrase rule (D29): lowercase words matching the pattern, minus

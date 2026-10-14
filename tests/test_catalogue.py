@@ -356,3 +356,16 @@ def test_section_counts_of_the_classes_come_from_config(corpus, monkeypatch):
         "multi-section needs at least 3 relevant sections, has 2"
     ]
     assert class_findings(corpus, question("single"), truth(), two) == []
+
+
+def test_page_spread_report_uses_the_configured_minimum(corpus, tmp_path, pilot, monkeypatch):
+    rows = valid_rows()  # 3 multi-section rows pair D003 with D002; 9 stay on D002
+    assert (
+        "multi-section on at least 2 pages: 3 of 12"
+        in run_check(corpus, tmp_path, rows, pilot).lines
+    )
+    monkeypatch.setattr(catalogue, "CATALOGUE_REPORT_MIN_PAGES", 3)
+    assert (
+        "multi-section on at least 3 pages: 0 of 12"
+        in run_check(corpus, tmp_path, rows, pilot).lines
+    )
