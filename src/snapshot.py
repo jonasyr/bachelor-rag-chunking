@@ -1,8 +1,9 @@
-"""Create the corpus snapshot (ADR 0019).
+"""Create the corpus snapshot (ADR 0019, ADR 0025).
 
-Fetches config.VUE_DOCS_COMMIT of config.VUE_DOCS_REPO_URL (shallow), replaces
-data/raw/vue_docs_snapshot/guide/ with every Markdown file below config.VUE_DOCS_SUBDIR and
-writes docs/corpus_snapshot.txt (versioned) with repository, commit, dates and a sha256 per file.
+Fetches config.VUE_DOCS_COMMIT of config.VUE_DOCS_REPO_URL (shallow), copies every Markdown file
+of config.VUE_DOCS_AREAS below config.VUE_DOCS_ROOT, minus config.VUE_DOCS_EXCLUDED, to
+data/raw/vue_docs_snapshot/<area>/ and writes docs/corpus_snapshot.txt (versioned) with
+repository, commit, dates, areas, exclusions and a sha256 per file.
 """
 
 import hashlib
@@ -16,10 +17,11 @@ from pathlib import Path
 from config import (
     DATA_RAW,
     SNAPSHOT_INFO_FILE,
-    SNAPSHOT_SUBDIR,
+    VUE_DOCS_AREAS,
     VUE_DOCS_COMMIT,
+    VUE_DOCS_EXCLUDED,
     VUE_DOCS_REPO_URL,
-    VUE_DOCS_SUBDIR,
+    VUE_DOCS_ROOT,
 )
 
 CHECKSUM_LINE_RE = re.compile(r"^[0-9a-f]{64}  ")
@@ -46,22 +48,38 @@ def fetch_commit(repo_url: str, commit: str, dest: Path) -> str:
     return _git(dest, "show", "-s", "--format=%cI", "HEAD")
 
 
-def copy_markdown(src_dir: Path, out_dir: Path) -> list[Path]:
-    """Replace out_dir/guide with the *.md files below src_dir; return paths relative to out_dir."""
-    if not src_dir.is_dir():
-        raise FileNotFoundError(f"{src_dir} not found in the checkout")
-    target = out_dir / SNAPSHOT_SUBDIR
-    if target.exists():
-        shutil.rmtree(target)
-    copied = []
-    for src in sorted(src_dir.rglob("*.md")):
-        dst = target / src.relative_to(src_dir)
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-        copied.append(dst.relative_to(out_dir))
-    if not copied:
-        raise FileNotFoundError(f"no Markdown files below {src_dir}")
-    return copied
+def copy_markdown(
+    src_root: Path, out_dir: Path, areas: tuple[str, ...], excluded: tuple[str, ...]
+) -> list[Path]:
+    """Replace out_dir/<area> with the *.md files below src_root/<area>, minus `excluded`
+    (paths relative to src_root); return the copied paths relative to out_dir."""
+    outside = [e for e in excluded if e.split("/", 1)[0] not in areas]
+    if outside:
+        raise ValueError(f"excluded files outside the areas {list(areas)}: {outside}")
+    missing = [e for e in excluded if not (src_root / e).is_file()]
+    if missing:
+        raise FileNotFoundError(f"excluded files not in the checkout: {missing}")
+    copied: list[Path] = []
+    for area in areas:
+        src_dir = src_root / area
+        if not src_dir.is_dir():
+            raise FileNotFoundError(f"{src_dir} not found in the checkout")
+        files = [
+            p
+            for p in sorted(src_dir.rglob("*.md"))
+            if p.relative_to(src_root).as_posix() not in excluded
+        ]
+        if not files:
+            raise FileNotFoundError(f"no Markdown files below {src_dir}")
+        target = out_dir / area
+        if target.exists():
+            shutil.rmtree(target)
+        for src in files:
+            dst = out_dir / src.relative_to(src_root)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            copied.append(dst.relative_to(out_dir))
+    return sorted(copied, key=lambda p: p.as_posix())
 
 
 def _checksums(lines: list[str]) -> dict[str, str]:
@@ -73,23 +91,28 @@ def _checksums(lines: list[str]) -> dict[str, str]:
 def snapshot(
     repo_url: str = VUE_DOCS_REPO_URL,
     commit: str = VUE_DOCS_COMMIT,
-    subdir: str = VUE_DOCS_SUBDIR,
     out_dir: Path = DATA_RAW,
     info_file: Path = SNAPSHOT_INFO_FILE,
+    root: str = VUE_DOCS_ROOT,
+    areas: tuple[str, ...] = VUE_DOCS_AREAS,
+    excluded: tuple[str, ...] = VUE_DOCS_EXCLUDED,
 ) -> int:
-    """Fetch the pinned commit, copy its Markdown files, then write or verify the record."""
+    """Fetch the pinned commit, copy the Markdown files of the areas, then write or verify the
+    record."""
     if shutil.which("git") is None:
         raise RuntimeError("git is required to create the snapshot")
     out_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         checkout = Path(tmp)
         commit_date = fetch_commit(repo_url, commit, checkout)
-        files = copy_markdown(checkout / subdir, out_dir)
+        files = copy_markdown(checkout / root, out_dir, areas, excluded)
     lines = [
         f"repository: {repo_url}",
         f"commit: {commit}",
         f"commit_date: {commit_date}",
         f"snapshot_date: {date.today().isoformat()}",
+        f"areas: {', '.join(areas)}",
+        f"excluded: {', '.join(excluded)}",
         f"files: {len(files)}",
         "",
     ]
@@ -110,4 +133,4 @@ def snapshot(
 
 
 if __name__ == "__main__":
-    print(f"{snapshot()} files -> {DATA_RAW / SNAPSHOT_SUBDIR}")
+    print(f"{snapshot()} files -> {DATA_RAW}")

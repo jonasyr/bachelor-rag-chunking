@@ -46,7 +46,9 @@ WBR_RE = re.compile(r"<wbr\s*/?>")
 # A v-pre span holds inline code (which may itself contain tags) or plain text.
 V_PRE_SPAN_RE = re.compile(r"<span v-pre>((?:`[^`]*`|[^`<])*)</span>")
 BR_RE = re.compile(r"\s*<br\s*/?>\s*")  # inline line break (API page titles): a space
-ESCAPED_LT_RE = re.compile(r"\\<")  # CommonMark escape: literal "<", never a tag
+# CommonMark escape `\<`: a literal "<", never a tag. Only an odd run of backslashes escapes it
+# (`\\<b>` is a literal backslash and a real tag); group 1 keeps the escaped backslash pairs.
+ESCAPED_LT_RE = re.compile(r"(?<!\\)((?:\\\\)*)\\<")
 CODE_TAG_RE = re.compile(r"<code(?: v-pre)?>(.*?)</code>")
 INLINE_TAG_RE = re.compile(r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>")
 # Vue tool links carry the whole demo as an encoded URL hash: noise for retrieval (ADR 0020).
@@ -59,6 +61,8 @@ LANGUAGE_BLOCK_END = "</code></pre></div>"
 INLINE_SELF_CLOSING_RE = re.compile(r"\s*<(sup|[A-Z][\w-]*)\b[^>]*/>")
 HTML_LINE_RE = re.compile(r"^\s*</?[A-Za-z][\w-]*(?=[\s/>]|$)")  # not autolinks
 MANIFEST_HEADER = ["file_id", "path", "title", "section", "tokens", "included"]
+# Manifest section of the areas without subfolders (D25).
+AREA_SECTIONS = {"api": "API Reference", "style-guide": "Style Guide"}
 # Manifest `section` per folder below guide/ (pages directly in guide/ get "Guide").
 SECTION_NAMES = {
     "best-practices": "Best Practices",
@@ -153,7 +157,7 @@ def has_anchored_heading(text: str) -> bool:
 
 def heading_title(raw: str) -> str:
     """Display title of a heading: inline line breaks as spaces, escaped `\\<` as `<`."""
-    return ESCAPED_LT_RE.sub("<", BR_RE.sub(" ", raw)).strip()
+    return ESCAPED_LT_RE.sub(r"\1<", BR_RE.sub(" ", raw)).strip()
 
 
 def _strip_frontmatter(lines: list[str]) -> list[str]:
@@ -278,7 +282,7 @@ def clean_markdown(text: str) -> CleanResult:
             (ENCODED_TOOL_URL_RE, r"\1"),
         ):
             line = _sub_outside_code(pattern, repl, line)
-        prose = ESCAPED_LT_RE.sub("", INLINE_CODE_RE.sub("", line))
+        prose = ESCAPED_LT_RE.sub(r"\1", INLINE_CODE_RE.sub("", line))
         if 'class="options-api"' in prose:
             raise ValueError(f"options-api markup left after cleaning: {line!r}")
         if HTML_LINE_RE.match(line):
@@ -351,8 +355,12 @@ def section_spans(doc_id: str, result: CleanResult) -> list[dict]:
 
 
 def manifest_section(path: str) -> str:
-    """Manifest `section` column for a path like guide/<folder>/<page>.md."""
+    """Manifest `section` column: the area name, or for guide/<folder>/<page>.md the folder."""
     parts = path.split("/")
+    if parts[0] in AREA_SECTIONS:
+        return AREA_SECTIONS[parts[0]]
+    if parts[0] != "guide":
+        raise ValueError(f"{path}: no manifest section for area {parts[0]!r}")
     if len(parts) == 2:
         return "Guide"
     if parts[1] not in SECTION_NAMES:
