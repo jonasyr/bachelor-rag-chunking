@@ -1,9 +1,9 @@
 """Answer generation.
 
-Assembles prompt from top-k chunks (see docs/prompts.md),
+Assembles prompt from top-k chunks (see docs/reference/prompts.md),
 calls LLM (config.LLM_MODEL, temperature=0), writes generated_answers.csv.
 
-Output schema (§10 Ground Truth): question_id, strategy, answer, sources,
+Output schema (docs/reference/data-formats.md): question_id, strategy, answer, sources,
                                    prompt_tokens, completion_tokens
 """
 

@@ -35,6 +35,7 @@ chroma_db/
 
 # Generated / binary docs
 *.pdf
+!output/figures/*.pdf
 
 
 # OS

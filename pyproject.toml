@@ -7,9 +7,9 @@ license = "MIT AND Apache-2.0"
 license-files = ["LICENSE", "LICENSES/*"]
 dependencies = [
     # OpenAI (LLM + embeddings)
-    "openai==2.44.0",  # pinned (ADR 0016)
+    "openai==2.44.0",  # pinned (ADR 0023)
     # Vector store
-    "chromadb==1.5.9",  # pinned (ADR 0016)
+    "chromadb==1.5.9",  # pinned (ADR 0023)
     # Token counting
     "tiktoken==0.13.0",  # pinned (ADR 0019)
     # Environment
@@ -17,8 +17,6 @@ dependencies = [
     # Data
     "pandas>=2.1.0",
     "numpy>=1.26.0",
-    # Markdown processing
-    "markdown>=3.6",
     # Visualisation
     "matplotlib>=3.8.0",
     "plotly>=5.20.0",
