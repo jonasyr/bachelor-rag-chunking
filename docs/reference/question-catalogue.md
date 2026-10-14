@@ -2,25 +2,38 @@
 
 > Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
 
-**Umfang:** ca. 40 Fragen (Minimum 30, optimal 40–50, nicht über 60; [ADR 0017](../adr/0017-fragenkatalog.md)). Der
+**Umfang:** 48 Fragen ([ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), im Rahmen von [ADR 0017](../adr/0017-fragenkatalog.md): 30–60). Der
 Fragenkatalog ist eine der wichtigsten Eigenleistungen.
 
 **Fragetypen und Beispiele (Vue.js, englisch):**
 
-| Typ | Anzahl | Beispiel |
-|-----|------:|----------|
-| Faktisch | 10 | Which lifecycle hooks are available in the Composition API? |
-| Prozedural | 10 | How do you define props in a component using `<script setup>`? |
-| Konzeptuell | 10 | What is a composable in Vue and what problem does it solve? |
-| Vergleichend | 5 | What is the difference between the Options API and the Composition API? |
-| Einschränkung/Fehler | 5 | What happens if a child component mutates a prop directly? |
+| Typ | Wert (`type`) | Anzahl | Beispiel |
+|-----|---------------|------:|----------|
+| Faktisch | `factual` | 12 | Which lifecycle hooks are available in the Composition API? |
+| Prozedural | `procedural` | 12 | How do you define props in a component using `<script setup>`? |
+| Konzeptuell | `conceptual` | 12 | What is a composable in Vue and what problem does it solve? |
+| Vergleichend | `comparative` | 6 | What is the difference between `ref()` and `reactive()`? |
+| Einschränkung/Fehler | `limitation` | 6 | What happens if a child component mutates a prop directly? |
+
+**Konstruktionsklassen (`difficulty`, je 12 Fragen):**
+
+| Wert | Regel |
+|------|-------|
+| `single` | genau ein relevanter Abschnitt; dessen Hauptinhalt ist die Antwort |
+| `multi-section` | mindestens zwei relevante Abschnitte, alle für die Antwort nötig |
+| `detail` | genau ein Abschnitt; die Antwort ist ein einzelnes Faktum (Referenzantwort höchstens 30 Wörter) |
+| `paraphrase` | genau ein Abschnitt; die Frage teilt kein Inhaltswort mit dem Titel des Abschnitts oder seiner Seite |
+
+Wortvergleich, Begründung und Umfang: [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md). **Bereiche:** mindestens 12 Fragen mit einem relevanten Abschnitt
+in der API-Referenz, mindestens 3 im Style Guide; eine Frage zählt für jeden Bereich, den sie berührt.
 
 **Felder:** zwei Dateien, Formate in [Datenartefakte und Formate](data-formats.md#fragen-und-ground-truth):
 
 - `questions.csv`: `question_id`, `question`, `type`, `difficulty`, `notes`
 - `ground_truth.csv`: `question_id`, `expected_answer`, `relevant_doc_ids`, `relevant_section_ids`
 
-Die erlaubten Werte von `type` und `difficulty` sind noch offen ([Plan](../plan.md)).
+Geprüft mit `src/catalogue.py check`, eingefroren mit `src/catalogue.py freeze` ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)); Ablauf:
+[Fragenkatalog erstellen](../how-to/build-the-question-catalogue.md).
 
 ## Regeln für Annotation und Aufbau
 

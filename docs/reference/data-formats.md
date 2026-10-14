@@ -91,8 +91,11 @@ Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inpu
 **`questions.csv`**
 ```
 question_id,question,type,difficulty,notes
-Q001,"What is the difference between ref and reactive in Vue?",conceptual,medium,
+Q001,"What is the difference between ref and reactive in Vue?",comparative,multi-section,
 ```
+
+`type` und `difficulty` nehmen nur die Werte aus [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) an (`config.QUESTION_TYPES`,
+`config.QUESTION_CLASSES`); die Pilot-Sets sind davon ausgenommen.
 
 **`ground_truth.csv`**
 ```
@@ -110,6 +113,27 @@ Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `conf
 - Jede Frage hat eine Ground-Truth-Zeile und umgekehrt; jede Frage hat mindestens eine `relevant_section_id`, und alle
   existieren in `sections.jsonl`.
 - `relevant_doc_ids` liegen im Korpus und sind genau die Dokumente der `relevant_section_ids`.
+- Nur für den Hauptkatalog: Der Freeze-Datensatz existiert und beide Prüfsummen passen ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)).
+
+**`section_index.md`** (`data/processed/`, nicht versioniert, geschrieben von `catalogue.py sections`): Markdown-Tabelle,
+eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
+```
+| section_id | area | path | heading path | tokens |
+|---|---|---|---|---:|
+| `D001#createapp` | api | api/application.md | Application API › createApp() | 164 |
+```
+`area` ist das erste Pfadsegment (`api`, `guide`, `style-guide`).
+
+**`catalogue_freeze.json`** (`data/evaluation/`, versioniert, geschrieben von `catalogue.py freeze`; [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)):
+```
+{
+  "date": "2026-11-09",
+  "questions": 48,
+  "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
+  "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
+  "sha256": {"questions.csv": "…", "ground_truth.csv": "…"}
+}
+```
 
 ## Ergebnisse
 

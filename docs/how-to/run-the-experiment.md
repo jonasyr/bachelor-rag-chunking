@@ -3,7 +3,8 @@
 > Seitentyp: Anleitung (how-to). Übersicht: [Dokumentation](../README.md).
 
 Voraussetzungen: [Einrichten](set-up.md), [Korpus-Snapshot](create-corpus-snapshot.md), Fragenkatalog und Ground Truth
-fertig und eingefroren ([Fragenkatalog](../reference/question-catalogue.md),
+fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.md),
+[Fragenkatalog](../reference/question-catalogue.md),
 [ADR 0017](../adr/0017-fragenkatalog.md), [ADR 0027](../adr/0027-blinde-annotation.md)). Nur das Chunking variiert
 ([ADR 0006](../adr/0006-nur-chunking-variiert.md)). Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 
