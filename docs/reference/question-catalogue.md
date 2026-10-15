@@ -32,6 +32,10 @@ in der API-Referenz, mindestens 3 im Style Guide; eine Frage zählt für jeden B
 - `questions.csv`: `question_id`, `question`, `type`, `difficulty`, `notes`
 - `ground_truth.csv`: `question_id`, `expected_answer`, `relevant_doc_ids`, `relevant_section_ids`
 
+**Auswahl der Themen:** Je Slot zieht ein fester Stichprobenplan einen Ausgangsabschnitt (nach Textlänge, Seed
+`config.CATALOGUE_SEED`) und eine Konstruktionsklasse; Jonas wählt den Typ und schreibt Frage, Antwort und Annotation.
+Sprünge nur mit festem Grund, KI-Vorschläge werden protokolliert und von Jonas entschieden ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)).
+
 Geprüft mit `src/catalogue.py check`, eingefroren mit `src/catalogue.py freeze` ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)); Ablauf:
 [Fragenkatalog erstellen](../how-to/build-the-question-catalogue.md).
 

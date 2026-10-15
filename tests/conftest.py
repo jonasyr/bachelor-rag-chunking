@@ -7,6 +7,7 @@ import pytest
 
 import tokens
 from catalogue import load_corpus
+from catalogue_plan import PLAN_HEADER
 from config import AREA_MIN_QUESTIONS, QUESTION_CLASSES, QUESTION_TYPES
 from embedding_client import EmbeddingResult
 from preprocess import clean_markdown, section_spans
@@ -133,3 +134,37 @@ def pilot(tmp_path):
         encoding="utf-8",
     )
     return pilot_dir
+
+
+def write_plan_for(tmp_path, rows):
+    """A plan with one used slot per catalogue row (starting section = first annotated section)."""
+    plan = tmp_path / "catalogue_plan.csv"
+    with plan.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(PLAN_HEADER)
+        for number, (qid, _, _, cls, _, sids) in enumerate(rows, start=1):
+            areas = {"D001": "api", "D003": "style-guide"}
+            area = areas.get(sids[0].split("#")[0], "guide")  # unknown IDs: format tests
+            writer.writerow([area, number, sids[0], f"S{number:02d}", cls, "used", "", qid])
+    return plan
+
+
+def fresh_plan_for(rows):
+    """The fresh draw that matches write_plan_for(rows): same rows, every slot still open."""
+    fresh = []
+    for number, (_, _, _, cls, _, sids) in enumerate(rows, start=1):
+        areas = {"D001": "api", "D003": "style-guide"}
+        area = areas.get(sids[0].split("#")[0], "guide")
+        fresh.append(
+            {
+                "area": area,
+                "draw": str(number),
+                "section_id": sids[0],
+                "slot_id": f"S{number:02d}",
+                "class": cls,
+                "status": "open",
+                "skip_reason": "",
+                "question_id": "",
+            }
+        )
+    return fresh

@@ -132,9 +132,36 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
   "questions": 48,
   "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
-  "sha256": {"questions.csv": "…", "ground_truth.csv": "…", "sections.jsonl": "…", "documents.jsonl": "…"}
+  "sha256": {"questions.csv": "…", "ground_truth.csv": "…", "sections.jsonl": "…", "documents.jsonl": "…",
+             "catalogue_plan.csv": "…", "catalogue_review.csv": "…"}
 }
 ```
+
+Plan- und Durchsichtsdatei werden nur aufgezeichnet; die Sperre in `retrieve.py` prüft die vier übrigen Dateien.
+
+**`catalogue_plan.csv`** (`data/evaluation/`, versioniert, einmal geschrieben von `catalogue.py plan`, danach ändert
+der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
+die Reserve in Ziehungsreihenfolge.
+```
+area,draw,section_id,slot_id,class,status,skip_reason,question_id
+api,1,D009#onmounted,S01,single,used,,Q001
+api,2,D012#createrenderer,S02,multi-section,skipped,code-or-links,
+api,13,D020#script,S02,multi-section,open,,
+api,14,D003#v-bind,,,reserve,,
+```
+`status` ∈ `config.CATALOGUE_PLAN_STATUSES` (`open`, `used`, `skipped`, `reserve`); `skip_reason` ∈
+`config.CATALOGUE_SKIP_REASONS`. `check` vergleicht den Plan mit einer frischen Ziehung und meldet jede andere
+Abweichung als Fehler.
+
+**`catalogue_review.csv`** (`data/evaluation/`, versioniert; Claude hängt Zeilen mit `decision = open` an, die
+Entscheidung trifft Jonas im Editor; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)):
+```
+round,question_id,kind,suggestion,section_id,decision,reason,date
+1,Q001,missing_section,onUnmounted shows the same callback timing.,D009#onunmounted,accepted,,2026-10-20
+1,Q002,wording,Name the hook instead of "it".,,rejected,the slot asks for a paraphrase,2026-10-20
+```
+`kind` ∈ `config.CATALOGUE_REVIEW_KINDS`, `decision` ∈ `config.CATALOGUE_REVIEW_DECISIONS`; `section_id` nur bei
+`missing_section`, `reason` Pflicht bei `rejected`.
 
 ## Ergebnisse
 

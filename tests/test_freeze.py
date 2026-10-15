@@ -1,10 +1,11 @@
 import json
 
 import pytest
-from conftest import valid_rows, write_catalogue
+from conftest import fresh_plan_for, valid_rows, write_catalogue, write_plan_for
 
 import freeze
 from catalogue import freeze_catalogue
+from catalogue_review import ensure_review_file
 from run_log import sha256_of
 
 
@@ -13,13 +14,25 @@ def main_catalogue(tmp_path, monkeypatch, corpus_files):
     questions, truth = write_catalogue(tmp_path, valid_rows())
     monkeypatch.setattr(freeze, "QUESTIONS_FILE", questions)
     monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", truth)
+    ensure_review_file(tmp_path / "catalogue_review.csv")  # `catalogue.py plan` creates it
     return questions, truth, corpus_files[1], corpus_files[0]
 
 
 def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp_path):
     questions, truth, sections, documents = main_catalogue
     out = tmp_path / "catalogue_freeze.json"
-    record = freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+    record = freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=write_plan_for(tmp_path, valid_rows()),
+        review_file=tmp_path / "catalogue_review.csv",
+        fresh_plan=fresh_plan_for(valid_rows()),
+    )
     stored = json.loads(out.read_text(encoding="utf-8"))
     assert stored == record
     assert stored["sha256"] == {
@@ -27,6 +40,8 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         "ground_truth.csv": sha256_of(truth),
         "sections.jsonl": sha256_of(sections),
         "documents.jsonl": sha256_of(documents),
+        "catalogue_plan.csv": sha256_of(tmp_path / "catalogue_plan.csv"),
+        "catalogue_review.csv": sha256_of(tmp_path / "catalogue_review.csv"),
     }
     assert stored["questions"] == 48 and stored["types"]["comparative"] == 6
     assert set(stored) == {"date", "questions", "types", "classes", "sha256"}
@@ -38,17 +53,50 @@ def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
     questions, truth = write_catalogue(tmp_path, valid_rows()[:47])
     out = tmp_path / "catalogue_freeze.json"
     with pytest.raises(ValueError, match="strict check"):
-        freeze_catalogue(corpus, questions, truth, out, pilot, corpus_files[1], corpus_files[0])
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            corpus_files[1],
+            corpus_files[0],
+            plan_file=write_plan_for(tmp_path, valid_rows()[:47]),
+            review_file=tmp_path / "catalogue_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()[:47]),
+        )
     assert not out.exists()
 
 
 def test_freeze_never_overwrites_a_record(corpus, main_catalogue, pilot, tmp_path):
     questions, truth, sections, documents = main_catalogue
     out = tmp_path / "catalogue_freeze.json"
-    freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+    freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=write_plan_for(tmp_path, valid_rows()),
+        review_file=tmp_path / "catalogue_review.csv",
+        fresh_plan=fresh_plan_for(valid_rows()),
+    )
     before = out.read_bytes()
     with pytest.raises(FileExistsError, match="ADR 0030"):
-        freeze_catalogue(corpus, questions, truth, out, pilot, sections, documents)
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            sections,
+            documents,
+            plan_file=write_plan_for(tmp_path, valid_rows()),
+            review_file=tmp_path / "catalogue_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()),
+        )
     with pytest.raises(FileExistsError, match="ADR 0030"):
         freeze.write_freeze(questions, truth, sections, documents, out)
     assert out.read_bytes() == before
@@ -117,3 +165,44 @@ def test_require_frozen_refuses_changed_document_text(main_catalogue, tmp_path):
     documents.write_text(documents.read_text(encoding="utf-8").replace("Takes", "Gets"))
     with pytest.raises(RuntimeError, match="documents.jsonl changed since the freeze"):
         freeze.require_frozen(questions, truth, sections, documents, out)
+
+
+def test_freeze_records_plan_and_review(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    plan = write_plan_for(tmp_path, valid_rows())
+    review = tmp_path / "catalogue_review.csv"
+    review.write_text("round,question_id,kind,suggestion,section_id,decision,reason,date\n")
+    out = tmp_path / "catalogue_freeze.json"
+    record = freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        out,
+        pilot,
+        sections,
+        documents,
+        plan_file=plan,
+        review_file=review,
+        fresh_plan=fresh_plan_for(valid_rows()),
+    )
+    assert record["sha256"]["catalogue_plan.csv"] == sha256_of(plan)
+    assert record["sha256"]["catalogue_review.csv"] == sha256_of(review)
+
+
+def test_freeze_requires_the_review_log(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    out = tmp_path / "catalogue_freeze.json"
+    with pytest.raises(ValueError, match="strict check"):
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            sections,
+            documents,
+            plan_file=write_plan_for(tmp_path, valid_rows()),
+            review_file=tmp_path / "missing_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()),
+        )
+    assert not out.exists()
