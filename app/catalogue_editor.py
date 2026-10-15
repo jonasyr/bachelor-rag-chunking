@@ -28,6 +28,7 @@ from config import (  # noqa: E402
     QUESTION_TYPES,
 )
 
+VIEWS = ["Formatted", "Source text"]  # how the section is shown; the source text is what counts
 AREA_NAMES = {"api": "API reference", "guide": "Guide", "style-guide": "Style guide"}
 SKIP_LABELS = {
     "code-or-links": "Only code or links",
@@ -44,6 +45,16 @@ CSS = """
 .heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;
   font-family: "Source Sans 3", "Source Sans Pro", sans-serif;}
 [data-testid="stMainBlockContainer"] {padding-top: 2.5rem;}
+[class*="st-key-source_"] {background: var(--surface);}
+[class*="st-key-source_"] p, [class*="st-key-source_"] li {
+  font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
+  line-height: 1.7; overflow-wrap: anywhere;}
+[class*="st-key-source_"] :not(pre) > code {white-space: normal; overflow-wrap: anywhere;}
+[class*="st-key-source_"] ul, [class*="st-key-source_"] ol, [class*="st-key-source_"] li,
+[class*="st-key-source_"] p {width: auto !important; max-width: min(72ch, 100%);}
+[class*="st-key-source_"] pre {max-width: 100%; overflow-x: auto;}
+[class*="st-key-source_"] h1, [class*="st-key-source_"] h2 {font-size: 1.35rem;}
+[class*="st-key-source_"] h3, [class*="st-key-source_"] h4 {font-size: 1.15rem;}
 .source .code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.88rem;
   line-height: 1.55;}
 mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-radius: 2px;}
@@ -86,11 +97,20 @@ def palette_css() -> str:
     return "<style>:root {" + "".join(f"--{k}: {v};" for k, v in tokens.items()) + "}</style>"
 
 
-def source_page(corpus: catalogue.Corpus, section: dict, words: list[str]) -> None:
-    """The section as a printed page: raw text, never rendered as Markdown (st.html)."""
+def source_page(
+    corpus: catalogue.Corpus, section: dict, words: list[str], key: str, view: str = "Formatted"
+) -> None:
+    """The section either formatted as Markdown or as the exact source text (st.html)."""
     path = store.highlight(corpus.heading_path(section), words)
-    body = store.page_html(corpus.text(section), words)
-    st.html(f'<div class="heading-path">{path}</div><div class="source">{body}</div>')
+    if view == "Source text":
+        body = store.page_html(corpus.text(section), words)
+        st.html(f'<div class="heading-path">{path}</div><div class="source">{body}</div>')
+        return
+    st.html(f'<div class="heading-path">{path}</div>')
+    with st.container(border=True, key=f"source_{key}"):
+        st.markdown(
+            store.markdown_with_highlights(corpus.text(section), words), unsafe_allow_html=True
+        )
 
 
 def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None:
@@ -297,7 +317,13 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
             if question
             else []
         )
-        source_page(corpus, seed, words)
+        view = (
+            st.segmented_control(
+                "View", VIEWS, default=VIEWS[0], key="view", label_visibility="collapsed"
+            )
+            or VIEWS[0]
+        )
+        source_page(corpus, seed, words, "seed", view)
 
     # Second row: on narrow screens the search follows the question and its checks.
     search, _ = st.columns([6, 5], gap="large")
@@ -317,7 +343,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     key="hit",
                     format_func=lambda s: f"{s}  {corpus.heading_path(options[s][0])}",
                 ) or next(iter(options))
-                source_page(corpus, options[pick][0], words)
+                source_page(corpus, options[pick][0], words, "hit", view)
                 if st.button("Add this section", key="add_section", disabled=frozen or pick in ids):
                     st.session_state[extra_key].append(pick)
                     st.rerun()
@@ -345,7 +371,7 @@ def review_tab(corpus, review: list[dict], questions: list[dict], frozen: bool) 
             st.markdown(f"**{r['question_id']}**: {text.get(r['question_id'], '')}")
             st.markdown(f"{r['kind'].replace('_', ' ').capitalize()}: {r['suggestion']}")
             if r["section_id"]:
-                source_page(corpus, corpus.by_id[r["section_id"]], [])
+                source_page(corpus, corpus.by_id[r["section_id"]], [], f"review_{i}")
             reason = st.text_input("Reason", key=f"reason_{i}")
             a, b = st.columns(2)
             today = date.today().isoformat()

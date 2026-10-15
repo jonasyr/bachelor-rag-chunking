@@ -166,6 +166,8 @@ SINGLE_CLASS_SECTIONS = 1
 CATALOGUE_REPORT_MIN_PAGES = 2
 CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
 CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
+# Editor: site-relative doc links ("/api/...") in the formatted view point to the public docs
+VUE_DOCS_SITE_URL = "https://vuejs.org"
 # Random sampling plan (D31): one starting section per slot, drawn by text length from the
 # innermost H2/H3 sections of an area with SHA-256 of "{seed}:{area}:{k}" (version-independent).
 CATALOGUE_SEED = 20261014  # fixed on 14.10.2026, the date of the decision; never tuned

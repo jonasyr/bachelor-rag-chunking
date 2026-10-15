@@ -26,6 +26,7 @@ from config import (
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTIONS_FILE,
+    VUE_DOCS_SITE_URL,
 )
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
@@ -194,4 +195,51 @@ def page_html(text: str, words: list[str]) -> str:
         out.append(f'<span class="code">{highlight(match.group(), words)}</span>')
         last = match.end()
     out.append(highlight(text[last:], words))
+    return "".join(out)
+
+
+PROTECTED_RE = re.compile(r"`[^`\n]*`|\]\([^)\s]*\)")  # inline code and link targets
+
+
+def _mark(text: str, words: list[str]) -> str:
+    """Mark matching tokens in Markdown prose; HTML entities like &lt; are left alone."""
+    out, last = [], 0
+    for match in TOKEN_RE.finditer(text):
+        token = match.group()
+        forms = {token.lower(), *CAMEL_RE.sub(" ", token).lower().split()}
+        entity = match.start() > 0 and text[match.start() - 1] == "&"
+        out.append(text[last : match.start()])
+        if not entity and any(same_word(f, w) for f in forms for w in words):
+            out.append(f'<mark class="hl">{token}</mark>')
+        else:
+            out.append(token)
+        last = match.end()
+    out.append(text[last:])
+    return "".join(out)
+
+
+def _prose(text: str, words: list[str]) -> str:
+    """Tags shown as text, words marked; inline code untouched; site links made absolute."""
+    out, last = [], 0
+    for match in PROTECTED_RE.finditer(text):
+        plain = text[last : match.start()].replace("\\<", "&lt;").replace("<", "&lt;")
+        out.append(_mark(plain, words))
+        piece = match.group()
+        if piece.startswith("](/"):
+            piece = f"]({VUE_DOCS_SITE_URL}{piece[2:-1]})"
+        out.append(piece)
+        last = match.end()
+    plain = text[last:].replace("\\<", "&lt;").replace("<", "&lt;")
+    out.append(_mark(plain, words))
+    return "".join(out)
+
+
+def markdown_with_highlights(text: str, words: list[str]) -> str:
+    """The section as Markdown for the formatted view: fenced code blocks stay untouched."""
+    out, last = [], 0
+    for match in FENCE_RE.finditer(text):
+        out.append(_prose(text[last : match.start()], words))
+        out.append(match.group())
+        last = match.end()
+    out.append(_prose(text[last:], words))
     return "".join(out)

@@ -268,3 +268,23 @@ def test_unknown_sections_are_value_errors(corpus, files):
     save_plan(files["CATALOGUE_PLAN_FILE"], rows)
     with pytest.raises(ValueError, match="D999#gone"):
         store.save_question(corpus, "S02", "Q2?", "factual", "B.", "", [])
+
+
+def test_markdown_view_marks_prose_but_leaves_code_alone():
+    text = (
+        "## onMounted()\n\nRuns when `onMounted` fires after mounted.\n\n"
+        "```ts\nonMounted(() => {})\n```\n"
+    )
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert '## <mark class="hl">onMounted</mark>()' in out
+    assert "`onMounted`" in out  # inline code untouched
+    assert 'after <mark class="hl">mounted</mark>.' in out
+    assert "```ts\nonMounted(() => {})\n```" in out  # fenced code untouched
+
+
+def test_markdown_view_shows_tags_in_prose_as_text_and_fixes_doc_links():
+    text = "Use <script setup> with [defineProps](/api/sfc-script-setup#defineprops)."
+    out = store.markdown_with_highlights(text, ["props", "script"])
+    assert "&lt;" in out and "<script" not in out
+    assert "(https://vuejs.org/api/sfc-script-setup#defineprops)" in out  # link target not marked
+    assert '[<mark class="hl">defineProps</mark>]' in out  # whole token, like the source view
