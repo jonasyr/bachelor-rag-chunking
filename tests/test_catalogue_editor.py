@@ -161,7 +161,9 @@ def test_unknown_section_ids_show_an_error_instead_of_crashing(app):
 def test_the_source_is_formatted_by_default_and_raw_on_request(app):
     at, _ = app
     assert at.segmented_control(key="view").value == "Formatted"
-    assert any(m.value.startswith("#") for m in at.markdown)  # section text rendered as Markdown
+    # rendered on the server (st.html): no code block left for the client's lazy highlighter
+    assert any("<h2>" in h.proto.body for h in at.get("html"))
+    assert not any(m.value.lstrip().startswith("#") for m in at.markdown)
     at.segmented_control(key="view").set_value("Source text").run()
     assert not at.exception
     assert at.segmented_control(key="view").value == "Source text"

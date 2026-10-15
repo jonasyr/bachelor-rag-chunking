@@ -312,3 +312,23 @@ def test_multi_backtick_code_spans_stay_whole():
     assert "``foo ` mounted``" in out and "```a `` b mounted```" in out
     assert 'then <mark class="hl">mounted</mark>.' in out
     assert 'A lone ` <mark class="hl">mounted</mark>.' in out  # unmatched backtick is plain text
+
+
+def test_formatted_html_is_rendered_on_the_server_without_a_client_highlighter():
+    text = (
+        "## onMounted()\n\n- **Type**\n\n"
+        "  ```ts\n  function onMounted(cb: () => void): void\n  ```\n\n"
+        "- **Details**\n\n  Not inside `<Suspense>` trees after mounted.\n"
+    )
+    out = store.formatted_html(text, ["mounted"])
+    assert '<h2><mark class="hl">onMounted</mark>()</h2>' in out
+    assert '<pre><code class="language-ts">function onMounted(cb: () =&gt; void): void' in out
+    assert "<code>&lt;Suspense&gt;</code>" in out  # inline code escaped, not an element
+    assert 'after <mark class="hl">mounted</mark>.' in out
+    assert out.count("<li>") == 2 and out.index("<pre>") < out.index("</li>")  # code stays in item
+
+
+def test_formatted_html_keeps_corpus_tags_as_text_and_blocks_unsafe_links():
+    out = store.formatted_html("Use <script setup>. [x](javascript:alert(1))", [])
+    assert "<script" not in out and "&lt;script setup&gt;" in out
+    assert "javascript:" not in out.split("[x]")[0] and 'href="javascript' not in out

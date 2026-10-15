@@ -8,6 +8,8 @@ Every write is refused once the freeze record exists (ADR 0030).
 import html
 import re
 
+from markdown_it import MarkdownIt
+
 from atomic_csv import read_csv, write_csv
 from catalogue import CAMEL_RE, Corpus, same_word
 from catalogue_plan import mark_used, read_plan, save_plan, slot_row
@@ -303,3 +305,13 @@ def _prose(text: str, words: list[str]) -> str:
 def markdown_with_highlights(text: str, words: list[str]) -> str:
     """The section as Markdown for the formatted view: fenced code blocks stay untouched."""
     return "".join(piece if code else _prose(piece, words) for code, piece in segments(text))
+
+
+# Server-side rendering: the browser loads no syntax highlighter (it failed on iOS Safari).
+# Raw HTML is on only for our <mark> tags; _prose escapes every tag of the corpus.
+MARKDOWN = MarkdownIt("commonmark", {"html": True}).enable("table")
+
+
+def formatted_html(text: str, words: list[str]) -> str:
+    """The section as HTML for the formatted view (CommonMark plus tables)."""
+    return MARKDOWN.render(markdown_with_highlights(text, words))
