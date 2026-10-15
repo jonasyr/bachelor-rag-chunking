@@ -288,3 +288,19 @@ def test_markdown_view_shows_tags_in_prose_as_text_and_fixes_doc_links():
     assert "&lt;" in out and "<script" not in out
     assert "(https://vuejs.org/api/sfc-script-setup#defineprops)" in out  # link target not marked
     assert '[<mark class="hl">defineProps</mark>]' in out  # whole token, like the source view
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        "~~~md\nSee [API](/api/foo) when mounted.\n~~~",
+        "````md\n```js\nmounted [API](/api/foo)\n```\n````",
+    ],
+)
+def test_every_fence_form_of_the_preprocessing_stays_verbatim(block):
+    text = f"Before mounted.\n\n{block}\n\nAfter."
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert block in out  # no link rewrite, no marks inside the code block
+    assert 'Before <mark class="hl">mounted</mark>.' in out
+    page = store.page_html(text, ["mounted"])
+    assert '<span class="code">' + block.split("\n")[0] in page

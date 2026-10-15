@@ -28,6 +28,7 @@ from config import (
     SECTIONS_FILE,
     VUE_DOCS_SITE_URL,
 )
+from preprocess import closes_fence, fence_marker
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
@@ -184,18 +185,42 @@ def highlight(text: str, words: list[str]) -> str:
     return "".join(out)
 
 
-FENCE_RE = re.compile(r"^[ \t]*```.*?^[ \t]*```[^\n]*$", re.MULTILINE | re.DOTALL)
+def segments(text: str) -> list[tuple[bool, str]]:
+    """(is_code, text) pieces; fences recognised as in preprocessing (``` or ~~~, any length).
+
+    An unclosed fence runs to the end of the text, as in CommonMark.
+    """
+    out: list[tuple[bool, str]] = []
+    buffer: list[str] = []
+    marker: str | None = None
+    for line in text.splitlines(keepends=True):
+        bare = line.rstrip("\n")
+        if marker is None:
+            opened = fence_marker(bare)
+            if opened is not None:
+                if buffer:
+                    out.append((False, "".join(buffer)))
+                buffer, marker = [line], opened
+            else:
+                buffer.append(line)
+            continue
+        buffer.append(line)
+        if closes_fence(bare, marker):
+            block = "".join(buffer)
+            tail = "\n" if block.endswith("\n") else ""
+            out.append((True, block[: len(block) - len(tail)]))
+            buffer, marker = ([tail] if tail else []), None
+    if buffer:
+        out.append((marker is not None, "".join(buffer)))
+    return out
 
 
 def page_html(text: str, words: list[str]) -> str:
     """The section text for the source page: highlighted, fenced code blocks in monospace."""
-    out, last = [], 0
-    for match in FENCE_RE.finditer(text):
-        out.append(highlight(text[last : match.start()], words))
-        out.append(f'<span class="code">{highlight(match.group(), words)}</span>')
-        last = match.end()
-    out.append(highlight(text[last:], words))
-    return "".join(out)
+    return "".join(
+        f'<span class="code">{highlight(piece, words)}</span>' if code else highlight(piece, words)
+        for code, piece in segments(text)
+    )
 
 
 PROTECTED_RE = re.compile(r"`[^`\n]*`|\]\([^)\s]*\)")  # inline code and link targets
@@ -236,10 +261,4 @@ def _prose(text: str, words: list[str]) -> str:
 
 def markdown_with_highlights(text: str, words: list[str]) -> str:
     """The section as Markdown for the formatted view: fenced code blocks stay untouched."""
-    out, last = [], 0
-    for match in FENCE_RE.finditer(text):
-        out.append(_prose(text[last : match.start()], words))
-        out.append(match.group())
-        last = match.end()
-    out.append(_prose(text[last:], words))
-    return "".join(out)
+    return "".join(piece if code else _prose(piece, words) for code, piece in segments(text))
