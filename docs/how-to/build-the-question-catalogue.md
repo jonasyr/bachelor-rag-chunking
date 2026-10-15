@@ -24,10 +24,10 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    Der Plan legt für 48 Slots je einen Ausgangsabschnitt und eine Konstruktionsklasse fest (12 API, 3 Style Guide,
    33 Guide) und wird nie überschrieben.
 
-2. Den Editor starten (nur auf diesem Rechner erreichbar):
+2. Den Editor starten (nur auf diesem Rechner erreichbar; die Option gilt unabhängig vom Arbeitsverzeichnis):
 
    ```bash
-   uv run streamlit run app/catalogue_editor.py
+   uv run streamlit run app/catalogue_editor.py --server.address localhost
    ```
 
    Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über

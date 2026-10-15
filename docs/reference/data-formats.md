@@ -139,8 +139,8 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
 
 Plan- und Durchsichtsdatei werden nur aufgezeichnet; die Sperre in `retrieve.py` prüft die vier übrigen Dateien.
 
-**`catalogue_plan.csv`** (`data/evaluation/`, versioniert, einmal geschrieben von `catalogue.py plan`, danach nur
-Status, Sprunggrund und Frage-ID vom Editor; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
+**`catalogue_plan.csv`** (`data/evaluation/`, versioniert, einmal geschrieben von `catalogue.py plan`, danach ändert
+der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
 die Reserve in Ziehungsreihenfolge.
 ```
 area,draw,section_id,slot_id,class,status,skip_reason,question_id

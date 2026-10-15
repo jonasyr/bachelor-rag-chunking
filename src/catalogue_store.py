@@ -11,6 +11,7 @@ import re
 from atomic_csv import read_csv, write_csv
 from catalogue import CAMEL_RE, Corpus, same_word
 from catalogue_plan import mark_used, read_plan, save_plan, slot_row
+from catalogue_plan import skip_slot as catalogue_skip
 from catalogue_review import decide, read_review
 from config import (
     CATALOGUE_FREEZE_FILE,
@@ -97,6 +98,10 @@ def save_question(
         )
         if owner is not None and owner["slot_id"] != slot_id:
             raise ValueError(f"{question_id} belongs to slot {owner['slot_id']}, not {slot_id}")
+    if row["section_id"] not in corpus.by_id:
+        raise ValueError(
+            f"starting section {row['section_id']} of slot {slot_id} is not in sections.jsonl"
+        )
     unknown = [s for s in section_ids if s not in corpus.by_id]
     if unknown:
         raise ValueError(f"unknown section IDs {unknown}")
@@ -134,7 +139,11 @@ def accept_suggestion(corpus: Corpus, index: int, reason: str, today: str) -> di
     _refuse_if_frozen()
     row = read_review(CATALOGUE_REVIEW_FILE)[index]
     if row["kind"] == "missing_section" and row["decision"] == "open":
+        if row["section_id"] not in corpus.by_id:
+            raise ValueError(f"suggested section {row['section_id']} is not in sections.jsonl")
         questions, truth = load_catalogue()
+        if row["question_id"] not in truth:
+            raise ValueError(f"{row['question_id']} has no ground truth row")
         entry = truth[row["question_id"]]
         ids = list(
             dict.fromkeys([*entry["relevant_section_ids"].split(ID_SEPARATOR), row["section_id"]])
@@ -145,6 +154,12 @@ def accept_suggestion(corpus: Corpus, index: int, reason: str, today: str) -> di
         )
         write_rows(GROUND_TRUTH_FILE, GROUND_TRUTH_HEADER, list(truth.values()))
     return decide(CATALOGUE_REVIEW_FILE, index, "accepted", reason, today)
+
+
+def skip_slot(corpus: Corpus, slot_id: str, reason: str) -> dict:
+    """Skip an open slot (ADR 0031); refused after the freeze."""
+    _refuse_if_frozen()
+    return catalogue_skip(CATALOGUE_PLAN_FILE, slot_id, reason, corpus, CATALOGUE_FREEZE_FILE)
 
 
 def reject_suggestion(index: int, reason: str, today: str) -> dict:

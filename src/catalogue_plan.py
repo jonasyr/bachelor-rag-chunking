@@ -24,6 +24,7 @@ from config import (
     CATALOGUE_SEED,
     CATALOGUE_SKIP_MIN_TOKENS,
     CATALOGUE_SKIP_REASONS,
+    CATALOGUE_SLOT_FORMAT,
     QUESTION_CLASSES,
 )
 
@@ -117,7 +118,7 @@ def draw_plan(
                     "area": area,
                     "draw": str(number),
                     "section_id": section["section_id"],
-                    "slot_id": f"S{slot:02d}" if is_slot else "",
+                    "slot_id": CATALOGUE_SLOT_FORMAT.format(slot) if is_slot else "",
                     "class": shuffled[slot - 1] if is_slot else "",
                     "status": "open" if is_slot else "reserve",
                     "skip_reason": "",
@@ -179,11 +180,16 @@ def mark_used(rows: list[dict], slot_id: str, question_id: str) -> None:
     row["status"], row["question_id"] = "used", question_id
 
 
-def skip_slot(plan_file: Path, slot_id: str, reason: str, corpus: Corpus) -> dict:
+def skip_slot(
+    plan_file: Path, slot_id: str, reason: str, corpus: Corpus, freeze_file: Path | None = None
+) -> dict:
     """Skip an open slot's section with a listed reason; the area's next reserve row takes over.
 
-    `too-short` is only accepted for a section under CATALOGUE_SKIP_MIN_TOKENS tokens.
+    `too-short` is only accepted for a section under CATALOGUE_SKIP_MIN_TOKENS tokens. With a
+    `freeze_file` that exists, the plan is frozen and nothing is written (ADR 0030).
     """
+    if freeze_file is not None and freeze_file.exists():
+        raise PermissionError("the catalogue is frozen (ADR 0030); the plan can no longer change")
     if reason not in CATALOGUE_SKIP_REASONS:
         raise ValueError(
             f"skip reason {reason!r} not allowed; use one of {list(CATALOGUE_SKIP_REASONS)}"
@@ -192,7 +198,9 @@ def skip_slot(plan_file: Path, slot_id: str, reason: str, corpus: Corpus) -> dic
     row = slot_row(rows, slot_id)
     if row["status"] != "open":
         raise ValueError(f"slot {slot_id} is not open (it holds {row['question_id']})")
-    section = corpus.by_id[row["section_id"]]
+    section = corpus.by_id.get(row["section_id"])
+    if section is None:
+        raise ValueError(f"section {row['section_id']} of slot {slot_id} is not in sections.jsonl")
     length = section["end_token"] - section["start_token"]
     if reason == "too-short" and length >= CATALOGUE_SKIP_MIN_TOKENS:
         raise ValueError(

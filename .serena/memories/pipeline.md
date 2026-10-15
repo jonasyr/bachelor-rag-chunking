@@ -8,7 +8,7 @@ data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`
   `docs/how-to/build-the-question-catalogue.md`; `retrieve.py` refuses the main catalogue until
   `catalogue_freeze.json` matches (ADR 0030) — never delete the record to get past it; tests monkeypatch
   `freeze.QUESTIONS_FILE`/`GROUND_TRUTH_FILE` instead.
-- Catalogue authoring (ADR 0031): editor `uv run streamlit run app/catalogue_editor.py` (localhost only); all writes
+- Catalogue authoring (ADR 0031): editor `uv run streamlit run app/catalogue_editor.py --server.address localhost`; all writes
   go through `src/catalogue_store.py` (atomic, strict). Claude's review only appends `open` rows to
   `data/evaluation/catalogue_review.csv` and never edits questions/ground truth; never run `catalogue.py plan` twice.
 - Section spans for relevance: `data/processed/sections.jsonl`; chunk `start_token`/`end_token` must come from

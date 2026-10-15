@@ -242,3 +242,9 @@ def test_plan_integrity_flags_skips_without_promotion(corpus, small_plan):
     errors = plan_integrity(rows, fresh_of(corpus))
     assert any("slot S01: 0 open or used rows" in e for e in errors)
     assert any("area api: 1 skipped but 0 reserve sections used" in e for e in errors)
+
+
+def test_slot_ids_follow_the_configured_format(corpus, monkeypatch):
+    monkeypatch.setattr(catalogue_plan, "CATALOGUE_SLOT_FORMAT", "T{:03d}")
+    slots = [r["slot_id"] for r in draw_plan(corpus, seed=3, **SMALL) if r["slot_id"]]
+    assert slots == ["T001", "T002", "T003"]

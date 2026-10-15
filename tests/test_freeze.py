@@ -5,6 +5,7 @@ from conftest import fresh_plan_for, valid_rows, write_catalogue, write_plan_for
 
 import freeze
 from catalogue import freeze_catalogue
+from catalogue_review import ensure_review_file
 from run_log import sha256_of
 
 
@@ -13,6 +14,7 @@ def main_catalogue(tmp_path, monkeypatch, corpus_files):
     questions, truth = write_catalogue(tmp_path, valid_rows())
     monkeypatch.setattr(freeze, "QUESTIONS_FILE", questions)
     monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", truth)
+    ensure_review_file(tmp_path / "catalogue_review.csv")  # `catalogue.py plan` creates it
     return questions, truth, corpus_files[1], corpus_files[0]
 
 
@@ -39,6 +41,7 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         "sections.jsonl": sha256_of(sections),
         "documents.jsonl": sha256_of(documents),
         "catalogue_plan.csv": sha256_of(tmp_path / "catalogue_plan.csv"),
+        "catalogue_review.csv": sha256_of(tmp_path / "catalogue_review.csv"),
     }
     assert stored["questions"] == 48 and stored["types"]["comparative"] == 6
     assert set(stored) == {"date", "questions", "types", "classes", "sha256"}
@@ -184,3 +187,22 @@ def test_freeze_records_plan_and_review(corpus, main_catalogue, pilot, tmp_path)
     )
     assert record["sha256"]["catalogue_plan.csv"] == sha256_of(plan)
     assert record["sha256"]["catalogue_review.csv"] == sha256_of(review)
+
+
+def test_freeze_requires_the_review_log(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    out = tmp_path / "catalogue_freeze.json"
+    with pytest.raises(ValueError, match="strict check"):
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            sections,
+            documents,
+            plan_file=write_plan_for(tmp_path, valid_rows()),
+            review_file=tmp_path / "missing_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()),
+        )
+    assert not out.exists()

@@ -23,6 +23,7 @@ from config import (  # noqa: E402
     AREA_MIN_QUESTIONS,
     CATALOGUE_SKIP_REASONS,
     DETAIL_MAX_ANSWER_WORDS,
+    ID_SEPARATOR,
     QUESTION_CLASSES,
     QUESTION_TYPES,
 )
@@ -196,9 +197,15 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
     saved_t = truth.get(qid or "", {})
     st.subheader(f"Slot {sid}: {AREA_NAMES[row['area']]}, {row['class']}")
 
+    # Reload the form when the saved rows changed on disk (hand edit, review decision).
+    fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))
+    if st.session_state.get(f"saved_{sid}", fingerprint) != fingerprint:
+        forget_slot(sid)
+    st.session_state[f"saved_{sid}"] = fingerprint
+
     extra_key = f"extra_{sid}"
     if extra_key not in st.session_state:
-        saved_ids = saved_t.get("relevant_section_ids", "").split(";") if saved_t else []
+        saved_ids = saved_t.get("relevant_section_ids", "").split(ID_SEPARATOR) if saved_t else []
         st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
 
     left, right = st.columns([6, 5], gap="large")
@@ -277,9 +284,11 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                 )
                 if st.button("Skip this section", key="skip", disabled=frozen):
                     try:
-                        catalogue_plan.skip_slot(store.CATALOGUE_PLAN_FILE, sid, reason, corpus)
+                        store.skip_slot(corpus, sid, reason)
+                        forget_slot(sid)  # the draft belonged to the skipped section
+                        st.session_state[f"extra_{sid}"] = []
                         st.rerun()
-                    except ValueError as error:
+                    except (ValueError, PermissionError) as error:
                         st.error(str(error))
 
     with left:
@@ -314,6 +323,12 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     st.rerun()
 
 
+def forget_slot(sid: str) -> None:
+    """Drop a slot's form state so it is rebuilt from the files."""
+    for name in ("extra", "question", "answer", "notes", "qtype"):
+        st.session_state.pop(f"{name}_{sid}", None)
+
+
 def forget_section_lists() -> None:
     """Drop cached section lists so they are reloaded from the ground truth file."""
     for key in [k for k in st.session_state if str(k).startswith("extra_")]:
@@ -335,9 +350,12 @@ def review_tab(corpus, review: list[dict], questions: list[dict], frozen: bool) 
             a, b = st.columns(2)
             today = date.today().isoformat()
             if a.button("Accept", key=f"accept_{i}", disabled=frozen):
-                store.accept_suggestion(corpus, i, reason or "", today)
-                forget_section_lists()
-                st.rerun()
+                try:
+                    store.accept_suggestion(corpus, i, reason or "", today)
+                    forget_section_lists()
+                    st.rerun()
+                except (ValueError, PermissionError) as error:
+                    st.error(str(error))
             if b.button("Reject", key=f"reject_{i}", disabled=frozen):
                 try:
                     store.reject_suggestion(i, reason or "", today)
@@ -353,6 +371,14 @@ def review_tab(corpus, review: list[dict], questions: list[dict], frozen: bool) 
                 st.markdown(f"{r['question_id']}, {r['kind']}: {r['decision']} ({reason})")
 
 
+def unknown_sections(corpus, plan, truth, review) -> list[str]:
+    """Section IDs in the plan, the ground truth or the review that the corpus does not have."""
+    ids = {r["section_id"] for r in plan}
+    ids |= {s for t in truth.values() for s in t["relevant_section_ids"].split(ID_SEPARATOR) if s}
+    ids |= {r["section_id"] for r in review if r["section_id"]}
+    return sorted(ids - set(corpus.by_id))
+
+
 def main() -> None:
     st.set_page_config(page_title="Question catalogue", layout="wide")
     st.markdown(CSS + palette_css(), unsafe_allow_html=True)
@@ -364,6 +390,13 @@ def main() -> None:
         return
     questions, truth = store.load_catalogue()
     review = catalogue_review.read_review(store.CATALOGUE_REVIEW_FILE)
+    unknown = unknown_sections(corpus, plan, truth, review)
+    if unknown:
+        st.error(
+            f"Section IDs not in sections.jsonl: {', '.join(unknown)}. The corpus was rebuilt or a "
+            "file was edited by hand; fix the files before editing."
+        )
+        return
     frozen = store.is_frozen()
     sidebar(questions, plan, review)
     if frozen:

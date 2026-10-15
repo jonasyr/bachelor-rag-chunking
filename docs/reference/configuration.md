@@ -114,6 +114,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `CATALOGUE_RESERVE` | `{"api": 12, "style-guide": 3, "guide": 33}` | Reserveabschnitte je Bereich für Sprünge | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_REASONS` | `("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")` | erlaubte Gründe für einen Sprung | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_MIN_TOKENS` | `50` | `too-short` nur für Abschnitte unter so vielen Tokens | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CATALOGUE_SLOT_FORMAT` | `"S{:02d}"` | Format der Slot-IDs im Plan (S01 … S48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_PLAN_STATUSES` | `("open", "used", "skipped", "reserve")` | Werte von `status` in `catalogue_plan.csv` | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_KINDS`, `CATALOGUE_REVIEW_DECISIONS` | `("missing_section", "wording", "fact", "class")`, `("open", "accepted", "rejected")` | Arten und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `QUESTION_ID_PATTERN`, `QUESTION_ID_FORMAT` | `r"Q\d+"`, `"Q{:03d}"` | Muster vorhandener und Format neuer Frage-IDs (Editor) | – |

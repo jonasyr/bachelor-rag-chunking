@@ -24,6 +24,7 @@ from catalogue import (
     show,
     write_section_index,
 )
+from catalogue_review import ensure_review_file
 from config import (
     AREA_MIN_QUESTIONS,
     QUESTION_CLASSES,
@@ -207,6 +208,7 @@ def run_check(corpus, tmp_path, rows, pilot_dir):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows)
     review = tmp_path / "catalogue_review.csv"
+    ensure_review_file(review)
     return check(
         corpus,
         questions,
@@ -294,6 +296,7 @@ def cli(corpus_files, tmp_path, monkeypatch, pilot):
     monkeypatch.setattr(catalogue, "CATALOGUE_FREEZE_FILE", tmp_path / "freeze.json")
     monkeypatch.setattr(catalogue, "CATALOGUE_PLAN_FILE", write_plan_for(tmp_path, valid_rows()))
     monkeypatch.setattr(catalogue, "CATALOGUE_REVIEW_FILE", tmp_path / "catalogue_review.csv")
+    ensure_review_file(tmp_path / "catalogue_review.csv")
     monkeypatch.setattr(catalogue, "draw_plan", lambda corpus: fresh_plan_for(valid_rows()))
     return tmp_path
 

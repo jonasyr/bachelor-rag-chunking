@@ -115,3 +115,44 @@ def test_saving_moves_to_the_next_open_slot(app):
     at.button(key="save").click().run()
     assert not at.exception
     assert any("Slot S02" in h.value for h in at.subheader)
+
+
+def test_skip_clears_the_draft_and_sections_of_the_slot(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("Draft for the old section?")
+    at.session_state["extra_S01"] = ["D002#cleanup"]
+    at.run()
+    at.selectbox(key="skip_reason").select("code-or-links")
+    at.button(key="skip").click().run()
+    assert not at.exception
+    assert at.session_state["extra_S01"] == []
+    assert at.text_area(key="question_S01").value == ""
+
+
+def test_hand_edited_rows_replace_the_form(app):
+    at, paths = app
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A ref.")
+    at.button(key="save").click().run()
+    at.selectbox(key="slot").select("S01").run()  # the form now shows the saved question
+    path = paths["QUESTIONS_FILE"]
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("What does it return?", "Hand edited?"),
+        encoding="utf-8",
+    )
+    at.run()  # still on S01: the edit on disk must replace the form
+    assert not at.exception
+    assert at.text_area(key="question_S01").value == "Hand edited?"
+
+
+def test_unknown_section_ids_show_an_error_instead_of_crashing(app):
+    at, paths = app
+    plan = paths["CATALOGUE_PLAN_FILE"]
+    rows = read_plan(plan)
+    rows[0]["section_id"] = "D999#gone"
+    from catalogue_plan import save_plan
+
+    save_plan(plan, rows)
+    at.run()
+    assert not at.exception
+    assert any("D999#gone" in e.value for e in at.error)

@@ -174,6 +174,7 @@ CATALOGUE_RESERVE = {"api": 12, "style-guide": 3, "guide": 33}  # replacement se
 CATALOGUE_SKIP_REASONS = ("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")
 CATALOGUE_SKIP_MIN_TOKENS = 50  # `too-short`: starting section under this many tokens
 CATALOGUE_PLAN_STATUSES = ("open", "used", "skipped", "reserve")
+CATALOGUE_SLOT_FORMAT = "S{:02d}"  # slot IDs S01 … S48 in the plan
 # AI review log (D31): kinds of suggestions and their decisions
 CATALOGUE_REVIEW_KINDS = ("missing_section", "wording", "fact", "class")
 CATALOGUE_REVIEW_DECISIONS = ("open", "accepted", "rejected")

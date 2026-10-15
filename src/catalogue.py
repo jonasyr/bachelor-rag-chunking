@@ -455,6 +455,10 @@ def check(
         if fresh_plan is not None:
             report.errors += plan_integrity(plan, fresh_plan)
         report.errors += too_short_errors(plan, corpus)
+    if not review_file.exists():
+        report.findings.append(
+            f"{review_file.name} is missing; `catalogue.py plan` creates it (ADR 0031)"
+        )
     try:
         review = read_review(review_file)
     except ValueError as error:

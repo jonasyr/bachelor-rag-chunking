@@ -233,3 +233,38 @@ def test_page_html_sets_fenced_code_in_monospace_and_keeps_highlights():
     code = '```ts\n<mark class="hl">onMounted</mark>(() =&gt; {})\n```'
     assert f'<span class="code">{code}</span>' in out
     assert out.startswith("Use the hook.") and out.endswith("Done.")
+
+
+def test_skip_is_refused_after_the_freeze(corpus, files):
+    files["CATALOGUE_FREEZE_FILE"].write_text("{}", encoding="utf-8")
+    before = files["CATALOGUE_PLAN_FILE"].read_bytes()
+    with pytest.raises(PermissionError, match="frozen"):
+        store.skip_slot(corpus, "S01", "code-or-links")
+    assert files["CATALOGUE_PLAN_FILE"].read_bytes() == before
+
+
+def test_unknown_sections_are_value_errors(corpus, files):
+    store.save_question(corpus, "S01", "Q?", "factual", "A.", "", [])
+    save_review(
+        files["CATALOGUE_REVIEW_FILE"],
+        [
+            dict.fromkeys(REVIEW_HEADER, "")
+            | {
+                "round": "1",
+                "question_id": "Q001",
+                "kind": "missing_section",
+                "suggestion": "x",
+                "section_id": "D009#nope",
+                "decision": "open",
+            },
+        ],
+    )
+    with pytest.raises(ValueError, match="D009#nope"):
+        store.accept_suggestion(corpus, 0, "", "2026-10-20")
+    rows = read_plan(files["CATALOGUE_PLAN_FILE"])
+    next(r for r in rows if r["slot_id"] == "S02")["section_id"] = "D999#gone"
+    from catalogue_plan import save_plan
+
+    save_plan(files["CATALOGUE_PLAN_FILE"], rows)
+    with pytest.raises(ValueError, match="D999#gone"):
+        store.save_question(corpus, "S02", "Q2?", "factual", "B.", "", [])
