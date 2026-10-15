@@ -262,3 +262,21 @@ def test_plan_integrity_keeps_promoted_reserves_in_their_own_area(corpus, small_
         f"slot {api_slot['slot_id']}: a section from area guide cannot fill a slot of area api" in e
         for e in errors
     ), errors
+
+
+@pytest.mark.parametrize("slot", ["", "S01"])
+def test_plan_integrity_rejects_reserve_rows_skipped_without_promotion(corpus, small_plan, slot):
+    rows = read_plan(small_plan)
+    reserve = next(r for r in rows if r["area"] == "api" and r["status"] == "reserve")
+    s01 = next(r for r in rows if r["slot_id"] == "S01")
+    reserve.update(
+        status="skipped",
+        skip_reason="code-or-links",
+        slot_id=slot,
+        **{"class": s01["class"] if slot else ""},
+    )
+    errors = plan_integrity(rows, fresh_of(corpus))
+    assert any(
+        "skipped sections followed by one open or used row" in e or "belongs to no slot" in e
+        for e in errors
+    ), errors

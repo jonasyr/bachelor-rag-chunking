@@ -312,6 +312,11 @@ def plan_integrity(rows: list[dict], fresh: list[dict]) -> list[str]:
             errors.append(f"{where}: {r['status']} but holds {r['question_id']}")
         if r["status"] != "skipped" and r["skip_reason"]:
             errors.append(f"{where}: skip_reason only on skipped rows")
+    errors += [
+        f"plan row {r['area']}/{r['draw']}: {r['status']} but belongs to no slot"
+        for r in rows
+        if r["status"] != "reserve" and not r["slot_id"]
+    ]
     drawn = {f["slot_id"]: f["class"] for f in fresh if f["slot_id"]}
     extra = sorted({r["slot_id"] for r in rows if r["slot_id"]} - set(drawn))
     if extra:
@@ -323,7 +328,19 @@ def plan_integrity(rows: list[dict], fresh: list[dict]) -> list[str]:
             errors.append(f"slot {slot}: {active} open or used rows, needs exactly 1")
         if any(r["class"] != cls for r in chain):
             errors.append(f"slot {slot}: class changed from {cls}")
-        home = next(f["area"] for f in fresh if f["slot_id"] == slot)
+        ordered = sorted(chain, key=lambda r: int(r["draw"]))
+        original = next(f for f in fresh if f["slot_id"] == slot)
+        if (
+            not ordered
+            or (ordered[0]["area"], ordered[0]["draw"]) != (original["area"], original["draw"])
+            or any(r["status"] != "skipped" for r in ordered[:-1])
+            or ordered[-1]["status"] not in ("open", "used")
+        ):
+            errors.append(
+                f"slot {slot}: rows must be the drawn section, then skipped sections followed by "
+                "one open or used row"
+            )
+        home = original["area"]
         for r in chain:
             if r["area"] != home:
                 errors.append(
