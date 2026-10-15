@@ -248,3 +248,17 @@ def test_slot_ids_follow_the_configured_format(corpus, monkeypatch):
     monkeypatch.setattr(catalogue_plan, "CATALOGUE_SLOT_FORMAT", "T{:03d}")
     slots = [r["slot_id"] for r in draw_plan(corpus, seed=3, **SMALL) if r["slot_id"]]
     assert slots == ["T001", "T002", "T003"]
+
+
+def test_plan_integrity_keeps_promoted_reserves_in_their_own_area(corpus, small_plan):
+    rows = read_plan(small_plan)
+    fresh = fresh_of(corpus)
+    api_slot = next(r for r in rows if r["area"] == "api" and r["slot_id"])
+    guide_reserve = next(r for r in rows if r["area"] == "guide" and r["status"] == "reserve")
+    api_slot.update(status="skipped", skip_reason="code-or-links")
+    guide_reserve.update(slot_id=api_slot["slot_id"], status="open", **{"class": api_slot["class"]})
+    errors = plan_integrity(rows, fresh)
+    assert any(
+        f"slot {api_slot['slot_id']}: a section from area guide cannot fill a slot of area api" in e
+        for e in errors
+    ), errors

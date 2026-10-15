@@ -323,6 +323,13 @@ def plan_integrity(rows: list[dict], fresh: list[dict]) -> list[str]:
             errors.append(f"slot {slot}: {active} open or used rows, needs exactly 1")
         if any(r["class"] != cls for r in chain):
             errors.append(f"slot {slot}: class changed from {cls}")
+        home = next(f["area"] for f in fresh if f["slot_id"] == slot)
+        for r in chain:
+            if r["area"] != home:
+                errors.append(
+                    f"slot {slot}: a section from area {r['area']} "
+                    f"cannot fill a slot of area {home}"
+                )
     for area in dict.fromkeys(f["area"] for f in fresh):
         reserve = [
             r for r, f in zip(rows, fresh, strict=True) if f["area"] == area and not f["slot_id"]

@@ -465,6 +465,17 @@ def check(
         report.errors.append(str(error))
         review = []
     report.errors += review_errors(review, {q["question_id"] for q in questions}, set(corpus.by_id))
+    for number, r in enumerate(review, start=2):
+        annotated = {s["section_id"] for s in relevant.get(r["question_id"], [])}
+        if (
+            r["kind"] == "missing_section"
+            and r["decision"] == "accepted"
+            and (r["section_id"] not in annotated)
+        ):
+            report.findings.append(
+                f"{r['question_id']}: accepted section {r['section_id']} (review row {number}) "
+                "is no longer annotated"
+            )
     still_open = sum(1 for r in review if r["decision"] == "open")
     if still_open:
         report.findings.append(f"{still_open} review suggestion(s) still open")

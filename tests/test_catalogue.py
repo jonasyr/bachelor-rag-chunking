@@ -487,3 +487,27 @@ def test_check_rejects_too_short_skips_of_long_sections(corpus, tmp_path, pilot,
         fresh_plan=None,
     )
     assert any("too-short needs fewer than 1 tokens" in e for e in report.errors)
+
+
+def test_accepted_missing_sections_must_stay_annotated(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    questions, truth = write_catalogue(tmp_path, rows)
+    review = tmp_path / "catalogue_review.csv"
+    review.write_text(
+        "round,question_id,kind,suggestion,section_id,decision,reason,date\n"
+        "1,Q001,missing_section,Also cleanup.,D002#cleanup,accepted,,2026-10-20\n",
+        encoding="utf-8",
+    )
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot_dir=pilot,
+        plan_file=write_plan_for(tmp_path, rows),
+        review_file=review,
+        fresh_plan=fresh_plan_for(rows),
+    )
+    assert (
+        "Q001: accepted section D002#cleanup (review row 2) is no longer annotated"
+        in report.findings
+    )
