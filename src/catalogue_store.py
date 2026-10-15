@@ -223,7 +223,48 @@ def page_html(text: str, words: list[str]) -> str:
     )
 
 
-PROTECTED_RE = re.compile(r"`[^`\n]*`|\]\([^)\s]*\)")  # inline code and link targets
+LINK_TARGET_RE = re.compile(r"\]\([^)\s]*\)")
+
+
+def code_spans(text: str) -> list[tuple[int, int]]:
+    """Inline code spans as in CommonMark: a backtick run closed by a run of the same length."""
+    spans, i, n = [], 0, len(text)
+    while i < n:
+        if text[i] != "`":
+            i += 1
+            continue
+        j = i
+        while j < n and text[j] == "`":
+            j += 1
+        run, k, end = j - i, j, None
+        while k < n:
+            if text[k] != "`":
+                k += 1
+                continue
+            m = k
+            while m < n and text[m] == "`":
+                m += 1
+            if m - k == run:
+                end = m
+                break
+            k = m
+        if end is None:
+            i = j  # unmatched run: plain backticks
+        else:
+            spans.append((i, end))
+            i = end
+    return spans
+
+
+def _protected(text: str) -> list[tuple[int, int]]:
+    """Inline code spans and link targets outside them, in text order."""
+    spans = code_spans(text)
+    links = [
+        m.span()
+        for m in LINK_TARGET_RE.finditer(text)
+        if not any(a <= m.start() < b for a, b in spans)
+    ]
+    return sorted(spans + links)
 
 
 def _mark(text: str, words: list[str]) -> str:
@@ -246,14 +287,14 @@ def _mark(text: str, words: list[str]) -> str:
 def _prose(text: str, words: list[str]) -> str:
     """Tags shown as text, words marked; inline code untouched; site links made absolute."""
     out, last = [], 0
-    for match in PROTECTED_RE.finditer(text):
-        plain = text[last : match.start()].replace("\\<", "&lt;").replace("<", "&lt;")
+    for start, end in _protected(text):
+        plain = text[last:start].replace("\\<", "&lt;").replace("<", "&lt;")
         out.append(_mark(plain, words))
-        piece = match.group()
+        piece = text[start:end]
         if piece.startswith("](/"):
             piece = f"]({VUE_DOCS_SITE_URL}{piece[2:-1]})"
         out.append(piece)
-        last = match.end()
+        last = end
     plain = text[last:].replace("\\<", "&lt;").replace("<", "&lt;")
     out.append(_mark(plain, words))
     return "".join(out)

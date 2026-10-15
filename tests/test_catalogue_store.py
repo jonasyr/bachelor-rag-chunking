@@ -304,3 +304,11 @@ def test_every_fence_form_of_the_preprocessing_stays_verbatim(block):
     assert 'Before <mark class="hl">mounted</mark>.' in out
     page = store.page_html(text, ["mounted"])
     assert '<span class="code">' + block.split("\n")[0] in page
+
+
+def test_multi_backtick_code_spans_stay_whole():
+    text = "Use ``foo ` mounted`` and ```a `` b mounted``` then mounted. A lone ` mounted."
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert "``foo ` mounted``" in out and "```a `` b mounted```" in out
+    assert 'then <mark class="hl">mounted</mark>.' in out
+    assert 'A lone ` <mark class="hl">mounted</mark>.' in out  # unmatched backtick is plain text
