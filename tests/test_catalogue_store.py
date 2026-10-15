@@ -268,3 +268,47 @@ def test_unknown_sections_are_value_errors(corpus, files):
     save_plan(files["CATALOGUE_PLAN_FILE"], rows)
     with pytest.raises(ValueError, match="D999#gone"):
         store.save_question(corpus, "S02", "Q2?", "factual", "B.", "", [])
+
+
+def test_markdown_view_marks_prose_but_leaves_code_alone():
+    text = (
+        "## onMounted()\n\nRuns when `onMounted` fires after mounted.\n\n"
+        "```ts\nonMounted(() => {})\n```\n"
+    )
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert '## <mark class="hl">onMounted</mark>()' in out
+    assert "`onMounted`" in out  # inline code untouched
+    assert 'after <mark class="hl">mounted</mark>.' in out
+    assert "```ts\nonMounted(() => {})\n```" in out  # fenced code untouched
+
+
+def test_markdown_view_shows_tags_in_prose_as_text_and_fixes_doc_links():
+    text = "Use <script setup> with [defineProps](/api/sfc-script-setup#defineprops)."
+    out = store.markdown_with_highlights(text, ["props", "script"])
+    assert "&lt;" in out and "<script" not in out
+    assert "(https://vuejs.org/api/sfc-script-setup#defineprops)" in out  # link target not marked
+    assert '[<mark class="hl">defineProps</mark>]' in out  # whole token, like the source view
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        "~~~md\nSee [API](/api/foo) when mounted.\n~~~",
+        "````md\n```js\nmounted [API](/api/foo)\n```\n````",
+    ],
+)
+def test_every_fence_form_of_the_preprocessing_stays_verbatim(block):
+    text = f"Before mounted.\n\n{block}\n\nAfter."
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert block in out  # no link rewrite, no marks inside the code block
+    assert 'Before <mark class="hl">mounted</mark>.' in out
+    page = store.page_html(text, ["mounted"])
+    assert '<span class="code">' + block.split("\n")[0] in page
+
+
+def test_multi_backtick_code_spans_stay_whole():
+    text = "Use ``foo ` mounted`` and ```a `` b mounted``` then mounted. A lone ` mounted."
+    out = store.markdown_with_highlights(text, ["mounted"])
+    assert "``foo ` mounted``" in out and "```a `` b mounted```" in out
+    assert 'then <mark class="hl">mounted</mark>.' in out
+    assert 'A lone ` <mark class="hl">mounted</mark>.' in out  # unmatched backtick is plain text

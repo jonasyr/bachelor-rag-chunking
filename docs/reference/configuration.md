@@ -104,6 +104,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `SINGLE_CLASS_SECTIONS` | `1` | `single`, `detail`, `paraphrase`: genau so viele relevante Abschnitte | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_REPORT_MIN_PAGES` | `2` | Bericht von `check`: Anzahl der `multi-section`-Fragen mit Abschnitten auf mindestens so vielen Seiten (nur Anzeige, keine Regel) | – |
 | `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext je Seite eines Treffers (nie über den Abschnitt hinaus) | – |
+| `VUE_DOCS_SITE_URL` | `"https://vuejs.org"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
 | `CATALOGUE_HEADING_SEPARATOR` | `" › "` | Trenner im Überschriftenpfad (`section_index.md`, `find`, `show`) | – |
 | `CATALOGUE_WORD_PATTERN` | `r"[a-z0-9]+"` | Wörter für den Paraphrase-Vergleich (nach Kleinschreibung) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |

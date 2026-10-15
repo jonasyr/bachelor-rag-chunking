@@ -30,7 +30,8 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    uv run streamlit run app/catalogue_editor.py --server.address localhost
    ```
 
-   Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über
+   Der Abschnitt erscheint formatiert (Markdown); „Source text“ zeigt den genauen Text, auf den sich die Relevanzregel
+   bezieht. Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über
    „Find more sections“ suchen und hinzufügen, auch in der API-Referenz und im Style Guide. Der Ausgangsabschnitt gehört
    immer zur Annotation. Während des Schreibens markiert der Editor Wörter der Frage, die in den Überschriften
    vorkommen; bei `paraphrase` müssen sie umformuliert werden, bei `detail` zeigt die Prüfung die Länge der Antwort.

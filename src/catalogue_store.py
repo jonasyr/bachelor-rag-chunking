@@ -26,7 +26,9 @@ from config import (
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTIONS_FILE,
+    VUE_DOCS_SITE_URL,
 )
+from preprocess import closes_fence, fence_marker
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
@@ -183,15 +185,121 @@ def highlight(text: str, words: list[str]) -> str:
     return "".join(out)
 
 
-FENCE_RE = re.compile(r"^[ \t]*```.*?^[ \t]*```[^\n]*$", re.MULTILINE | re.DOTALL)
+def segments(text: str) -> list[tuple[bool, str]]:
+    """(is_code, text) pieces; fences recognised as in preprocessing (``` or ~~~, any length).
+
+    An unclosed fence runs to the end of the text, as in CommonMark.
+    """
+    out: list[tuple[bool, str]] = []
+    buffer: list[str] = []
+    marker: str | None = None
+    for line in text.splitlines(keepends=True):
+        bare = line.rstrip("\n")
+        if marker is None:
+            opened = fence_marker(bare)
+            if opened is not None:
+                if buffer:
+                    out.append((False, "".join(buffer)))
+                buffer, marker = [line], opened
+            else:
+                buffer.append(line)
+            continue
+        buffer.append(line)
+        if closes_fence(bare, marker):
+            block = "".join(buffer)
+            tail = "\n" if block.endswith("\n") else ""
+            out.append((True, block[: len(block) - len(tail)]))
+            buffer, marker = ([tail] if tail else []), None
+    if buffer:
+        out.append((marker is not None, "".join(buffer)))
+    return out
 
 
 def page_html(text: str, words: list[str]) -> str:
     """The section text for the source page: highlighted, fenced code blocks in monospace."""
+    return "".join(
+        f'<span class="code">{highlight(piece, words)}</span>' if code else highlight(piece, words)
+        for code, piece in segments(text)
+    )
+
+
+LINK_TARGET_RE = re.compile(r"\]\([^)\s]*\)")
+
+
+def code_spans(text: str) -> list[tuple[int, int]]:
+    """Inline code spans as in CommonMark: a backtick run closed by a run of the same length."""
+    spans, i, n = [], 0, len(text)
+    while i < n:
+        if text[i] != "`":
+            i += 1
+            continue
+        j = i
+        while j < n and text[j] == "`":
+            j += 1
+        run, k, end = j - i, j, None
+        while k < n:
+            if text[k] != "`":
+                k += 1
+                continue
+            m = k
+            while m < n and text[m] == "`":
+                m += 1
+            if m - k == run:
+                end = m
+                break
+            k = m
+        if end is None:
+            i = j  # unmatched run: plain backticks
+        else:
+            spans.append((i, end))
+            i = end
+    return spans
+
+
+def _protected(text: str) -> list[tuple[int, int]]:
+    """Inline code spans and link targets outside them, in text order."""
+    spans = code_spans(text)
+    links = [
+        m.span()
+        for m in LINK_TARGET_RE.finditer(text)
+        if not any(a <= m.start() < b for a, b in spans)
+    ]
+    return sorted(spans + links)
+
+
+def _mark(text: str, words: list[str]) -> str:
+    """Mark matching tokens in Markdown prose; HTML entities like &lt; are left alone."""
     out, last = [], 0
-    for match in FENCE_RE.finditer(text):
-        out.append(highlight(text[last : match.start()], words))
-        out.append(f'<span class="code">{highlight(match.group(), words)}</span>')
+    for match in TOKEN_RE.finditer(text):
+        token = match.group()
+        forms = {token.lower(), *CAMEL_RE.sub(" ", token).lower().split()}
+        entity = match.start() > 0 and text[match.start() - 1] == "&"
+        out.append(text[last : match.start()])
+        if not entity and any(same_word(f, w) for f in forms for w in words):
+            out.append(f'<mark class="hl">{token}</mark>')
+        else:
+            out.append(token)
         last = match.end()
-    out.append(highlight(text[last:], words))
+    out.append(text[last:])
     return "".join(out)
+
+
+def _prose(text: str, words: list[str]) -> str:
+    """Tags shown as text, words marked; inline code untouched; site links made absolute."""
+    out, last = [], 0
+    for start, end in _protected(text):
+        plain = text[last:start].replace("\\<", "&lt;").replace("<", "&lt;")
+        out.append(_mark(plain, words))
+        piece = text[start:end]
+        if piece.startswith("](/"):
+            piece = f"]({VUE_DOCS_SITE_URL}{piece[2:-1]})"
+        out.append(piece)
+        last = end
+    plain = text[last:].replace("\\<", "&lt;").replace("<", "&lt;")
+    out.append(_mark(plain, words))
+    return "".join(out)
+
+
+def markdown_with_highlights(text: str, words: list[str]) -> str:
+    """The section as Markdown for the formatted view: fenced code blocks stay untouched."""
+    return "".join(piece if code else _prose(piece, words) for code, piece in segments(text))
