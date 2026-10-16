@@ -18,14 +18,19 @@ from pathlib import Path
 
 from atomic_csv import read_csv, write_csv
 from config import (
+    CATALOGUE_FREEZE_FILE,
+    DOCUMENTS_FILE,
     GENERATED_ANSWERS_FILE,
+    GROUND_TRUTH_FILE,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
     SCORES_FILE,
+    SECTIONS_FILE,
     STRATEGY_IDS,
 )
-from retrieve import QUESTIONS_HEADER
+from freeze import require_frozen
+from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 
 ANSWERS_HEADER = [
     "question_id",
@@ -39,8 +44,22 @@ SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 GROUPS = ["type", "difficulty"]  # questions.csv columns the summary is broken down by
 
 
-def check_grid(path: Path, rows: list[dict]) -> None:
-    """Every question has exactly one row per experiment strategy, nothing else."""
+def catalogue(
+    questions_file: Path,
+    ground_truth_file: Path,
+    sections_file: Path,
+    documents_file: Path,
+    freeze_file: Path,
+) -> dict[str, dict]:
+    """The questions by ID; the main catalogue only while it matches its freeze record."""
+    require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
+    rows = read_rows(questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED)
+    return {q["question_id"]: q for q in rows}
+
+
+def check_grid(path: Path, rows: list[dict], qids: list[str]) -> None:
+    """Every question of the catalogue has exactly one row per experiment strategy, nothing
+    else, so no strategy is compared on fewer questions than the others."""
     pairs = [(r["question_id"], r["strategy"]) for r in rows]
     foreign = sorted({s for _, s in pairs} - set(STRATEGY_IDS))
     if foreign:
@@ -48,14 +67,27 @@ def check_grid(path: Path, rows: list[dict]) -> None:
     duplicates = sorted({p for p in pairs if pairs.count(p) > 1})
     if duplicates:
         raise ValueError(f"{path}: duplicate rows {duplicates}")
-    qids = sorted({q for q, _ in pairs})
+    foreign_questions = sorted({q for q, _ in pairs} - set(qids))
+    if foreign_questions:
+        raise ValueError(f"{path}: questions {foreign_questions} are not in the catalogue")
     missing = [f"{q}/{s}" for q in qids for s in STRATEGY_IDS if (q, s) not in pairs]
     if missing:
         raise ValueError(f"{path}: rows missing for {missing}")
 
 
-def scaffold(answers_file: Path = GENERATED_ANSWERS_FILE, scores_file: Path = SCORES_FILE) -> int:
+def scaffold(
+    answers_file: Path = GENERATED_ANSWERS_FILE,
+    scores_file: Path = SCORES_FILE,
+    questions_file: Path = QUESTIONS_FILE,
+    ground_truth_file: Path = GROUND_TRUTH_FILE,
+    sections_file: Path = SECTIONS_FILE,
+    documents_file: Path = DOCUMENTS_FILE,
+    freeze_file: Path = CATALOGUE_FREEZE_FILE,
+) -> int:
     """Write the unscored rows in (question_id, strategy) order; return their number."""
+    questions = catalogue(
+        questions_file, ground_truth_file, sections_file, documents_file, freeze_file
+    )
     if scores_file.exists():
         raise FileExistsError(
             f"{scores_file} exists and may hold manual scores; move it away to start afresh"
@@ -63,7 +95,7 @@ def scaffold(answers_file: Path = GENERATED_ANSWERS_FILE, scores_file: Path = SC
     answers = read_csv(answers_file, ANSWERS_HEADER)
     if not answers:
         raise ValueError(f"{answers_file} has no answers; run src/generate.py first")
-    check_grid(answers_file, answers)
+    check_grid(answers_file, answers, sorted(questions))
     order = list(STRATEGY_IDS)
     rows = [
         {"question_id": a["question_id"], "strategy": a["strategy"]}
@@ -85,18 +117,22 @@ def criterion_value(row: dict, criterion: str, path: Path) -> int:
 
 
 def summarise(
-    scores_file: Path = SCORES_FILE, questions_file: Path = QUESTIONS_FILE
+    scores_file: Path = SCORES_FILE,
+    questions_file: Path = QUESTIONS_FILE,
+    ground_truth_file: Path = GROUND_TRUTH_FILE,
+    sections_file: Path = SECTIONS_FILE,
+    documents_file: Path = DOCUMENTS_FILE,
+    freeze_file: Path = CATALOGUE_FREEZE_FILE,
 ) -> dict[tuple, dict]:
     """Fill total_score and return the statistics per (group, value, strategy); group "all"
     spans all questions, the other groups are the question type and construction class."""
+    questions = catalogue(
+        questions_file, ground_truth_file, sections_file, documents_file, freeze_file
+    )
     rows = read_csv(scores_file, SCORES_HEADER)
     if not rows:
         raise ValueError(f"{scores_file} has no rows; run --mode scaffold first")
-    check_grid(scores_file, rows)
-    questions = {q["question_id"]: q for q in read_csv(questions_file, QUESTIONS_HEADER)}
-    unknown = sorted({r["question_id"] for r in rows} - set(questions))
-    if unknown:
-        raise ValueError(f"{scores_file}: questions {unknown} are not in {questions_file}")
+    check_grid(scores_file, rows, sorted(questions))
     totals = []
     for row in rows:
         values = [criterion_value(row, c, scores_file) for c in RUBRIC_CRITERIA]

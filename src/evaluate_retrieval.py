@@ -3,7 +3,7 @@
 Computes Hit@k, reciprocal rank, Precision@k, Recall@k and the context tokens of the top-k
 chunks per question, strategy and relevance rule (main rule and sensitivity rule,
 docs/reference/evaluation.md), writes them to retrieval_scores.csv and prints the means per
-strategy, overall and per question type and construction class.
+strategy, overall and per question type and construction class. k is always TOP_K (ADR 0014).
 Reads retrieved_results.csv (or retrieved_results_control.csv for K1), questions.csv,
 ground_truth.csv, sections.jsonl and the chunk files. The main catalogue is evaluated only
 while it matches its freeze record (ADR 0030), and the results must carry the relevance flags
@@ -101,7 +101,6 @@ def ranked_results(
 
 
 def evaluate(
-    k: int = TOP_K,
     results_file: Path = RETRIEVED_RESULTS_FILE,
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
@@ -118,8 +117,6 @@ def evaluate(
         raise ValueError("strategies must be the experiment set or the control set (D26)")
     if sorted(chunk_files) != sorted(strategies):
         raise ValueError(f"chunk_files must cover exactly the strategies {sorted(strategies)}")
-    if not 1 <= k <= TOP_K:
-        raise ValueError(f"k must lie between 1 and TOP_K = {TOP_K}, got {k}")
     questions = read_rows(
         questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
     )
@@ -149,7 +146,7 @@ def evaluate(
                         "disagrees with the ground truth; run src/retrieve.py again"
                     )
             for rule, min_overlap in RULES.items():
-                scores = question_scores(ranked, relevant[qid], k, min_overlap)
+                scores = question_scores(ranked, relevant[qid], TOP_K, min_overlap)
                 rows.append({"question_id": qid, "strategy": key, "rule": rule, **scores})
 
     out_file.parent.mkdir(parents=True, exist_ok=True)
@@ -182,7 +179,7 @@ def summarise(rows: list[dict], questions_file: Path = QUESTIONS_FILE) -> dict[t
     }
 
 
-def print_summary(summary: dict[tuple, dict], k: int) -> None:
+def print_summary(summary: dict[tuple, dict], k: int = TOP_K) -> None:
     for rule in RULES:
         print(f"\nrule: {rule}")
         print(
@@ -206,17 +203,15 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="Retrieval metrics per strategy (ADR 0012).")
-    p.add_argument("--k", type=int, default=TOP_K, help=f"cut-off, 1-{TOP_K}")
     p.add_argument("--control", action="store_true", help="the size-matched control K1")
     args = p.parse_args()
     if args.control:
         rows = evaluate(
-            args.k,
             results_file=CONTROL_RETRIEVED_FILE,
             chunk_files=CONTROL_CHUNK_FILES,
             strategies=CONTROL_STRATEGIES,
             out_file=CONTROL_RETRIEVAL_SCORES_FILE,
         )
     else:
-        rows = evaluate(args.k)
-    print_summary(summarise(rows), args.k)
+        rows = evaluate()
+    print_summary(summarise(rows))

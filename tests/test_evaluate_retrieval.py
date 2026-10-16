@@ -1,4 +1,5 @@
 import csv
+import inspect
 import json
 
 import pytest
@@ -266,13 +267,11 @@ def test_main_catalogue_is_evaluated_only_while_frozen(files, monkeypatch):
     assert not files["out_file"].exists()
 
 
-def test_k_below_top_k_cuts_the_ranking(files):
-    rows = by_key(run(files, k=3))
-    q2 = rows["Q002", "C1", "main"]  # D002 chunks only at ranks 4-5: nothing in the top 3
-    assert (q2["hit"], q2["precision"]) == ("0", "0.000000")
-    assert q2["context_tokens"] == str(50 + 150 + 10)
-    with pytest.raises(ValueError, match="k"):
-        run(files, k=TOP_K + 1)
+def test_the_cutoff_is_always_top_k_and_cannot_be_overridden(files):
+    """k is fixed by ADR 0014; a smaller cut-off would write files that look like @5 results."""
+    assert "k" not in inspect.signature(evaluate).parameters
+    with pytest.raises(TypeError):
+        run(files, k=3)
 
 
 def test_question_scores_is_pure(files):
