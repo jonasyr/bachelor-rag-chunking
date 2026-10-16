@@ -50,11 +50,19 @@ CSS = """
 .slot-title {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 1.5rem;
   font-weight: 600; line-height: 1.25; margin: 0; color: var(--ink);}
 .slot-title span {color: var(--muted); font-weight: 400;}
-/* Laptop and up: the section is a scrolling page beside the form, so the form, the checks
-   and the search stay in view while reading. */
-@media (min-width: 1024px) {
-  .formatted, .source {max-height: max(20rem, calc(100vh - 19rem)); overflow-y: auto;
+/* Two columns (640 px and up): the starting section fills the height of the form beside it
+   and scrolls inside; a found section scrolls within most of the window. */
+@media (min-width: 640px) {
+  .formatted, .source {max-height: 75vh; overflow-y: auto;
     scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
+  [data-testid="stColumn"]:has(.st-key-reader) {display: flex; flex-direction: column;}
+  [data-testid="stColumn"]:has(.st-key-reader) > [data-testid="stVerticalBlock"],
+  [data-testid="stLayoutWrapper"]:has(> .st-key-reader),
+  .st-key-reader, .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source),
+  .st-key-reader .stHtml:has(.formatted, .source) {
+    flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;}
+  .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source) {min-height: 20rem;}
+  .st-key-reader .formatted, .st-key-reader .source {flex: 1 1 0; min-height: 0; max-height: none;}
 }
 .formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
   font-size: 1.02rem; line-height: 1.7; color: var(--ink); background: var(--surface);
@@ -341,7 +349,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     except (ValueError, PermissionError) as error:
                         st.error(str(error))
 
-    with left:
+    with left, st.container(key="reader"):
         words = (
             catalogue.shared_words(question, catalogue.heading_texts(corpus, sections))
             if question
