@@ -175,6 +175,16 @@ Q001,C1,1,C1_D049_0004,0.840000,1
 
 **`retrieved_results_control.csv`** (`retrieve.py --control`): gleiche Spalten, `strategy` immer `K1`.
 
+**`retrieval_scores.csv`** (`evaluate_retrieval.py`, wird vollständig neu geschrieben; `retrieval_scores_control.csv`
+mit `--control` für K1): eine Zeile je Frage, Strategie und Relevanzregel (`rule` = `main` oder `sensitivity`,
+[Evaluation](evaluation.md#relevanz-eines-chunks)), sortiert nach `question_id`, Strategie, Regel. `hit` = `1`/`0`;
+`reciprocal_rank`, `precision`, `recall` mit sechs Nachkommastellen; `context_tokens` = summierte Länge der k
+abgerufenen Chunks (Kontext@k).
+```
+question_id,strategy,rule,hit,reciprocal_rank,precision,recall,context_tokens
+Q001,C1,main,1,0.333333,0.600000,1.000000,610
+```
+
 **`generated_answers.csv`** (Schema festgelegt, `generate.py` noch nicht umgesetzt)
 ```
 question_id,strategy,answer,sources,prompt_tokens,completion_tokens

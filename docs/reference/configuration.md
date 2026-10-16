@@ -32,6 +32,8 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `CATALOGUE_FREEZE_FILE` | `data/evaluation/catalogue_freeze.json` | Freeze-Datensatz des Katalogs (Datum, Anzahlen, SHA-256) | [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `RETRIEVED_RESULTS_FILE` | `data/evaluation/retrieved_results.csv` | Top-k je Frage und Strategie | – |
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
+| `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten | – |
 | `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 

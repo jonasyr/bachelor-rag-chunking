@@ -54,8 +54,12 @@ GROUND_TRUTH_HEADER = ["question_id", "expected_answer", "relevant_doc_ids", "re
 QUESTIONS_REQUIRED = ["question_id", "question", "type", "difficulty"]  # `notes` may be empty
 
 
-def read_rows(path: Path, what: str, header: list[str], required: list[str]) -> list[dict]:
-    """Rows with exactly `header` and non-blank `required` fields; raise on any violation."""
+def read_rows(
+    path: Path, what: str, header: list[str], required: list[str], unique_ids: bool = True
+) -> list[dict]:
+    """Rows with exactly `header` and non-blank `required` fields; raise on any violation.
+
+    `unique_ids=False` allows several rows per question (result files)."""
     if not path.exists():
         raise FileNotFoundError(f"{path} not found; create the {what} first")
     with path.open(encoding="utf-8", newline="") as f:
@@ -77,7 +81,7 @@ def read_rows(path: Path, what: str, header: list[str], required: list[str]) -> 
         for field in required:
             if not row[field].strip():
                 raise ValueError(f"{path}: {row['question_id'] or '?'}: empty {field}")
-    ids = [row["question_id"] for row in rows]
+    ids = [row["question_id"] for row in rows] if unique_ids else []
     duplicates = sorted({qid for qid in ids if ids.count(qid) > 1})
     if duplicates:
         raise ValueError(f"{path}: duplicate question_id {duplicates}")

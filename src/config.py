@@ -40,6 +40,9 @@ RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 SCORES_FILE = DATA_EVAL / "scores.csv"
+# Retrieval metrics per question, strategy and relevance rule (src/evaluate_retrieval.py, D12)
+RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
+CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)
 
 # ---------------------------------------------------------------------------
 # Corpus (D19, D25)

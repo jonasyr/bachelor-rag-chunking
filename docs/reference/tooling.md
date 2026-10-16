@@ -84,7 +84,7 @@ Nach `.gitignore`:
 |---|---|
 | `data/raw/vue_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
 | `chroma_db/` | ignoriert (ganzer Ordner, kein `.gitkeep`; entsteht beim ersten `embed.py`) |
-| `data/evaluation/retrieved_results.csv`, `generated_answers.csv`, `scores.csv`, `query_embeddings.npz` | ignoriert |
+| `data/evaluation/retrieved_results*.csv`, `retrieval_scores*.csv`, `generated_answers.csv`, `scores.csv`, `query_embeddings.npz` | ignoriert |
 | `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `catalogue_freeze.json` | versioniert |
 | `data/pilot/**/query_embeddings.npz` | ignoriert; alle übrigen Pilotdateien versioniert |
 | `*.pdf` | ignoriert, außer `output/figures/*.pdf` |
@@ -104,7 +104,7 @@ Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. 
 | `catalogue.py` | `plan` (Stichprobenplan einmal ziehen, [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)), `sections` (Nachschlageliste schreiben), `find TERM` (wörtliche Suche, Groß-/Kleinschreibung egal, nur der innerste Abschnitt), `show SECTION_ID`, `check [--draft]` (Abdeckungsprüfung; `--draft` scheitert nur an Fehlern), `freeze` (strenge Prüfung, dann Freeze-Datensatz); [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `app/catalogue_editor.py` | `uv run streamlit run app/catalogue_editor.py --server.address localhost` (die Option bindet unabhängig vom Arbeitsverzeichnis; `.streamlit/config.toml` gilt nur beim Start aus der Repo-Wurzel); schreibgeschützt nach dem Einfrieren ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)) |
 | `generate.py` (Gerüst) | `--strategy C1\|C2\|C3\|all` (nur das Experiment; K1 wird nicht generiert) |
-| `evaluate_retrieval.py` (Gerüst) | `--k` (Standard `config.TOP_K`) |
+| `evaluate_retrieval.py` | `--k` (1 bis `config.TOP_K`, Standard `TOP_K`); `--control` die Kontrolle K1; schreibt `retrieval_scores*.csv` und gibt die Mittel je Strategie, Fragetyp und Konstruktionsklasse für Haupt- und Sensitivitätsregel aus; bricht auf dem Hauptkatalog ohne passenden Freeze-Datensatz ab und wenn `is_relevant` nicht zur Ground Truth passt |
 | `evaluate_answers.py` (Gerüst) | `--mode scaffold\|summarise` (Pflicht) |
 | `scripts/difficulty_probe.py` | `[SET_DIR]`: Pilot-Set, relativ zur Repo-Wurzel (Standard `config.PILOT_DIR` = `data/pilot`); läuft C1–C3 und K1, schreibt die Ergebnisdateien des Sets; Sets: [Datenformate](data-formats.md#pilot-sets) |
 | `scripts/remap_pilot.py` | einmalig: `OLD_DIR PILOT_DIR [PILOT_DIR …]` (Pfade relativ zum Arbeitsverzeichnis, also der Repo-Wurzel); bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab und überschreibt sie ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
