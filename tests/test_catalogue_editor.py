@@ -38,7 +38,7 @@ def app(corpus_files, corpus, tmp_path, monkeypatch, pilot):
 def test_renders_the_first_open_slot_without_errors(app):
     at, _ = app
     assert not at.exception
-    assert any("Slot S01" in h.value for h in at.subheader)
+    assert any("Slot S01" in h.proto.body for h in at.get("html"))
 
 
 def test_save_writes_the_catalogue(app):
@@ -114,7 +114,7 @@ def test_saving_moves_to_the_next_open_slot(app):
     at.text_area(key="answer_S01").input("A ref.")
     at.button(key="save").click().run()
     assert not at.exception
-    assert any("Slot S02" in h.value for h in at.subheader)
+    assert any("Slot S02" in h.proto.body for h in at.get("html"))
 
 
 def test_skip_clears_the_draft_and_sections_of_the_slot(app):
@@ -161,7 +161,9 @@ def test_unknown_section_ids_show_an_error_instead_of_crashing(app):
 def test_the_source_is_formatted_by_default_and_raw_on_request(app):
     at, _ = app
     assert at.segmented_control(key="view").value == "Formatted"
-    assert any(m.value.startswith("#") for m in at.markdown)  # section text rendered as Markdown
+    # rendered on the server (st.html): no code block left for the client's lazy highlighter
+    assert any("<h2>" in h.proto.body for h in at.get("html"))
+    assert not any(m.value.lstrip().startswith("#") for m in at.markdown)
     at.segmented_control(key="view").set_value("Source text").run()
     assert not at.exception
     assert at.segmented_control(key="view").value == "Source text"

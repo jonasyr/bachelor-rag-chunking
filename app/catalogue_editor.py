@@ -38,23 +38,53 @@ SKIP_LABELS = {
 }
 CSS = """
 <style>
-.source {font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
+.source {font-family: "Source Serif", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
   line-height: 1.7; max-width: 72ch; white-space: pre-wrap; overflow-wrap: anywhere;
   padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: 6px;
   background: var(--surface); color: var(--ink);}
 .heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;
-  font-family: "Source Sans 3", "Source Sans Pro", sans-serif;}
-[data-testid="stMainBlockContainer"] {padding-top: 2.5rem;}
-[class*="st-key-source_"] {background: var(--surface);}
-[class*="st-key-source_"] p, [class*="st-key-source_"] li {
-  font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
-  line-height: 1.7; overflow-wrap: anywhere;}
-[class*="st-key-source_"] :not(pre) > code {white-space: normal; overflow-wrap: anywhere;}
-[class*="st-key-source_"] ul, [class*="st-key-source_"] ol, [class*="st-key-source_"] li,
-[class*="st-key-source_"] p {width: auto !important; max-width: min(72ch, 100%);}
-[class*="st-key-source_"] pre {max-width: 100%; overflow-x: auto;}
-[class*="st-key-source_"] h1, [class*="st-key-source_"] h2 {font-size: 1.35rem;}
-[class*="st-key-source_"] h3, [class*="st-key-source_"] h4 {font-size: 1.15rem;}
+  font-family: "Source Sans", "Source Sans 3", sans-serif;}
+[data-testid="stMainBlockContainer"] {padding-top: 2rem; max-width: 1480px;}
+[data-testid="stSidebar"] table {width: 100%;}
+[data-testid="stSidebar"] td:last-child {font-variant-numeric: tabular-nums;}
+.slot-title {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 1.5rem;
+  font-weight: 600; line-height: 1.25; margin: 0; color: var(--ink);}
+.slot-title span {color: var(--muted); font-weight: 400;}
+/* Two columns (640 px and up): the starting section fills the height of the form beside it
+   and scrolls inside; a found section scrolls within most of the window. */
+@media (min-width: 640px) {
+  .formatted, .source {max-height: 75vh; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
+  [data-testid="stColumn"]:has(.st-key-reader) {display: flex; flex-direction: column;}
+  [data-testid="stColumn"]:has(.st-key-reader) > [data-testid="stVerticalBlock"],
+  [data-testid="stLayoutWrapper"]:has(> .st-key-reader),
+  .st-key-reader, .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source),
+  .st-key-reader .stHtml:has(.formatted, .source) {
+    flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;}
+  .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source) {min-height: 20rem;}
+  .st-key-reader .formatted, .st-key-reader .source {flex: 1 1 0; min-height: 0; max-height: none;}
+}
+.formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
+  font-size: 1.02rem; line-height: 1.7; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 1.5rem;
+  overflow-wrap: anywhere;}
+.formatted > * {max-width: min(72ch, 100%);}
+.formatted h1, .formatted h2, .formatted h3, .formatted h4 {
+  font-family: "Source Sans", "Source Sans 3", sans-serif; line-height: 1.3;
+  margin: 1rem 0 0.5rem;}
+.formatted h1, .formatted h2 {font-size: 1.35rem;}
+.formatted h3, .formatted h4 {font-size: 1.15rem;}
+.formatted p, .formatted ul, .formatted ol, .formatted pre, .formatted table {margin: 0 0 0.9rem;}
+.formatted ul, .formatted ol {padding-left: 1.4rem;}
+.formatted li > p {margin-bottom: 0.4rem;}
+.formatted code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.86em;
+  background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 3px;}
+.formatted pre {background: var(--code-bg); padding: 0.75rem 1rem;
+  border-radius: 6px; overflow-x: auto; line-height: 1.5;}
+.formatted pre code {background: none; padding: 0; font-size: 0.86rem; overflow-wrap: normal;}
+.formatted table {border-collapse: collapse; display: block; overflow-x: auto;}
+.formatted th, .formatted td {border: 1px solid var(--line); padding: 0.3rem 0.6rem;}
+.formatted a {color: var(--accent);}
 .source .code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.88rem;
   line-height: 1.55;}
 mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-radius: 2px;}
@@ -73,6 +103,8 @@ LIGHT = {
     "select": "rgba(36, 87, 166, 0.22)",
     "ok": "#2F7D4F",
     "problem": "#B3261E",
+    "code-bg": "#F3F5F7",
+    "accent": "#2457A6",
 }
 DARK = {
     "line": "#2E3640",
@@ -83,6 +115,8 @@ DARK = {
     "select": "rgba(122, 165, 232, 0.32)",
     "ok": "#6CC48F",
     "problem": "#F2877F",
+    "code-bg": "#161B21",
+    "accent": "#7AA5E8",
 }
 
 
@@ -106,11 +140,8 @@ def source_page(
         body = store.page_html(corpus.text(section), words)
         st.html(f'<div class="heading-path">{path}</div><div class="source">{body}</div>')
         return
-    st.html(f'<div class="heading-path">{path}</div>')
-    with st.container(border=True, key=f"source_{key}"):
-        st.markdown(
-            store.markdown_with_highlights(corpus.text(section), words), unsafe_allow_html=True
-        )
+    body = store.formatted_html(corpus.text(section), words)
+    st.html(f'<div class="heading-path">{path}</div><div class="formatted">{body}</div>')
 
 
 def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None:
@@ -206,16 +237,23 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
 
     if "goto" in st.session_state:  # set by Save/Skip; allowed before the widget exists
         st.session_state["slot"] = st.session_state.pop("goto")
-    sid = (
-        st.selectbox("Slot", slots, index=slots.index(first_open), format_func=label, key="slot")
-        or first_open
-    )
+    title, picker = st.columns([7, 5], vertical_alignment="bottom", gap="large")
+    with picker:
+        sid = (
+            st.selectbox(
+                "Slot", slots, index=slots.index(first_open), format_func=label, key="slot"
+            )
+            or first_open
+        )
     row = catalogue_plan.slot_row(plan, sid)
     seed = corpus.by_id[row["section_id"]]
     qid = row["question_id"] if row["status"] == "used" else None
     saved_q = next((q for q in questions if q["question_id"] == qid), None)
     saved_t = truth.get(qid or "", {})
-    st.subheader(f"Slot {sid}: {AREA_NAMES[row['area']]}, {row['class']}")
+    title.html(
+        f'<h2 class="slot-title">Slot {sid} '
+        f"<span>{AREA_NAMES[row['area']]}, {row['class']}</span></h2>"
+    )
 
     # Reload the form when the saved rows changed on disk (hand edit, review decision).
     fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))
@@ -228,7 +266,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         saved_ids = saved_t.get("relevant_section_ids", "").split(ID_SEPARATOR) if saved_t else []
         st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
 
-    left, right = st.columns([6, 5], gap="large")
+    left, right = st.columns([7, 5], gap="large")
     with right:
         question = (
             st.text_area(
@@ -311,7 +349,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
                     except (ValueError, PermissionError) as error:
                         st.error(str(error))
 
-    with left:
+    with left, st.container(key="reader"):
         words = (
             catalogue.shared_words(question, catalogue.heading_texts(corpus, sections))
             if question
@@ -326,7 +364,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         source_page(corpus, seed, words, "seed", view)
 
     # Second row: on narrow screens the search follows the question and its checks.
-    search, _ = st.columns([6, 5], gap="large")
+    search, _ = st.columns([7, 5], gap="large")
     with search:
         term = st.text_input(
             "Find more sections", key="find", placeholder="Search the documentation"
