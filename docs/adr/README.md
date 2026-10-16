@@ -22,7 +22,7 @@ bleibt unverändert.
 | [0010](0010-starke-baseline.md) | Fixed-size mit Overlap ist eine starke Baseline | Angenommen |
 | [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen |
 | [0012](0012-retrieval-metriken.md) | Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k) | Angenommen |
-| [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen |
+| [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen; ergänzt durch 0032 |
 | [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen |
 | [0015](0015-tech-stack.md) | Tech-Stack | Angenommen |
 | [0016](0016-modell-neutralitaet.md) | Modell-Neutralität | Angenommen; Embedding-Modell und Versionen in 0023 |
@@ -41,3 +41,4 @@ bleibt unverändert.
 | [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragenkatalog: 48 Fragen, Fragetypen und Konstruktionsklassen mit Quoten, Bereichsuntergrenzen | Angenommen; ergänzt durch 0031 |
 | [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre vor dem Retrieval | Angenommen; erweitert durch 0031 |
 | [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan der Slots und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen |
+| [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten (Lesepaket, Bogen, Schlüssel) | Angenommen |

@@ -40,6 +40,14 @@ RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 SCORES_FILE = DATA_EVAL / "scores.csv"
+# Blind rubric scoring (D32): the rater fills the sheet while reading the packet; the key that maps
+# each code to its strategy is opened only by `evaluate_answers.py --mode summarise`.
+SCORING_SHEET_FILE = DATA_EVAL / "scoring_sheet.csv"
+SCORING_PACKET_FILE = DATA_EVAL / "scoring_packet.md"
+SCORING_KEY_FILE = DATA_EVAL / "scoring_key.csv"
+# Retrieval metrics per question, strategy and relevance rule (src/evaluate_retrieval.py, D12)
+RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
+CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)
 
 # ---------------------------------------------------------------------------
 # Corpus (D19, D25)
@@ -224,3 +232,4 @@ LLM_MAX_TOKENS = 1024
 # ---------------------------------------------------------------------------
 RUBRIC_CRITERIA = ["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]
 RUBRIC_MAX_SCORE = 2
+SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned

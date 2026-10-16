@@ -175,14 +175,45 @@ Q001,C1,1,C1_D049_0004,0.840000,1
 
 **`retrieved_results_control.csv`** (`retrieve.py --control`): gleiche Spalten, `strategy` immer `K1`.
 
+**`retrieval_scores.csv`** (`evaluate_retrieval.py`, wird vollständig neu geschrieben; `retrieval_scores_control.csv`
+mit `--control` für K1): eine Zeile je Frage, Strategie und Relevanzregel (`rule` = `main` oder `sensitivity`,
+[Evaluation](evaluation.md#relevanz-eines-chunks)), sortiert nach `question_id`, Strategie, Regel. `hit` = `1`/`0`;
+`reciprocal_rank`, `precision`, `recall` mit sechs Nachkommastellen; `context_tokens` = summierte Länge der k
+abgerufenen Chunks (Kontext@k).
+```
+question_id,strategy,rule,hit,reciprocal_rank,precision,recall,context_tokens
+Q001,C1,main,1,0.333333,0.600000,1.000000,610
+```
+
 **`generated_answers.csv`** (Schema festgelegt, `generate.py` noch nicht umgesetzt)
 ```
 question_id,strategy,answer,sources,prompt_tokens,completion_tokens
 Q001,C1,"...",C1_D049_0004,1200,180
 ```
 
-**`scores.csv`** (Schema festgelegt, `evaluate_answers.py` noch nicht umgesetzt; Kriterien-Spalten =
-`config.RUBRIC_CRITERIA`, `total_score` nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
+Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
+aus `generated_answers.csv` drei Dateien, je Frage die drei Antworten in der mit `config.SCORING_SEED` gemischten
+Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben.
+
+**`scoring_packet.md`** (Lesepaket): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
+`### Q001-A` mit der Antwort und den Passagen, die das Modell sah (`[Excerpt N]`, getrennt durch `---`, ohne
+Chunk-IDs), beide in einem Code-Block, dessen Zaun länger ist als jede Backtick-Folge im Text.
+
+**`scoring_sheet.csv`** (Bewertungsbogen, von Hand gefüllt: Kriterien ganze Zahlen 0–2, `notes` frei)
+```
+code,question_id,correctness,completeness,groundedness,no_hallucination,clarity,notes
+Q001-A,Q001,2,1,2,2,2,lists only one of the two hooks
+```
+
+**`scoring_key.csv`** (Schlüssel; erst `--mode summarise` liest ihn)
+```
+code,question_id,strategy
+Q001-A,Q001,C3
+```
+
+**`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach
+`question_id` und Strategie; Kriterien-Spalten = `config.RUBRIC_CRITERIA`, `total_score` = Mittel der Kriterien mit
+einer Nachkommastelle, nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
 ```
 question_id,strategy,correctness,completeness,groundedness,no_hallucination,clarity,total_score
 Q001,C1,2,2,2,2,2,2.0

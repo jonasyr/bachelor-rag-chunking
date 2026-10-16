@@ -85,8 +85,12 @@ Qualitätsunterschiede werden den Kosten gegenübergestellt („X % bessere Retr
 ## Arbeitsdefinition Halluzination
 Eine Halluzination liegt vor, wenn die Antwort Informationen enthält, die weder durch die Kontextpassagen noch durch die Referenzantwort gedeckt sind oder diesen widersprechen. Bewertung 2/1/0 wie in der Rubrik.
 
+**Blind:** Die Bewertung sieht die Strategie nicht; die drei Antworten einer Frage stehen unter neutralen Codes in
+gemischter Reihenfolge, die Zuordnung liegt in einem Schlüssel, den erst die Auswertung liest
+([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); Dateien: [Datenformate](data-formats.md)).
+
 ## Zweitbewertung (empfohlen)
-10–20 % der Antworten unabhängig durch eine zweite Person bewerten lassen. Einfache Übereinstimmung = gleiche Bewertungen / alle Bewertungen, oder durchschnittliche absolute Abweichung bei 0–2-Skala. Cohen's Kappa optional.
+Mit Lesepaket und leerem Bewertungsbogen, ohne Schlüssel ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): 10–20 % der Antworten unabhängig durch eine zweite Person bewerten lassen. Einfache Übereinstimmung = gleiche Bewertungen / alle Bewertungen, oder durchschnittliche absolute Abweichung bei 0–2-Skala. Cohen's Kappa optional.
 
 ## Statistische Auswertung
 Deskriptiv ausreichend: Mittelwert, Median, Standardabweichung, Boxplot, Vergleich nach Fragetyp, Korrelation Retrieval vs. Antwortscore. Optional Signifikanztests: Friedman-Test (mehrere verbundene Gruppen), Wilcoxon Signed-Rank (paarweise) — nur bei Sicherheit im Umgang damit.
