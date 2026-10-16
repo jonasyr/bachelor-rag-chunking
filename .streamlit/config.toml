@@ -20,7 +20,8 @@ textColor = "#E4E8EC"
 borderColor = "#2E3640"
 
 [client]
-toolbarMode = "minimal"
+# "viewer" keeps the theme switch in the menu (default: system setting); no developer options
+toolbarMode = "viewer"
 
 [server]
 # Local only: the editor works on the thesis data and must not be reachable from the network

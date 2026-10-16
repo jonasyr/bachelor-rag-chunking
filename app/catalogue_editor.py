@@ -38,20 +38,31 @@ SKIP_LABELS = {
 }
 CSS = """
 <style>
-.source {font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
+.source {font-family: "Source Serif", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
   line-height: 1.7; max-width: 72ch; white-space: pre-wrap; overflow-wrap: anywhere;
   padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: 6px;
   background: var(--surface); color: var(--ink);}
 .heading-path {color: var(--muted); font-size: 0.92rem; margin-bottom: 0.4rem;
-  font-family: "Source Sans 3", "Source Sans Pro", sans-serif;}
-[data-testid="stMainBlockContainer"] {padding-top: 2.5rem;}
-.formatted {font-family: "Source Serif Pro", "Source Serif 4", Georgia, serif;
+  font-family: "Source Sans", "Source Sans 3", sans-serif;}
+[data-testid="stMainBlockContainer"] {padding-top: 2rem; max-width: 1480px;}
+[data-testid="stSidebar"] table {width: 100%;}
+[data-testid="stSidebar"] td:last-child {font-variant-numeric: tabular-nums;}
+.slot-title {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 1.5rem;
+  font-weight: 600; line-height: 1.25; margin: 0; color: var(--ink);}
+.slot-title span {color: var(--muted); font-weight: 400;}
+/* Laptop and up: the section is a scrolling page beside the form, so the form, the checks
+   and the search stay in view while reading. */
+@media (min-width: 1024px) {
+  .formatted, .source {max-height: max(20rem, calc(100vh - 19rem)); overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
+}
+.formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
   font-size: 1.02rem; line-height: 1.7; color: var(--ink); background: var(--surface);
   border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 1.5rem;
   overflow-wrap: anywhere;}
 .formatted > * {max-width: min(72ch, 100%);}
 .formatted h1, .formatted h2, .formatted h3, .formatted h4 {
-  font-family: "Source Sans 3", "Source Sans Pro", sans-serif; line-height: 1.3;
+  font-family: "Source Sans", "Source Sans 3", sans-serif; line-height: 1.3;
   margin: 1rem 0 0.5rem;}
 .formatted h1, .formatted h2 {font-size: 1.35rem;}
 .formatted h3, .formatted h4 {font-size: 1.15rem;}
@@ -218,16 +229,23 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
 
     if "goto" in st.session_state:  # set by Save/Skip; allowed before the widget exists
         st.session_state["slot"] = st.session_state.pop("goto")
-    sid = (
-        st.selectbox("Slot", slots, index=slots.index(first_open), format_func=label, key="slot")
-        or first_open
-    )
+    title, picker = st.columns([7, 5], vertical_alignment="bottom", gap="large")
+    with picker:
+        sid = (
+            st.selectbox(
+                "Slot", slots, index=slots.index(first_open), format_func=label, key="slot"
+            )
+            or first_open
+        )
     row = catalogue_plan.slot_row(plan, sid)
     seed = corpus.by_id[row["section_id"]]
     qid = row["question_id"] if row["status"] == "used" else None
     saved_q = next((q for q in questions if q["question_id"] == qid), None)
     saved_t = truth.get(qid or "", {})
-    st.subheader(f"Slot {sid}: {AREA_NAMES[row['area']]}, {row['class']}")
+    title.html(
+        f'<h2 class="slot-title">Slot {sid} '
+        f"<span>{AREA_NAMES[row['area']]}, {row['class']}</span></h2>"
+    )
 
     # Reload the form when the saved rows changed on disk (hand edit, review decision).
     fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))
@@ -240,7 +258,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         saved_ids = saved_t.get("relevant_section_ids", "").split(ID_SEPARATOR) if saved_t else []
         st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
 
-    left, right = st.columns([6, 5], gap="large")
+    left, right = st.columns([7, 5], gap="large")
     with right:
         question = (
             st.text_area(
@@ -338,7 +356,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         source_page(corpus, seed, words, "seed", view)
 
     # Second row: on narrow screens the search follows the question and its checks.
-    search, _ = st.columns([6, 5], gap="large")
+    search, _ = st.columns([7, 5], gap="large")
     with search:
         term = st.text_input(
             "Find more sections", key="find", placeholder="Search the documentation"

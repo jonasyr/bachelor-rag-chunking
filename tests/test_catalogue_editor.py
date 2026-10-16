@@ -38,7 +38,7 @@ def app(corpus_files, corpus, tmp_path, monkeypatch, pilot):
 def test_renders_the_first_open_slot_without_errors(app):
     at, _ = app
     assert not at.exception
-    assert any("Slot S01" in h.value for h in at.subheader)
+    assert any("Slot S01" in h.proto.body for h in at.get("html"))
 
 
 def test_save_writes_the_catalogue(app):
@@ -114,7 +114,7 @@ def test_saving_moves_to_the_next_open_slot(app):
     at.text_area(key="answer_S01").input("A ref.")
     at.button(key="save").click().run()
     assert not at.exception
-    assert any("Slot S02" in h.value for h in at.subheader)
+    assert any("Slot S02" in h.proto.body for h in at.get("html"))
 
 
 def test_skip_clears_the_draft_and_sections_of_the_slot(app):
