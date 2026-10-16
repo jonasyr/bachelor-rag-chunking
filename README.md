@@ -47,7 +47,7 @@ uv run python src/retrieve.py --control
 uv run python src/generate.py      # 7. generate answers            (stub)
 uv run python src/evaluate_retrieval.py                          # 8a. retrieval metrics, then the control:
 uv run python src/evaluate_retrieval.py --control
-uv run python src/evaluate_answers.py --mode scaffold            # 8b. score sheet, fill by hand
+uv run python src/evaluate_answers.py --mode scaffold            # 8b. blind scoring: read the packet, fill the sheet
 uv run python src/evaluate_answers.py --mode summarise
 ```
 

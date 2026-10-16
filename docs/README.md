@@ -39,7 +39,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 
 ## Entscheidungen und Plan
 
-- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0031, je eine Datei
+- [adr/](adr/README.md): Entscheidungen D1–D18 und ADR 0019–0032, je eine Datei
 - [plan.md](plan.md): Projektstand, Zeitplan und offene Entscheidungen
 - `superpowers/` (`specs/`, `plans/`): datierte Entwürfe und Umsetzungspläne einzelner Arbeitsschritte; Momentaufnahmen,
   werden nicht nachgepflegt

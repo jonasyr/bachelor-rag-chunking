@@ -35,7 +35,10 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
 | `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten | – |
-| `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen | [ADR 0013](../adr/0013-antwort-rubrik.md) |
+| `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen mit Strategie (abgeleitet aus Bogen und Schlüssel) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
+| `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+| `SCORING_PACKET_FILE` | `data/evaluation/scoring_packet.md` | Lesepaket der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+| `SCORING_KEY_FILE` | `data/evaluation/scoring_key.csv` | Schlüssel Code → Strategie | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 
 Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 
@@ -141,3 +144,4 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 |---|---|---|---|
 | `RUBRIC_CRITERIA` | `["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]` | Rubrik-Kriterien = Spalten in `scores.csv` | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
+| `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |

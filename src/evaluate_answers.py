@@ -1,24 +1,36 @@
-"""Answer quality evaluation: manual rubric 0-2 on five criteria (ADR 0013).
+"""Answer quality evaluation: blind manual rubric 0-2 on five criteria (ADR 0013, 0032).
 
---mode scaffold  Write scores.csv with one unscored row per generated answer; an existing
-                 scores.csv is never overwritten, so manual scores cannot be lost.
---mode summarise Check the filled scores.csv (every criterion an integer 0-2), fill in
-                 total_score = mean of the criteria, print mean, median and standard deviation
-                 per strategy, overall and per question type and construction class.
+--mode scaffold  From generated_answers.csv write three files:
+                 scoring_packet.md  what the rater reads: per question the question and the
+                                    reference answer, then each answer under a neutral code
+                                    (Q001-A, Q001-B, ...) with the excerpts the model saw;
+                 scoring_sheet.csv  what the rater fills: one row per code, criteria 0-2, notes;
+                 scoring_key.csv    which strategy each code stands for; not opened while scoring.
+                 The answers of a question appear in an order shuffled with config.SCORING_SEED,
+                 and nothing in packet or sheet names the strategy (no strategy keys, no chunk
+                 IDs). An existing sheet or key is never overwritten.
+--mode summarise Check the filled sheet against its key (every code exactly once, every
+                 criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
+                 the criteria, and print mean, median and standard deviation per strategy,
+                 overall and per question type and construction class.
 
-Answers exist only for the experiment C1-C3, never for the control K1 (ADR 0026), and every
-question needs an answer of every strategy, so the strategies are compared on the same questions.
+Both modes use the main catalogue only while it matches its freeze record (ADR 0030). Answers
+exist only for the experiment C1-C3, never for the control K1 (ADR 0026), and every question of
+the catalogue needs exactly one answer of every strategy.
 
-Output schema (docs/reference/data-formats.md): question_id, strategy, correctness, completeness,
-groundedness, no_hallucination, clarity, total_score
+Output schema of scores.csv (docs/reference/data-formats.md): question_id, strategy,
+correctness, completeness, groundedness, no_hallucination, clarity, total_score
 """
 
+import random
+import re
 import statistics
 from pathlib import Path
 
 from atomic_csv import read_csv, write_csv
 from config import (
     CATALOGUE_FREEZE_FILE,
+    CHUNK_FILES,
     DOCUMENTS_FILE,
     GENERATED_ANSWERS_FILE,
     GROUND_TRUTH_FILE,
@@ -26,11 +38,22 @@ from config import (
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
     SCORES_FILE,
+    SCORING_KEY_FILE,
+    SCORING_PACKET_FILE,
+    SCORING_SEED,
+    SCORING_SHEET_FILE,
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
+from embed import load_jsonl
 from freeze import require_frozen
-from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
+from retrieve import (
+    GROUND_TRUTH_HEADER,
+    QUESTIONS_HEADER,
+    QUESTIONS_REQUIRED,
+    read_rows,
+    split_ids,
+)
 
 ANSWERS_HEADER = [
     "question_id",
@@ -41,7 +64,10 @@ ANSWERS_HEADER = [
     "completion_tokens",
 ]
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
+SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
+KEY_HEADER = ["code", "question_id", "strategy"]
 GROUPS = ["type", "difficulty"]  # questions.csv columns the summary is broken down by
+LETTERS = "ABCDEFGHIJ"  # code suffixes, one per strategy of a question
 
 
 def catalogue(
@@ -50,11 +76,17 @@ def catalogue(
     sections_file: Path,
     documents_file: Path,
     freeze_file: Path,
-) -> dict[str, dict]:
-    """The questions by ID; the main catalogue only while it matches its freeze record."""
+) -> tuple[dict[str, dict], dict[str, dict]]:
+    """Questions and ground truth by ID; the main catalogue only while it is frozen."""
     require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
-    rows = read_rows(questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED)
-    return {q["question_id"]: q for q in rows}
+    questions = read_rows(
+        questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
+    )
+    truth = read_rows(ground_truth_file, "ground truth", GROUND_TRUTH_HEADER, GROUND_TRUTH_HEADER)
+    return (
+        {q["question_id"]: q for q in questions},
+        {t["question_id"]: t for t in truth},
+    )
 
 
 def check_grid(path: Path, rows: list[dict], qids: list[str]) -> None:
@@ -75,39 +107,108 @@ def check_grid(path: Path, rows: list[dict], qids: list[str]) -> None:
         raise ValueError(f"{path}: rows missing for {missing}")
 
 
+def fenced(text: str) -> str:
+    """Text in a code fence longer than any backtick run inside, so it cannot end the fence."""
+    longest = max((len(run) for run in re.findall(r"`+", text)), default=0)
+    fence = "`" * max(3, longest + 1)
+    return f"{fence}text\n{text}\n{fence}"
+
+
+def excerpts(chunk_ids: list[str], chunks: dict[str, dict]) -> str:
+    """The context as the prompt shows it (docs/reference/prompts.md), without chunk IDs."""
+    return "\n---\n".join(
+        f"[Excerpt {n}]\n{chunks[cid]['text']}" for n, cid in enumerate(chunk_ids, start=1)
+    )
+
+
 def scaffold(
     answers_file: Path = GENERATED_ANSWERS_FILE,
-    scores_file: Path = SCORES_FILE,
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
     sections_file: Path = SECTIONS_FILE,
     documents_file: Path = DOCUMENTS_FILE,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
+    chunk_files: dict[str, Path] = CHUNK_FILES,
+    sheet_file: Path = SCORING_SHEET_FILE,
+    packet_file: Path = SCORING_PACKET_FILE,
+    key_file: Path = SCORING_KEY_FILE,
+    seed: int = SCORING_SEED,
 ) -> int:
-    """Write the unscored rows in (question_id, strategy) order; return their number."""
-    questions = catalogue(
+    """Write packet, sheet and key for blind scoring; return the number of answers."""
+    questions, truth = catalogue(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
-    if scores_file.exists():
-        raise FileExistsError(
-            f"{scores_file} exists and may hold manual scores; move it away to start afresh"
-        )
+    for path in (sheet_file, key_file):
+        if path.exists():
+            raise FileExistsError(
+                f"{path} exists and may hold manual scores or their key; move it away to "
+                "start afresh"
+            )
     answers = read_csv(answers_file, ANSWERS_HEADER)
     if not answers:
         raise ValueError(f"{answers_file} has no answers; run src/generate.py first")
-    check_grid(answers_file, answers, sorted(questions))
-    order = list(STRATEGY_IDS)
-    rows = [
-        {"question_id": a["question_id"], "strategy": a["strategy"]}
-        | dict.fromkeys([*RUBRIC_CRITERIA, "total_score"], "")
-        for a in sorted(answers, key=lambda a: (a["question_id"], order.index(a["strategy"])))
+    qids = sorted(questions)
+    check_grid(answers_file, answers, qids)
+    if sorted(chunk_files) != sorted(STRATEGY_IDS):
+        raise ValueError(f"chunk_files must cover exactly the strategies {sorted(STRATEGY_IDS)}")
+    chunks = {
+        key: {c["chunk_id"]: c for c in load_jsonl(path, "run src/chunking.py first")}
+        for key, path in chunk_files.items()
+    }
+    by_pair = {(a["question_id"], a["strategy"]): a for a in answers}
+    for (qid, key), answer in by_pair.items():
+        unknown = [cid for cid in split_ids(answer["sources"]) if cid not in chunks[key]]
+        if unknown:
+            raise ValueError(f"{answers_file}: {qid}/{key} cites unknown chunk {unknown}")
+
+    rng = random.Random(seed)
+    key_rows, sheet_rows = [], []
+    packet = [
+        "# Scoring packet",
+        "",
+        "Score every code in scoring_sheet.csv: each criterion an integer 0-2 "
+        "(rubric: docs/reference/evaluation.md), notes optional. Do not open scoring_key.csv "
+        "before every row is scored.",
     ]
-    write_csv(scores_file, SCORES_HEADER, rows)
-    return len(rows)
+    for qid in qids:
+        order = list(STRATEGY_IDS)
+        rng.shuffle(order)
+        packet += [
+            "",
+            f"## {qid}",
+            "",
+            f"**Question:** {questions[qid]['question']}",
+            "",
+            f"**Reference answer:** {truth[qid]['expected_answer']}",
+        ]
+        for letter, key in zip(LETTERS, order, strict=False):
+            code = f"{qid}-{letter}"
+            answer = by_pair[qid, key]
+            key_rows.append({"code": code, "question_id": qid, "strategy": key})
+            sheet_rows.append(
+                {"code": code, "question_id": qid} | dict.fromkeys([*RUBRIC_CRITERIA, "notes"], "")
+            )
+            packet += [
+                "",
+                f"### {code}",
+                "",
+                "**Answer:**",
+                "",
+                fenced(answer["answer"]),
+                "",
+                "**Excerpts the model saw:**",
+                "",
+                fenced(excerpts(split_ids(answer["sources"]), chunks[key])),
+            ]
+    write_csv(key_file, KEY_HEADER, key_rows)
+    write_csv(sheet_file, SHEET_HEADER, sheet_rows)
+    packet_file.parent.mkdir(parents=True, exist_ok=True)
+    packet_file.write_text("\n".join(packet) + "\n", encoding="utf-8")
+    return len(key_rows)
 
 
 def criterion_value(row: dict, criterion: str, path: Path) -> int:
-    where = f"{path}: {row['question_id']}/{row['strategy']} {criterion}"
+    where = f"{path}: {row['code']} {criterion}"
     text = row[criterion].strip()
     if not text:
         raise ValueError(f"{where} is unscored")
@@ -116,35 +217,48 @@ def criterion_value(row: dict, criterion: str, path: Path) -> int:
     return int(text)
 
 
+def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
+    """The sheet's scores with their strategies, in (question_id, strategy) order."""
+    sheet = read_csv(sheet_file, SHEET_HEADER)
+    key = read_csv(key_file, KEY_HEADER)
+    if not sheet or not key:
+        raise ValueError("sheet or key is empty; run --mode scaffold first")
+    check_grid(key_file, key, qids)
+    codes = [r["code"] for r in sheet]
+    if sorted(codes) != sorted(r["code"] for r in key):
+        raise ValueError(f"{sheet_file}: the codes do not match the key {key_file}")
+    by_code = {r["code"]: r for r in key}
+    for row in sheet:
+        if row["question_id"] != by_code[row["code"]]["question_id"]:
+            raise ValueError(f"{sheet_file}: {row['code']} has another question in the key")
+    rows = []
+    for row in sheet:
+        values = [criterion_value(row, c, sheet_file) for c in RUBRIC_CRITERIA]
+        rows.append(
+            {"question_id": row["question_id"], "strategy": by_code[row["code"]]["strategy"]}
+            | dict(zip(RUBRIC_CRITERIA, values, strict=True))
+            | {"total_score": f"{sum(values) / len(values):.1f}"}  # steps of 1/5: exact
+        )
+    order = list(STRATEGY_IDS)
+    return sorted(rows, key=lambda r: (r["question_id"], order.index(r["strategy"])))
+
+
 def summarise(
-    scores_file: Path = SCORES_FILE,
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
     sections_file: Path = SECTIONS_FILE,
     documents_file: Path = DOCUMENTS_FILE,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
+    sheet_file: Path = SCORING_SHEET_FILE,
+    key_file: Path = SCORING_KEY_FILE,
+    scores_file: Path = SCORES_FILE,
 ) -> dict[tuple, dict]:
-    """Fill total_score and return the statistics per (group, value, strategy); group "all"
+    """Write scores.csv and return the statistics per (group, value, strategy); group "all"
     spans all questions, the other groups are the question type and construction class."""
-    questions = catalogue(
+    questions, _ = catalogue(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
-    rows = read_csv(scores_file, SCORES_HEADER)
-    if not rows:
-        raise ValueError(f"{scores_file} has no rows; run --mode scaffold first")
-    check_grid(scores_file, rows, sorted(questions))
-    totals = []
-    for row in rows:
-        values = [criterion_value(row, c, scores_file) for c in RUBRIC_CRITERIA]
-        total = f"{sum(values) / len(values):.1f}"  # steps of 1/5: one decimal is exact
-        if row["total_score"].strip() and float(row["total_score"]) != float(total):
-            raise ValueError(
-                f"{scores_file}: {row['question_id']}/{row['strategy']} total_score "
-                f"{row['total_score']} is not the mean of the criteria ({total})"
-            )
-        totals.append(total)
-    for row, total in zip(rows, totals, strict=True):
-        row["total_score"] = total
+    rows = unblind(sheet_file, key_file, sorted(questions))
     write_csv(scores_file, SCORES_HEADER, rows)
 
     buckets: dict[tuple, list[dict]] = {}
@@ -160,7 +274,7 @@ def summarise(
             "total_score": statistics.mean(total),
             "median": statistics.median(total),
             "sd": statistics.stdev(total) if len(total) > 1 else 0.0,
-        } | {c: statistics.mean(int(r[c]) for r in group) for c in RUBRIC_CRITERIA}
+        } | {c: statistics.mean(r[c] for r in group) for c in RUBRIC_CRITERIA}
     return summary
 
 
@@ -178,10 +292,12 @@ def print_summary(summary: dict[tuple, dict]) -> None:
 if __name__ == "__main__":
     import argparse
 
-    p = argparse.ArgumentParser(description="Manual rubric scores (ADR 0013).")
+    p = argparse.ArgumentParser(description="Blind manual rubric scores (ADR 0013, 0032).")
     p.add_argument("--mode", choices=["scaffold", "summarise"], required=True)
     args = p.parse_args()
     if args.mode == "scaffold":
-        print(f"{scaffold()} unscored rows -> {SCORES_FILE}")
+        count = scaffold()
+        print(f"{count} blinded answers -> {SCORING_PACKET_FILE.name}, {SCORING_SHEET_FILE.name}")
     else:
         print_summary(summarise())
+        print(f"unblinded scores -> {SCORES_FILE}")
