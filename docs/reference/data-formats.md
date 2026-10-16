@@ -191,8 +191,10 @@ question_id,strategy,answer,sources,prompt_tokens,completion_tokens
 Q001,C1,"...",C1_D049_0004,1200,180
 ```
 
-**`scores.csv`** (Schema festgelegt, `evaluate_answers.py` noch nicht umgesetzt; Kriterien-Spalten =
-`config.RUBRIC_CRITERIA`, `total_score` nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
+**`scores.csv`** (`evaluate_answers.py --mode scaffold` legt eine leere Zeile je Antwort an, sortiert nach
+`question_id` und Strategie, und überschreibt nie eine vorhandene Datei; Kriterien-Spalten = `config.RUBRIC_CRITERIA`,
+von Hand mit ganzen Zahlen 0–2 gefüllt; `--mode summarise` prüft sie und trägt `total_score` mit einer
+Nachkommastelle ein, nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
 ```
 question_id,strategy,correctness,completeness,groundedness,no_hallucination,clarity,total_score
 Q001,C1,2,2,2,2,2,2.0

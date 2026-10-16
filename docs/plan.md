@@ -10,7 +10,8 @@ Stand 14.10.2026: Korpus festgelegt (Guide, API-Referenz, Style Guide;
 `chunking.py`, `embed.py`, `retrieve.py` (inkl. `--control` für K1), Fragenkatalog-Werkzeuge `catalogue.py` und
 `freeze.py` ([ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.md)), Stichprobenplan, Editor
 `app/catalogue_editor.py` und protokollierte KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)).
-Noch Platzhalter: `generate.py`, `evaluate_retrieval.py`, `evaluate_answers.py`. Nächster Schritt: Stichprobenplan ziehen, dann 48 Fragen
+Stand 16.10.2026: `evaluate_retrieval.py` (Haupt- und Sensitivitätsregel, K1 mit `--control`) und `evaluate_answers.py`
+(Rubrik-Gerüst und Zusammenfassung) umgesetzt und getestet. Noch Platzhalter: `generate.py`. Nächster Schritt: Stichprobenplan ziehen, dann 48 Fragen
 in sechs Blöcken zu 8 schreiben und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)),
 Einfrieren bis 06.11.2026 (Meilenstein 09.11.).
 

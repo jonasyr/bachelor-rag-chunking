@@ -16,7 +16,7 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 4. Retrieval für C1–C3, danach für die Kontrolle K1 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)):
    `uv run python src/retrieve.py` und `uv run python src/retrieve.py --control`
 5. Antworten generieren (nur C1–C3, K1 nicht): `uv run python src/generate.py` (noch nicht umgesetzt)
-6. Auswerten (noch nicht umgesetzt): `uv run python src/evaluate_retrieval.py`; für die Rubrik
+6. Auswerten: `uv run python src/evaluate_retrieval.py` und `uv run python src/evaluate_retrieval.py --control`; für die Rubrik
    `uv run python src/evaluate_answers.py --mode scaffold`, `data/evaluation/scores.csv` von Hand ausfüllen (0–2), dann
    `uv run python src/evaluate_answers.py --mode summarise`.
 
