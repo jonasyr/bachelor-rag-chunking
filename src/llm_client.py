@@ -1,7 +1,8 @@
 """OpenAI chat completions for the answer generation (ADR 0014, 0033).
 
 Every request carries the pinned settings of src/config.py: model, temperature 0, reasoning
-effort "none" (the only effort at which the API accepts a temperature) and the token limit.
+effort "none" (the only effort at which the API accepts a temperature), the token limit and a
+fixed seed (best effort only, so the answers are still stored once).
 The API key is read only when a call is made, so tests never need it.
 """
 
@@ -9,7 +10,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_TEMPERATURE
+from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_SEED, LLM_TEMPERATURE
 from embedding_client import _openai_client
 
 
@@ -35,6 +36,7 @@ def complete(messages: list[dict], client: Any = None) -> Completion:
         temperature=LLM_TEMPERATURE,
         reasoning_effort=LLM_REASONING_EFFORT,
         max_completion_tokens=LLM_MAX_TOKENS,
+        seed=LLM_SEED,
     )
     choice = response.choices[0]
     return Completion(

@@ -226,6 +226,7 @@ EMBEDDING_PRICE_PER_MTOK = 0.13  # USD per 1M input tokens, OpenAI model page, a
 LLM_MODEL = "gpt-6-luna"
 LLM_REASONING_EFFORT = "none"  # the only effort at which the API accepts a temperature (D33)
 LLM_TEMPERATURE = 0.0  # constant for reproducibility (D14)
+LLM_SEED = 20261017  # best-effort deterministic sampling on every request (D33); fixed, never tuned
 LLM_MAX_TOKENS = 1024  # an answer cut off at this limit stops the run (D33)
 LLM_PRICE_INPUT_PER_MTOK = 0.10  # USD per 1M input tokens, OpenAI model page, accessed 17.10.2026
 LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date

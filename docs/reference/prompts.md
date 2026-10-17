@@ -34,6 +34,6 @@ beginnt mit `[Excerpt N]`. Geschweifte Klammern in Frage oder Chunk bleiben unve
 
 ## Parameter
 
-Konstant für alle Strategien: `LLM_MODEL`, `LLM_REASONING_EFFORT` ([ADR 0033](../adr/0033-antwortmodell.md)),
+Konstant für alle Strategien: `LLM_MODEL`, `LLM_REASONING_EFFORT`, `LLM_SEED` ([ADR 0033](../adr/0033-antwortmodell.md)),
 `LLM_TEMPERATURE` und `TOP_K` ([ADR 0014](../adr/0014-temperatur-und-topk.md)), `LLM_MAX_TOKENS`. Werte:
 [Konfiguration](configuration.md#llm-und-embedding).

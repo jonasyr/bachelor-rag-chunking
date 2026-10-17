@@ -17,6 +17,7 @@ from config import (
     LLM_PRICE_INPUT_PER_MTOK,
     LLM_PRICE_OUTPUT_PER_MTOK,
     LLM_REASONING_EFFORT,
+    LLM_SEED,
     LLM_TEMPERATURE,
 )
 
@@ -66,6 +67,7 @@ def append_generation_run(
         "model": LLM_MODEL,
         "reasoning_effort": LLM_REASONING_EFFORT,
         "temperature": LLM_TEMPERATURE,
+        "seed": LLM_SEED,
         "max_completion_tokens": LLM_MAX_TOKENS,
         "openai_sdk": version("openai"),
         **record,

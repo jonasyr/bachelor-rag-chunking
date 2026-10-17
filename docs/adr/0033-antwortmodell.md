@@ -27,7 +27,9 @@ Angenommen (17.10.2026; konkretisiert [ADR 0016](0016-modell-neutralitaet.md), s
 ## Entscheidung
 
 Wir werden die Antworten mit `gpt-6-luna` erzeugen, mit `reasoning_effort = "none"`, `temperature = 0` und
-`max_completion_tokens = 1024` (`config.LLM_*`), für alle Strategien gleich.
+`max_completion_tokens = 1024` und einem festen `seed` (`config.LLM_*`), für alle Strategien gleich. Der `seed` ist
+laut OpenAI eine Beta-Funktion, die Determinismus nur nach Möglichkeit herstellt (Hinweis aus dem Codex-Review von
+PR #14); er ersetzt das einmalige Speichern nicht.
 
 Wir werden alle Antworten in einem Lauf über C1–C3 erzeugen und speichern; `generated_answers.csv` wird nie
 überschrieben, eine Neuerzeugung erfordert das bewusste Löschen der Datei. Der Lauf schreibt nichts, wenn eine

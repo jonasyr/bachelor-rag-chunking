@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_TEMPERATURE
+from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_SEED, LLM_TEMPERATURE
 from llm_client import complete
 
 
@@ -39,6 +39,7 @@ def test_sends_the_pinned_settings():
             "temperature": LLM_TEMPERATURE,
             "reasoning_effort": LLM_REASONING_EFFORT,
             "max_completion_tokens": LLM_MAX_TOKENS,
+            "seed": LLM_SEED,
         }
     ]
 

@@ -11,6 +11,7 @@ from config import (
     LLM_PRICE_INPUT_PER_MTOK,
     LLM_PRICE_OUTPUT_PER_MTOK,
     LLM_REASONING_EFFORT,
+    LLM_SEED,
     LLM_TEMPERATURE,
     STRATEGY_IDS,
     TOP_K,
@@ -192,6 +193,7 @@ def test_run_log_records_versions_inputs_and_cost(files):
     assert record["system_fingerprints"] == ["fp_0", "fp_1"]
     assert record["temperature"] == LLM_TEMPERATURE
     assert record["reasoning_effort"] == LLM_REASONING_EFFORT
+    assert record["seed"] == LLM_SEED
     assert record["strategy"] == ",".join(STRATEGIES)
     assert record["answers"] == count
     assert record["openai_sdk"]

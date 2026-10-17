@@ -138,6 +138,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `LLM_MODEL` | `"gpt-6-luna"` | Antwortmodell, gepinnt 17.10.2026 (nur als Alias angeboten, daher Antworten einmal erzeugen) | [ADR 0016](../adr/0016-modell-neutralitaet.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_TEMPERATURE` | `0.0` | konstant für Reproduzierbarkeit | [ADR 0014](../adr/0014-temperatur-und-topk.md) |
+| `LLM_SEED` | `20261017` | fester `seed` jeder Anfrage (OpenAI: Beta, nur „best effort“); fest, nie getunt | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung, wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht beide) | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
