@@ -89,7 +89,8 @@ erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
 
-**`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`;
+**`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`, dazu je
+neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`;
 [ADR 0033](../adr/0033-antwortmodell.md)). Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`. Ein
 abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
 
@@ -217,7 +218,9 @@ Q001,C1,"...",C1_D049_0004,1200,180
 
 Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
 aus `generated_answers.csv` drei Dateien, je Frage die drei Antworten in der mit `config.SCORING_SEED` gemischten
-Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben.
+Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben (liegen beide
+vor, stimmt der Schlüssel und sind die neuen Einträge byte-gleich zur Prüfsumme im Laufprotokoll, schreibt ein
+erneuter Aufruf nur Lesepaket und `scoring_items.jsonl` neu).
 
 **`scoring_packet.md`** (Lesepaket): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
 `### Q001-A` mit der Antwort und den Passagen, die das Modell sah (`[Excerpt N]`, getrennt durch `---`, ohne
@@ -234,6 +237,10 @@ Q001-A,Q001,2,1,2,2,2,lists only one of the two hooks
 code,question_id,strategy
 Q001-A,Q001,C3
 ```
+
+**`scoring_items.jsonl`** (Daten der Bewertungsseite, [ADR 0034](../adr/0034-bewertung-in-der-app.md); nicht
+versioniert): eine Zeile je Code in der Reihenfolge des Lesepakets mit `code`, `question_id`, `question`,
+`reference_answer`, `answer` und `excerpts` (Texte der Passagen in Rangfolge, ohne Chunk-IDs); keine Strategie.
 
 **`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach
 `question_id` und Strategie; Kriterien-Spalten = `config.RUBRIC_CRITERIA`, `total_score` = Mittel der Kriterien mit
@@ -257,7 +264,7 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
 | `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
 | `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
-| `scoring_packet.md`, `scores.csv` | Lesepaket, entblindete Bewertung | nein |
+| `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 
 | Set | Inhalt |

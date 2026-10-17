@@ -40,6 +40,7 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_PACKET_FILE` | `data/evaluation/scoring_packet.md` | Lesepaket der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_KEY_FILE` | `data/evaluation/scoring_key.csv` | Schlüssel Code → Strategie | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+| `SCORING_ITEMS_FILE` | `data/evaluation/scoring_items.jsonl` | blinde Einträge der Bewertungsseite | [ADR 0034](../adr/0034-bewertung-in-der-app.md) |
 
 Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 

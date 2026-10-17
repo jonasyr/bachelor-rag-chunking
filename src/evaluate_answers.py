@@ -1,15 +1,19 @@
 """Answer quality evaluation: blind manual rubric 0-2 on five criteria (ADR 0013, 0032).
 
---mode scaffold  From generated_answers.csv write three files:
+--mode scaffold  From generated_answers.csv write four files:
                  scoring_packet.md  what the rater reads: per question the question and the
                                     reference answer, then each answer under a neutral code
                                     (Q001-A, Q001-B, ...) with the excerpts the model saw;
                  scoring_sheet.csv  what the rater fills: one row per code, criteria 0-2, notes;
-                 scoring_key.csv    which strategy each code stands for; not opened while scoring.
+                 scoring_key.csv    which strategy each code stands for; not opened while scoring;
+                 scoring_items.jsonl the same answers as data for the scoring page (ADR 0034),
+                                    equally blind.
                  The answers of a question appear in an order shuffled with config.SCORING_SEED,
                  and nothing in packet or sheet names the strategy (no strategy keys, no chunk
-                 IDs). An existing sheet or key is never overwritten, and the answers and chunk
-                 files must be exactly those of the latest generation run (ADR 0033).
+                 IDs). An existing sheet or key is never overwritten; with both present and the
+                 same key, only packet and item file are written again (after a fresh clone).
+                 The answers and chunk files must be exactly those of the latest generation run
+                 (ADR 0033).
 --mode summarise Check the filled sheet against its key (every code exactly once, every
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
@@ -24,6 +28,8 @@ Output schema of scores.csv (docs/reference/data-formats.md): question_id, strat
 correctness, completeness, groundedness, no_hallucination, clarity, total_score
 """
 
+import hashlib
+import json
 import random
 import re
 import statistics
@@ -42,6 +48,7 @@ from config import (
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
     SCORES_FILE,
+    SCORING_ITEMS_FILE,
     SCORING_KEY_FILE,
     SCORING_PACKET_FILE,
     SCORING_SEED,
@@ -60,7 +67,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
-from run_log import require_run
+from run_log import append_scaffold_run, latest_run, require_run
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -141,6 +148,7 @@ def scaffold(
     sheet_file: Path = SCORING_SHEET_FILE,
     packet_file: Path = SCORING_PACKET_FILE,
     key_file: Path = SCORING_KEY_FILE,
+    items_file: Path = SCORING_ITEMS_FILE,
     seed: int = SCORING_SEED,
     generation_runs_file: Path = GENERATION_RUNS_FILE,
     limit: int | None = None,
@@ -153,8 +161,11 @@ def scaffold(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
     scored = scored_questions(questions, limit, questions_file, ground_truth_file)
+    # Sheet and key both present: only packet and item file are written again, and only if the
+    # key is the one this call computes (restores the ignored files after a fresh clone).
+    restoring = sheet_file.exists() and key_file.exists()
     for path in (sheet_file, key_file):
-        if path.exists():
+        if path.exists() and not restoring:
             raise FileExistsError(
                 f"{path} exists and may hold manual scores or their key; move it away to "
                 "start afresh"
@@ -181,6 +192,7 @@ def scaffold(
 
     rng = random.Random(seed)
     key_rows, sheet_rows = [], []
+    items: list[dict] = []
     packet = [
         "# Scoring packet",
         "",
@@ -206,6 +218,16 @@ def scaffold(
             sheet_rows.append(
                 {"code": code, "question_id": qid} | dict.fromkeys([*RUBRIC_CRITERIA, "notes"], "")
             )
+            items.append(
+                {
+                    "code": code,
+                    "question_id": qid,
+                    "question": questions[qid]["question"],
+                    "reference_answer": truth[qid]["expected_answer"],
+                    "answer": answer["answer"],
+                    "excerpts": [chunks[key][cid]["text"] for cid in split_ids(answer["sources"])],
+                }
+            )
             packet += [
                 "",
                 f"### {code}",
@@ -218,10 +240,43 @@ def scaffold(
                 "",
                 fenced(context(split_ids(answer["sources"]), chunks[key])),
             ]
-    write_csv(key_file, KEY_HEADER, key_rows)
-    write_csv(sheet_file, SHEET_HEADER, sheet_rows)
+    items_text = "".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items)
+    items_sha = hashlib.sha256(items_text.encode("utf-8")).hexdigest()
+    strategy = ",".join(STRATEGY_IDS)
+    if restoring:
+        refuse = "; move sheet and key away to start afresh"
+        try:
+            same_key = read_csv(key_file, KEY_HEADER) == key_rows
+        except ValueError:
+            same_key = False
+        if not same_key:
+            raise FileExistsError(
+                f"{sheet_file} and {key_file} exist and may hold manual scores or their key, and "
+                f"the key differs from this call's (other --set or --limit){refuse}"
+            )
+        # the scores belong to exactly the items they were given on: same answers, excerpts,
+        # questions and reference answers as the logged scaffold
+        record = latest_run(generation_runs_file, "scaffold", strategy)
+        if record is None:
+            raise FileExistsError(
+                f"{generation_runs_file} has no scaffold record for the existing sheet{refuse}"
+            )
+        if record.get("outputs_sha256", {}).get(items_file.name) != items_sha:
+            raise FileExistsError(
+                f"the items differ from those {sheet_file} was scored on (answers, excerpts or "
+                f"reference answers changed){refuse}"
+            )
+    else:
+        write_csv(key_file, KEY_HEADER, key_rows)
+        write_csv(sheet_file, SHEET_HEADER, sheet_rows)
     packet_file.parent.mkdir(parents=True, exist_ok=True)
     packet_file.write_text("\n".join(packet) + "\n", encoding="utf-8")
+    items_file.parent.mkdir(parents=True, exist_ok=True)
+    items_file.write_text(items_text, encoding="utf-8")
+    if not restoring:
+        append_scaffold_run(
+            strategy, len(key_rows), {items_file.name: items_sha}, generation_runs_file
+        )
     return len(key_rows)
 
 
@@ -318,6 +373,7 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "sheet_file": set_dir / SCORING_SHEET_FILE.name,
         "packet_file": set_dir / SCORING_PACKET_FILE.name,
         "key_file": set_dir / SCORING_KEY_FILE.name,
+        "items_file": set_dir / SCORING_ITEMS_FILE.name,
         "scores_file": set_dir / SCORES_FILE.name,
         "generation_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }

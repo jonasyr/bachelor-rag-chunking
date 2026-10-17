@@ -168,3 +168,34 @@ def fresh_plan_for(rows):
             }
         )
     return fresh
+
+
+SCORING_CODES = ["H01-B", "H01-A", "H01-C", "H02-A", "H02-C", "H02-B"]  # packet order
+
+
+def write_scoring_set(folder, codes=tuple(SCORING_CODES)):
+    """A scaffolded scoring set as evaluate_answers.py writes it: blind items and an empty sheet."""
+    from atomic_csv import write_csv
+    from config import RUBRIC_CRITERIA
+    from evaluate_answers import SHEET_HEADER
+
+    folder.mkdir(parents=True, exist_ok=True)
+    items = [
+        {
+            "code": code,
+            "question_id": code.split("-")[0],
+            "question": f"Question {code.split('-')[0]}?",
+            "reference_answer": "Use `ref()`.",
+            "answer": f"Answer {code}.",
+            "excerpts": [f"Excerpt one for {code}.", "Excerpt two."],
+        }
+        for code in codes
+    ]
+    (folder / "scoring_items.jsonl").write_text(
+        "".join(json.dumps(i) + "\n" for i in items), encoding="utf-8"
+    )
+    rows = [
+        {"code": c, "question_id": c.split("-")[0]} | dict.fromkeys([*RUBRIC_CRITERIA, "notes"], "")
+        for c in codes
+    ]
+    write_csv(folder / "scoring_sheet.csv", SHEET_HEADER, rows)

@@ -46,6 +46,7 @@ SCORES_FILE = DATA_EVAL / "scores.csv"
 SCORING_SHEET_FILE = DATA_EVAL / "scoring_sheet.csv"
 SCORING_PACKET_FILE = DATA_EVAL / "scoring_packet.md"
 SCORING_KEY_FILE = DATA_EVAL / "scoring_key.csv"
+SCORING_ITEMS_FILE = DATA_EVAL / "scoring_items.jsonl"  # blind items for the scoring page (D34)
 # Retrieval metrics per question, strategy and relevance rule (src/evaluate_retrieval.py, D12)
 RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
 CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)

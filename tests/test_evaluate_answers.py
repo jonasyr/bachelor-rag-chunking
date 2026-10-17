@@ -1,5 +1,6 @@
 import csv
 import json
+import re
 
 import pytest
 
@@ -86,6 +87,7 @@ def files(tmp_path):
         "sheet_file": tmp_path / "scoring_sheet.csv",
         "packet_file": tmp_path / "scoring_packet.md",
         "key_file": tmp_path / "scoring_key.csv",
+        "items_file": tmp_path / "scoring_items.jsonl",
         "scores_file": tmp_path / "scores.csv",
         "generation_runs_file": tmp_path / "generation_runs.jsonl",
     }
@@ -102,6 +104,7 @@ SCAFFOLD_ARGS = [
     "sheet_file",
     "packet_file",
     "key_file",
+    "items_file",
     "generation_runs_file",
 ]
 SUMMARISE_ARGS = [
@@ -428,8 +431,114 @@ def test_pilot_paths_keep_every_file_inside_the_set(tmp_path):
         "sheet_file",
         "packet_file",
         "key_file",
+        "items_file",
         "scores_file",
         "generation_runs_file",
     }
     assert all(p.parent == tmp_path for p in paths.values())
     assert paths["generation_runs_file"].name == "runs.jsonl"
+
+
+CHUNK_ID_RE = re.compile(r"\b[CK]\d_D\d{3}_\d{4}\b")
+
+
+def items_of(files):
+    text = files["items_file"].read_text(encoding="utf-8")
+    return [json.loads(line) for line in text.splitlines()]
+
+
+def test_scaffold_writes_blind_items_in_sheet_order(files):
+    run_scaffold(files)
+    items = items_of(files)
+    assert [i["code"] for i in items] == [r["code"] for r in read(files["sheet_file"])]
+    first = items[0]
+    assert set(first) == {
+        "code",
+        "question_id",
+        "question",
+        "reference_answer",
+        "answer",
+        "excerpts",
+    }
+    strategy = strategy_of(files)[first["code"]]
+    assert first["answer"] == f"Answer to {first['question_id']} ({strategy})."
+    assert first["excerpts"] == [f"Excerpt 1 of {strategy}.", f"Excerpt 2 of {strategy}."]
+    assert first["reference_answer"] in ("Ref one.", "Ref two.")
+
+
+def test_items_carry_no_strategy_and_no_chunk_id(files):
+    run_scaffold(files)
+    text = files["items_file"].read_text(encoding="utf-8")
+    assert not CHUNK_ID_RE.search(text)
+    assert all(name not in text for name in STRATEGY_IDS.values())
+    assert all("strategy" not in item for item in items_of(files))
+
+
+def test_scaffold_again_with_the_same_seed_gives_identical_files(files):
+    run_scaffold(files, limit=1)
+    before = {
+        k: files[k].read_text(encoding="utf-8") for k in ("key_file", "items_file", "sheet_file")
+    }
+    for name in ("sheet_file", "key_file", "packet_file", "items_file"):
+        files[name].unlink()
+    run_scaffold(files, limit=1)
+    assert {k: files[k].read_text(encoding="utf-8") for k in before} == before
+
+
+def test_scaffold_again_restores_lost_items_and_keeps_the_scores(files):
+    """After a fresh clone the ignored item file is gone but the scored sheet is versioned."""
+    run_scaffold(files, limit=1)
+    items_before = files["items_file"].read_text(encoding="utf-8")
+    key_before = files["key_file"].read_text(encoding="utf-8")
+    fill(files, all_two())
+    sheet_before = files["sheet_file"].read_text(encoding="utf-8")
+    files["items_file"].unlink()
+    assert run_scaffold(files, limit=1) == len(STRATEGIES)
+    assert files["items_file"].read_text(encoding="utf-8") == items_before
+    assert files["sheet_file"].read_text(encoding="utf-8") == sheet_before
+    assert files["key_file"].read_text(encoding="utf-8") == key_before
+
+
+def test_scaffold_with_another_key_still_refuses_the_existing_sheet(files):
+    run_scaffold(files, limit=1)
+    files["items_file"].unlink()
+    with pytest.raises(FileExistsError, match="manual scores"):
+        run_scaffold(files)  # no limit: other codes than the existing key
+    assert not files["items_file"].exists()
+
+
+def scaffold_records(files):
+    lines = files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+    return [r for r in map(json.loads, lines) if r.get("step") == "scaffold"]
+
+
+def test_scaffold_logs_the_checksum_of_its_items(files):
+    run_scaffold(files, limit=1)
+    (record,) = scaffold_records(files)
+    assert record["outputs_sha256"] == {"scoring_items.jsonl": sha256_of(files["items_file"])}
+    assert record["strategy"] == ",".join(STRATEGIES)
+
+
+def test_restore_refuses_regenerated_answers(files):
+    """Scores must never be paired with answers the rater did not see (review of PR #17)."""
+    run_scaffold(files, limit=1)
+    fill(files, all_two())
+    sheet_before = files["sheet_file"].read_text(encoding="utf-8")
+    files["items_file"].unlink()
+    rows = answer_rows()
+    next(r for r in rows if r[0] == "Q001")[2] = "A regenerated answer."  # a scored question
+    write_csv(files["answers_file"], ANSWERS_HEADER, rows)
+    with pytest.raises(FileExistsError, match="items differ"):
+        run_scaffold(files, limit=1)  # records a matching generation run first
+    assert not files["items_file"].exists()
+    assert files["sheet_file"].read_text(encoding="utf-8") == sheet_before
+
+
+def test_restore_needs_the_scaffold_record(files):
+    run_scaffold(files, limit=1)
+    files["items_file"].unlink()
+    lines = files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+    kept = [line for line in lines if json.loads(line).get("step") != "scaffold"]
+    files["generation_runs_file"].write_text("\n".join(kept) + "\n", encoding="utf-8")
+    with pytest.raises(FileExistsError, match="no scaffold record"):
+        run_scaffold(files, limit=1)

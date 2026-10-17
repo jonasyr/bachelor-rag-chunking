@@ -93,13 +93,9 @@ def require_run(
     Without `outputs_required`, a record that predates output checksums (no `outputs_sha256`)
     is checked on its inputs only.
     """
-    records = []
-    if runs_file.exists():
-        records = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines()]
-    matching = [r for r in records if r.get("step") == step and r.get("strategy") == strategy]
-    if not matching:
+    record = latest_run(runs_file, step, strategy)
+    if record is None:
         raise RuntimeError(f"{runs_file} has no {step} run over {strategy}; run src/{step}.py")
-    record = matching[-1]
     checks = [("inputs_sha256", f) for f in inputs]
     if outputs_required or "outputs_sha256" in record:
         checks += [("outputs_sha256", f) for f in outputs]
@@ -110,6 +106,30 @@ def require_run(
                 f"({runs_file}); run src/{step}.py again"
             )
     return record
+
+
+def latest_run(runs_file: Path, step: str, strategy: str) -> dict | None:
+    """The latest record of `step` over `strategy`, or None."""
+    if not runs_file.exists():
+        return None
+    records = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines()]
+    matching = [r for r in records if r.get("step") == step and r.get("strategy") == strategy]
+    return matching[-1] if matching else None
+
+
+def append_scaffold_run(
+    strategy: str, codes: int, outputs: dict[str, str], runs_file: Path
+) -> dict:
+    """Log a fresh blind-scoring scaffold with the checksum of its item file (ADR 0034)."""
+    full = {
+        "date": date.today().isoformat(),
+        "step": "scaffold",
+        "strategy": strategy,
+        "codes": codes,
+        "outputs_sha256": outputs,
+    }
+    _append(full, runs_file)
+    return full
 
 
 def _append(record: dict, runs_file: Path) -> None:

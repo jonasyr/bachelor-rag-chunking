@@ -14,6 +14,7 @@ data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`
 - Catalogue authoring (ADR 0031): editor `uv run streamlit run app/catalogue_editor.py --server.address localhost`; all writes
   go through `src/catalogue_store.py` (atomic, strict). Claude's review only appends `open` rows to
   `data/evaluation/catalogue_review.csv` and never edits questions/ground truth; never run `catalogue.py plan` twice.
+- Scoring page (ADR 0034): app/scoring_page.py + src/scoring_store.py read only scoring_items.jsonl and the sheet, never the key; tests/test_scoring_page.py checks that statically.
 - Section spans for relevance: `data/processed/sections.jsonl`; chunk `start_token`/`end_token` must come from
   `src/tokens.py` so chunks and sections share one index space.
 - `preprocess.py` rewrites `documents.jsonl` in place and refuses a second run (re-run `ingest.py` first);
