@@ -211,3 +211,12 @@ def test_key_points_edited_after_scoring_show_the_refusal_not_a_traceback(scorin
     at.selectbox(key="scoring_code|Pilot: hard").set_value("H01-B").run()
     assert not at.exception
     assert any("key_points.csv" in e.value for e in at.error)
+
+
+def test_a_question_added_after_the_freeze_shows_an_error_not_a_traceback(scoring_page):
+    at, folder = scoring_page
+    write_scoring_set(folder, codes=(*SCORING_CODES, "H03-A"))  # re-scaffolded with more questions
+    at.run()
+    at.selectbox(key="scoring_code|Pilot: hard").set_value("H03-A").run()
+    assert not at.exception
+    assert any("H03" in e.value and "key points" in e.value for e in at.error)

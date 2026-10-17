@@ -335,6 +335,14 @@ def main() -> None:
         for tab, text in zip(tabs, item["excerpts"], strict=True):
             with tab:
                 page(text)
+    if not key_points.get(item["question_id"]):
+        with side:
+            st.error(
+                f"{item['question_id']} has no frozen key points: the set was scaffolded again "
+                "with more questions after the freeze. Its answers cannot be scored by the rules; "
+                "scaffold the set as it was frozen, or start a new set."
+            )
+        return
     with side:
         form(
             s,

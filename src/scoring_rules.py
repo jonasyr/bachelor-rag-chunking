@@ -44,6 +44,11 @@ def validate(checks: dict, n_points: int) -> None:
     if set(checks) != expected:
         wrong = sorted(set(checks) ^ expected)
         raise ValueError(f"checks must be exactly points and {list(CHECKS)}; differs in {wrong}")
+    if n_points < 1:
+        raise ValueError(
+            "the question has no frozen key points (added after the freeze?); a set needs key "
+            "points for every question before it can be scored"
+        )
     points = checks["points"]
     if len(points) != n_points:
         raise ValueError(f"the question has {n_points} key points, the checks mark {len(points)}")

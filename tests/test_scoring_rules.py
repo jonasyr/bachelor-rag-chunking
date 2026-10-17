@@ -120,3 +120,8 @@ def test_rows_round_trip_with_the_rules_version():
     assert list(row) == rules.CHECKS_HEADER
     assert row["points"] == "covered;missing" and row["rules_version"] == RUBRIC_RULES_VERSION
     assert rules.from_row(row) == (RUBRIC_RULES_VERSION, checks(points=["covered", "missing"]))
+
+
+def test_validate_rejects_a_question_without_key_points():
+    with pytest.raises(ValueError, match="no frozen key points"):
+        rules.validate(checks(points=[]), 0)
