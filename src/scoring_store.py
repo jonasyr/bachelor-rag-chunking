@@ -14,6 +14,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
+import scoring_rules as rules
 from atomic_csv import read_csv, write_csv
 from config import (
     GENERATION_RUNS_FILE,
@@ -195,21 +196,35 @@ def is_read_only(s: ScoringSet) -> bool:
     return s.scores_file.exists()
 
 
-def save_score(s: ScoringSet, code: str, values: dict[str, int], notes: str) -> None:
-    """Rewrite the sheet atomically with only this code's row changed."""
+def save_score(s: ScoringSet, code: str, checks: dict, notes: str) -> dict[str, int]:
+    """Validate the checks, derive the five scores (ADR 0035) and write checks file and sheet
+    atomically with only this code's rows changed; returns the derived values."""
     if is_read_only(s):
         raise PermissionError(f"{s.scores_file} exists: the scores were unblinded, read-only")
-    if sorted(values) != sorted(RUBRIC_CRITERIA):
-        raise ValueError(f"values must cover exactly the criteria {RUBRIC_CRITERIA}")
-    for criterion, value in values.items():
-        if type(value) is not int or not 0 <= value <= RUBRIC_MAX_SCORE:
-            raise ValueError(f"{criterion} must be an integer 0-{RUBRIC_MAX_SCORE}, got {value!r}")
+    require_frozen_key_points(s)
     rows = _sheet(s)
     row = next((r for r in rows if r["code"] == code), None)
     if row is None:
         raise ValueError(f"unknown code {code} in {s.sheet_file}")
+    n_points = len(load_key_points(s).get(row["question_id"], []))
+    rules.validate(checks, n_points)
+    values = rules.derive(checks)
+    stored = {r["code"]: r for r in read_csv(s.checks_file, rules.CHECKS_HEADER)}
+    stored[code] = rules.to_row(code, checks)
+    order = [r["code"] for r in rows]
+    write_csv(
+        s.checks_file,
+        rules.CHECKS_HEADER,
+        sorted(stored.values(), key=lambda r: order.index(r["code"])),
+    )
     row.update({c: str(v) for c, v in values.items()} | {"notes": notes})
     write_csv(s.sheet_file, SHEET_HEADER, rows)
+    return values
+
+
+def load_checks(s: ScoringSet) -> dict[str, dict]:
+    """The stored checks of every scored code."""
+    return {r["code"]: rules.from_row(r)[1] for r in read_csv(s.checks_file, rules.CHECKS_HEADER)}
 
 
 def is_scored(entry: dict) -> bool:

@@ -3,12 +3,28 @@ import json
 import pytest
 from conftest import SCORING_CODES, write_scoring_set
 
+import scoring_rules as rules
 import scoring_store as scoring
 from atomic_csv import read_csv, write_csv
 from config import KEY_POINTS_MAX, RUBRIC_CRITERIA
 from evaluate_answers import SHEET_HEADER
 
-ALL_TWO = dict.fromkeys(RUBRIC_CRITERIA, 2)
+GOOD = {
+    "points": ["covered"],
+    "declines": "no",
+    "core_wrong": "no",
+    "other_error": "no",
+    "grounded": "all",
+    "hallucination": "none",
+    "answers_question": "yes",
+    "direct": "yes",
+    "wordy": "no",
+}
+
+
+def ok(code, **changed):
+    """A flawless answer's checks for `code` (H01 has one key point, H02 two in `frozen`)."""
+    return GOOD | {"points": ["covered"] * (1 if code.startswith("H01") else 2)} | changed
 
 
 @pytest.fixture
@@ -31,6 +47,15 @@ def hard(dirs):
     write_scoring_set(dirs[1] / "hard")
     (s,) = scoring.scoring_sets()
     return s
+
+
+@pytest.fixture
+def frozen(hard):
+    items = scoring.load_items(hard)
+    scoring.save_key_points(hard, items, "H01", ["Core one"])
+    scoring.save_key_points(hard, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(hard, items)
+    return hard
 
 
 def sheet(s):
@@ -92,9 +117,10 @@ def test_malformed_value_in_the_sheet_is_reported(hard):
         scoring.load_scores(hard)
 
 
-def test_save_changes_exactly_one_row(hard):
+def test_save_changes_exactly_one_row(frozen):
+    hard = frozen
     before = sheet(hard)
-    scoring.save_score(hard, "H01-A", ALL_TWO | {"clarity": 1}, "fine")
+    scoring.save_score(hard, "H01-A", ok("H01-A", wordy="yes"), "fine")
     after = sheet(hard)
     changed = [i for i, (a, b) in enumerate(zip(before, after, strict=True)) if a != b]
     assert changed == [1]
@@ -104,45 +130,45 @@ def test_save_changes_exactly_one_row(hard):
     assert hard.sheet_file.read_text(encoding="utf-8").splitlines()[0] == ",".join(SHEET_HEADER)
 
 
-def test_notes_with_commas_quotes_and_newlines_round_trip(hard):
+def test_notes_with_commas_quotes_and_newlines_round_trip(frozen):
     notes = 'misses "watch", adds\na second line'
-    scoring.save_score(hard, "H01-B", ALL_TWO, notes)
-    assert scoring.load_scores(hard)["H01-B"]["notes"] == notes
+    scoring.save_score(frozen, "H01-B", ok("H01-B"), notes)
+    assert scoring.load_scores(frozen)["H01-B"]["notes"] == notes
 
 
-def test_save_keeps_rows_changed_by_hand_meanwhile(hard):
+def test_save_keeps_rows_changed_by_hand_meanwhile(frozen):
+    hard = frozen
     rows = sheet(hard)
     rows[3].update(dict.fromkeys(RUBRIC_CRITERIA, "1"))  # edited in the CSV while the app is open
     write_csv(hard.sheet_file, SHEET_HEADER, rows)
-    scoring.save_score(hard, "H01-B", ALL_TWO, "")
+    scoring.save_score(hard, "H01-B", ok("H01-B"), "")
     assert sheet(hard)[3]["correctness"] == "1"
 
 
 @pytest.mark.parametrize(
-    ("code", "values", "message"),
+    ("code", "checks", "message"),
     [
-        ("H09-A", ALL_TWO, "unknown code"),
-        ("H01-B", ALL_TWO | {"clarity": 3}, "clarity"),
-        ("H01-B", ALL_TWO | {"clarity": -1}, "clarity"),
-        ("H01-B", ALL_TWO | {"clarity": True}, "clarity"),
-        ("H01-B", ALL_TWO | {"clarity": None}, "clarity"),
-        ("H01-B", {c: 2 for c in RUBRIC_CRITERIA[:-1]}, "criteria"),
+        ("H09-A", ok("H01-A"), "unknown code"),
+        ("H01-B", ok("H01-B", grounded="most"), "grounded"),
+        ("H01-B", {k: v for k, v in ok("H01-B").items() if k != "wordy"}, "wordy"),
     ],
 )
-def test_save_refuses_unknown_codes_and_invalid_values(hard, code, values, message):
-    before = hard.sheet_file.read_bytes()
+def test_save_refuses_unknown_codes_and_invalid_checks(frozen, code, checks, message):
+    before = frozen.sheet_file.read_bytes()
     with pytest.raises(ValueError, match=message):
-        scoring.save_score(hard, code, values, "")
-    assert hard.sheet_file.read_bytes() == before
+        scoring.save_score(frozen, code, checks, "")
+    assert frozen.sheet_file.read_bytes() == before
+    assert not frozen.checks_file.exists()
 
 
-def test_read_only_once_scores_were_unblinded(hard):
+def test_read_only_once_scores_were_unblinded(frozen):
+    hard = frozen
     assert not scoring.is_read_only(hard)
     hard.scores_file.write_text("unblinded", encoding="utf-8")
     assert scoring.is_read_only(hard)
     before = hard.sheet_file.read_bytes()
     with pytest.raises(PermissionError, match="unblinded"):
-        scoring.save_score(hard, "H01-B", ALL_TWO, "")
+        scoring.save_score(hard, "H01-B", ok("H01-B"), "")
     assert hard.sheet_file.read_bytes() == before
 
 
@@ -156,30 +182,34 @@ def test_partly_filled_row_counts_as_unscored(hard):
     assert scoring.progress(scoring.load_items(hard), scores) == (0, 6)
 
 
-def test_progress_by_question(hard):
-    scoring.save_score(hard, "H01-A", ALL_TWO, "")
+def test_progress_by_question(frozen):
+    hard = frozen
+    scoring.save_score(hard, "H01-A", ok("H01-A"), "")
     items, scores = scoring.load_items(hard), scoring.load_scores(hard)
     assert scoring.progress(items, scores) == (1, 6)
     assert scoring.by_question(items, scores) == [("H01", 1, 3), ("H02", 0, 3)]
 
 
-def test_first_unscored_and_next_code(hard):
+def test_first_unscored_and_next_code(frozen):
+    hard = frozen
     codes = SCORING_CODES
-    scoring.save_score(hard, "H01-B", ALL_TWO, "")
+    scoring.save_score(hard, "H01-B", ok("H01-B"), "")
     scores = scoring.load_scores(hard)
     assert scoring.first_unscored(codes, scores) == "H01-A"
     assert scoring.next_code(codes, "H01-B", scores) == "H01-A"
 
 
-def test_next_code_wraps_to_the_earliest_unscored(hard):
+def test_next_code_wraps_to_the_earliest_unscored(frozen):
+    hard = frozen
     for code in SCORING_CODES[1:]:
-        scoring.save_score(hard, code, ALL_TWO, "")
+        scoring.save_score(hard, code, ok(code), "")
     assert scoring.next_code(SCORING_CODES, "H02-B", scoring.load_scores(hard)) == "H01-B"
 
 
-def test_next_code_when_everything_is_scored(hard):
+def test_next_code_when_everything_is_scored(frozen):
+    hard = frozen
     for code in SCORING_CODES:
-        scoring.save_score(hard, code, ALL_TWO, "")
+        scoring.save_score(hard, code, ok(code), "")
     scores = scoring.load_scores(hard)
     assert scoring.first_unscored(SCORING_CODES, scores) == "H01-B"
     assert scoring.next_code(SCORING_CODES, "H01-A", scores) == "H01-C"
@@ -270,3 +300,39 @@ def test_a_hand_edit_after_the_freeze_is_caught(hard):
         f.write("H02,2,Added later\n")
     with pytest.raises(PermissionError, match="key_points.csv"):
         scoring.require_frozen_key_points(hard)
+
+
+def test_save_writes_the_checks_and_the_derived_scores(frozen):
+    values = scoring.save_score(frozen, "H01-B", GOOD | {"other_error": "yes"}, "one slip")
+    assert values == rules.derive(GOOD | {"other_error": "yes"})
+    row = next(r for r in sheet(frozen) if r["code"] == "H01-B")
+    assert row["correctness"] == "1" and row["clarity"] == "2" and row["notes"] == "one slip"
+    assert scoring.load_checks(frozen) == {"H01-B": GOOD | {"other_error": "yes"}}
+    checks_rows = read_csv(frozen.checks_file, rules.CHECKS_HEADER)
+    assert [r["code"] for r in checks_rows] == ["H01-B"]
+
+
+def test_checks_rows_follow_sheet_order(frozen):
+    two = GOOD | {"points": ["covered", "missing"]}
+    scoring.save_score(frozen, "H02-A", two, "")
+    scoring.save_score(frozen, "H01-B", GOOD, "")
+    rows = read_csv(frozen.checks_file, rules.CHECKS_HEADER)
+    assert [r["code"] for r in rows] == ["H01-B", "H02-A"]  # sheet (packet) order
+
+
+def test_save_is_refused_before_the_freeze(hard):
+    with pytest.raises(PermissionError, match="not frozen"):
+        scoring.save_score(hard, "H01-B", GOOD, "")
+    assert not hard.checks_file.exists()
+
+
+def test_save_is_refused_when_the_point_count_does_not_match(frozen):
+    with pytest.raises(ValueError, match="2 key points"):
+        scoring.save_score(frozen, "H02-A", GOOD, "")  # H02 has two points
+
+
+def test_save_is_refused_after_a_hand_edit_of_the_key_points(frozen):
+    with frozen.key_points_file.open("a", encoding="utf-8") as f:
+        f.write("H01,2,Added later\n")
+    with pytest.raises(PermissionError, match="key_points.csv"):
+        scoring.save_score(frozen, "H01-B", GOOD, "")
