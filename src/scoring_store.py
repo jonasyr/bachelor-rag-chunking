@@ -144,8 +144,18 @@ def load_key_points(s: ScoringSet) -> dict[str, list[str]]:
         raise ValueError(f"{s.key_points_file}: {error}") from error
 
 
+def _freeze(s: ScoringSet) -> dict | None:
+    """The latest key-point freeze made on the current scaffold (same item file), or None."""
+    record = latest_run(s.runs_file, "key_points", STRATEGY)
+    if record is None or not s.items_file.exists():
+        return None
+    if record["outputs_sha256"].get(s.items_file.name) != sha256_of(s.items_file):
+        return None  # frozen for an earlier scaffold of this set
+    return record
+
+
 def is_frozen(s: ScoringSet) -> bool:
-    return latest_run(s.runs_file, "key_points", STRATEGY) is not None
+    return _freeze(s) is not None
 
 
 def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: list[str]) -> None:
@@ -171,7 +181,8 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
 
 
 def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
-    """Record the checksum of the key points once every question has some (ADR 0035)."""
+    """Record the checksums of the key points and of the scaffold they belong to (the item
+    file) once every question has some (ADR 0035)."""
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen already")
     points = load_key_points(s)
@@ -182,12 +193,19 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     stray = sorted(set(points) - known)
     if stray:
         raise ValueError(f"key points for questions outside {s.name}: {', '.join(stray)}")
-    sha = sha256_of(s.key_points_file)
-    append_key_points_run(STRATEGY, {s.key_points_file.name: sha}, s.runs_file)
+    if s.checks_file.exists():
+        raise ValueError(
+            f"{s.checks_file} holds checks of an earlier scaffold; move it aside before freezing"
+        )
+    outputs = {
+        s.key_points_file.name: sha256_of(s.key_points_file),
+        s.items_file.name: sha256_of(s.items_file),
+    }
+    append_key_points_run(STRATEGY, outputs, s.runs_file)
 
 
 def require_frozen_key_points(s: ScoringSet) -> None:
-    record = latest_run(s.runs_file, "key_points", STRATEGY)
+    record = _freeze(s)
     if record is None:
         raise PermissionError(f"the key points of {s.name} are not frozen yet")
     frozen = record["outputs_sha256"].get(s.key_points_file.name)

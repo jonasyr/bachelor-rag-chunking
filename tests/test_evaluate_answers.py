@@ -570,10 +570,18 @@ def freeze_points(files, points=1):
     """Key points for every question and their freeze record, as the scoring page writes them."""
     rows = [[q, str(n), f"Point {n}"] for q in QIDS for n in range(1, points + 1)]
     write_csv(files["key_points_file"], KEY_POINTS_HEADER, rows)
+    scaffold = [
+        json.loads(line)
+        for line in files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+        if json.loads(line).get("step") == "scaffold"
+    ][-1]
     record = {
         "step": "key_points",
         "strategy": ",".join(STRATEGIES),
-        "outputs_sha256": {"key_points.csv": sha256_of(files["key_points_file"])},
+        "outputs_sha256": {
+            "key_points.csv": sha256_of(files["key_points_file"]),
+            "scoring_items.jsonl": scaffold["outputs_sha256"]["scoring_items.jsonl"],
+        },
     }
     with files["generation_runs_file"].open("a", encoding="utf-8") as f:
         f.write(json.dumps(record) + "\n")
@@ -689,3 +697,18 @@ def test_summarise_requires_the_checks_once_key_points_are_frozen(files):
     with pytest.raises(ValueError, match="scoring_checks.csv"):
         run_summarise(files)
     assert not files["scores_file"].exists()
+
+
+def test_summarise_refuses_a_freeze_made_for_an_earlier_scaffold(files):
+    scored_with_checks(files)
+    freeze_points(files)
+    newer = {
+        "step": "scaffold",
+        "strategy": ",".join(STRATEGIES),
+        "codes": 6,
+        "outputs_sha256": {"scoring_items.jsonl": "0" * 64},
+    }
+    with files["generation_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(newer) + "\n")
+    with pytest.raises(ValueError, match="earlier scaffold"):
+        run_summarise(files)

@@ -293,13 +293,15 @@ def main() -> None:
         st.info("The scores of this set were unblinded (scores.csv exists), so it is read-only.")
     frozen = scoring.is_frozen(s)
     step_key = f"scoring_step|{s.name}"
-    if st.session_state.pop("scoring_frozen_now", False) or step_key not in st.session_state:
-        st.session_state[step_key] = "Score" if frozen else "Key points"
+    if not frozen:  # no Score step without a freeze for the current scaffold
+        st.session_state[step_key] = "Key points"
+    elif st.session_state.pop("scoring_frozen_now", False) or step_key not in st.session_state:
+        st.session_state[step_key] = "Score"
     step = st.segmented_control(
         "Step", STEPS, key=step_key, label_visibility="collapsed", required=True
     )
     if step == "Key points" or not frozen:
-        if step == "Score":
+        if not frozen:
             st.caption("Scoring opens once the key points are frozen.")
         key_points_step(s, items, frozen or locked)
         return

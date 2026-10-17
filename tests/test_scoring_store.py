@@ -366,3 +366,27 @@ def test_key_points_for_a_question_outside_the_set_cannot_be_frozen(hard):
     with pytest.raises(ValueError, match="H09"):
         scoring.freeze_key_points(hard, scoring.load_items(hard))
     assert not scoring.is_frozen(hard)
+
+
+def rescaffold(s):
+    """A new scaffold of the same set: same codes, other answer texts (other items checksum)."""
+    text = s.items_file.read_text(encoding="utf-8").replace("Answer ", "New answer ")
+    s.items_file.write_text(text, encoding="utf-8")
+
+
+def test_a_freeze_only_holds_for_the_scaffold_it_was_made_on(frozen):
+    record = json.loads(frozen.runs_file.read_text().splitlines()[-1])
+    assert "scoring_items.jsonl" in record["outputs_sha256"]
+    rescaffold(frozen)
+    assert not scoring.is_frozen(frozen)
+    with pytest.raises(PermissionError, match="not frozen"):
+        scoring.require_frozen_key_points(frozen)
+    scoring.freeze_key_points(frozen, scoring.load_items(frozen))  # freeze again for the new one
+    assert scoring.is_frozen(frozen)
+
+
+def test_freezing_is_refused_while_checks_of_an_earlier_scaffold_remain(frozen):
+    scoring.save_score(frozen, "H01-B", ok("H01-B"), "")
+    rescaffold(frozen)
+    with pytest.raises(ValueError, match="scoring_checks.csv"):
+        scoring.freeze_key_points(frozen, scoring.load_items(frozen))

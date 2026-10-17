@@ -246,7 +246,9 @@ versioniert): eine Zeile je Code in der Reihenfolge des Lesepakets mit `code`, `
 **`key_points.csv`** (Kernpunkte je Frage, von Jonas vor der Bewertung geschrieben und eingefroren,
 [ADR 0035](../adr/0035-regelbasierte-bewertung.md); versioniert): eine Zeile je Punkt, `point` ab 1 ohne Lücken
 (1 = Kernaussage), höchstens `config.KEY_POINTS_MAX` je Frage, `text` einzeilig. Das Einfrieren schreibt einen
-Eintrag `{"step":"key_points","strategy":"C1,C2,C3","outputs_sha256":{"key_points.csv":"…"}}` ins Laufprotokoll.
+Eintrag `{"step":"key_points","strategy":"C1,C2,C3","outputs_sha256":{"key_points.csv":"…","scoring_items.jsonl":"…"}}`
+ins Laufprotokoll; er gilt nur für das Scaffold mit dieser `scoring_items.jsonl`. Nach einem neuen Scaffold werden die
+Kernpunkte erneut eingefroren (eine `scoring_checks.csv` des alten Scaffolds vorher beiseitelegen).
 ```
 question_id,point,text
 Q001,1,"ref() wraps any value, reactive() only objects"

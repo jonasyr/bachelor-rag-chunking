@@ -213,13 +213,13 @@ def test_key_points_edited_after_scoring_show_the_refusal_not_a_traceback(scorin
     assert any("key_points.csv" in e.value for e in at.error)
 
 
-def test_a_question_added_after_the_freeze_shows_an_error_not_a_traceback(scoring_page):
+def test_a_new_scaffold_after_the_freeze_reopens_the_key_points(scoring_page):
     at, folder = scoring_page
     write_scoring_set(folder, codes=(*SCORING_CODES, "H03-A"))  # re-scaffolded with more questions
     at.run()
-    at.selectbox(key="scoring_code|Pilot: hard").set_value("H03-A").run()
     assert not at.exception
-    assert any("H03" in e.value and "key points" in e.value for e in at.error)
+    assert at.segmented_control(key="scoring_step|Pilot: hard").value == "Key points"
+    assert any("2 of 3 questions" in m.value for m in at.sidebar.markdown)
 
 
 @pytest.mark.parametrize("filled", [(2,), (1, 3)])

@@ -339,6 +339,15 @@ def check_derived(
         return
     if record is None:
         raise ValueError(f"{checks_file} exists but the key points are not frozen ({runs_file})")
+    scaffold = latest_run(runs_file, "scaffold", ",".join(STRATEGY_IDS))
+    items = SCORING_ITEMS_FILE.name
+    if scaffold is None or record["outputs_sha256"].get(items) != scaffold["outputs_sha256"].get(
+        items
+    ):
+        raise ValueError(
+            f"the key points were frozen for an earlier scaffold ({runs_file}); freeze them again "
+            "and score the new answers"
+        )
     frozen = record["outputs_sha256"].get(key_points_file.name)
     if not key_points_file.exists() or sha256_of(key_points_file) != frozen:
         raise ValueError(
