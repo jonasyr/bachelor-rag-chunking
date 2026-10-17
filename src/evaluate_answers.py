@@ -1,11 +1,13 @@
 """Answer quality evaluation: blind manual rubric 0-2 on five criteria (ADR 0013, 0032).
 
---mode scaffold  From generated_answers.csv write three files:
+--mode scaffold  From generated_answers.csv write four files:
                  scoring_packet.md  what the rater reads: per question the question and the
                                     reference answer, then each answer under a neutral code
                                     (Q001-A, Q001-B, ...) with the excerpts the model saw;
                  scoring_sheet.csv  what the rater fills: one row per code, criteria 0-2, notes;
-                 scoring_key.csv    which strategy each code stands for; not opened while scoring.
+                 scoring_key.csv    which strategy each code stands for; not opened while scoring;
+                 scoring_items.jsonl the same answers as data for the scoring page (ADR 0034),
+                                    equally blind.
                  The answers of a question appear in an order shuffled with config.SCORING_SEED,
                  and nothing in packet or sheet names the strategy (no strategy keys, no chunk
                  IDs). An existing sheet or key is never overwritten, and the answers and chunk
@@ -24,6 +26,7 @@ Output schema of scores.csv (docs/reference/data-formats.md): question_id, strat
 correctness, completeness, groundedness, no_hallucination, clarity, total_score
 """
 
+import json
 import random
 import re
 import statistics
@@ -42,6 +45,7 @@ from config import (
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
     SCORES_FILE,
+    SCORING_ITEMS_FILE,
     SCORING_KEY_FILE,
     SCORING_PACKET_FILE,
     SCORING_SEED,
@@ -141,6 +145,7 @@ def scaffold(
     sheet_file: Path = SCORING_SHEET_FILE,
     packet_file: Path = SCORING_PACKET_FILE,
     key_file: Path = SCORING_KEY_FILE,
+    items_file: Path = SCORING_ITEMS_FILE,
     seed: int = SCORING_SEED,
     generation_runs_file: Path = GENERATION_RUNS_FILE,
     limit: int | None = None,
@@ -181,6 +186,7 @@ def scaffold(
 
     rng = random.Random(seed)
     key_rows, sheet_rows = [], []
+    items: list[dict] = []
     packet = [
         "# Scoring packet",
         "",
@@ -206,6 +212,16 @@ def scaffold(
             sheet_rows.append(
                 {"code": code, "question_id": qid} | dict.fromkeys([*RUBRIC_CRITERIA, "notes"], "")
             )
+            items.append(
+                {
+                    "code": code,
+                    "question_id": qid,
+                    "question": questions[qid]["question"],
+                    "reference_answer": truth[qid]["expected_answer"],
+                    "answer": answer["answer"],
+                    "excerpts": [chunks[key][cid]["text"] for cid in split_ids(answer["sources"])],
+                }
+            )
             packet += [
                 "",
                 f"### {code}",
@@ -222,6 +238,10 @@ def scaffold(
     write_csv(sheet_file, SHEET_HEADER, sheet_rows)
     packet_file.parent.mkdir(parents=True, exist_ok=True)
     packet_file.write_text("\n".join(packet) + "\n", encoding="utf-8")
+    items_file.parent.mkdir(parents=True, exist_ok=True)
+    items_file.write_text(
+        "".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8"
+    )
     return len(key_rows)
 
 
@@ -318,6 +338,7 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "sheet_file": set_dir / SCORING_SHEET_FILE.name,
         "packet_file": set_dir / SCORING_PACKET_FILE.name,
         "key_file": set_dir / SCORING_KEY_FILE.name,
+        "items_file": set_dir / SCORING_ITEMS_FILE.name,
         "scores_file": set_dir / SCORES_FILE.name,
         "generation_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }
