@@ -199,3 +199,19 @@ def write_scoring_set(folder, codes=tuple(SCORING_CODES)):
         for c in codes
     ]
     write_csv(folder / "scoring_sheet.csv", SHEET_HEADER, rows)
+    log_scaffold(folder / "scoring_items.jsonl")
+
+
+def log_scaffold(items_file):
+    """The scaffold record evaluate_answers.py writes into a pilot set's runs.jsonl."""
+    import hashlib
+
+    from config import STRATEGY_IDS
+
+    record = {
+        "step": "scaffold",
+        "strategy": ",".join(STRATEGY_IDS),
+        "outputs_sha256": {items_file.name: hashlib.sha256(items_file.read_bytes()).hexdigest()},
+    }
+    with (items_file.parent / "runs.jsonl").open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")

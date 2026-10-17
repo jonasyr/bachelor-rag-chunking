@@ -5,6 +5,7 @@ import re
 import pytest
 
 import freeze
+import scoring_rules as rules
 from config import CONTROL_STRATEGIES, RUBRIC_CRITERIA, RUBRIC_MAX_SCORE, STRATEGY_IDS
 from evaluate_answers import (
     ANSWERS_HEADER,
@@ -17,6 +18,7 @@ from evaluate_answers import (
 )
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 from run_log import sha256_of
+from scoring_rules import KEY_POINTS_HEADER
 
 STRATEGIES = list(STRATEGY_IDS)
 QIDS = ("Q001", "Q002")
@@ -89,6 +91,8 @@ def files(tmp_path):
         "key_file": tmp_path / "scoring_key.csv",
         "items_file": tmp_path / "scoring_items.jsonl",
         "scores_file": tmp_path / "scores.csv",
+        "checks_file": tmp_path / "scoring_checks.csv",
+        "key_points_file": tmp_path / "key_points.csv",
         "generation_runs_file": tmp_path / "generation_runs.jsonl",
     }
 
@@ -116,6 +120,9 @@ SUMMARISE_ARGS = [
     "sheet_file",
     "key_file",
     "scores_file",
+    "checks_file",
+    "key_points_file",
+    "generation_runs_file",
 ]
 
 
@@ -433,6 +440,8 @@ def test_pilot_paths_keep_every_file_inside_the_set(tmp_path):
         "key_file",
         "items_file",
         "scores_file",
+        "checks_file",
+        "key_points_file",
         "generation_runs_file",
     }
     assert all(p.parent == tmp_path for p in paths.values())
@@ -542,3 +551,164 @@ def test_restore_needs_the_scaffold_record(files):
     files["generation_runs_file"].write_text("\n".join(kept) + "\n", encoding="utf-8")
     with pytest.raises(FileExistsError, match="no scaffold record"):
         run_scaffold(files, limit=1)
+
+
+GOOD_CHECKS = {
+    "points": ["covered"],
+    "declines": "no",
+    "core_wrong": "no",
+    "other_error": "no",
+    "grounded": "all",
+    "hallucination": "none",
+    "answers_question": "yes",
+    "direct": "yes",
+    "wordy": "no",
+}
+
+
+def freeze_points(files, points=1):
+    """Key points for every question and their freeze record, as the scoring page writes them."""
+    rows = [[q, str(n), f"Point {n}"] for q in QIDS for n in range(1, points + 1)]
+    write_csv(files["key_points_file"], KEY_POINTS_HEADER, rows)
+    scaffold = [
+        json.loads(line)
+        for line in files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+        if json.loads(line).get("step") == "scaffold"
+    ][-1]
+    record = {
+        "step": "key_points",
+        "strategy": ",".join(STRATEGIES),
+        "outputs_sha256": {
+            "key_points.csv": sha256_of(files["key_points_file"]),
+            "scoring_items.jsonl": scaffold["outputs_sha256"]["scoring_items.jsonl"],
+        },
+    }
+    with files["generation_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+
+
+def write_checks(files, rows):
+    write_csv(
+        files["checks_file"],
+        rules.CHECKS_HEADER,
+        [[r[h] for h in rules.CHECKS_HEADER] for r in rows],
+    )
+
+
+def test_summarise_accepts_a_sheet_that_equals_its_checks(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes])
+    run_summarise(files)
+    assert files["scores_file"].exists()
+
+
+def test_summarise_refuses_a_score_that_differs_from_its_checks(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    rows = [rules.to_row(c, GOOD_CHECKS) for c in codes]
+    rows[0] = rules.to_row(codes[0], GOOD_CHECKS | {"wordy": "yes"})  # clarity 1, sheet says 2
+    write_checks(files, rows)
+    with pytest.raises(ValueError, match=f"{codes[0]}.*clarity"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_summarise_refuses_missing_checks_and_older_rules(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes[1:]])
+    with pytest.raises(ValueError, match=f"no checks for {codes[0]}"):
+        run_summarise(files)
+    old = [rules.to_row(c, GOOD_CHECKS) | {"rules_version": "2000-01-01"} for c in codes]
+    write_checks(files, old)
+    with pytest.raises(ValueError, match="2000-01-01"):
+        run_summarise(files)
+
+
+def test_summarise_without_a_checks_file_works_as_before(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    assert not files["checks_file"].exists()
+    run_summarise(files)
+    assert files["scores_file"].exists()
+
+
+def scored_with_checks(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes])
+
+
+def test_summarise_refuses_checks_without_frozen_key_points(files):
+    scored_with_checks(files)
+    with pytest.raises(ValueError, match="not frozen"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_summarise_refuses_key_points_changed_after_the_freeze(files):
+    scored_with_checks(files)
+    freeze_points(files)
+    with files["key_points_file"].open("a", encoding="utf-8") as f:
+        f.write("Q001,2,Added later\n")
+    with pytest.raises(ValueError, match="key_points.csv"):
+        run_summarise(files)
+
+
+def test_summarise_refuses_checks_whose_point_count_differs(files):
+    scored_with_checks(files)  # checks mark one point per answer
+    freeze_points(files, points=2)
+    with pytest.raises(ValueError, match="2 key points"):
+        run_summarise(files)
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        (lambda rows: rows + [rows[0]], "more than once"),  # duplicate code
+        (lambda rows: rows + [rules.to_row("Q009-A", GOOD_CHECKS)], "not in"),  # stray code
+        (lambda rows: rows[::-1], "order"),
+    ],
+)
+def test_summarise_refuses_a_malformed_checks_sequence(files, change, message):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    write_checks(files, change([rules.to_row(c, GOOD_CHECKS) for c in codes]))
+    with pytest.raises(ValueError, match=message):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_summarise_requires_the_checks_once_key_points_are_frozen(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    freeze_points(files)
+    assert not files["checks_file"].exists()
+    with pytest.raises(ValueError, match="scoring_checks.csv"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_summarise_refuses_a_freeze_made_for_an_earlier_scaffold(files):
+    scored_with_checks(files)
+    freeze_points(files)
+    newer = {
+        "step": "scaffold",
+        "strategy": ",".join(STRATEGIES),
+        "codes": 6,
+        "outputs_sha256": {"scoring_items.jsonl": "0" * 64},
+    }
+    with files["generation_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(newer) + "\n")
+    with pytest.raises(ValueError, match="earlier scaffold"):
+        run_summarise(files)

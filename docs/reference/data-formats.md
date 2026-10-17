@@ -90,7 +90,8 @@ erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
 
 **`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`, dazu je
-neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`;
+neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`, je
+Einfrieren der Kernpunkte ein Eintrag `"step":"key_points"` (siehe `key_points.csv`);
 [ADR 0033](../adr/0033-antwortmodell.md)). Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`. Ein
 abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
 
@@ -242,6 +243,26 @@ Q001-A,Q001,C3
 versioniert): eine Zeile je Code in der Reihenfolge des Lesepakets mit `code`, `question_id`, `question`,
 `reference_answer`, `answer` und `excerpts` (Texte der Passagen in Rangfolge, ohne Chunk-IDs); keine Strategie.
 
+**`key_points.csv`** (Kernpunkte je Frage, von Jonas vor der Bewertung geschrieben und eingefroren,
+[ADR 0035](../adr/0035-regelbasierte-bewertung.md); versioniert): eine Zeile je Punkt, `point` ab 1 ohne Lücken
+(1 = Kernaussage), höchstens `config.KEY_POINTS_MAX` je Frage, `text` einzeilig. Das Einfrieren schreibt einen
+Eintrag `{"step":"key_points","strategy":"C1,C2,C3","outputs_sha256":{"key_points.csv":"…","scoring_items.jsonl":"…"}}`
+ins Laufprotokoll; er gilt nur für das Scaffold mit dieser `scoring_items.jsonl`. Nach einem neuen Scaffold werden die
+Kernpunkte erneut eingefroren (eine `scoring_checks.csv` des alten Scaffolds vorher beiseitelegen).
+```
+question_id,point,text
+Q001,1,"ref() wraps any value, reactive() only objects"
+```
+
+**`scoring_checks.csv`** (Antworten auf die Prüffragen je bewertetem Code, in der Reihenfolge des Bogens,
+[ADR 0035](../adr/0035-regelbasierte-bewertung.md); versioniert): `points` = Markierungen der Kernpunkte in
+Punktreihenfolge, durch `;` getrennt; übrige Spalten und Optionen nach
+[Evaluation](evaluation.md#regelbasierte-bewertung).
+```
+code,rules_version,points,declines,core_wrong,other_error,grounded,hallucination,answers_question,direct,wordy
+Q001-A,2026-10-17,covered;missing,no,no,no,all,none,yes,yes,no
+```
+
 **`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach
 `question_id` und Strategie; Kriterien-Spalten = `config.RUBRIC_CRITERIA`, `total_score` = Mittel der Kriterien mit
 einer Nachkommastelle, nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
@@ -264,6 +285,7 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
 | `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
 | `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
+| `key_points.csv`, `scoring_checks.csv` | Kernpunkte und Prüffragen der regelbasierten Bewertung ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)) | ja |
 | `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (16.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md); in der App umgesetzt: [ADR 0034](0034-bewertung-in-der-app.md))
+Angenommen (16.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md); in der App umgesetzt: [ADR 0034](0034-bewertung-in-der-app.md); regelbasiert: [ADR 0035](0035-regelbasierte-bewertung.md))
 
 ## Kontext
 

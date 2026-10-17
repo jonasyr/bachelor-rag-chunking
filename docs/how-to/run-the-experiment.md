@@ -20,8 +20,12 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 6. Auswerten: `uv run python src/evaluate_retrieval.py` und `uv run python src/evaluate_retrieval.py --control`; für die Rubrik
    `uv run python src/evaluate_answers.py --mode scaffold`, dann blind bewerten
    ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md), [ADR 0034](../adr/0034-bewertung-in-der-app.md)): in der App
-   (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“) je Code 0–2 je Kriterium
-   eintragen (`notes` frei). Lesepaket `data/evaluation/scoring_packet.md` und Bogen `data/evaluation/scoring_sheet.csv`
+   (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“), regelbasiert nach
+   [ADR 0035](../adr/0035-regelbasierte-bewertung.md): Schritt „Key points“ je Frage 1–4 Kernpunkte schreiben (nur
+   Frage und Referenzantwort sichtbar) und einfrieren (gilt nur für dieses Scaffold; nach einem neuen Scaffold erneut
+   einfrieren); Schritt „Score“ je Code die Prüffragen beantworten, die fünf
+   Werte folgen aus den Regeln ([Evaluation](../reference/evaluation.md#regelbasierte-bewertung); `notes` frei, z. B.
+   wenn eine Regel nicht passt). Lesepaket `data/evaluation/scoring_packet.md` und Bogen `data/evaluation/scoring_sheet.csv`
    nur noch für die Zweitbewertung oder ohne App; `scoring_key.csv` dabei nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
    Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
    Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.

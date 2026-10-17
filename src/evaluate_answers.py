@@ -17,7 +17,9 @@
 --mode summarise Check the filled sheet against its key (every code exactly once, every
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
-                 overall and per question type and construction class.
+                 overall and per question type and construction class. With a checks file
+                 (scoring_checks.csv, ADR 0035) the key points must be the frozen ones and every
+                 sheet row must equal the scores its checks derive under the current rules.
 
 Both modes use the main catalogue only while it matches its freeze record (ADR 0030). With --set
 DIR they work on a pilot set instead, and --limit N (pilot sets only) scores its first N
@@ -35,6 +37,7 @@ import re
 import statistics
 from pathlib import Path
 
+import scoring_rules as rules
 from atomic_csv import read_csv, write_csv
 from config import (
     CATALOGUE_FREEZE_FILE,
@@ -43,11 +46,14 @@ from config import (
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    KEY_POINTS_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
+    RUBRIC_RULES_VERSION,
     SCORES_FILE,
+    SCORING_CHECKS_FILE,
     SCORING_ITEMS_FILE,
     SCORING_KEY_FILE,
     SCORING_PACKET_FILE,
@@ -67,7 +73,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
-from run_log import append_scaffold_run, latest_run, require_run
+from run_log import append_scaffold_run, latest_run, require_run, sha256_of
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -316,6 +322,76 @@ def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
     return sorted(rows, key=lambda r: (r["question_id"], order.index(r["strategy"])))
 
 
+def check_derived(
+    sheet_file: Path, checks_file: Path, key_points_file: Path, runs_file: Path
+) -> None:
+    """Once key points are frozen or a checks file exists (ADR 0035): the checks file exists, the
+    key points are the frozen ones, every checks row marks as many points as its question has,
+    and every sheet row equals the scores its checks derive under the current rules, so neither a
+    hand-edited score, changed key points nor an older rule version can be unblinded."""
+    record = latest_run(runs_file, "key_points", ",".join(STRATEGY_IDS))
+    if not checks_file.exists():
+        if record is not None:  # a rule-based run: its scores must come from the checks
+            raise ValueError(
+                f"the key points are frozen ({runs_file}) but {checks_file} is missing; restore it "
+                "from git"
+            )
+        return
+    if record is None:
+        raise ValueError(f"{checks_file} exists but the key points are not frozen ({runs_file})")
+    scaffold = latest_run(runs_file, "scaffold", ",".join(STRATEGY_IDS))
+    items = SCORING_ITEMS_FILE.name
+    if scaffold is None or record["outputs_sha256"].get(items) != scaffold["outputs_sha256"].get(
+        items
+    ):
+        raise ValueError(
+            f"the key points were frozen for an earlier scaffold ({runs_file}); freeze them again "
+            "and score the new answers"
+        )
+    frozen = record["outputs_sha256"].get(key_points_file.name)
+    if not key_points_file.exists() or sha256_of(key_points_file) != frozen:
+        raise ValueError(
+            f"{key_points_file} differs from the frozen key points; restore it from git"
+        )
+    try:
+        points = rules.key_points(read_csv(key_points_file, rules.KEY_POINTS_HEADER))
+    except ValueError as error:
+        raise ValueError(f"{key_points_file}: {error}") from error
+    counts = {qid: len(texts) for qid, texts in points.items()}
+    sheet = read_csv(sheet_file, SHEET_HEADER)
+    check_rows = read_csv(checks_file, rules.CHECKS_HEADER)
+    order = [r["code"] for r in sheet]
+    seen: set[str] = set()
+    for code in (r["code"] for r in check_rows):
+        if code in seen:
+            raise ValueError(f"{checks_file}: {code} appears more than once")
+        if code not in order:
+            raise ValueError(f"{checks_file}: {code} is not in {sheet_file}")
+        seen.add(code)
+    if [r["code"] for r in check_rows] != [c for c in order if c in seen]:
+        raise ValueError(f"{checks_file}: rows are not in the order of {sheet_file}")
+    stored = {r["code"]: r for r in check_rows}
+    for row in sheet:
+        if row["code"] not in stored:
+            raise ValueError(f"{checks_file}: no checks for {row['code']}")
+        version, checks = rules.from_row(stored[row["code"]])
+        if version != RUBRIC_RULES_VERSION:
+            raise ValueError(
+                f"{checks_file}: {row['code']} was scored under rules {version}, current rules are "
+                f"{RUBRIC_RULES_VERSION}; score it again"
+            )
+        try:
+            rules.validate(checks, counts.get(row["question_id"], 0))
+        except ValueError as error:
+            raise ValueError(f"{checks_file}: {row['code']}: {error}") from error
+        for criterion, value in rules.derive(checks).items():
+            if row[criterion].strip() != str(value):
+                raise ValueError(
+                    f"{sheet_file}: {row['code']} {criterion} is {row[criterion]!r}, its checks "
+                    f"give {value}"
+                )
+
+
 def summarise(
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
@@ -324,6 +400,9 @@ def summarise(
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     sheet_file: Path = SCORING_SHEET_FILE,
     key_file: Path = SCORING_KEY_FILE,
+    checks_file: Path = SCORING_CHECKS_FILE,
+    key_points_file: Path = KEY_POINTS_FILE,
+    generation_runs_file: Path = GENERATION_RUNS_FILE,
     scores_file: Path = SCORES_FILE,
     limit: int | None = None,
 ) -> dict[tuple, dict]:
@@ -333,6 +412,7 @@ def summarise(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
     scored = scored_questions(questions, limit, questions_file, ground_truth_file)
+    check_derived(sheet_file, checks_file, key_points_file, generation_runs_file)
     rows = unblind(sheet_file, key_file, scored)
     write_csv(scores_file, SCORES_HEADER, rows)
 
@@ -375,6 +455,8 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "key_file": set_dir / SCORING_KEY_FILE.name,
         "items_file": set_dir / SCORING_ITEMS_FILE.name,
         "scores_file": set_dir / SCORES_FILE.name,
+        "checks_file": set_dir / SCORING_CHECKS_FILE.name,
+        "key_points_file": set_dir / KEY_POINTS_FILE.name,
         "generation_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }
 
@@ -393,12 +475,25 @@ if __name__ == "__main__":
         p.error("--limit needs --set: every experiment answer is scored (ADR 0032)")
     paths = pilot_paths(args.set) if args.set else {}
     if args.mode == "scaffold":
-        scaffold_args = {k: v for k, v in paths.items() if k != "scores_file"}
+        scaffold_args = {
+            k: v
+            for k, v in paths.items()
+            if k not in ("scores_file", "checks_file", "key_points_file")
+        }
         count = scaffold(**scaffold_args, limit=args.limit)
         packet = paths.get("packet_file", SCORING_PACKET_FILE)
         sheet = paths.get("sheet_file", SCORING_SHEET_FILE)
         print(f"{count} blinded answers -> {packet}, {sheet}")
     else:
-        keep = ["questions_file", "ground_truth_file", "sheet_file", "key_file", "scores_file"]
+        keep = [
+            "questions_file",
+            "ground_truth_file",
+            "sheet_file",
+            "key_file",
+            "checks_file",
+            "key_points_file",
+            "generation_runs_file",
+            "scores_file",
+        ]
         print_summary(summarise(**{k: paths[k] for k in keep if k in paths}, limit=args.limit))
         print(f"unblinded scores -> {paths.get('scores_file', SCORES_FILE)}")
