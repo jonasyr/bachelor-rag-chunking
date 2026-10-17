@@ -42,6 +42,11 @@ QUESTIONS = {
     "wordy": "Is it repetitive, padded or confusing?",
 }
 OPTION_LABELS = {"minor": "Minor addition"}
+GROUPS = {  # heading shown before the first check of each group
+    "core_wrong": "Facts",
+    "grounded": "Sources",
+    "answers_question": "Clarity",
+}
 SUMMARISE = (
     "Everything is scored. Unblind with `uv run python src/evaluate_answers.py --mode summarise`"
     " (for a pilot set add `--set DIR --limit N` as in scaffold)."
@@ -97,14 +102,46 @@ def key_points_step(s: scoring.ScoringSet, items: list[dict], read_only: bool) -
     if st.session_state.get(pick_key) not in ids:
         st.session_state[pick_key] = next((q for q in ids if q not in points), ids[0])
     qid = st.selectbox(
-        "Question",
+        "Go to question",
         ids,
         key=pick_key,
         format_func=lambda q: f"{q}, done" if q in points else q,
     )
     q = qs[ids.index(qid)]
-    question_cards(q["question"], q["reference_answer"])
-    saved = points.get(qid, [])
+    cards, inputs = st.columns([7, 5], gap="large")
+    with cards:
+        question_cards(q["question"], q["reference_answer"])
+    with inputs:
+        key_point_inputs(s, items, ids, qid, points.get(qid, []), read_only)
+    if read_only:
+        st.info("The key points are frozen.")
+        return
+    st.divider()
+    confirm = st.checkbox(
+        "Freeze the key points. They cannot be changed afterwards.", key="kp_confirm"
+    )
+    if st.button(
+        "Freeze key points",
+        key="kp_freeze",
+        disabled=not confirm or any(x not in points for x in ids),
+    ):
+        try:
+            scoring.freeze_key_points(s, items)
+        except (ValueError, PermissionError) as error:
+            st.error(str(error))
+            return
+        st.session_state["scoring_frozen_now"] = True
+        st.rerun()
+
+
+def key_point_inputs(
+    s: scoring.ScoringSet,
+    items: list[dict],
+    ids: list[str],
+    qid: str,
+    saved: list[str],
+    read_only: bool,
+) -> None:
     texts = [
         st.text_input(
             point_label(n),
@@ -124,25 +161,6 @@ def key_points_step(s: scoring.ScoringSet, items: list[dict], read_only: bool) -
             return
         rest = [x for x in ids if x not in scoring.load_key_points(s)]
         st.session_state["kp_goto"] = rest[0] if rest else qid
-        st.rerun()
-    if read_only:
-        st.info("The key points are frozen.")
-        return
-    st.divider()
-    confirm = st.checkbox(
-        "Freeze the key points. They cannot be changed afterwards.", key="kp_confirm"
-    )
-    if st.button(
-        "Freeze key points",
-        key="kp_freeze",
-        disabled=not confirm or any(x not in points for x in ids),
-    ):
-        try:
-            scoring.freeze_key_points(s, items)
-        except (ValueError, PermissionError) as error:
-            st.error(str(error))
-            return
-        st.session_state["scoring_frozen_now"] = True
         st.rerun()
 
 
@@ -199,6 +217,8 @@ def form(
         if declines and skipped:
             continue
         default = None if declined_before and skipped else stored.get(check)
+        if check in GROUPS:
+            st.markdown(f"**{GROUPS[check]}**")
         answers[check] = control(
             QUESTIONS[check], rules.CHECKS[check], default, f"{s.name}|{code}|{check}", locked
         )
@@ -206,11 +226,9 @@ def form(
     checks = rules.declined(answers | {"points": marks}, len(key_points)) if answered else None
     if checks:
         values = rules.derive(checks)
-        st.markdown(
-            "| " + " | ".join(LABELS[c] for c in RUBRIC_CRITERIA) + " |\n"
-            "|" + "---:|" * len(RUBRIC_CRITERIA) + "\n"
-            "| " + " | ".join(str(values[c]) for c in RUBRIC_CRITERIA) + " |"
-        )
+        rows = ["| Score | |", "|---|---:|"]
+        rows += [f"| {LABELS[c]} | {values[c]} |" for c in RUBRIC_CRITERIA]
+        st.markdown("\n".join(rows))
     else:
         st.caption("The five scores appear once every check is answered.")
     notes = st.text_input(
