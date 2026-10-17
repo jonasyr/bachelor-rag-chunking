@@ -47,6 +47,10 @@ SCORING_SHEET_FILE = DATA_EVAL / "scoring_sheet.csv"
 SCORING_PACKET_FILE = DATA_EVAL / "scoring_packet.md"
 SCORING_KEY_FILE = DATA_EVAL / "scoring_key.csv"
 SCORING_ITEMS_FILE = DATA_EVAL / "scoring_items.jsonl"  # blind items for the scoring page (D34)
+KEY_POINTS_FILE = (
+    DATA_EVAL / "key_points.csv"
+)  # key points per question, frozen before scoring (D35)
+SCORING_CHECKS_FILE = DATA_EVAL / "scoring_checks.csv"  # checks behind every derived score (D35)
 # Retrieval metrics per question, strategy and relevance rule (src/evaluate_retrieval.py, D12)
 RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
 CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)
@@ -254,4 +258,7 @@ CONTEXT_SEPARATOR = "\n---\n"  # between the excerpts; each starts with "[Excerp
 # ---------------------------------------------------------------------------
 RUBRIC_CRITERIA = ["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]
 RUBRIC_MAX_SCORE = 2
+KEY_POINTS_MAX = 4  # key points per question; point 1 is the core point (D35)
+RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completeness 1 (D35)
+RUBRIC_RULES_VERSION = "2026-10-17"  # version of the rules in src/scoring_rules.py (D35)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
