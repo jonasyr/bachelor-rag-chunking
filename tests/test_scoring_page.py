@@ -5,6 +5,7 @@ from conftest import SCORING_CODES, write_scoring_set
 from streamlit.testing.v1 import AppTest
 
 import catalogue_store as store
+import scoring_rules as rules
 import scoring_store as scoring
 from atomic_csv import read_csv
 from evaluate_answers import SHEET_HEADER
@@ -27,6 +28,21 @@ def dirs(tmp_path, monkeypatch):
     return main, pilot
 
 
+def title(at):
+    return next(h.proto.body for h in at.get("html") if "slot-title" in h.proto.body)
+
+
+ANSWER_TEXT = "Answer H01-B."  # write_scoring_set: answers are "Answer <code>."
+
+
+def freeze(folder):
+    (s,) = scoring.scoring_sets()
+    items = scoring.load_items(s)
+    scoring.save_key_points(s, items, "H01", ["Core one"])
+    scoring.save_key_points(s, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(s, items)
+
+
 @pytest.fixture
 def page(dirs):
     write_scoring_set(dirs[1] / "hard")
@@ -35,53 +51,115 @@ def page(dirs):
     return at, dirs[1] / "hard"
 
 
-def title(at):
-    return next(h.proto.body for h in at.get("html") if "slot-title" in h.proto.body)
+@pytest.fixture
+def scoring_page(dirs):
+    write_scoring_set(dirs[1] / "hard")
+    freeze(dirs[1] / "hard")
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    return at, dirs[1] / "hard"
 
 
-def score_all(at, value=2, count=5):
-    for group in at.button_group[:count]:
-        group.set_value(value)
+def answer_all(at, code, n_points, **changed):
+    """Answer every shown check of `code` with a flawless answer unless `changed`."""
+    good = {
+        "declines": "no",
+        "core_wrong": "no",
+        "other_error": "no",
+        "grounded": "all",
+        "hallucination": "none",
+        "answers_question": "yes",
+        "direct": "yes",
+        "wordy": "no",
+    }
+    for n in range(1, n_points + 1):
+        at.button_group(key=f"Pilot: hard|{code}|point_{n}").set_value("covered")
+    for check, value in (good | changed).items():
+        key = f"Pilot: hard|{code}|{check}"
+        if any(g.key == key for g in at.button_group):
+            at.button_group(key=key).set_value(value)
     at.run()
 
 
-def test_opens_the_first_unscored_answer(page):
+def test_before_the_freeze_the_page_opens_on_key_points_without_answers(page):
     at, _ = page
     assert not at.exception
-    assert "H01, answer B" in title(at)
-    assert "question 1 of 2" in title(at)
-    assert any(m.value == "**0 of 6 scored**" for m in at.sidebar.markdown)
+    assert at.segmented_control(key="scoring_step|Pilot: hard").value == "Key points"
+    bodies = " ".join(h.proto.body for h in at.get("html")) + " ".join(m.value for m in at.markdown)
+    assert ANSWER_TEXT not in bodies and "Excerpt one" not in bodies
+    assert "Question H01?" in bodies
 
 
-def test_save_and_next_writes_the_sheet_and_moves_on(page):
+def test_key_points_are_saved_and_freezing_opens_scoring(page):
     at, folder = page
-    score_all(at)
-    at.text_input(key="Pilot: hard|H01-B|notes").input("misses watch").run()
+    at.text_input(key="kp|Pilot: hard|H01|1").input("Core one").run()
+    at.button(key="kp_save").click().run()
+    at.text_input(key="kp|Pilot: hard|H02|1").input("Core two").run()
+    at.button(key="kp_save").click().run()
+    assert (folder / "key_points.csv").exists()
+    at.checkbox(key="kp_confirm").check().run()
+    at.button(key="kp_freeze").click().run()
+    assert not at.exception
+    assert (folder / "runs.jsonl").exists()
+    assert at.segmented_control(key="scoring_step|Pilot: hard").value == "Score"
+    assert "H01, answer B" in title(at)
+
+
+def test_freeze_is_disabled_until_every_question_has_key_points(page):
+    at, _ = page
+    at.checkbox(key="kp_confirm").check().run()
+    assert at.button(key="kp_freeze").disabled
+
+
+def test_scoring_through_the_checks_writes_the_derived_scores(scoring_page):
+    at, folder = scoring_page
+    assert at.segmented_control(key="scoring_step|Pilot: hard").value == "Score"
+    answer_all(at, "H01-B", 1, wordy="yes")
     at.button(key="scoring_save").click().run()
     row = read_csv(folder / "scoring_sheet.csv", SHEET_HEADER)[0]
-    assert row["code"] == "H01-B" and row["correctness"] == "2" and row["notes"] == "misses watch"
+    assert row["code"] == "H01-B" and row["clarity"] == "1" and row["correctness"] == "2"
     assert "H01, answer A" in title(at)
-    assert any(m.value == "**1 of 6 scored**" for m in at.sidebar.markdown)
 
 
-def test_save_is_disabled_until_every_criterion_is_set(page):
-    at, _ = page
-    score_all(at, count=4)
+def test_save_is_disabled_until_every_shown_check_is_answered(scoring_page):
+    at, _ = scoring_page
+    at.button_group(key="Pilot: hard|H01-B|point_1").set_value("covered").run()
     assert at.button(key="scoring_save").disabled
 
 
-def test_saving_the_last_answer_reports_everything_scored(page):
-    at, _ = page
-    for _ in SCORING_CODES:
-        score_all(at)
+def test_declining_hides_the_skipped_checks_and_reopening_asks_them_again(scoring_page):
+    at, folder = scoring_page
+    at.button_group(key="Pilot: hard|H01-B|declines").set_value("yes").run()
+    keys = {g.key for g in at.button_group}
+    assert "Pilot: hard|H01-B|point_1" not in keys
+    for check in rules.SKIPPED_WHEN_DECLINING:
+        assert f"Pilot: hard|H01-B|{check}" not in keys
+    for check in ("answers_question", "direct", "wordy"):
+        at.button_group(key=f"Pilot: hard|H01-B|{check}").set_value(
+            {"wordy": "no"}.get(check, "yes")
+        )
+    at.run()
+    at.button(key="scoring_save").click().run()
+    row = read_csv(folder / "scoring_sheet.csv", SHEET_HEADER)[0]
+    assert (row["correctness"], row["completeness"], row["groundedness"]) == ("1", "0", "2")
+    at.selectbox(key="scoring_code|Pilot: hard").set_value("H01-B").run()
+    at.button_group(key="Pilot: hard|H01-B|declines").set_value("no").run()
+    assert at.button_group(key="Pilot: hard|H01-B|core_wrong").value is None
+    assert at.button(key="scoring_save").disabled
+
+
+def test_saving_the_last_answer_reports_everything_scored(scoring_page):
+    at, _ = scoring_page
+    points = {"H01": 1, "H02": 2}
+    for code in SCORING_CODES:
+        answer_all(at, code, points[code.split("-")[0]])
         at.button(key="scoring_save").click().run()
     assert not at.exception
     assert any(m.value == "**6 of 6 scored**" for m in at.sidebar.markdown)
-    assert any("Everything is scored" in c.value for c in at.sidebar.caption)
 
 
-def test_read_only_after_unblinding(page):
-    at, folder = page
+def test_read_only_after_unblinding(scoring_page):
+    at, folder = scoring_page
     (folder / "scores.csv").write_text("unblinded", encoding="utf-8")
     at.run()
     assert any("read-only" in i.value for i in at.info)
@@ -116,6 +194,7 @@ def test_the_router_offers_the_scoring_page(dirs, corpus_files, tmp_path, monkey
     monkeypatch.setattr(store, "SECTIONS_FILE", sections)
     monkeypatch.setattr(store, "CATALOGUE_PLAN_FILE", tmp_path / "missing_plan.csv")
     write_scoring_set(dirs[1] / "hard")
+    freeze(dirs[1] / "hard")
     at = AppTest.from_file(str(APP / "catalogue_editor.py"), default_timeout=60)
     at.run()
     at.switch_page("scoring_page.py").run()

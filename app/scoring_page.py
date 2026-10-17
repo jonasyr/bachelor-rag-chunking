@@ -1,8 +1,10 @@
-"""Scoring page (ADR 0032, 0034): blind rubric scoring of the generated answers.
+"""Scoring page (ADR 0032, 0034, 0035): blind, rule-based rubric scoring of the generated answers.
 
-Shows only a set's blind item file and its scoring sheet: no strategy, no chunk ID, and the key
-stays closed. All reading and writing goes through src/scoring_store.py. Opened through the
-router app/catalogue_editor.py.
+Two steps: Key points (per question only the question and its reference answer, then frozen)
+and Score (factual checks per answer; the five scores follow from src/scoring_rules.py). Shows
+only a set's blind item file and its scoring sheet: no strategy, no chunk ID, and the key stays
+closed. All reading and writing goes through src/scoring_store.py. Opened through the router
+app/catalogue_editor.py.
 """
 
 import html
@@ -16,10 +18,11 @@ sys.path.insert(0, str(APP_DIR))
 import streamlit as st  # noqa: E402
 from ui_theme import SCORING_CSS  # noqa: E402
 
+import scoring_rules as rules  # noqa: E402
 import scoring_store as scoring  # noqa: E402
-from config import RUBRIC_CRITERIA, RUBRIC_MAX_SCORE  # noqa: E402
+from config import KEY_POINTS_MAX, RUBRIC_CRITERIA  # noqa: E402
 
-SCORES = list(range(RUBRIC_MAX_SCORE + 1))
+STEPS = ["Key points", "Score"]
 LABELS = {
     "correctness": "Correctness",
     "completeness": "Completeness",
@@ -27,18 +30,18 @@ LABELS = {
     "no_hallucination": "Free of hallucination",
     "clarity": "Clarity",
 }
-# English rendering of the rubric in docs/reference/evaluation.md (scores 0, 1, 2)
-ANCHORS = {
-    "correctness": ("wrong", "partly correct", "correct"),
-    "completeness": ("key points missing", "partly complete", "complete"),
-    "groundedness": ("not supported", "partly supported", "clearly supported by the excerpts"),
-    "no_hallucination": (
-        "false or unsupported claims",
-        "small unsupported additions",
-        "no hallucinations",
-    ),
-    "clarity": ("unclear", "understandable with weaknesses", "clear and precise"),
+# the checks of ADR 0035 as the form asks them (docs/reference/evaluation.md)
+QUESTIONS = {
+    "declines": "Does the answer say the excerpts do not contain the answer, and give none?",
+    "core_wrong": "Does it state the core point wrongly or contradict it?",
+    "other_error": "Is any other statement factually wrong?",
+    "grounded": "How many of its statements are backed by the excerpts?",
+    "hallucination": "Does it contain anything that neither the excerpts nor the reference cover?",
+    "answers_question": "Does it address what was asked?",
+    "direct": "Is the answer given directly, in the first two sentences?",
+    "wordy": "Is it repetitive, padded or confusing?",
 }
+OPTION_LABELS = {"minor": "Minor addition"}
 SUMMARISE = (
     "Everything is scored. Unblind with `uv run python src/evaluate_answers.py --mode summarise`"
     " (for a pilot set add `--set DIR --limit N` as in scaffold)."
@@ -68,48 +71,169 @@ def page(text: str) -> None:
     st.html(f'<div class="formatted inert">{scoring.text_html(text)}</div>')
 
 
-def form(s: scoring.ScoringSet, item: dict, saved: dict, codes: list[str], locked: bool) -> None:
-    code = item["code"]
+def question_cards(question: str, reference: str) -> None:
     st.markdown("**Question**")
-    st.html(f'<div class="context inert">{scoring.text_html(item["question"])}</div>')
+    st.html(f'<div class="context inert">{scoring.text_html(question)}</div>')
     st.markdown("**Reference answer**")
-    st.html(
-        f'<div class="context reference inert">{scoring.text_html(item["reference_answer"])}</div>'
+    st.html(f'<div class="context reference inert">{scoring.text_html(reference)}</div>')
+
+
+def point_label(n: int) -> str:
+    return "Core point" if n == 1 else f"Point {n}"
+
+
+def key_points_step(s: scoring.ScoringSet, items: list[dict], read_only: bool) -> None:
+    """Write the key points per question; never shows an answer or an excerpt (ADR 0035)."""
+    qs = scoring.questions(items)
+    points = scoring.load_key_points(s)
+    ids = [q["question_id"] for q in qs]
+    with st.sidebar:
+        done = sum(q in points for q in ids)
+        st.markdown(f"**{done} of {len(ids)} questions have key points**")
+        st.progress(done / len(ids) if ids else 0.0)
+    pick_key = f"kp_question|{s.name}"
+    if "kp_goto" in st.session_state:  # set by a button; allowed before the widget exists
+        st.session_state[pick_key] = st.session_state.pop("kp_goto")
+    if st.session_state.get(pick_key) not in ids:
+        st.session_state[pick_key] = next((q for q in ids if q not in points), ids[0])
+    qid = st.selectbox(
+        "Question",
+        ids,
+        key=pick_key,
+        format_func=lambda q: f"{q}, done" if q in points else q,
     )
-    values = {}
-    for criterion in RUBRIC_CRITERIA:
-        values[criterion] = st.segmented_control(
-            LABELS[criterion],
-            SCORES,
-            default=saved["values"][criterion],
-            key=f"{s.name}|{code}|{criterion}",
-            disabled=locked,
+    q = qs[ids.index(qid)]
+    question_cards(q["question"], q["reference_answer"])
+    saved = points.get(qid, [])
+    texts = [
+        st.text_input(
+            point_label(n),
+            value=saved[n - 1] if n <= len(saved) else "",
+            key=f"kp|{s.name}|{qid}|{n}",
+            disabled=read_only,
+            help="The direct answer to the question" if n == 1 else None,
         )
-        anchors = ANCHORS[criterion]
-        chosen = values[criterion]
-        st.caption(
-            anchors[chosen].capitalize()
-            if chosen is not None
-            else ", ".join(f"{n} {a}" for n, a in zip(SCORES, anchors, strict=True))
+        for n in range(1, KEY_POINTS_MAX + 1)
+    ]
+    filled = [t for t in texts if t.strip()]
+    if st.button("Save and next", key="kp_save", type="primary", disabled=read_only or not filled):
+        try:
+            scoring.save_key_points(s, items, qid, filled)
+        except (ValueError, PermissionError) as error:
+            st.error(str(error))
+            return
+        rest = [x for x in ids if x not in scoring.load_key_points(s)]
+        st.session_state["kp_goto"] = rest[0] if rest else qid
+        st.rerun()
+    if read_only:
+        st.info("The key points are frozen.")
+        return
+    st.divider()
+    confirm = st.checkbox(
+        "Freeze the key points. They cannot be changed afterwards.", key="kp_confirm"
+    )
+    if st.button(
+        "Freeze key points",
+        key="kp_freeze",
+        disabled=not confirm or any(x not in points for x in ids),
+    ):
+        try:
+            scoring.freeze_key_points(s, items)
+        except (ValueError, PermissionError) as error:
+            st.error(str(error))
+            return
+        st.session_state["scoring_frozen_now"] = True
+        st.rerun()
+
+
+def control(label: str, options: tuple[str, ...], default, key: str, locked: bool):
+    return st.segmented_control(
+        label,
+        list(options),
+        default=default,
+        key=key,
+        disabled=locked,
+        format_func=lambda o: OPTION_LABELS.get(o, o.capitalize()),
+    )
+
+
+def form(
+    s: scoring.ScoringSet,
+    item: dict,
+    saved_notes: str,
+    saved_checks: dict | None,
+    key_points: list[str],
+    codes: list[str],
+    locked: bool,
+) -> None:
+    code = item["code"]
+    question_cards(item["question"], item["reference_answer"])
+    stored = saved_checks or {}
+    # checks skipped while the answer was declining were never asked: they start empty
+    declined_before = stored.get("declines") == "yes"
+    answers = {
+        "declines": control(
+            QUESTIONS["declines"],
+            rules.CHECKS["declines"],
+            stored.get("declines"),
+            f"{s.name}|{code}|declines",
+            locked,
         )
+    }
+    declines = answers["declines"] == "yes"
+    marks = []
+    if not declines:
+        st.markdown("**Key points**")
+        for n, text in enumerate(key_points, start=1):
+            marks.append(
+                control(
+                    f"{point_label(n)}: {text}",
+                    rules.POINT_MARKS,
+                    None if declined_before or not stored else stored["points"][n - 1],
+                    f"{s.name}|{code}|point_{n}",
+                    locked,
+                )
+            )
+    for check in list(rules.CHECKS)[1:]:
+        skipped = check in rules.SKIPPED_WHEN_DECLINING
+        if declines and skipped:
+            continue
+        default = None if declined_before and skipped else stored.get(check)
+        answers[check] = control(
+            QUESTIONS[check], rules.CHECKS[check], default, f"{s.name}|{code}|{check}", locked
+        )
+    answered = all(v is not None for v in answers.values()) and None not in marks
+    checks = rules.declined(answers | {"points": marks}, len(key_points)) if answered else None
+    if checks:
+        values = rules.derive(checks)
+        st.markdown(
+            "| " + " | ".join(LABELS[c] for c in RUBRIC_CRITERIA) + " |\n"
+            "|" + "---:|" * len(RUBRIC_CRITERIA) + "\n"
+            "| " + " | ".join(str(values[c]) for c in RUBRIC_CRITERIA) + " |"
+        )
+    else:
+        st.caption("The five scores appear once every check is answered.")
     notes = st.text_input(
-        "Notes", value=saved["notes"], key=f"{s.name}|{code}|notes", disabled=locked
+        "Notes",
+        value=saved_notes,
+        key=f"{s.name}|{code}|notes",
+        disabled=locked,
+        placeholder="e.g. a rule did not fit",
     )
     back, forward = st.columns(2)
     position = codes.index(code)
     if back.button("Previous", key="scoring_previous", disabled=position == 0, width="stretch"):
         st.session_state["scoring_goto"] = codes[position - 1]
         st.rerun()
-    incomplete = any(v is None for v in values.values())
     if forward.button(
         "Save and next",
         key="scoring_save",
         type="primary",
-        disabled=locked or incomplete,
+        disabled=locked or checks is None,
         width="stretch",
     ):
         try:
-            scoring.save_score(s, code, values, notes)
+            scoring.save_score(s, code, checks, notes)
         except (ValueError, PermissionError) as error:
             st.error(str(error))
             return
@@ -131,13 +255,27 @@ def main() -> None:
     s = choose_set(sets)
     try:
         items, scores = scoring.load_items(s), scoring.load_scores(s)
+        key_points, checks = scoring.load_key_points(s), scoring.load_checks(s)
     except (FileNotFoundError, ValueError) as error:
         st.error(str(error))
         return
-    sidebar(items, scores)
     locked = scoring.is_read_only(s)
     if locked:
         st.info("The scores of this set were unblinded (scores.csv exists), so it is read-only.")
+    frozen = scoring.is_frozen(s)
+    step_key = f"scoring_step|{s.name}"
+    if st.session_state.pop("scoring_frozen_now", False) or step_key not in st.session_state:
+        st.session_state[step_key] = "Score" if frozen else "Key points"
+    step = st.segmented_control(
+        "Step", STEPS, key=step_key, label_visibility="collapsed", required=True
+    )
+    if step == "Key points" or not frozen:
+        if step == "Score":
+            st.caption("Scoring opens once the key points are frozen.")
+        key_points_step(s, items, frozen or locked)
+        return
+
+    sidebar(items, scores)
     codes = [i["code"] for i in items]
     key = f"scoring_code|{s.name}"
     if "scoring_goto" in st.session_state:  # set by a button; allowed before the widget exists
@@ -173,7 +311,15 @@ def main() -> None:
             with tab:
                 page(text)
     with side:
-        form(s, item, scores[code], codes, locked)
+        form(
+            s,
+            item,
+            scores[code]["notes"],
+            checks.get(code),
+            key_points.get(item["question_id"], []),
+            codes,
+            locked,
+        )
 
 
 main()
