@@ -19,9 +19,10 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    Datei wird nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md))
 6. Auswerten: `uv run python src/evaluate_retrieval.py` und `uv run python src/evaluate_retrieval.py --control`; für die Rubrik
    `uv run python src/evaluate_answers.py --mode scaffold`, dann blind bewerten
-   ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `data/evaluation/scoring_packet.md` lesen und je Code
-   `data/evaluation/scoring_sheet.csv` ausfüllen (0–2 je Kriterium, `notes` frei), `scoring_key.csv` dabei nicht
-   öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
+   ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md), [ADR 0034](../adr/0034-bewertung-in-der-app.md)): in der App
+   (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“) je Code 0–2 je Kriterium
+   eintragen (`notes` frei). Lesepaket `data/evaluation/scoring_packet.md` und Bogen `data/evaluation/scoring_sheet.csv`
+   nur noch für die Zweitbewertung oder ohne App; `scoring_key.csv` dabei nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
 
 Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Datenformate](../reference/data-formats.md).
 

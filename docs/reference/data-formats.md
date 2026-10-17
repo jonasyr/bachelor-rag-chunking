@@ -235,6 +235,10 @@ code,question_id,strategy
 Q001-A,Q001,C3
 ```
 
+**`scoring_items.jsonl`** (Daten der Bewertungsseite, [ADR 0034](../adr/0034-bewertung-in-der-app.md); nicht
+versioniert): eine Zeile je Code in der Reihenfolge des Lesepakets mit `code`, `question_id`, `question`,
+`reference_answer`, `answer` und `excerpts` (Texte der Passagen in Rangfolge, ohne Chunk-IDs); keine Strategie.
+
 **`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach
 `question_id` und Strategie; Kriterien-Spalten = `config.RUBRIC_CRITERIA`, `total_score` = Mittel der Kriterien mit
 einer Nachkommastelle, nach [Evaluation](evaluation.md#antwort-evaluation-rubrik-02))
@@ -257,7 +261,7 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
 | `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
 | `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
-| `scoring_packet.md`, `scores.csv` | Lesepaket, entblindete Bewertung | nein |
+| `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 
 | Set | Inhalt |
