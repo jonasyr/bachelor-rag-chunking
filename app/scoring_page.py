@@ -152,8 +152,17 @@ def key_point_inputs(
         )
         for n in range(1, KEY_POINTS_MAX + 1)
     ]
+    used = [bool(t.strip()) for t in texts]
     filled = [t for t in texts if t.strip()]
-    if st.button("Save and next", key="kp_save", type="primary", disabled=read_only or not filled):
+    # point 1 is the core point: never renumber a later point into its place
+    contiguous = bool(filled) and used == [True] * len(filled) + [False] * (
+        len(texts) - len(filled)
+    )
+    if filled and not contiguous:
+        st.caption("Fill the core point first and the other points in order, without gaps.")
+    if st.button(
+        "Save and next", key="kp_save", type="primary", disabled=read_only or not contiguous
+    ):
         try:
             scoring.save_key_points(s, items, qid, filled)
         except (ValueError, PermissionError) as error:

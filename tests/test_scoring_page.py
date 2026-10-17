@@ -220,3 +220,13 @@ def test_a_question_added_after_the_freeze_shows_an_error_not_a_traceback(scorin
     at.selectbox(key="scoring_code|Pilot: hard").set_value("H03-A").run()
     assert not at.exception
     assert any("H03" in e.value and "key points" in e.value for e in at.error)
+
+
+@pytest.mark.parametrize("filled", [(2,), (1, 3)])
+def test_key_points_need_a_core_point_and_no_gaps(page, filled):
+    at, folder = page
+    for n in filled:
+        at.text_input(key=f"kp|Pilot: hard|H01|{n}").input(f"Point {n} text").run()
+    assert at.button(key="kp_save").disabled
+    assert any("without gaps" in c.value for c in at.caption)
+    assert not (folder / "key_points.csv").exists()
