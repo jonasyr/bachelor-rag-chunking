@@ -2,7 +2,8 @@
 
 Flow and layout: `docs/explanation/research-design.md`, `docs/reference/tooling.md` (repo tree, script options);
 data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`, `docs/how-to/run-the-experiment.md`.
-- Stub (`raise NotImplementedError`): only `generate.py`; all other `src/*.py` are implemented and tested.
+- No stubs left: every `src/*.py` is implemented and tested. `generate.py` (ADR 0033) never overwrites
+  `generated_answers.csv`; tests use a fake completer, never the API (`tests/test_generate.py`).
   `evaluate_retrieval.py` recomputes relevance from chunks and refuses results whose `is_relevant` disagrees. Status and next step: `docs/plan.md#stand`.
 - Question catalogue: `src/catalogue.py` (sections/find/show/check/freeze), how-to
   `docs/how-to/build-the-question-catalogue.md`; `retrieve.py` refuses the main catalogue until

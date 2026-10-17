@@ -190,7 +190,12 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 - **Konstruktvalidität:** etablierte Metriken, transparente Rubrik, Bewertungsbeispiele; eine Zweitbewertung von
   10–20 % der Antworten wird empfohlen ([ADR 0007](../adr/0007-triangulation.md)).
 - **Reliabilität:** Temperatur 0, Rohdaten speichern, Modellversionen dokumentieren, fixierter Snapshot, Prompts
-  veröffentlichen.
+  veröffentlichen. Temperatur 0 verringert die Zufälligkeit, garantiert aber keine identischen Ausgaben; deshalb werden
+  die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)).
+- **Generator:** Das Antwortmodell antwortet direkt, ohne verdecktes Reasoning (Effort `none`, die Voraussetzung für
+  Temperatur 0). Die Ergebnisse gelten für einen solchen Generator; ein Reasoning-Modell könnte schwache Kontexte
+  teilweise ausgleichen, sodass die Unterschiede zwischen den Strategien kleiner ausfielen
+  ([ADR 0033](../adr/0033-antwortmodell.md)).
 
 ## Prompt-Gestaltung
 

@@ -44,7 +44,7 @@ uv run python src/chunking.py      # 4. chunk C1–C3 and the control K1
 uv run python src/embed.py         # 5. embed, build Chroma indices
 uv run python src/retrieve.py      # 6. retrieve (all strategies), then the control:
 uv run python src/retrieve.py --control
-uv run python src/generate.py      # 7. generate answers            (stub)
+uv run python src/generate.py      # 7. generate answers C1–C3 once (needs OPENAI_API_KEY)
 uv run python src/evaluate_retrieval.py                          # 8a. retrieval metrics, then the control:
 uv run python src/evaluate_retrieval.py --control
 uv run python src/evaluate_answers.py --mode scaffold            # 8b. blind scoring: read the packet, fill the sheet

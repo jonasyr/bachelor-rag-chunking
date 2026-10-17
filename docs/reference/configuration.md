@@ -34,7 +34,8 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
 | `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
-| `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten | – |
+| `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten (nie überschrieben) | [ADR 0033](../adr/0033-antwortmodell.md) |
+| `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll von `generate.py` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen mit Strategie (abgeleitet aus Bogen und Schlüssel) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_PACKET_FILE` | `data/evaluation/scoring_packet.md` | Lesepaket der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
@@ -134,9 +135,12 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `EMBEDDING_DIMENSIONS` | `3072` | Vektordimension (Modellstandard) | [ADR 0023](../adr/0023-embedding-modell.md) |
 | `EMBEDDING_BATCH_SIZE` | `100` | Texte je API-Anfrage (API-Grenze: ≤ 2.048 Eingaben, ≤ 300.000 Tokens) | [ADR 0023](../adr/0023-embedding-modell.md) |
 | `EMBEDDING_PRICE_PER_MTOK` | `0.13` | USD je 1 Mio. Eingabe-Tokens (OpenAI-Modellseite, abgerufen 13.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0023](../adr/0023-embedding-modell.md) |
-| `LLM_MODEL` | `"gpt-4o"` | **Platzhalter**; exakter Snapshot wird bei der Umsetzung von `generate.py` gepinnt | [ADR 0016](../adr/0016-modell-neutralitaet.md) |
+| `LLM_MODEL` | `"gpt-6-luna"` | Antwortmodell, gepinnt 17.10.2026 (nur als Alias angeboten, daher Antworten einmal erzeugen) | [ADR 0016](../adr/0016-modell-neutralitaet.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `LLM_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_TEMPERATURE` | `0.0` | konstant für Reproduzierbarkeit | [ADR 0014](../adr/0014-temperatur-und-topk.md) |
-| `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge | – |
+| `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
+| `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung, wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht beide) | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
 
 ## Evaluation
 

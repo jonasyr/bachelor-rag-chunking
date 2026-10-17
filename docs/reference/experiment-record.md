@@ -251,7 +251,7 @@ in `runs.jsonl` schreibt.
 
 | Komponente | Version | Datum der ersten Nutzung |
 |---|---|---|
-| LLM | | |
+| LLM | `gpt-6-luna`, Effort `none`, Temperatur 0, höchstens 1.024 Ausgabe-Tokens ([ADR 0033](../adr/0033-antwortmodell.md)); gemeldetes Modell: nach dem ersten Lauf aus `model_reported` eintragen | gepinnt 17.10.2026; erste Nutzung: nach dem ersten Lauf eintragen |
 | Embedding-Modell | `text-embedding-3-large`, 3.072 Dimensionen ([ADR 0023](../adr/0023-embedding-modell.md)) | 13.10.2026 |
 | OpenAI Python SDK | 2.44.0 | 13.10.2026 |
 | ChromaDB | 1.5.9 | 13.10.2026 |
