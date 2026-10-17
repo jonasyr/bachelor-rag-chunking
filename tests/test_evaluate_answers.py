@@ -679,3 +679,13 @@ def test_summarise_refuses_a_malformed_checks_sequence(files, change, message):
     with pytest.raises(ValueError, match=message):
         run_summarise(files)
     assert not files["scores_file"].exists()
+
+
+def test_summarise_requires_the_checks_once_key_points_are_frozen(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    freeze_points(files)
+    assert not files["checks_file"].exists()
+    with pytest.raises(ValueError, match="scoring_checks.csv"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()

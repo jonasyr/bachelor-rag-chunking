@@ -325,13 +325,18 @@ def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
 def check_derived(
     sheet_file: Path, checks_file: Path, key_points_file: Path, runs_file: Path
 ) -> None:
-    """With a checks file (ADR 0035): the key points are the frozen ones, every checks row marks
-    as many points as its question has, and every sheet row equals the scores its checks derive
-    under the current rules, so neither a hand-edited score, changed key points nor an older rule
-    version can be unblinded."""
-    if not checks_file.exists():
-        return
+    """Once key points are frozen or a checks file exists (ADR 0035): the checks file exists, the
+    key points are the frozen ones, every checks row marks as many points as its question has,
+    and every sheet row equals the scores its checks derive under the current rules, so neither a
+    hand-edited score, changed key points nor an older rule version can be unblinded."""
     record = latest_run(runs_file, "key_points", ",".join(STRATEGY_IDS))
+    if not checks_file.exists():
+        if record is not None:  # a rule-based run: its scores must come from the checks
+            raise ValueError(
+                f"the key points are frozen ({runs_file}) but {checks_file} is missing; restore it "
+                "from git"
+            )
+        return
     if record is None:
         raise ValueError(f"{checks_file} exists but the key points are not frozen ({runs_file})")
     frozen = record["outputs_sha256"].get(key_points_file.name)
