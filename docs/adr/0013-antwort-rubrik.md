@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D13 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
+Angenommen (D13 im Leitfaden; Quelle: Exposé/Baseline, übernommen; Stufen operationalisiert durch [ADR 0035](0035-regelbasierte-bewertung.md))
 
 ## Kontext
 

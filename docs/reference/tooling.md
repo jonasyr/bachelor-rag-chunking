@@ -89,7 +89,7 @@ Nach `.gitignore`:
 | `data/raw/vue_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
 | `chroma_db/` | ignoriert (ganzer Ordner, kein `.gitkeep`; entsteht beim ersten `embed.py`) |
 | `data/evaluation/retrieved_results*.csv`, `retrieval_scores*.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `query_embeddings.npz` | ignoriert |
-| `data/evaluation/generated_answers.csv` (Primärdaten, nicht exakt wiederholbar, [ADR 0033](../adr/0033-antwortmodell.md)), `scoring_sheet.csv`, `scoring_key.csv` (Primärdaten der Bewertung) | versioniert |
+| `data/evaluation/generated_answers.csv` (Primärdaten, nicht exakt wiederholbar, [ADR 0033](../adr/0033-antwortmodell.md)), `scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` (Primärdaten der Bewertung) | versioniert |
 | `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `catalogue_freeze.json`, `generation_runs.jsonl` | versioniert |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | ignoriert; alle übrigen Pilotdateien versioniert |
 | `*.pdf` | ignoriert, außer `output/figures/*.pdf` |

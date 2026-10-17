@@ -41,6 +41,8 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `SCORING_PACKET_FILE` | `data/evaluation/scoring_packet.md` | Lesepaket der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_KEY_FILE` | `data/evaluation/scoring_key.csv` | Schlüssel Code → Strategie | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_ITEMS_FILE` | `data/evaluation/scoring_items.jsonl` | blinde Einträge der Bewertungsseite | [ADR 0034](../adr/0034-bewertung-in-der-app.md) |
+| `KEY_POINTS_FILE` | `data/evaluation/key_points.csv` | Kernpunkte je Frage, vor der Bewertung eingefroren | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
+| `SCORING_CHECKS_FILE` | `data/evaluation/scoring_checks.csv` | Antworten auf die Prüffragen je Code | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 
 Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 
@@ -150,4 +152,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 |---|---|---|---|
 | `RUBRIC_CRITERIA` | `["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]` | Rubrik-Kriterien = Spalten in `scores.csv` | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
+| `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
+| `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
+| `RUBRIC_RULES_VERSION` | `"2026-10-17"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |

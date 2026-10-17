@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (17.10.2026; ergänzt [ADR 0032](0032-blinde-rubrik-bewertung.md))
+Angenommen (17.10.2026; ergänzt [ADR 0032](0032-blinde-rubrik-bewertung.md); ergänzt durch [ADR 0035](0035-regelbasierte-bewertung.md))
 
 ## Kontext
 
