@@ -1,0 +1,13 @@
+question_id,point,text
+H01,1,Use the defineModel() macro in the child (Vue 3.4+)
+H01,2,the compiler expands it to a modelValue prop and an update:modelValue event that is emitted when the local ref is mutated.
+H02,1,No: computed getters must be free of side effects such as async requests
+H02,2,"use a watcher (watch), which runs a callback with side effects when reactive state changes."
+H03,1,"Use the v-html directive, since mustaches render plain text"
+H03,2,"rendering untrusted HTML enables XSS, so only use v-html on content known to be safe."
+H04,1,Yes: export a reactive() object from a module and import it in each component
+H04,2,"with SSR this singleton store is shared across requests, which causes cross-request state pollution."
+H05,1,"defineAsyncComponent accepts a loadingComponent option, but async components are suspensible: inside <Suspense> their own loading, error, delay and timeout options are ignored and the Suspense #fallback slot is shown, unless suspensible: false is set."
+H06,1,Reactive props destructure is supported from Vue 3.5 on.
+H07,1,Pass the option { once: true } (Vue 3.4+).
+H08,1,"Name composables in camelCase starting with ""use"", e.g. useMouse."
