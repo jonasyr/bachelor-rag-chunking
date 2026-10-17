@@ -28,4 +28,6 @@ existiert, ist der Bogen in der App schreibgeschützt.
 - Neutral: Lesepaket und Bogen bleiben für die Zweitbewertung ohne App erhalten.
 - Schlecht: Eine weitere abgeleitete Datei, die zu Bogen und Schlüssel passen muss; die App prüft, dass die Codes
   übereinstimmen. Geht sie verloren, schreibt ein erneutes `scaffold` mit gleichem Schlüssel nur Lesepaket und
-  Einträge neu und lässt den Bogen mit den Bewertungen unverändert (Hinweis aus dem Abschluss-Review).
+  Einträge neu und lässt den Bogen mit den Bewertungen unverändert (Hinweis aus dem Abschluss-Review), aber nur, wenn
+  die neuen Einträge byte-gleich zu denen sind, deren Prüfsumme das erste `scaffold` im Laufprotokoll vermerkt hat; so
+  geraten Bewertungen nie an neu erzeugte Antworten (Review von PR #17).

@@ -505,3 +505,40 @@ def test_scaffold_with_another_key_still_refuses_the_existing_sheet(files):
     with pytest.raises(FileExistsError, match="manual scores"):
         run_scaffold(files)  # no limit: other codes than the existing key
     assert not files["items_file"].exists()
+
+
+def scaffold_records(files):
+    lines = files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+    return [r for r in map(json.loads, lines) if r.get("step") == "scaffold"]
+
+
+def test_scaffold_logs_the_checksum_of_its_items(files):
+    run_scaffold(files, limit=1)
+    (record,) = scaffold_records(files)
+    assert record["outputs_sha256"] == {"scoring_items.jsonl": sha256_of(files["items_file"])}
+    assert record["strategy"] == ",".join(STRATEGIES)
+
+
+def test_restore_refuses_regenerated_answers(files):
+    """Scores must never be paired with answers the rater did not see (review of PR #17)."""
+    run_scaffold(files, limit=1)
+    fill(files, all_two())
+    sheet_before = files["sheet_file"].read_text(encoding="utf-8")
+    files["items_file"].unlink()
+    rows = answer_rows()
+    next(r for r in rows if r[0] == "Q001")[2] = "A regenerated answer."  # a scored question
+    write_csv(files["answers_file"], ANSWERS_HEADER, rows)
+    with pytest.raises(FileExistsError, match="items differ"):
+        run_scaffold(files, limit=1)  # records a matching generation run first
+    assert not files["items_file"].exists()
+    assert files["sheet_file"].read_text(encoding="utf-8") == sheet_before
+
+
+def test_restore_needs_the_scaffold_record(files):
+    run_scaffold(files, limit=1)
+    files["items_file"].unlink()
+    lines = files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+    kept = [line for line in lines if json.loads(line).get("step") != "scaffold"]
+    files["generation_runs_file"].write_text("\n".join(kept) + "\n", encoding="utf-8")
+    with pytest.raises(FileExistsError, match="no scaffold record"):
+        run_scaffold(files, limit=1)

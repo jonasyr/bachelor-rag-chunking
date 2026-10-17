@@ -28,6 +28,7 @@ Output schema of scores.csv (docs/reference/data-formats.md): question_id, strat
 correctness, completeness, groundedness, no_hallucination, clarity, total_score
 """
 
+import hashlib
 import json
 import random
 import re
@@ -66,7 +67,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
-from run_log import require_run
+from run_log import append_scaffold_run, latest_run, require_run
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -239,7 +240,11 @@ def scaffold(
                 "",
                 fenced(context(split_ids(answer["sources"]), chunks[key])),
             ]
+    items_text = "".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items)
+    items_sha = hashlib.sha256(items_text.encode("utf-8")).hexdigest()
+    strategy = ",".join(STRATEGY_IDS)
     if restoring:
+        refuse = "; move sheet and key away to start afresh"
         try:
             same_key = read_csv(key_file, KEY_HEADER) == key_rows
         except ValueError:
@@ -247,8 +252,19 @@ def scaffold(
         if not same_key:
             raise FileExistsError(
                 f"{sheet_file} and {key_file} exist and may hold manual scores or their key, and "
-                "the key differs from this call's (other --set, --limit or answers); move them "
-                "away to start afresh"
+                f"the key differs from this call's (other --set or --limit){refuse}"
+            )
+        # the scores belong to exactly the items they were given on: same answers, excerpts,
+        # questions and reference answers as the logged scaffold
+        record = latest_run(generation_runs_file, "scaffold", strategy)
+        if record is None:
+            raise FileExistsError(
+                f"{generation_runs_file} has no scaffold record for the existing sheet{refuse}"
+            )
+        if record.get("outputs_sha256", {}).get(items_file.name) != items_sha:
+            raise FileExistsError(
+                f"the items differ from those {sheet_file} was scored on (answers, excerpts or "
+                f"reference answers changed){refuse}"
             )
     else:
         write_csv(key_file, KEY_HEADER, key_rows)
@@ -256,9 +272,11 @@ def scaffold(
     packet_file.parent.mkdir(parents=True, exist_ok=True)
     packet_file.write_text("\n".join(packet) + "\n", encoding="utf-8")
     items_file.parent.mkdir(parents=True, exist_ok=True)
-    items_file.write_text(
-        "".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8"
-    )
+    items_file.write_text(items_text, encoding="utf-8")
+    if not restoring:
+        append_scaffold_run(
+            strategy, len(key_rows), {items_file.name: items_sha}, generation_runs_file
+        )
     return len(key_rows)
 
 
