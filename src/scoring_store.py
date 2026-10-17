@@ -66,8 +66,9 @@ def load_items(s: ScoringSet) -> list[dict]:
     items = [json.loads(line) for line in lines if line.strip()]
     if [i["code"] for i in items] != [r["code"] for r in _sheet(s)]:
         raise ValueError(
-            f"{s.items_file} does not match {s.sheet_file}; move sheet and key away and run "
-            "src/evaluate_answers.py --mode scaffold again"
+            f"{s.items_file} does not match {s.sheet_file}; run src/evaluate_answers.py --mode "
+            "scaffold again with the same --set and --limit (it rewrites the item file and keeps "
+            "the sheet)"
         )
     return items
 

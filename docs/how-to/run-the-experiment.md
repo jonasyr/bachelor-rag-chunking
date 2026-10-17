@@ -23,6 +23,8 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“) je Code 0–2 je Kriterium
    eintragen (`notes` frei). Lesepaket `data/evaluation/scoring_packet.md` und Bogen `data/evaluation/scoring_sheet.csv`
    nur noch für die Zweitbewertung oder ohne App; `scoring_key.csv` dabei nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
+   Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
+   Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
 
 Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Datenformate](../reference/data-formats.md).
 

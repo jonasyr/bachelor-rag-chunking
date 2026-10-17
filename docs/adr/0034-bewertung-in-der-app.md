@@ -27,4 +27,5 @@ existiert, ist der Bogen in der App schreibgeschützt.
 - Gut: Die Katalogseite behält ihre Zusicherung aus ADR 0027; Antworten und Passagen stehen nur auf der Bewertungsseite.
 - Neutral: Lesepaket und Bogen bleiben für die Zweitbewertung ohne App erhalten.
 - Schlecht: Eine weitere abgeleitete Datei, die zu Bogen und Schlüssel passen muss; die App prüft, dass die Codes
-  übereinstimmen.
+  übereinstimmen. Geht sie verloren, schreibt ein erneutes `scaffold` mit gleichem Schlüssel nur Lesepaket und
+  Einträge neu und lässt den Bogen mit den Bewertungen unverändert (Hinweis aus dem Abschluss-Review).

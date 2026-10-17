@@ -10,8 +10,10 @@
                                     equally blind.
                  The answers of a question appear in an order shuffled with config.SCORING_SEED,
                  and nothing in packet or sheet names the strategy (no strategy keys, no chunk
-                 IDs). An existing sheet or key is never overwritten, and the answers and chunk
-                 files must be exactly those of the latest generation run (ADR 0033).
+                 IDs). An existing sheet or key is never overwritten; with both present and the
+                 same key, only packet and item file are written again (after a fresh clone).
+                 The answers and chunk files must be exactly those of the latest generation run
+                 (ADR 0033).
 --mode summarise Check the filled sheet against its key (every code exactly once, every
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
@@ -158,8 +160,11 @@ def scaffold(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
     scored = scored_questions(questions, limit, questions_file, ground_truth_file)
+    # Sheet and key both present: only packet and item file are written again, and only if the
+    # key is the one this call computes (restores the ignored files after a fresh clone).
+    restoring = sheet_file.exists() and key_file.exists()
     for path in (sheet_file, key_file):
-        if path.exists():
+        if path.exists() and not restoring:
             raise FileExistsError(
                 f"{path} exists and may hold manual scores or their key; move it away to "
                 "start afresh"
@@ -234,8 +239,20 @@ def scaffold(
                 "",
                 fenced(context(split_ids(answer["sources"]), chunks[key])),
             ]
-    write_csv(key_file, KEY_HEADER, key_rows)
-    write_csv(sheet_file, SHEET_HEADER, sheet_rows)
+    if restoring:
+        try:
+            same_key = read_csv(key_file, KEY_HEADER) == key_rows
+        except ValueError:
+            same_key = False
+        if not same_key:
+            raise FileExistsError(
+                f"{sheet_file} and {key_file} exist and may hold manual scores or their key, and "
+                "the key differs from this call's (other --set, --limit or answers); move them "
+                "away to start afresh"
+            )
+    else:
+        write_csv(key_file, KEY_HEADER, key_rows)
+        write_csv(sheet_file, SHEET_HEADER, sheet_rows)
     packet_file.parent.mkdir(parents=True, exist_ok=True)
     packet_file.write_text("\n".join(packet) + "\n", encoding="utf-8")
     items_file.parent.mkdir(parents=True, exist_ok=True)

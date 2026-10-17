@@ -483,3 +483,25 @@ def test_scaffold_again_with_the_same_seed_gives_identical_files(files):
         files[name].unlink()
     run_scaffold(files, limit=1)
     assert {k: files[k].read_text(encoding="utf-8") for k in before} == before
+
+
+def test_scaffold_again_restores_lost_items_and_keeps_the_scores(files):
+    """After a fresh clone the ignored item file is gone but the scored sheet is versioned."""
+    run_scaffold(files, limit=1)
+    items_before = files["items_file"].read_text(encoding="utf-8")
+    key_before = files["key_file"].read_text(encoding="utf-8")
+    fill(files, all_two())
+    sheet_before = files["sheet_file"].read_text(encoding="utf-8")
+    files["items_file"].unlink()
+    assert run_scaffold(files, limit=1) == len(STRATEGIES)
+    assert files["items_file"].read_text(encoding="utf-8") == items_before
+    assert files["sheet_file"].read_text(encoding="utf-8") == sheet_before
+    assert files["key_file"].read_text(encoding="utf-8") == key_before
+
+
+def test_scaffold_with_another_key_still_refuses_the_existing_sheet(files):
+    run_scaffold(files, limit=1)
+    files["items_file"].unlink()
+    with pytest.raises(FileExistsError, match="manual scores"):
+        run_scaffold(files)  # no limit: other codes than the existing key
+    assert not files["items_file"].exists()

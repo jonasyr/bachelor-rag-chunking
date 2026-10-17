@@ -217,7 +217,8 @@ Q001,C1,"...",C1_D049_0004,1200,180
 
 Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
 aus `generated_answers.csv` drei Dateien, je Frage die drei Antworten in der mit `config.SCORING_SEED` gemischten
-Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben.
+Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben (liegen beide
+vor und stimmt der Schlüssel, schreibt ein erneuter Aufruf nur Lesepaket und `scoring_items.jsonl` neu).
 
 **`scoring_packet.md`** (Lesepaket): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
 `### Q001-A` mit der Antwort und den Passagen, die das Modell sah (`[Excerpt N]`, getrennt durch `---`, ohne

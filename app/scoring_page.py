@@ -6,12 +6,18 @@ router app/catalogue_editor.py.
 """
 
 import html
+import sys
+from pathlib import Path
 
-import streamlit as st
-from ui_theme import SCORING_CSS
+APP_DIR = Path(__file__).resolve().parent  # also when the page runs on its own (tests)
+sys.path.insert(0, str(APP_DIR.parent / "src"))
+sys.path.insert(0, str(APP_DIR))
 
-import scoring_store as scoring
-from config import RUBRIC_CRITERIA, RUBRIC_MAX_SCORE
+import streamlit as st  # noqa: E402
+from ui_theme import SCORING_CSS  # noqa: E402
+
+import scoring_store as scoring  # noqa: E402
+from config import RUBRIC_CRITERIA, RUBRIC_MAX_SCORE  # noqa: E402
 
 SCORES = list(range(RUBRIC_MAX_SCORE + 1))
 LABELS = {
@@ -118,7 +124,8 @@ def main() -> None:
     if not sets:
         st.info(
             "Nothing to score yet. Run `uv run python src/evaluate_answers.py --mode scaffold` "
-            "(with `--set DIR` for a pilot set) after generating the answers."
+            "(with `--set DIR` for a pilot set) after generating the answers; run it again to "
+            "restore a lost item file, the scores in the sheet stay."
         )
         return
     s = choose_set(sets)
