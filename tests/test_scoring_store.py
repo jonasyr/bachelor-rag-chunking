@@ -408,3 +408,17 @@ def test_an_item_file_that_differs_from_its_scaffold_record_cannot_be_frozen(har
     with pytest.raises(ValueError, match="scaffold"):
         scoring.freeze_key_points(hard, scoring.load_items(hard))
     assert not scoring.is_frozen(hard)
+
+
+def test_saving_drops_key_points_of_questions_outside_the_scaffold(hard):
+    hard.key_points_file.write_text(
+        "question_id,point,text\nH01,1,Core\nH02,1,Core two\nH09,1,Removed question\n",
+        encoding="utf-8",
+    )
+    items = scoring.load_items(hard)
+    with pytest.raises(ValueError, match="save the key points of any question"):
+        scoring.freeze_key_points(hard, items)
+    scoring.save_key_points(hard, items, "H01", ["Core"])
+    assert scoring.load_key_points(hard) == {"H01": ["Core"], "H02": ["Core two"]}
+    scoring.freeze_key_points(hard, items)
+    assert scoring.is_frozen(hard)

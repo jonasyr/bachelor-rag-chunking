@@ -162,7 +162,8 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
     """Replace one question's key points (point 1 = core point); refused after the freeze."""
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen")
-    if question_id not in {q["question_id"] for q in questions(items)}:
+    known = {q["question_id"] for q in questions(items)}
+    if question_id not in known:
         raise ValueError(f"unknown question {question_id}")
     if not 1 <= len(points) <= KEY_POINTS_MAX:
         raise ValueError(f"a question has 1 to {KEY_POINTS_MAX} key points, got {len(points)}")
@@ -171,7 +172,9 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
             raise ValueError("a key point is empty")
         if "\n" in text or "\r" in text:
             raise ValueError("a key point is one line")
-    current = load_key_points(s) | {question_id: [t.strip() for t in points]}
+    # points of questions no longer in the scaffold (fewer questions after a new scaffold) go
+    current = {q: t for q, t in load_key_points(s).items() if q in known}
+    current[question_id] = [t.strip() for t in points]
     rows = [
         {"question_id": qid, "point": str(n), "text": text}
         for qid in sorted(current)
@@ -192,7 +195,10 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     known = {q["question_id"] for q in questions(items)}
     stray = sorted(set(points) - known)
     if stray:
-        raise ValueError(f"key points for questions outside {s.name}: {', '.join(stray)}")
+        raise ValueError(
+            f"key points for questions outside {s.name}: {', '.join(stray)}; save the key points "
+            "of any question once to drop them"
+        )
     if s.checks_file.exists():
         raise ValueError(
             f"{s.checks_file} holds checks of an earlier scaffold; move it aside before freezing"
