@@ -21,8 +21,9 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    `uv run python src/evaluate_answers.py --mode scaffold`, dann blind bewerten
    ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md), [ADR 0034](../adr/0034-bewertung-in-der-app.md)): in der App
    (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“), regelbasiert nach
-   [ADR 0035](../adr/0035-regelbasierte-bewertung.md): Schritt „Key points“ je Frage 1–4 Kernpunkte schreiben (nur
-   Frage und Referenzantwort sichtbar) und einfrieren (gilt nur für dieses Scaffold; nach einem neuen Scaffold erneut
+   [ADR 0035](../adr/0035-regelbasierte-bewertung.md): Schritt „Key points“ je Frage 1–4 Kernpunkte prüfen (aus der
+   Referenzantwort vorbefüllt, [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md); nur
+   Frage und Referenzantwort sichtbar), wo nötig weiter teilen, speichern und einfrieren (gilt nur für dieses Scaffold; nach einem neuen Scaffold erneut
    einfrieren); Schritt „Score“ je Code die Prüffragen beantworten, die fünf
    Werte folgen aus den Regeln ([Evaluation](../reference/evaluation.md#regelbasierte-bewertung); `notes` frei, z. B.
    wenn eine Regel nicht passt). Von Hand eingetragene Werte nimmt `summarise` bei einem neuen Scaffold nicht an

@@ -15,7 +15,7 @@ data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`
   go through `src/catalogue_store.py` (atomic, strict). Claude's review only appends `open` rows to
   `data/evaluation/catalogue_review.csv` and never edits questions/ground truth; never run `catalogue.py plan` twice.
 - Scoring page (ADR 0034): app/scoring_page.py + src/scoring_store.py read only scoring_items.jsonl and the sheet, never the key; tests/test_scoring_page.py checks that statically.
-- Rule-based scoring (ADR 0035): key points -> freeze (run record with sha) -> checks -> scoring_rules.derive; summarise verifies sheet vs scoring_checks.csv. Details: docs/reference/evaluation.md#regelbasierte-bewertung. Key point text is Jonas's only. New scaffolds carry "scoring":"rules" (ADR 0036): summarise then refuses hand-entered sheets.
+- Rule-based scoring (ADR 0035): key points -> freeze (run record with sha) -> checks -> scoring_rules.derive; summarise verifies sheet vs scoring_checks.csv. Details: docs/reference/evaluation.md#regelbasierte-bewertung. Key point text is Jonas's only. New scaffolds carry "scoring":"rules" (ADR 0036): summarise then refuses hand-entered sheets. ADR 0037: key points pre-filled from the reference (scoring_rules.split_reference, Jonas confirms); check rules in the form help texts (POINT_HELP/HELP in app/scoring_page.py) and evaluation.md.
 - Section spans for relevance: `data/processed/sections.jsonl`; chunk `start_token`/`end_token` must come from
   `src/tokens.py` so chunks and sections share one index space.
 - `preprocess.py` rewrites `documents.jsonl` in place and refuses a second run (re-run `ingest.py` first);

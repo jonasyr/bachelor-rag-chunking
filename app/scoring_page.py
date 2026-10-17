@@ -38,8 +38,24 @@ QUESTIONS = {
     "grounded": "How many of its statements are backed by the excerpts?",
     "hallucination": "Does it contain anything that neither the excerpts nor the reference cover?",
     "answers_question": "Does it address what was asked?",
-    "direct": "Is the answer given directly, in the first two sentences?",
+    "direct": "Does the core point come in the first two sentences?",
     "wordy": "Is it repetitive, padded or confusing?",
+}
+# how to apply the checks in borderline cases (ADR 0037, docs/reference/evaluation.md)
+POINT_HELP = (
+    "Covered: the same meaning, also in other words. A qualifier in brackets, such as a version, "
+    "is not required. Stated only partly: missing."
+)
+HELP = {
+    "grounded": "A true statement that the excerpts do not back counts as not backed.",
+    "hallucination": (
+        "Counts also when the addition is true (minor if it does not change the answer). An "
+        "illustrative example name is not a hallucination."
+    ),
+    "direct": (
+        "Yes when the core point comes in the first two sentences, even if a second part of the "
+        "question is answered later."
+    ),
 }
 OPTION_LABELS = {"minor": "Minor addition"}
 GROUPS = {  # heading shown before the first check of each group
@@ -112,7 +128,7 @@ def key_points_step(s: scoring.ScoringSet, items: list[dict], read_only: bool) -
     with cards:
         question_cards(q["question"], q["reference_answer"])
     with inputs:
-        key_point_inputs(s, items, ids, qid, points.get(qid, []), read_only)
+        key_point_inputs(s, items, ids, qid, points.get(qid), q["reference_answer"], read_only)
     if read_only:
         st.info("The key points are frozen.")
         return
@@ -139,13 +155,20 @@ def key_point_inputs(
     items: list[dict],
     ids: list[str],
     qid: str,
-    saved: list[str],
+    saved: list[str] | None,
+    reference: str,
     read_only: bool,
 ) -> None:
+    if saved is None:  # unsaved: start from the reference answer split into parts (ADR 0037)
+        st.caption(
+            "Pre-filled from the reference answer. Split a part further where an answer could get "
+            "half of it right; a qualifier in brackets need not be its own point."
+        )
+    shown = rules.split_reference(reference) if saved is None else saved
     texts = [
         st.text_input(
             point_label(n),
-            value=saved[n - 1] if n <= len(saved) else "",
+            value=shown[n - 1] if n <= len(shown) else "",
             key=f"kp|{s.name}|{qid}|{n}",
             disabled=read_only,
             help="The direct answer to the question" if n == 1 else None,
@@ -173,13 +196,16 @@ def key_point_inputs(
         st.rerun()
 
 
-def control(label: str, options: tuple[str, ...], default, key: str, locked: bool):
+def control(
+    label: str, options: tuple[str, ...], default, key: str, locked: bool, help: str | None = None
+):
     return st.segmented_control(
         label,
         list(options),
         default=default,
         key=key,
         disabled=locked,
+        help=help,
         format_func=lambda o: OPTION_LABELS.get(o, o.capitalize()),
     )
 
@@ -221,6 +247,7 @@ def form(
                     else stored["points"][n - 1],
                     f"{s.name}|{code}|point_{n}",
                     locked,
+                    POINT_HELP,
                 )
             )
     for check in list(rules.CHECKS)[1:]:
@@ -231,7 +258,12 @@ def form(
         if check in GROUPS:
             st.markdown(f"**{GROUPS[check]}**")
         answers[check] = control(
-            QUESTIONS[check], rules.CHECKS[check], default, f"{s.name}|{code}|{check}", locked
+            QUESTIONS[check],
+            rules.CHECKS[check],
+            default,
+            f"{s.name}|{code}|{check}",
+            locked,
+            HELP.get(check),
         )
     answered = all(v is not None for v in answers.values()) and None not in marks
     checks = rules.declined(answers | {"points": marks}, len(key_points)) if answered else None
