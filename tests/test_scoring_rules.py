@@ -145,6 +145,8 @@ def test_key_points_group_by_question_in_point_order():
         ((("H01", "one", "Core"),), "1 to"),
         (tuple(("H01", str(n), "x") for n in range(1, 6)), "at most"),
         ((("H01", "1", " "),), "empty"),
+        ((("H01", "1", "two\nlines"),), "one line"),
+        ((("H01", "1", "carriage\rreturn"),), "one line"),
     ],
 )
 def test_malformed_key_points_are_refused(rows, message):

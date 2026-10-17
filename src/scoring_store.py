@@ -178,6 +178,10 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     missing = [q["question_id"] for q in questions(items) if q["question_id"] not in points]
     if missing:
         raise ValueError(f"no key points yet for {', '.join(missing)}")
+    known = {q["question_id"] for q in questions(items)}
+    stray = sorted(set(points) - known)
+    if stray:
+        raise ValueError(f"key points for questions outside {s.name}: {', '.join(stray)}")
     sha = sha256_of(s.key_points_file)
     append_key_points_run(STRATEGY, {s.key_points_file.name: sha}, s.runs_file)
 

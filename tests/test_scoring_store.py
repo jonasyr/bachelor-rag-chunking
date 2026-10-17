@@ -357,3 +357,12 @@ def test_save_refuses_a_malformed_checks_file(frozen, extra, message):
         f.write(",".join(rules.to_row(extra, ok("H01-B")).values()) + "\n")
     with pytest.raises(ValueError, match=message):
         scoring.save_score(frozen, "H01-A", ok("H01-A"), "")
+
+
+def test_key_points_for_a_question_outside_the_set_cannot_be_frozen(hard):
+    hard.key_points_file.write_text(
+        "question_id,point,text\nH01,1,Core\nH02,1,Core two\nH09,1,Stray\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="H09"):
+        scoring.freeze_key_points(hard, scoring.load_items(hard))
+    assert not scoring.is_frozen(hard)

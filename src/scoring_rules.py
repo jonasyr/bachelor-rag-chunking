@@ -124,6 +124,8 @@ def key_points(rows: list[dict]) -> dict[str, list[str]]:
             )
         if not row["text"].strip():
             raise ValueError(f"{qid}: key point {row['point']} is empty")
+        if "\n" in row["text"] or "\r" in row["text"]:
+            raise ValueError(f"{qid}: key point {row['point']} must be one line")
         texts.append(row["text"])
         if len(texts) > KEY_POINTS_MAX:
             raise ValueError(f"{qid}: at most {KEY_POINTS_MAX} key points")
