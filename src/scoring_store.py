@@ -197,10 +197,14 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
         raise ValueError(
             f"{s.checks_file} holds checks of an earlier scaffold; move it aside before freezing"
         )
-    outputs = {
-        s.key_points_file.name: sha256_of(s.key_points_file),
-        s.items_file.name: sha256_of(s.items_file),
-    }
+    items_sha = sha256_of(s.items_file)
+    scaffold = latest_run(s.runs_file, "scaffold", STRATEGY)
+    if scaffold is None or scaffold["outputs_sha256"].get(s.items_file.name) != items_sha:
+        raise ValueError(
+            f"{s.items_file} differs from the latest scaffold record in {s.runs_file}; run "
+            "src/evaluate_answers.py --mode scaffold again"
+        )
+    outputs = {s.key_points_file.name: sha256_of(s.key_points_file), s.items_file.name: items_sha}
     append_key_points_run(STRATEGY, outputs, s.runs_file)
 
 

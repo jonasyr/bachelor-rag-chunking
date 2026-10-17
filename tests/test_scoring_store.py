@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from conftest import SCORING_CODES, write_scoring_set
+from conftest import SCORING_CODES, log_scaffold, write_scoring_set
 
 import scoring_rules as rules
 import scoring_store as scoring
@@ -222,6 +222,11 @@ def test_text_html_shows_raw_html_as_text():
     assert "<pre><code" in out
 
 
+def freezes(s):
+    lines = s.runs_file.read_text(encoding="utf-8").splitlines()
+    return [r for r in map(json.loads, lines) if r["step"] == "key_points"]
+
+
 def items_of(s):
     return scoring.load_items(s)
 
@@ -279,13 +284,13 @@ def test_freeze_needs_every_question_and_writes_one_record(hard):
     scoring.save_key_points(hard, items, "H02", ["Core two"])
     scoring.freeze_key_points(hard, items)
     assert scoring.is_frozen(hard)
-    (record,) = (json.loads(line) for line in hard.runs_file.read_text().splitlines())
+    (record,) = freezes(hard)
     assert record["step"] == "key_points" and "key_points.csv" in record["outputs_sha256"]
     with pytest.raises(PermissionError, match="frozen"):
         scoring.freeze_key_points(hard, items)
     with pytest.raises(PermissionError, match="frozen"):
         scoring.save_key_points(hard, items, "H01", ["Changed"])
-    assert len(hard.runs_file.read_text().splitlines()) == 1
+    assert len(freezes(hard)) == 1
 
 
 def test_a_hand_edit_after_the_freeze_is_caught(hard):
@@ -368,10 +373,13 @@ def test_key_points_for_a_question_outside_the_set_cannot_be_frozen(hard):
     assert not scoring.is_frozen(hard)
 
 
-def rescaffold(s):
-    """A new scaffold of the same set: same codes, other answer texts (other items checksum)."""
+def rescaffold(s, record=True):
+    """A new scaffold of the same set: same codes, other answer texts (other items checksum),
+    logged like evaluate_answers.py --mode scaffold unless `record` is False."""
     text = s.items_file.read_text(encoding="utf-8").replace("Answer ", "New answer ")
     s.items_file.write_text(text, encoding="utf-8")
+    if record:
+        log_scaffold(s.items_file)
 
 
 def test_a_freeze_only_holds_for_the_scaffold_it_was_made_on(frozen):
@@ -390,3 +398,13 @@ def test_freezing_is_refused_while_checks_of_an_earlier_scaffold_remain(frozen):
     rescaffold(frozen)
     with pytest.raises(ValueError, match="scoring_checks.csv"):
         scoring.freeze_key_points(frozen, scoring.load_items(frozen))
+
+
+def test_an_item_file_that_differs_from_its_scaffold_record_cannot_be_frozen(hard):
+    items = scoring.load_items(hard)
+    scoring.save_key_points(hard, items, "H01", ["Core one"])
+    scoring.save_key_points(hard, items, "H02", ["Core two"])
+    rescaffold(hard, record=False)  # item file changed without a scaffold run
+    with pytest.raises(ValueError, match="scaffold"):
+        scoring.freeze_key_points(hard, scoring.load_items(hard))
+    assert not scoring.is_frozen(hard)
