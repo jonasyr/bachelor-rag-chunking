@@ -57,7 +57,8 @@ vor dem Hauptlauf.
 - Gut: Veraltete Retrieval-Ergebnisse oder nachträglich neu erzeugte Chunk-Dateien können weder in die Generierung
   noch in die Bewertung gelangen.
 - Schlecht: Ohne datierten Snapshot lässt sich ein Lauf nach einer Modelländerung nicht exakt wiederholen; die
-  gespeicherten Antworten sind die Primärdaten.
+  gespeicherten Antworten sind die Primärdaten und daher versioniert (`generated_answers.csv`, mit
+  `generation_runs.jsonl`).
 - Neutral: Die Ergebnisse gelten für einen Generator, der direkt antwortet; mit einem Reasoning-Modell könnten die
   Unterschiede zwischen den Strategien kleiner ausfallen. Das nennt die Arbeit als Einschränkung
   ([Forschungsdesign](../explanation/research-design.md#validität-und-grenzen)).
