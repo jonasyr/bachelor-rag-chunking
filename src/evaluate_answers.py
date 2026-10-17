@@ -15,9 +15,10 @@
                  the criteria, and print mean, median and standard deviation per strategy,
                  overall and per question type and construction class.
 
-Both modes use the main catalogue only while it matches its freeze record (ADR 0030). Answers
-exist only for the experiment C1-C3, never for the control K1 (ADR 0026), and every question of
-the catalogue needs exactly one answer of every strategy.
+Both modes use the main catalogue only while it matches its freeze record (ADR 0030). With --set
+DIR they work on a pilot set instead, and --limit N (pilot sets only) scores its first N
+questions. Answers exist only for the experiment C1-C3, never for the control K1 (ADR 0026), and
+every question of the catalogue needs exactly one answer of every strategy.
 
 Output schema of scores.csv (docs/reference/data-formats.md): question_id, strategy,
 correctness, completeness, groundedness, no_hallucination, clarity, total_score
@@ -36,6 +37,7 @@ from config import (
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
@@ -48,7 +50,7 @@ from config import (
     STRATEGY_IDS,
 )
 from embed import load_jsonl
-from freeze import require_frozen
+from freeze import is_main_catalogue, require_frozen
 from generate import ANSWERS_HEADER
 from prompt import context
 from retrieve import (
@@ -84,6 +86,23 @@ def catalogue(
         {q["question_id"]: q for q in questions},
         {t["question_id"]: t for t in truth},
     )
+
+
+def scored_questions(
+    questions: dict[str, dict],
+    limit: int | None,
+    questions_file: Path,
+    ground_truth_file: Path,
+) -> list[str]:
+    """The question IDs to score: all, or for a pilot set the first `limit` in ID order."""
+    qids = sorted(questions)
+    if limit is None:
+        return qids
+    if limit < 1:
+        raise ValueError(f"limit must be a positive number of questions, got {limit}")
+    if is_main_catalogue(questions_file, ground_truth_file):
+        raise ValueError("a limit is for pilot sets only; every experiment answer is scored (D32)")
+    return qids[:limit]
 
 
 def check_grid(path: Path, rows: list[dict], qids: list[str]) -> None:
@@ -124,11 +143,16 @@ def scaffold(
     key_file: Path = SCORING_KEY_FILE,
     seed: int = SCORING_SEED,
     generation_runs_file: Path = GENERATION_RUNS_FILE,
+    limit: int | None = None,
 ) -> int:
-    """Write packet, sheet and key for blind scoring; return the number of answers."""
+    """Write packet, sheet and key for blind scoring; return the number of answers.
+
+    `limit` (pilot sets only) scores the first questions in ID order; all answers are still
+    checked."""
     questions, truth = catalogue(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
+    scored = scored_questions(questions, limit, questions_file, ground_truth_file)
     for path in (sheet_file, key_file):
         if path.exists():
             raise FileExistsError(
@@ -164,7 +188,7 @@ def scaffold(
         "(rubric: docs/reference/evaluation.md), notes optional. Do not open scoring_key.csv "
         "before every row is scored.",
     ]
-    for qid in qids:
+    for qid in scored:
         order = list(STRATEGY_IDS)
         rng.shuffle(order)
         packet += [
@@ -246,13 +270,15 @@ def summarise(
     sheet_file: Path = SCORING_SHEET_FILE,
     key_file: Path = SCORING_KEY_FILE,
     scores_file: Path = SCORES_FILE,
+    limit: int | None = None,
 ) -> dict[tuple, dict]:
     """Write scores.csv and return the statistics per (group, value, strategy); group "all"
     spans all questions, the other groups are the question type and construction class."""
     questions, _ = catalogue(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
-    rows = unblind(sheet_file, key_file, sorted(questions))
+    scored = scored_questions(questions, limit, questions_file, ground_truth_file)
+    rows = unblind(sheet_file, key_file, scored)
     write_csv(scores_file, SCORES_HEADER, rows)
 
     buckets: dict[tuple, list[dict]] = {}
@@ -283,15 +309,40 @@ def print_summary(summary: dict[tuple, dict]) -> None:
         )
 
 
+def pilot_paths(set_dir: Path) -> dict[str, Path]:
+    """The files of a pilot set (data/pilot/...); answers and run log from generate.py --set."""
+    return {
+        "answers_file": set_dir / GENERATED_ANSWERS_FILE.name,
+        "questions_file": set_dir / QUESTIONS_FILE.name,
+        "ground_truth_file": set_dir / GROUND_TRUTH_FILE.name,
+        "sheet_file": set_dir / SCORING_SHEET_FILE.name,
+        "packet_file": set_dir / SCORING_PACKET_FILE.name,
+        "key_file": set_dir / SCORING_KEY_FILE.name,
+        "scores_file": set_dir / SCORES_FILE.name,
+        "generation_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
+    }
+
+
 if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="Blind manual rubric scores (ADR 0013, 0032).")
     p.add_argument("--mode", choices=["scaffold", "summarise"], required=True)
+    p.add_argument(
+        "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/hard) instead"
+    )
+    p.add_argument("--limit", type=int, metavar="N", help="pilot sets only: the first N questions")
     args = p.parse_args()
+    if args.limit is not None and not args.set:
+        p.error("--limit needs --set: every experiment answer is scored (ADR 0032)")
+    paths = pilot_paths(args.set) if args.set else {}
     if args.mode == "scaffold":
-        count = scaffold()
-        print(f"{count} blinded answers -> {SCORING_PACKET_FILE.name}, {SCORING_SHEET_FILE.name}")
+        scaffold_args = {k: v for k, v in paths.items() if k != "scores_file"}
+        count = scaffold(**scaffold_args, limit=args.limit)
+        packet = paths.get("packet_file", SCORING_PACKET_FILE)
+        sheet = paths.get("sheet_file", SCORING_SHEET_FILE)
+        print(f"{count} blinded answers -> {packet}, {sheet}")
     else:
-        print_summary(summarise())
-        print(f"unblinded scores -> {SCORES_FILE}")
+        keep = ["questions_file", "ground_truth_file", "sheet_file", "key_file", "scores_file"]
+        print_summary(summarise(**{k: paths[k] for k in keep if k in paths}, limit=args.limit))
+        print(f"unblinded scores -> {paths.get('scores_file', SCORES_FILE)}")

@@ -1,0 +1,342 @@
+question_id,strategy,answer,sources,prompt_tokens,completion_tokens
+H01,C1,"Use `v-model` on your component in the parent, and in the child use `defineModel()` (recommended in Vue 3.4+) to create a two-way binding:
+
+```vue
+<!-- Parent -->
+<MyInput v-model=""text"" />
+
+<!-- MyInput.vue -->
+<script setup>
+const model = defineModel()
+</script>
+
+<template>
+  <input v-model=""model"" />
+</template>
+```
+
+Behind the scenes, Vue uses a `modelValue` prop and an `update:modelValue` event. The parent’s `v-model=""text""` is compiled to a prop binding and an event listener that updates `text`.",C1_D039_0001;C1_D039_0003;C1_D003_0005;C1_D039_0002;C1_D042_0004,2649,133
+H01,C2,"In Vue 3.4+, use `defineModel()` in your input component, then bind the returned ref to the native input:
+
+```vue
+<script setup>
+const model = defineModel()
+</script>
+
+<template>
+  <input v-model=""model"" />
+</template>
+```
+
+A parent can then use `<MyInput v-model=""value"" />`. Behind the scenes, Vue uses a `modelValue` prop and an `update:modelValue` event. Before Vue 3.4, you can implement that pair with `defineProps(['modelValue'])` and `defineEmits(['update:modelValue'])`.",C2_D039_0001;C2_D039_0002;C2_D046_0005;C2_D003_0006;C2_D039_0003,2646,130
+H01,C3,"Use `v-model` on your component, and in Vue 3.4+ use `defineModel()` in the child to create the two-way binding:
+
+```vue
+<!-- Parent -->
+<MyInput v-model=""text"" />
+
+<!-- MyInput.vue -->
+<script setup>
+const model = defineModel()
+</script>
+
+<template>
+  <input v-model=""model"" />
+</template>
+```
+
+Behind the scenes, component `v-model` expands to a `modelValue` prop and an `onUpdate:modelValue` event handler. The child declares the `modelValue` prop and emits `update:modelValue` when the value changes.",C3_D039_0001;C3_D057_0016;C3_D046_0001;C3_D039_0004;C3_D003_0011,1329,132
+H02,C1,"No. Computed getters should be pure and free of side effects, so don’t make an API request inside one. Use a **watcher** to react to changes in the relevant reactive inputs and perform the request there. Keep the computed property for deriving a value.",C1_D043_0003;C1_D043_0002;C1_D043_0001;C1_D008_0003;C1_D024_0004,2174,57
+H02,C2,"Don’t make the API request inside a computed getter. Computed getters should be pure and side-effect-free; they’re for deriving and returning a value.
+
+Use a **watcher** to perform side effects in response to reactive state changes. You can watch the relevant inputs—or a computed value derived from them—and make the API request in the watcher callback.",C2_D043_0004;C2_D043_0002;C2_D043_0003;C2_D043_0001;C2_D055_0007,2432,74
+H02,C3,"No. Computed getters should perform pure computation only; they should not make async requests or cause other side effects.
+
+Use a **watcher** to react to changes in the relevant state and perform the API request. Keep the computed property for deriving a value from its reactive inputs.",C3_D043_0006;C3_D043_0005;C3_D024_0010;C3_D043_0002;C3_D043_0001,1579,59
+H03,C1,"Use `v-html` to render the string as markup:
+
+```vue
+<div v-html=""htmlString""></div>
+```
+
+Vue normally escapes HTML, but `v-html` bypasses that protection. If the string contains unsanitized or untrusted content, it can execute malicious HTML and create cross-site scripting (XSS) vulnerabilities. Use it only with trusted content—never directly with user-provided content.",C1_D026_0002;C1_D026_0003;C1_D026_0004;C1_D026_0001;C1_D051_0002,2620,87
+H03,C2,"Use `v-html` to render the string as HTML:
+
+```vue
+<div v-html=""userProvidedHtml""></div>
+```
+
+You can also set `innerHTML` in a render function. This bypasses Vue’s normal HTML escaping, so untrusted or arbitrary content can create cross-site scripting (XSS) vulnerabilities. Use it only for trusted, safe HTML—never directly for user-provided content.",C2_D026_0003;C2_D026_0002;C2_D026_0004;C2_D026_0005;C2_D051_0002,2543,86
+H03,C3,"Use `v-html` to render the string as real HTML:
+
+```vue-html
+<div v-html=""rawHtml""></div>
+```
+
+Vue replaces the element’s inner HTML with the value, interpreted as markup. Unlike normal interpolation, which escapes HTML, this can create **cross-site scripting (XSS)** vulnerabilities if the content is untrusted or unsanitized. Use it only for trusted content; never use it with arbitrary user-provided HTML.",C3_D026_0005;C3_D026_0006;C3_D026_0003;C3_D051_0003;C3_D026_0009,1210,94
+H04,C1,"Yes. You can create a reactive object with Vue’s `reactive()` in a JavaScript module and import it into multiple components. They will share the same state and update when it changes; no state-management library is required.
+
+The problem with this module-level singleton in SSR is that the server typically reuses the same module instance across requests. State changed for one user could then leak into another user’s request—called **cross-request state pollution**. The recommended fix is to create a fresh store for each request and provide it to that request’s app.",C1_D068_0006;C1_D068_0007;C1_D069_0002;C1_D069_0001;C1_D068_0005,2638,115
+H04,C2,"Yes. You can create shared reactive state with Vue’s built-in APIs, such as `reactive()` or `ref()`, in a module and import it into multiple components—no library is required.
+
+The SSR problem is that module-level state is a singleton reused across server requests. If it’s changed with data for one user, that state can leak into another user’s request (cross-request state pollution). For SSR, create a fresh store for each request and provide it through that request’s app.",C2_D068_0007;C2_D068_0008;C2_D068_0009;C2_D069_0001;C2_D069_0003,2643,104
+H04,C3,"Yes. You can create shared reactive state with Vue’s reactivity APIs—such as a `reactive()` object in a JavaScript module—and import it into multiple components. They will update from the same source of truth, without a library.
+
+The SSR problem is that module-level state is a singleton. Server modules are typically initialized once and reused across requests, so user-specific mutations can leak state from one request to another. This is called **cross-request state pollution**. The documentation recommends creating a fresh app and store for each request and providing the store to components.",C3_D069_0003;C3_D069_0001;C3_D068_0011;C3_D069_0002;C3_D068_0006,2068,117
+H05,C1,"Async components are suspensible by default. When a `<Suspense>` is in their parent chain, it takes over their loading state, so the async component’s own loading component and its loading-related options are ignored.
+
+While `<Suspense>` waits for the async dependency, it shows the `<template #fallback>` content instead. Once the dependency resolves, it shows the default-slot content.",C1_D028_0001;C1_D028_0003;C1_D028_0002;C1_D028_0004;C1_D002_0005,2190,80
+H05,C2,"Async components are **suspensible by default**. When one is inside a `<Suspense>`, the boundary takes over its loading state, so the component’s own loading UI and its delay, error, and timeout options are ignored.
+
+While the async dependency is pending, `<Suspense>` shows its `#fallback` slot; once it resolves, it shows the `#default` content. If you want the component to keep controlling its own spinner, set `suspensible: false`.",C2_D028_0001;C2_D028_0002;C2_D028_0005;C2_D028_0003;C2_D028_0004,2308,103
+H05,C3,"Async components are **suspensible by default**. When one is inside a `<Suspense>`, it becomes an async dependency, so `<Suspense>` takes over its loading state and ignores the component’s own loading, error, delay, and timeout options.
+
+While the dependency is pending, `<Suspense>` shows its `#fallback` slot instead. To keep the component’s own spinner in control, set `suspensible: false`.",C3_D028_0001;C3_D028_0002;C3_D028_0005;C3_D028_0008;C3_D028_0004,1236,93
+H06,C1,Variables destructured from `defineProps` stay reactive starting in **Vue 3.5**.,C1_D035_0001;C1_D035_0002;C1_D019_0004;C1_D056_0002;C1_D055_0001,2617,23
+H06,C2,"Variables destructured from `defineProps` stay reactive starting in **Vue 3.5**. In Vue 3.4 and below, they are not reactive.",C2_D035_0001;C2_D019_0005;C2_D035_0002;C2_D056_0003;C2_D019_0004,2621,37
+H06,C3,"Variables destructured from `defineProps` stay reactive starting in **Vue 3.5**. In Vue 3.4 and below, they are constants and do not update.",C3_D019_0012;C3_D035_0002;C3_D056_0005;C3_D035_0003;C3_D055_0003,2058,40
+H07,C1,"Use the `{ once: true }` option:
+
+```js
+watch(source, callback, { once: true })
+```
+
+The callback runs on the first source change, then the watcher stops. This option is supported in Vue 3.4+.",C1_D052_0003;C1_D052_0002;C1_D015_0006;C1_D015_0007;C1_D052_0001,2642,53
+H07,C2,"Use the `once` option: `{ once: true }`. The callback runs once, and the watcher stops automatically after that first callback.",C2_D015_0009;C2_D015_0008;C2_D052_0002;C2_D015_0007;C2_D052_0004,2648,31
+H07,C3,"Use the `{ once: true }` option:
+
+```js
+watch(source, callback, { once: true })
+```
+
+The callback runs on the first source change, then the watcher stops automatically.",C3_D052_0005;C3_D052_0004;C3_D015_0009;C3_D052_0002;C3_D052_0011,1588,43
+H08,C1,"Use a camelCase name that starts with `use`—for example, `useMouse`.",C1_D063_0001;C1_D063_0005;C1_D078_0001;C1_D054_0002;C1_D078_0002,2623,22
+H08,C2,"Use a camelCase name that starts with `use`—for example, `useMouse()`.",C2_D063_0001;C2_D063_0006;C2_D078_0002;C2_D078_0001;C2_D063_0002,2627,23
+H08,C3,"Use a camelCase function name that starts with `use`—for example, `useMousePosition`.",C3_D063_0002;C3_D063_0006;C3_D078_0003;C3_D069_0003;C3_D078_0002,1122,24
+H09,C1,"In `<script setup lang=""ts"">`, pass a type literal to `defineEmits`. You can use call signatures to specify each event and its payload:
+
+```ts
+const emit = defineEmits<{
+  (e: 'change', id: number): void
+  (e: 'update', value: string): void
+}>()
+```
+
+In Vue 3.3+, you can use the shorter named-tuple syntax:
+
+```ts
+const emit = defineEmits<{
+  change: [id: number]
+  update: [value: string]
+}>()
+```
+
+The returned `emit` function is typed to accept those event names and payloads. Use either this type-based declaration or a runtime declaration—not both.",C1_D072_0003;C1_D060_0008;C1_D034_0002;C1_D019_0003;C1_D072_0004,2627,154
+H09,C2,"Use the `defineEmits` macro with a type argument. You can declare event names and their payloads using call signatures:
+
+```vue
+<script setup lang=""ts"">
+const emit = defineEmits<{
+  (e: 'change', id: number): void
+  (e: 'update', value: string): void
+}>()
+</script>
+```
+
+In Vue 3.3+, you can use the shorter tuple syntax:
+
+```ts
+const emit = defineEmits<{
+  change: [id: number]
+  update: [value: string]
+}>()
+```
+
+The tuple values specify the accepted arguments for each event.",C2_D072_0003;C2_D072_0004;C2_D073_0003;C2_D073_0002;C2_D072_0001,2644,136
+H09,C3,"Use `defineEmits` with a TypeScript type argument inside `<script setup lang=""ts"">`. You can declare event names and their payload types with call signatures:
+
+```vue
+<script setup lang=""ts"">
+const emit = defineEmits<{
+  (e: 'change', id: number): void
+  (e: 'update', value: string): void
+}>()
+
+emit('change', 123)
+emit('update', 'value')
+</script>
+```
+
+In Vue 3.3+, you can use the shorter tuple syntax:
+
+```ts
+const emit = defineEmits<{
+  change: [id: number]
+  update: [value: string]
+}>()
+```
+
+`defineEmits` must be placed directly in `<script setup>`, not inside a function.",C3_D072_0005;C3_D034_0003;C3_D073_0004;C3_D019_0001;C3_D072_0001,1959,167
+H10,C1,"Use a **post-flush watcher** by setting `flush: 'post'`. By default, a watcher callback runs before its owner component’s DOM updates.
+
+```js
+watch(source, callback, {
+  flush: 'post'
+})
+```
+
+For `watchEffect()`, you can also use `flush: 'post'` or the `watchPostEffect()` alias.",C1_D052_0002;C1_D015_0008;C1_D052_0005;C1_D052_0003;C1_D055_0006,2637,79
+H10,C2,"By default, a watcher callback runs before its owner component’s DOM updates. Set `flush: 'post'` to run it after Vue updates the DOM:
+
+```js
+watch(source, callback, {
+  flush: 'post'
+})
+```
+
+For `watchEffect`, use the same option, or the `watchPostEffect()` convenience alias.",C2_D052_0006;C2_D052_0004;C2_D052_0001;C2_D052_0005;C2_D052_0002,2631,73
+H10,C3,"By default, a watcher callback runs before its owner component’s DOM updates. Set `flush: 'post'` to run it after the DOM has updated:
+
+```js
+watch(source, callback, {
+  flush: 'post'
+})
+```
+
+For `watchEffect`, use the same option or the `watchPostEffect()` alias.",C3_D052_0009;C3_D049_0006;C3_D052_0010;C3_D052_0001;C3_D052_0004,949,71
+H11,C1,"Use the `.lazy` modifier with `v-model`. It syncs the bound variable on the input’s `change` event instead of on every `input` event:
+
+```vue-html
+<input v-model.lazy=""message"" />
+```",C1_D024_0004;C1_D046_0001;C1_D049_0003;C1_D046_0004;C1_D043_0003,2629,50
+H11,C2,"Use the `.lazy` modifier with `v-model`. It updates the bound variable on the `change` event—when the user leaves the field—instead of on every keystroke:
+
+```vue-html
+<input v-model.lazy=""text"">
+```",C2_D024_0004;C2_D024_0005;C2_D039_0004;C2_D046_0001;C2_D053_0002,2496,53
+H11,C3,"Use the `.lazy` modifier with `v-model`. It syncs the bound variable on the `change` event instead of on every `input` event:
+
+```vue
+<input v-model.lazy=""msg"" />
+```",C3_D046_0011;C3_D049_0006;C3_D024_0007;C3_D056_0006;C3_D039_0004,967,47
+H12,C1,"Pass a default value as the second argument to `inject()`. It will be used when no ancestor provides the key, preventing the missing-provider warning:
+
+```js
+const value = inject('message', 'default value')
+```",C1_D036_0001;C1_D079_0001;C1_D036_0002;C1_D035_0006;C1_D028_0001,2498,48
+H12,C2,"Pass a default value as the second argument to `inject()`. It will be used when no ancestor provides the key:
+
+```js
+const value = inject('key', 'default value')
+```",C2_D036_0001;C2_D079_0001;C2_D033_0004;C2_D036_0002;C2_D028_0005,1928,42
+H12,C3,"Give `inject()` a default value. If no ancestor provides the key, Vue uses that value instead of warning:
+
+```js
+const value = inject('message', 'default value')
+```
+
+For a default that should be created only when needed, pass a factory function as the second argument and `true` as the third:
+
+```js
+const value = inject('key', () => new ExpensiveClass(), true)
+```",C3_D036_0005;C3_D036_0001;C3_D036_0004;C3_D033_0006;C3_D079_0003,1118,89
+H13,C1,"Vue’s default `v-for` update strategy patches elements in place by index. After sorting, an input’s temporary DOM state—such as the text typed into it—can therefore stay at that position instead of following its data item.
+
+Give each row a unique, stable key so Vue can track and reorder the elements by identity:
+
+```vue-html
+<div v-for=""item in items"" :key=""item.id"">
+  <input>
+</div>
+```
+
+Use a primitive key such as a string or number, not an object.",C1_D048_0005;C1_D048_0003;C1_D048_0004;C1_D024_0004;C1_D068_0007,2554,111
+H13,C2,"Vue uses an in-place patching strategy by default: after sorting, it may reuse the input at each position for a different row. Since input values are temporary DOM state, the typed text can appear attached to the wrong item.
+
+Give each row a **unique, stable primitive key** so Vue can track and reorder the elements by item identity:
+
+```vue-html
+<div v-for=""item in items"" :key=""item.id"">
+  <input>
+</div>
+```
+
+Use a string or number that identifies the item—not its changing array index.",C2_D048_0006;C2_D048_0005;C2_D048_0003;C2_D076_0002;C2_D048_0004,2550,114
+H13,C3,"Vue’s default `v-for` behavior patches elements in place by index. After sorting, an input’s temporary DOM state—such as text typed into it—can therefore remain at that position and appear beside a different row.
+
+Give each item a unique, stable primitive key so Vue can track and reorder the corresponding elements:
+
+```vue
+<div v-for=""item in items"" :key=""item.id"">
+  <input>
+</div>
+```
+
+Use a unique string or number for the key, not an object.",C3_D048_0006;C3_D048_0010;C3_D076_0003;C3_D048_0009;C3_D050_0004,1628,107
+H14,C1,"Use `v-once` on the element, component, or enclosing block:
+
+```vue-html
+<div v-once>
+  <p>{{ startupData }}</p>
+</div>
+```
+
+Vue renders it once, then treats it and its children as static content and skips them on subsequent re-renders.",C1_D024_0004;C1_D003_0008;C1_D024_0005;C1_D054_0006;C1_D024_0003,2313,65
+H14,C2,"Add `v-once` to the element or component that contains the block. Vue will render it using the startup data, then skip that entire subtree on all future updates:
+
+```vue-html
+<div v-once>
+  <p>{{ msg }}</p>
+</div>
+```",C2_D024_0004;C2_D003_0010;C2_D024_0005;C2_D024_0006;C2_D024_0007,2610,59
+H14,C3,"Use `v-once` on the element or component containing the block. Vue renders it once, then treats it and all its children as static content and skips them on future updates.
+
+```vue-html
+<div v-once>
+  <p>{{ startupData }}</p>
+</div>
+```",C3_D003_0014;C3_D024_0008;C3_D058_0005;C3_D055_0010;C3_D024_0009,996,62
+H15,C1,"Use Vue’s `onMounted()` lifecycle hook. Register it synchronously during component setup; its callback runs after the component’s initial render, when its DOM tree has been created and inserted into the parent container.
+
+```vue
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  // Access the component's DOM here
+})
+</script>
+```",C1_D054_0006;C1_D009_0001;C1_D042_0006;C1_D047_0001;C1_D068_0005,2293,79
+H15,C2,"Use the Composition API’s `onMounted()` hook. Register its callback synchronously during `setup()`; it runs after the component’s DOM tree has been created and inserted into its parent container.
+
+```vue
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  // Access or work with the component's rendered DOM here
+})
+</script>
+```",C2_D024_0004;C2_D042_0007;C2_D058_0002;C2_D042_0008;C2_D009_0001,2629,80
+H15,C3,"Use the `onMounted` lifecycle hook. It runs after the component’s initial render, when its DOM nodes have been created:
+
+```vue
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  // Run code after the component's DOM exists
+})
+</script>
+```
+
+Register the hook synchronously during component setup.",C3_D049_0006;C3_D047_0001;C3_D047_0002;C3_D068_0009;C3_D009_0001,793,75
+H16,C1,"Vue tracks reactive object properties by intercepting property access through a proxy. Copying or destructuring a property into a local variable disconnects that variable from the proxy: reading or changing the local variable no longer triggers the proxy’s tracking or update mechanisms.
+
+For a primitive property, the local variable is just a separate value. If it holds an object, mutating that object can still be reactive, but reassigning the local variable itself is not.",C1_D055_0002;C1_D055_0003;C1_D049_0005;C1_D052_0002;C1_D056_0003,2628,93
+H16,C2,"Destructuring a property copies its current value into a local variable. After that, reads and writes to the local variable no longer go through the reactive object’s proxy, so Vue can’t track or trigger updates through that binding. This is especially true for primitive values such as numbers.
+
+Keep using the property through the reactive object (for example, `state.count`) to retain the connection.",C2_D056_0004;C2_D056_0003;C2_D049_0006;C2_D049_0007;C2_D055_0003,2623,81
+H16,C3,"A reactive object tracks access through its proxy’s property `get` and `set` traps. When you copy or destructure a property into a local variable, that variable is just a separate binding: reading or assigning it no longer goes through the proxy, so Vue can’t track those operations or trigger updates through it.
+
+If the copied value is an object, mutating that object can still be reactive; the disconnect applies to the local variable binding itself.",C3_D056_0006;C3_D056_0008;C3_D055_0003;C3_D049_0010;C3_D049_0008,1679,94
