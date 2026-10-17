@@ -132,6 +132,18 @@ def append_scaffold_run(
     return full
 
 
+def append_key_points_run(strategy: str, outputs: dict[str, str], runs_file: Path) -> dict:
+    """Log the freeze of a set's key points with the file's checksum (ADR 0035)."""
+    full = {
+        "date": date.today().isoformat(),
+        "step": "key_points",
+        "strategy": strategy,
+        "outputs_sha256": outputs,
+    }
+    _append(full, runs_file)
+    return full
+
+
 def _append(record: dict, runs_file: Path) -> None:
     runs_file.parent.mkdir(parents=True, exist_ok=True)
     with runs_file.open("a", encoding="utf-8") as f:

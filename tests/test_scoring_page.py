@@ -21,6 +21,9 @@ def dirs(tmp_path, monkeypatch):
     monkeypatch.setattr(scoring, "SCORING_SHEET_FILE", main / "scoring_sheet.csv")
     monkeypatch.setattr(scoring, "SCORES_FILE", main / "scores.csv")
     monkeypatch.setattr(scoring, "PILOT_DIR", pilot)
+    monkeypatch.setattr(scoring, "KEY_POINTS_FILE", main / "key_points.csv")
+    monkeypatch.setattr(scoring, "SCORING_CHECKS_FILE", main / "scoring_checks.csv")
+    monkeypatch.setattr(scoring, "GENERATION_RUNS_FILE", main / "generation_runs.jsonl")
     return main, pilot
 
 

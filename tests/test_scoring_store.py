@@ -1,9 +1,11 @@
+import json
+
 import pytest
 from conftest import SCORING_CODES, write_scoring_set
 
 import scoring_store as scoring
 from atomic_csv import read_csv, write_csv
-from config import RUBRIC_CRITERIA
+from config import KEY_POINTS_MAX, RUBRIC_CRITERIA
 from evaluate_answers import SHEET_HEADER
 
 ALL_TWO = dict.fromkeys(RUBRIC_CRITERIA, 2)
@@ -18,6 +20,9 @@ def dirs(tmp_path, monkeypatch):
     monkeypatch.setattr(scoring, "SCORING_SHEET_FILE", main / "scoring_sheet.csv")
     monkeypatch.setattr(scoring, "SCORES_FILE", main / "scores.csv")
     monkeypatch.setattr(scoring, "PILOT_DIR", pilot)
+    monkeypatch.setattr(scoring, "KEY_POINTS_FILE", main / "key_points.csv")
+    monkeypatch.setattr(scoring, "SCORING_CHECKS_FILE", main / "scoring_checks.csv")
+    monkeypatch.setattr(scoring, "GENERATION_RUNS_FILE", main / "generation_runs.jsonl")
     return main, pilot
 
 
@@ -185,3 +190,83 @@ def test_text_html_shows_raw_html_as_text():
     out = scoring.text_html('Bind <input v-model="x"> like this:\n\n```js\nconst a = 1\n```')
     assert "&lt;input" in out and "<input" not in out
     assert "<pre><code" in out
+
+
+def items_of(s):
+    return scoring.load_items(s)
+
+
+def test_a_pilot_set_keeps_key_points_checks_and_run_log_in_its_folder(hard):
+    folder = hard.items_file.parent
+    assert hard.key_points_file == folder / "key_points.csv"
+    assert hard.checks_file == folder / "scoring_checks.csv"
+    assert hard.runs_file == folder / "runs.jsonl"
+
+
+def test_questions_in_packet_order_without_answers(hard):
+    qs = scoring.questions(items_of(hard))
+    assert [q["question_id"] for q in qs] == ["H01", "H02"]
+    assert set(qs[0]) == {"question_id", "question", "reference_answer"}
+
+
+def test_key_points_are_saved_per_question_and_numbered(hard):
+    items = items_of(hard)
+    scoring.save_key_points(hard, items, "H02", ["Core two", "Second"])
+    scoring.save_key_points(hard, items, "H01", ["Core one"])
+    assert scoring.load_key_points(hard) == {"H01": ["Core one"], "H02": ["Core two", "Second"]}
+    rows = read_csv(hard.key_points_file, scoring.KEY_POINTS_HEADER)
+    assert [(r["question_id"], r["point"]) for r in rows] == [
+        ("H01", "1"),
+        ("H02", "1"),
+        ("H02", "2"),
+    ]
+    scoring.save_key_points(hard, items, "H02", ["Replaced"])
+    assert scoring.load_key_points(hard)["H02"] == ["Replaced"]
+
+
+@pytest.mark.parametrize(
+    ("question", "points", "message"),
+    [
+        ("H01", [], "1 to"),
+        ("H01", ["x"] * (KEY_POINTS_MAX + 1), "1 to"),
+        ("H01", ["fine", "  "], "empty"),
+        ("H01", ["two\nlines"], "one line"),
+        ("H09", ["x"], "unknown question"),
+    ],
+)
+def test_invalid_key_points_are_refused(hard, question, points, message):
+    with pytest.raises(ValueError, match=message):
+        scoring.save_key_points(hard, items_of(hard), question, points)
+    assert not hard.key_points_file.exists()
+
+
+def test_freeze_needs_every_question_and_writes_one_record(hard):
+    items = items_of(hard)
+    scoring.save_key_points(hard, items, "H01", ["Core one"])
+    with pytest.raises(ValueError, match="H02"):
+        scoring.freeze_key_points(hard, items)
+    assert not scoring.is_frozen(hard)
+    scoring.save_key_points(hard, items, "H02", ["Core two"])
+    scoring.freeze_key_points(hard, items)
+    assert scoring.is_frozen(hard)
+    (record,) = (json.loads(line) for line in hard.runs_file.read_text().splitlines())
+    assert record["step"] == "key_points" and "key_points.csv" in record["outputs_sha256"]
+    with pytest.raises(PermissionError, match="frozen"):
+        scoring.freeze_key_points(hard, items)
+    with pytest.raises(PermissionError, match="frozen"):
+        scoring.save_key_points(hard, items, "H01", ["Changed"])
+    assert len(hard.runs_file.read_text().splitlines()) == 1
+
+
+def test_a_hand_edit_after_the_freeze_is_caught(hard):
+    items = items_of(hard)
+    scoring.save_key_points(hard, items, "H01", ["Core one"])
+    scoring.save_key_points(hard, items, "H02", ["Core two"])
+    with pytest.raises(PermissionError, match="not frozen"):
+        scoring.require_frozen_key_points(hard)
+    scoring.freeze_key_points(hard, items)
+    scoring.require_frozen_key_points(hard)  # unchanged: passes
+    with hard.key_points_file.open("a", encoding="utf-8") as f:
+        f.write("H02,2,Added later\n")
+    with pytest.raises(PermissionError, match="key_points.csv"):
+        scoring.require_frozen_key_points(hard)
