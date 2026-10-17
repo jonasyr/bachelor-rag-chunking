@@ -10,7 +10,8 @@ answers (ADR 0026). The main catalogue is used only while it matches its freeze 
 OpenAI offers the model only as an alias, so the answers are generated once: an existing
 answer file is never overwritten, the results must come from the latest retrieval run over the
 current questions and chunk files, and the run stops without writing anything if an answer is
-cut off or empty, or if the API reports a different model or system fingerprint within the run.
+cut off or empty, if the API reports a different model or system fingerprint within the run, or
+if the creation time of the model object behind the alias differs before and after the run.
 The run log records the model and fingerprint the API reported, the input and output checksums,
 tokens and cost per strategy.
 
@@ -18,6 +19,7 @@ Output schema (docs/reference/data-formats.md): question_id, strategy, answer, s
 prompt_tokens, completion_tokens
 """
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 from atomic_csv import write_csv
@@ -30,6 +32,7 @@ from config import (
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
     ID_SEPARATOR,
+    LLM_MODEL,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RETRIEVED_RESULTS_FILE,
@@ -39,7 +42,7 @@ from config import (
 from embed import load_jsonl
 from evaluate_retrieval import ranked_results
 from freeze import require_frozen
-from llm_client import Completer, Completion, complete
+from llm_client import Completer, Completion, ModelCreated, complete, model_created
 from prompt import context, messages
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import append_generation_run, generation_cost, require_run, sha256_of
@@ -80,8 +83,13 @@ def checked(answer: Completion, label: str, models: set[str], fingerprints: set[
     return answer
 
 
+def created_iso(seconds: int) -> str:
+    return datetime.fromtimestamp(seconds, UTC).isoformat()
+
+
 def generate(
     completer: Completer = complete,
+    model_created: ModelCreated = model_created,
     results_file: Path = RETRIEVED_RESULTS_FILE,
     questions_file: Path = QUESTIONS_FILE,
     ground_truth_file: Path = GROUND_TRUTH_FILE,
@@ -130,6 +138,7 @@ def generate(
     )
     grouped = ranked_results(results_file, qids, keys, chunks)
 
+    created_before = model_created()  # free lookup, only after every local check
     rows: list[dict] = []
     models: set[str] = set()
     fingerprints: set[str] = set()
@@ -157,12 +166,20 @@ def generate(
                 }
             )
 
+    created_after = model_created()
+    if created_after != created_before:
+        raise RuntimeError(
+            f"the model behind {LLM_MODEL} changed during the run (created "
+            f"{created_iso(created_before)}, now {created_iso(created_after)}); nothing was "
+            "written (ADR 0033)"
+        )
     write_csv(out_file, ANSWERS_HEADER, rows)
     append_generation_run(
         {
             "step": "generate",
             "strategy": ",".join(keys),
             "model_reported": next(iter(models), None),
+            "model_created": created_iso(created_before),
             "system_fingerprint": next(iter(fingerprints), None),
             "answers": len(rows),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},

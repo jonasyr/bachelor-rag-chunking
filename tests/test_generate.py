@@ -136,12 +136,28 @@ def record_retrieval(files, strategy=EXPERIMENT, outputs=True, **changed):
         f.write(json.dumps(record) + "\n")
 
 
-def run(files, completer=None, record=True, **overrides):
-    """Generate; first log a retrieval run over the current files unless `record` is False."""
+CREATED = 1789406102  # 2026-09-14T17:15:02Z, the creation time the API reported for gpt-6-luna
+
+
+class FakeCreated:
+    """Creation times of the pinned model, one per lookup (no network)."""
+
+    def __init__(self, *values):
+        self.values = list(values) or [CREATED, CREATED]
+        self.calls = 0
+
+    def __call__(self):
+        self.calls += 1
+        return self.values[min(self.calls, len(self.values)) - 1]
+
+
+def run(files, completer=None, record=True, created=None, **overrides):
+    """Generate; first log a retrieval run over the current files unless `record` is False.
+    Never reaches the API: completer and model lookup are always fakes."""
     if record:
         record_retrieval(files)
     args = {k: v for k, v in files.items() if k != "control_chunk_file"} | overrides
-    return generate(completer or FakeCompleter(), **args)
+    return generate(completer or FakeCompleter(), model_created=created or FakeCreated(), **args)
 
 
 def runs(files):
@@ -371,3 +387,30 @@ def test_missing_fingerprints_do_not_stop_the_run(files):
     completer = FakeCompleter(fingerprints=dict.fromkeys(range(1, count + 1), None))
     assert run(files, completer) == count
     assert runs(files)[0]["system_fingerprint"] is None
+
+
+def test_run_log_records_when_the_model_was_created(files):
+    run(files)
+    assert runs(files)[0]["model_created"] == "2026-09-14T17:15:02+00:00"
+
+
+def test_model_changed_during_the_run_writes_nothing(files):
+    """The alias pointed to a newer model object at the end of the run than at its start."""
+    with pytest.raises(RuntimeError, match="2026-09-14T17:15:02.*2026-10-17"):
+        run(files, created=FakeCreated(CREATED, 1792195200))
+    assert not files["out_file"].exists()
+    assert not files["runs_file"].exists()
+
+
+def test_model_is_looked_up_only_after_the_local_checks(files):
+    files["out_file"].write_text("kept", encoding="utf-8")
+    created = FakeCreated()
+    with pytest.raises(FileExistsError):
+        run(files, created=created)
+    assert created.calls == 0
+
+
+def test_model_is_looked_up_before_the_first_answer_and_after_the_last(files):
+    created = FakeCreated()
+    run(files, created=created)
+    assert created.calls == 2

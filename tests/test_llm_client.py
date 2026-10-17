@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_SEED, LLM_TEMPERATURE
-from llm_client import complete
+from llm_client import complete, model_created
 
 
 class FakeOpenAI:
@@ -22,6 +22,12 @@ class FakeOpenAI:
             usage=SimpleNamespace(prompt_tokens=120, completion_tokens=30),
         )
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self.create))
+        self.models = SimpleNamespace(retrieve=self.retrieve)
+        self.retrieved = []
+
+    def retrieve(self, model):
+        self.retrieved.append(model)
+        return SimpleNamespace(id=model, created=1789406102)
 
     def create(self, **kwargs):
         self.requests.append(kwargs)
@@ -63,3 +69,9 @@ def test_missing_key_raises_before_any_call(monkeypatch):
     monkeypatch.setattr("embedding_client.load_dotenv", lambda: None)
     with pytest.raises(RuntimeError, match="OPENAI_API_KEY"):
         complete([{"role": "user", "content": "Q?"}])
+
+
+def test_model_created_reads_the_pinned_model():
+    client = FakeOpenAI()
+    assert model_created(client=client) == 1789406102
+    assert client.retrieved == [LLM_MODEL]

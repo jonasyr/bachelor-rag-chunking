@@ -247,11 +247,20 @@ Chroma schreibt die Indexdateien beim Lesen neu, sodass der Zustand des Abbruchs
 abgebrochenen Laufs (gleiche Größenordnung, rund 0,0004 USD) sind nicht protokolliert, weil `retrieve.py` erst am Ende
 in `runs.jsonl` schreibt.
 
+## Antwortmodell: Prüfaufruf (17.10.2026)
+
+Ein Aufruf mit den Einstellungen des Hauptlaufs (Pilotfrage H01 des Sets `hard`, top-5 von C1, nicht gespeichert)
+bestätigte, dass die API `temperature = 0`, `seed` und Effort `none` zusammen annimmt: `finish_reason = "stop"`,
+2.649 Prompt- und 140 Antwort-Tokens, 0,00034 USD. Gemeldet wurden nur das Modell `gpt-6-luna` und kein
+`system_fingerprint`; die Modellliste der API führt für GPT-6 keine datierten Varianten (`gpt-5.6-luna`,
+`gpt-6-astra`, `gpt-6-luna`, `gpt-6-sol`, `gpt-6.1-sol`). Erstellungszeitpunkte laut `GET /v1/models`:
+`gpt-6-luna` 14.09.2026, 17:15:02 UTC; `gpt-6-sol` 14.09.2026, 17:12:17 UTC. Folgerung: [ADR 0033](../adr/0033-antwortmodell.md).
+
 ## Modellversionen (bei der Umsetzung eintragen)
 
 | Komponente | Version | Datum der ersten Nutzung |
 |---|---|---|
-| LLM | `gpt-6-luna`, Effort `none`, Temperatur 0, höchstens 1.024 Ausgabe-Tokens ([ADR 0033](../adr/0033-antwortmodell.md)); gemeldetes Modell: nach dem ersten Lauf aus `model_reported` eintragen | gepinnt 17.10.2026; erste Nutzung: nach dem ersten Lauf eintragen |
+| LLM | `gpt-6-luna` (Modellobjekt erstellt 14.09.2026, 17:15:02 UTC; Wissensstand 18.05.2026), Effort `none`, Temperatur 0, `seed` 20261017, höchstens 1.024 Ausgabe-Tokens ([ADR 0033](../adr/0033-antwortmodell.md)) | 17.10.2026 (Prüfaufruf) |
 | Embedding-Modell | `text-embedding-3-large`, 3.072 Dimensionen ([ADR 0023](../adr/0023-embedding-modell.md)) | 13.10.2026 |
 | OpenAI Python SDK | 2.44.0 | 13.10.2026 |
 | ChromaDB | 1.5.9 | 13.10.2026 |

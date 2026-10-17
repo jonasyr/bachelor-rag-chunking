@@ -22,6 +22,10 @@ Angenommen (17.10.2026; konkretisiert [ADR 0016](0016-modell-neutralitaet.md), s
   verkleinern, die die Arbeit messen will; zudem hilft es bei störenden Passagen nicht verlässlich
   (`lee2026noisybench`, nur Abstract geprüft). Ein Modell, das direkt aus den Passagen antwortet, zeigt deutlicher,
   was das Chunking liefert.
+- Ein erster Aufruf am 17.10.2026 meldete als Modell nur `gpt-6-luna` und keinen `system_fingerprint`; die
+  Modellliste der API führt keine datierten Varianten. Einziger Versionshinweis ist der Erstellungszeitpunkt des
+  Modellobjekts (`GET /v1/models/gpt-6-luna`: 14.09.2026, 17:15:02 UTC); ob er sich bei einer Änderung hinter dem
+  Alias ändert, dokumentiert OpenAI nicht.
 - 144 Antworten (48 Fragen × 3 Strategien) mit rund 2.500 Prompt-Tokens kosten mit `gpt-6-luna` etwa 0,05 USD.
 
 ## Entscheidung
@@ -38,6 +42,11 @@ verschiedene Modelle oder verschiedene `system_fingerprint`-Werte (Backend-Konfi
 Codex-Review von PR #14, weil sonst Strategien auf verschiedenen Backends laufen könnten. Zeigt der Pilotlauf, dass
 OpenAI den Fingerabdruck auch ohne Modelländerung laufend wechselt, wird diese Regel in einer neuen ADR überprüft. Das Laufprotokoll hält das von der API gemeldete Modell, die Prüfsummen der Ein- und
 Ausgaben, SDK-Version, Tokens und Kosten je Strategie fest.
+
+Wir werden den Erstellungszeitpunkt des Modellobjekts vor der ersten und nach der letzten Antwort abfragen (kostenlos),
+im Laufprotokoll festhalten und den Lauf ohne Schreiben abbrechen, wenn er sich unterscheidet. In der Arbeit wird das
+Modell als „`gpt-6-luna` (Modellobjekt erstellt 14.09.2026, Wissensstand 18.05.2026), aufgerufen am <Datum> mit
+SDK <Version>“ angegeben.
 
 Wir werden jeden Schritt nur auf den Dateien des letzten Laufs seines Vorgängers aufsetzen lassen (Hinweis aus dem
 Codex-Review von PR #14): `generate.py` prüft vor dem ersten API-Aufruf, dass Fragen, Ground Truth und Chunk-Dateien
@@ -56,6 +65,8 @@ vor dem Hauptlauf.
   Modellnamen genau angeben.
 - Gut: Veraltete Retrieval-Ergebnisse oder nachträglich neu erzeugte Chunk-Dateien können weder in die Generierung
   noch in die Bewertung gelangen.
+- Schlecht: Modell- und Fingerabdruck-Prüfung greifen bei `gpt-6-luna` derzeit nicht, weil die API weder eine
+  Version noch einen Fingerabdruck meldet; der Erstellungszeitpunkt ist ein Hinweis, kein Beweis.
 - Schlecht: Ohne datierten Snapshot lässt sich ein Lauf nach einer Modelländerung nicht exakt wiederholen; die
   gespeicherten Antworten sind die Primärdaten und daher versioniert (`generated_answers.csv`, mit
   `generation_runs.jsonl`).
