@@ -660,3 +660,22 @@ def test_summarise_refuses_checks_whose_point_count_differs(files):
     freeze_points(files, points=2)
     with pytest.raises(ValueError, match="2 key points"):
         run_summarise(files)
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        (lambda rows: rows + [rows[0]], "more than once"),  # duplicate code
+        (lambda rows: rows + [rules.to_row("Q009-A", GOOD_CHECKS)], "not in"),  # stray code
+        (lambda rows: rows[::-1], "order"),
+    ],
+)
+def test_summarise_refuses_a_malformed_checks_sequence(files, change, message):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    write_checks(files, change([rules.to_row(c, GOOD_CHECKS) for c in codes]))
+    with pytest.raises(ValueError, match=message):
+        run_summarise(files)
+    assert not files["scores_file"].exists()

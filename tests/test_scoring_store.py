@@ -345,3 +345,15 @@ def test_a_hand_edited_key_points_file_with_bad_numbering_cannot_be_frozen(hard)
     with pytest.raises(ValueError, match="H01"):
         scoring.freeze_key_points(hard, scoring.load_items(hard))
     assert not scoring.is_frozen(hard)
+
+
+@pytest.mark.parametrize(
+    ("extra", "message"),
+    [("H01-B", "more than once"), ("H09-A", "not in")],
+)
+def test_save_refuses_a_malformed_checks_file(frozen, extra, message):
+    scoring.save_score(frozen, "H01-B", ok("H01-B"), "")
+    with frozen.checks_file.open("a", encoding="utf-8") as f:
+        f.write(",".join(rules.to_row(extra, ok("H01-B")).values()) + "\n")
+    with pytest.raises(ValueError, match=message):
+        scoring.save_score(frozen, "H01-A", ok("H01-A"), "")

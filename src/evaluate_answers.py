@@ -344,8 +344,20 @@ def check_derived(
     except ValueError as error:
         raise ValueError(f"{key_points_file}: {error}") from error
     counts = {qid: len(texts) for qid, texts in points.items()}
-    stored = {r["code"]: r for r in read_csv(checks_file, rules.CHECKS_HEADER)}
-    for row in read_csv(sheet_file, SHEET_HEADER):
+    sheet = read_csv(sheet_file, SHEET_HEADER)
+    check_rows = read_csv(checks_file, rules.CHECKS_HEADER)
+    order = [r["code"] for r in sheet]
+    seen: set[str] = set()
+    for code in (r["code"] for r in check_rows):
+        if code in seen:
+            raise ValueError(f"{checks_file}: {code} appears more than once")
+        if code not in order:
+            raise ValueError(f"{checks_file}: {code} is not in {sheet_file}")
+        seen.add(code)
+    if [r["code"] for r in check_rows] != [c for c in order if c in seen]:
+        raise ValueError(f"{checks_file}: rows are not in the order of {sheet_file}")
+    stored = {r["code"]: r for r in check_rows}
+    for row in sheet:
         if row["code"] not in stored:
             raise ValueError(f"{checks_file}: no checks for {row['code']}")
         version, checks = rules.from_row(stored[row["code"]])

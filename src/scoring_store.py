@@ -210,9 +210,15 @@ def save_score(s: ScoringSet, code: str, checks: dict, notes: str) -> dict[str, 
     n_points = len(load_key_points(s).get(row["question_id"], []))
     rules.validate(checks, n_points)
     values = rules.derive(checks)
-    stored = {r["code"]: r for r in read_csv(s.checks_file, rules.CHECKS_HEADER)}
-    stored[code] = rules.to_row(code, checks)
     order = [r["code"] for r in rows]
+    stored: dict[str, dict] = {}
+    for r in read_csv(s.checks_file, rules.CHECKS_HEADER):
+        if r["code"] in stored:
+            raise ValueError(f"{s.checks_file}: {r['code']} appears more than once")
+        if r["code"] not in order:
+            raise ValueError(f"{s.checks_file}: {r['code']} is not in {s.sheet_file}")
+        stored[r["code"]] = r
+    stored[code] = rules.to_row(code, checks)
     write_csv(
         s.checks_file,
         rules.CHECKS_HEADER,
