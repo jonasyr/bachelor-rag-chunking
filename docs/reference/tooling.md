@@ -17,7 +17,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | Embeddings | OpenAI API (`openai` 2.44.0, gepinnt), Modell `config.EMBEDDING_MODEL` ([ADR 0023](../adr/0023-embedding-modell.md)) |
 | Vector Store | Chroma (`chromadb` 1.5.9, gepinnt; lokal, persistent; Kosinus, exakte Suche geprüft; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) |
 | Numerik | NumPy (Vektordateien `.npz`, exakter Kosinus) |
-| LLM | festes GPT-Modell über die OpenAI API (`config.LLM_MODEL`, noch Platzhalter) |
+| LLM | `gpt-6-luna` über die OpenAI Chat Completions API, Effort `none`, Temperatur 0 (`src/llm_client.py`, [ADR 0033](../adr/0033-antwortmodell.md)) |
 | Umgebung | `python-dotenv` (`.env`) |
 | Datenanalyse | Pandas |
 | Diagramme | Matplotlib / Plotly |
@@ -27,7 +27,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 Pandas, Matplotlib/Plotly, Streamlit und RAGAS sind deklariert, werden aber erst in der Auswertung genutzt.
 
 `OPENAI_API_KEY` (aus der Umgebung oder `.env`) wird nur gelesen, wenn ein Schritt die API aufruft
-(`src/embedding_client.py`: `embed.py` und `retrieve.py` bei neuen Vektoren, künftig `generate.py`). Tests und die
+(`src/embedding_client.py`: `embed.py` und `retrieve.py` bei neuen Vektoren; `src/llm_client.py`: `generate.py`). Tests und die
 übrigen Schritte brauchen keinen Schlüssel; fehlt er bei einem API-Aufruf, bricht der Schritt mit einer Meldung ab.
 
 ## Repository-Struktur
@@ -45,6 +45,7 @@ bachelor-rag-chunking/
 │   ├── snapshot.py  ingest.py  preprocess.py  tokens.py
 │   ├── chunking.py
 │   ├── embedding_client.py  canary.py  embed.py  run_log.py
+│   ├── llm_client.py  prompt.py
 │   ├── vector_index.py  relevance.py  retrieve.py  freeze.py
 │   ├── catalogue.py                         (Fragenkatalog: Plan, Nachschlageliste, Suche, Prüfung, Einfrieren)
 │   ├── catalogue_plan.py  catalogue_review.py  catalogue_store.py  atomic_csv.py
@@ -56,7 +57,7 @@ bachelor-rag-chunking/
 ├── data/
 │   ├── raw/vue_docs_snapshot/               (Snapshot: api/, guide/, style-guide/)
 │   ├── processed/                           (documents, sections, chunks_*, embeddings_*, embedding_runs)
-│   ├── evaluation/                          (questions, ground_truth, query_embeddings, retrieved_results*, …)
+│   ├── evaluation/                          (questions, ground_truth, query_embeddings, retrieved_results*, generation_runs, …)
 │   └── pilot/                               (Pilot-Sets: ., hard/, hard_posthoc/)
 ├── chroma_db/                               (Chroma-Index, entsteht beim ersten embed.py)
 ├── output/                                  (tables/*.tex, figures/*.pdf; entsteht mit der Auswertung)
@@ -84,9 +85,9 @@ Nach `.gitignore`:
 |---|---|
 | `data/raw/vue_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
 | `chroma_db/` | ignoriert (ganzer Ordner, kein `.gitkeep`; entsteht beim ersten `embed.py`) |
-| `data/evaluation/retrieved_results*.csv`, `retrieval_scores*.csv`, `generated_answers.csv`, `scoring_packet.md`, `scores.csv`, `query_embeddings.npz` | ignoriert |
-| `data/evaluation/scoring_sheet.csv`, `scoring_key.csv` (Primärdaten der Bewertung) | versioniert |
-| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `catalogue_freeze.json` | versioniert |
+| `data/evaluation/retrieved_results*.csv`, `retrieval_scores*.csv`, `scoring_packet.md`, `scores.csv`, `query_embeddings.npz` | ignoriert |
+| `data/evaluation/generated_answers.csv` (Primärdaten, nicht exakt wiederholbar, [ADR 0033](../adr/0033-antwortmodell.md)), `scoring_sheet.csv`, `scoring_key.csv` (Primärdaten der Bewertung) | versioniert |
+| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `catalogue_freeze.json`, `generation_runs.jsonl` | versioniert |
 | `data/pilot/**/query_embeddings.npz` | ignoriert; alle übrigen Pilotdateien versioniert |
 | `*.pdf` | ignoriert, außer `output/figures/*.pdf` |
 | `docs/corpus_snapshot.txt`, `docs/corpus_manifest.csv` | versioniert |
@@ -104,9 +105,9 @@ Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. 
 | `retrieve.py` | ohne Option alle Strategien C1–C3 ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)); `--control` nur die Kontrolle K1; bricht auf dem Hauptkatalog ohne passenden Freeze-Datensatz ab ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) |
 | `catalogue.py` | `plan` (Stichprobenplan einmal ziehen, [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)), `sections` (Nachschlageliste schreiben), `find TERM` (wörtliche Suche, Groß-/Kleinschreibung egal, nur der innerste Abschnitt), `show SECTION_ID`, `check [--draft]` (Abdeckungsprüfung; `--draft` scheitert nur an Fehlern), `freeze` (strenge Prüfung, dann Freeze-Datensatz); [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `app/catalogue_editor.py` | `uv run streamlit run app/catalogue_editor.py --server.address localhost` (die Option bindet unabhängig vom Arbeitsverzeichnis; `.streamlit/config.toml` gilt nur beim Start aus der Repo-Wurzel); schreibgeschützt nach dem Einfrieren ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)) |
-| `generate.py` (Gerüst) | `--strategy C1\|C2\|C3\|all` (nur das Experiment; K1 wird nicht generiert) |
+| `generate.py` | ohne Option alle Strategien C1–C3 in einem Lauf (K1 bekommt keine Antworten, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)); `--set DIR` ein Pilot-Set (z. B. `data/pilot/hard`); braucht `OPENAI_API_KEY`; überschreibt nie eine vorhandene `generated_answers.csv`, bricht vor dem ersten API-Aufruf ab, wenn die Ergebnisdatei nicht aus dem letzten Retrieval-Lauf über die aktuellen Fragen und Chunk-Dateien stammt, und ohne Schreiben bei abgeschnittener oder leerer Antwort oder wechselndem Modell oder Fingerabdruck, auf dem Hauptkatalog ohne passenden Freeze-Datensatz ([ADR 0033](../adr/0033-antwortmodell.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) |
 | `evaluate_retrieval.py` | `--control` die Kontrolle K1; k ist immer `config.TOP_K` ([ADR 0014](../adr/0014-temperatur-und-topk.md)); schreibt `retrieval_scores*.csv` und gibt die Mittel je Strategie, Fragetyp und Konstruktionsklasse für Haupt- und Sensitivitätsregel aus; bricht auf dem Hauptkatalog ohne passenden Freeze-Datensatz ab und wenn `is_relevant` nicht zur Ground Truth passt |
-| `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht): `scaffold` schreibt aus `generated_answers.csv` Lesepaket, Bewertungsbogen und Schlüssel der blinden Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); nie über einen vorhandenen Bogen oder Schlüssel); beide nur mit eingefrorenem Hauptkatalog ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) und nur, wenn jede Frage des Katalogs genau eine Zeile je Strategie C1–C3 hat; `summarise` prüft den Bogen gegen den Schlüssel und jede Bewertung (ganze Zahl 0–2), schreibt `scores.csv` mit `total_score` und gibt Mittel, Median und Standardabweichung je Strategie, Fragetyp und Konstruktionsklasse aus |
+| `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht): `scaffold` schreibt aus `generated_answers.csv` Lesepaket, Bewertungsbogen und Schlüssel der blinden Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); nie über einen vorhandenen Bogen oder Schlüssel; nur, wenn Antworten und Chunk-Dateien die des letzten Generierungslaufs sind, [ADR 0033](../adr/0033-antwortmodell.md)); beide nur mit eingefrorenem Hauptkatalog ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) und nur, wenn jede Frage des Katalogs genau eine Zeile je Strategie C1–C3 hat; `summarise` prüft den Bogen gegen den Schlüssel und jede Bewertung (ganze Zahl 0–2), schreibt `scores.csv` mit `total_score` und gibt Mittel, Median und Standardabweichung je Strategie, Fragetyp und Konstruktionsklasse aus |
 | `scripts/difficulty_probe.py` | `[SET_DIR]`: Pilot-Set, relativ zur Repo-Wurzel (Standard `config.PILOT_DIR` = `data/pilot`); läuft C1–C3 und K1, schreibt die Ergebnisdateien des Sets; Sets: [Datenformate](data-formats.md#pilot-sets) |
 | `scripts/remap_pilot.py` | einmalig: `OLD_DIR PILOT_DIR [PILOT_DIR …]` (Pfade relativ zum Arbeitsverzeichnis, also der Repo-Wurzel); bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab und überschreibt sie ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
 

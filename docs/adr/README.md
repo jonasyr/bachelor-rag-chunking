@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. Übertragen aus dem Decision Log des
-früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0031 sind seit
+früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0033 sind seit
 der Umsetzung hinzugekommen. Hintergrund: [Forschungsdesign](../explanation/research-design.md); offene Entscheidungen: [Plan](../plan.md).
 Format: Michael Nygard (Status, Kontext, Entscheidung, Konsequenzen), Nummern und Dateinamen bleiben fest.
 Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte auf „ersetzt durch …“ setzen.
@@ -23,9 +23,9 @@ bleibt unverändert.
 | [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen |
 | [0012](0012-retrieval-metriken.md) | Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k) | Angenommen |
 | [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen; ergänzt durch 0032 |
-| [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen |
+| [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen; umgesetzt in 0033 |
 | [0015](0015-tech-stack.md) | Tech-Stack | Angenommen |
-| [0016](0016-modell-neutralitaet.md) | Modell-Neutralität | Angenommen; Embedding-Modell und Versionen in 0023 |
+| [0016](0016-modell-neutralitaet.md) | Modell-Neutralität | Angenommen; Embedding-Modell und Versionen in 0023, Antwortmodell in 0033 |
 | [0017](0017-fragenkatalog.md) | Fragenkatalog: etwa 40 Fragen mit Referenzantworten | Angenommen; präzisiert durch 0027, 0029 und 0030 |
 | [0018](0018-literaturbasis.md) | Literaturbasis: 15 verifizierte Quellen | Angenommen |
 | [0019](0019-korpus-ausschnitt.md) | Korpus-Ausschnitt: ganzes `src/guide/`, nur Composition API | Teilweise ersetzt (0025); ergänzt durch 0022, Sensitivitätsregel geändert durch 0026 |
@@ -42,3 +42,4 @@ bleibt unverändert.
 | [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre vor dem Retrieval | Angenommen; erweitert durch 0031 |
 | [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan der Slots und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen |
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten (Lesepaket, Bogen, Schlüssel) | Angenommen |
+| [0033](0033-antwortmodell.md) | Antwortmodell `gpt-6-luna` (Effort `none`, Temperatur 0), Antworten einmal erzeugen | Angenommen |

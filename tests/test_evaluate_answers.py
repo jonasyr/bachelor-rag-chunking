@@ -14,6 +14,7 @@ from evaluate_answers import (
     summarise,
 )
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
+from run_log import sha256_of
 
 STRATEGIES = list(STRATEGY_IDS)
 QIDS = ("Q001", "Q002")
@@ -85,6 +86,7 @@ def files(tmp_path):
         "packet_file": tmp_path / "scoring_packet.md",
         "key_file": tmp_path / "scoring_key.csv",
         "scores_file": tmp_path / "scores.csv",
+        "generation_runs_file": tmp_path / "generation_runs.jsonl",
     }
 
 
@@ -99,6 +101,7 @@ SCAFFOLD_ARGS = [
     "sheet_file",
     "packet_file",
     "key_file",
+    "generation_runs_file",
 ]
 SUMMARISE_ARGS = [
     "questions_file",
@@ -112,7 +115,26 @@ SUMMARISE_ARGS = [
 ]
 
 
-def run_scaffold(files, **overrides):
+def record_generation(files, outputs=True, **changed):
+    """A generate record as generate.py writes it, over the current files unless `changed`."""
+    inputs = [files["questions_file"], files["ground_truth_file"], *files["chunk_files"].values()]
+    record = {
+        "step": "generate",
+        "strategy": ",".join(STRATEGIES),
+        "inputs_sha256": {f.name: sha256_of(f) for f in inputs} | changed,
+    }
+    if outputs:
+        record["outputs_sha256"] = {
+            files["answers_file"].name: sha256_of(files["answers_file"])
+        } | changed
+    with files["generation_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+
+
+def run_scaffold(files, record=True, **overrides):
+    """Scaffold; first log a generation run over the current files unless `record` is False."""
+    if record:
+        record_generation(files)
     return scaffold(**{k: files[k] for k in SCAFFOLD_ARGS} | overrides)
 
 
@@ -311,3 +333,41 @@ def test_main_catalogue_is_used_only_while_frozen(files, monkeypatch):
     with pytest.raises(RuntimeError, match="not frozen"):
         run_scaffold(files)
     assert not files["sheet_file"].exists()
+
+
+def assert_nothing_scaffolded(files):
+    for name in ("sheet_file", "packet_file", "key_file"):
+        assert not files[name].exists()
+
+
+def test_scaffold_needs_the_generation_run(files):
+    with pytest.raises(RuntimeError, match="no generate run"):
+        run_scaffold(files, record=False)
+    assert_nothing_scaffolded(files)
+
+
+def test_scaffold_refuses_chunks_changed_since_generation(files):
+    """The packet would show raters excerpts the model never saw."""
+    record_generation(files)
+    with files["chunk_files"]["C2"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"chunk_id": chunk_id("C2", 3), "text": "added later"}) + "\n")
+    with pytest.raises(RuntimeError, match="chunks_c2.jsonl"):
+        run_scaffold(files, record=False)
+    assert_nothing_scaffolded(files)
+
+
+def test_scaffold_refuses_answers_changed_since_generation(files):
+    record_generation(files)
+    rows = answer_rows()
+    rows[0][2] = "Edited by hand."
+    write_csv(files["answers_file"], ANSWERS_HEADER, rows)
+    with pytest.raises(RuntimeError, match="generated_answers.csv"):
+        run_scaffold(files, record=False)
+    assert_nothing_scaffolded(files)
+
+
+def test_scaffold_needs_the_answer_checksum_of_the_generation_run(files):
+    record_generation(files, outputs=False)
+    with pytest.raises(RuntimeError, match="generated_answers.csv"):
+        run_scaffold(files, record=False)
+    assert_nothing_scaffolded(files)

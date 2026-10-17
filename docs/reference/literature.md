@@ -48,3 +48,15 @@ Abgerufen am 14.10.2026; Grundlage von [ADR 0025](../adr/0025-korpus-guide-api-s
 | `smith2024chunking` | Smith, B., & Troynikov, A. (2024, 3. Juli). *Evaluating chunking strategies for retrieval*. Chroma. https://www.trychroma.com/research/evaluating-chunking | `text-embedding-3-large`, fünf abgerufene Chunks; kleinere Chunks (800 → 200 Tokens) erhöhen die Precision deutlich bei etwa gleichem Recall (rund 85–89 %) |
 | `bhat2025chunksize` | Bhat, S. R., Rudat, M., Spiekermann, J., & Flores-Herr, N. (2025). *Rethinking chunk size for long-document retrieval: A multi-dataset analysis* (arXiv:2505.21700). https://arxiv.org/abs/2505.21700 | beste Chunk-Größe hängt vom Datensatz und Fragetyp ab (64–128 Tokens für knappe Fakten, 512–1.024 für breiten Kontext) und vom Embedding-Modell |
 | `vuejs2026compare` | vuejs/docs. (2026). *Compare b75d188…40aa88a* [GitHub-Vergleich]. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien |
+
+Abgerufen am 17.10.2026; Grundlage von [ADR 0033](../adr/0033-antwortmodell.md).
+
+| Kurzname | Quelle (APA 7) | Belegt |
+|----------|----------------|--------|
+| `openai2026gpt6luna` | OpenAI. (o. J.). *GPT-6 Luna* [Modellseite]. https://developers.openai.com/api/docs/models/gpt-6-luna | 0,10/0,50 USD je 1 Mio. Ein-/Ausgabe-Tokens, Wissensstand 18.05.2026, Effort `none` bis `max`, nur Alias |
+| `openai2026latestmodel` | OpenAI. (o. J.). *Using GPT-6* [Leitfaden]. https://developers.openai.com/api/docs/guides/latest-model | `temperature` nur bei Effort `none`; `none` nur bei GPT-6 Sol und GPT-6 Luna |
+| `openai2026reasoning` | OpenAI. (o. J.). *Reasoning models* [Leitfaden]. https://developers.openai.com/api/docs/guides/reasoning | Effort-Stufen, Parameter bei Reasoning |
+| `openai2026deprecations` | OpenAI. (o. J.). *Deprecations*. https://developers.openai.com/api/docs/deprecations | GPT-4.1/4o-Snapshots bis 14.01.2027, GPT-5-Snapshots bis 11.12.2026 |
+| `renze2024temperature` | Renze, M., & Guven, E. (2024). The effect of sampling temperature on problem solving in large language models. In *Findings of the Association for Computational Linguistics: EMNLP 2024*. https://arxiv.org/abs/2402.05201 | keine signifikante Wirkung der Temperatur 0,0–1,0 auf die Lösungsgüte |
+| `atil2024nondeterminism` | Atil, B., et al. (2024). *Non-determinism of "deterministic" LLM settings* (arXiv:2408.04667). https://arxiv.org/abs/2408.04667 | Genauigkeitsschwankungen bis 15 % trotz „deterministischer“ Einstellungen |
+| `lee2026noisybench` | Lee, S., et al. (2026). *Lost in the noise: How test-time reasoning fails with contextual distractors* (arXiv:2601.07226). https://arxiv.org/abs/2601.07226 | Reasoning-Modelle brechen mit störenden Passagen ebenfalls ein; nur Abstract geprüft, vor dem Zitieren Volltext lesen |

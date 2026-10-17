@@ -242,6 +242,11 @@ def test_refuses_any_other_strategy_set(files):
         (lambda rows: [r for r in rows if r[1] != "C2"], "missing"),  # a missing strategy
         (lambda rows: rows + [["Q999", "C1", 1, "C1_D001_0001", "0.1", 0]], "unknown"),
         (lambda rows: [[*r[:3], "C1_D009_0001", *r[4:]] for r in rows], "unknown chunk"),
+        # a C2 chunk in a C1 row: the chunk exists, but not in that strategy
+        (
+            lambda rows: [[*r[:3], r[3].replace("C1_", "C2_"), *r[4:]] for r in rows],
+            "unknown chunk",
+        ),
     ],
 )
 def test_refuses_incomplete_or_foreign_results(files, change, message):

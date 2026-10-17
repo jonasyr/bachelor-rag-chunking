@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D16 im Leitfaden; Quelle: Baseline, übernommen); Embedding-Modell sowie SDK- und Chroma-Version entschieden in [ADR 0023](0023-embedding-modell.md)
+Angenommen (D16 im Leitfaden; Quelle: Baseline, übernommen); Embedding-Modell sowie SDK- und Chroma-Version entschieden in [ADR 0023](0023-embedding-modell.md), Antwortmodell in [ADR 0033](0033-antwortmodell.md)
 
 ## Kontext
 

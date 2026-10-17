@@ -189,6 +189,13 @@ def test_questions_are_not_embedded_with_a_changed_model(setup):
     assert not paths["query_file"].exists()
 
 
+def test_the_run_log_records_the_checksum_of_the_results(setup):
+    paths, _, _, fake = setup
+    retrieve(embedder=fake, **paths)
+    last = json.loads(paths["runs_file"].read_text(encoding="utf-8").splitlines()[-1])
+    assert last["outputs_sha256"] == {paths["out_file"].name: sha256_of(paths["out_file"])}
+
+
 def test_the_run_log_covers_every_retrieval_input(setup):
     paths, _, _, fake = setup
     retrieve(embedder=fake, **paths)

@@ -8,7 +8,8 @@
                  scoring_key.csv    which strategy each code stands for; not opened while scoring.
                  The answers of a question appear in an order shuffled with config.SCORING_SEED,
                  and nothing in packet or sheet names the strategy (no strategy keys, no chunk
-                 IDs). An existing sheet or key is never overwritten.
+                 IDs). An existing sheet or key is never overwritten, and the answers and chunk
+                 files must be exactly those of the latest generation run (ADR 0033).
 --mode summarise Check the filled sheet against its key (every code exactly once, every
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
@@ -33,6 +34,7 @@ from config import (
     CHUNK_FILES,
     DOCUMENTS_FILE,
     GENERATED_ANSWERS_FILE,
+    GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
@@ -47,6 +49,8 @@ from config import (
 )
 from embed import load_jsonl
 from freeze import require_frozen
+from generate import ANSWERS_HEADER
+from prompt import context
 from retrieve import (
     GROUND_TRUTH_HEADER,
     QUESTIONS_HEADER,
@@ -54,15 +58,8 @@ from retrieve import (
     read_rows,
     split_ids,
 )
+from run_log import require_run
 
-ANSWERS_HEADER = [
-    "question_id",
-    "strategy",
-    "answer",
-    "sources",
-    "prompt_tokens",
-    "completion_tokens",
-]
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
 KEY_HEADER = ["code", "question_id", "strategy"]
@@ -114,13 +111,6 @@ def fenced(text: str) -> str:
     return f"{fence}text\n{text}\n{fence}"
 
 
-def excerpts(chunk_ids: list[str], chunks: dict[str, dict]) -> str:
-    """The context as the prompt shows it (docs/reference/prompts.md), without chunk IDs."""
-    return "\n---\n".join(
-        f"[Excerpt {n}]\n{chunks[cid]['text']}" for n, cid in enumerate(chunk_ids, start=1)
-    )
-
-
 def scaffold(
     answers_file: Path = GENERATED_ANSWERS_FILE,
     questions_file: Path = QUESTIONS_FILE,
@@ -133,6 +123,7 @@ def scaffold(
     packet_file: Path = SCORING_PACKET_FILE,
     key_file: Path = SCORING_KEY_FILE,
     seed: int = SCORING_SEED,
+    generation_runs_file: Path = GENERATION_RUNS_FILE,
 ) -> int:
     """Write packet, sheet and key for blind scoring; return the number of answers."""
     questions, truth = catalogue(
@@ -151,6 +142,9 @@ def scaffold(
     check_grid(answers_file, answers, qids)
     if sorted(chunk_files) != sorted(STRATEGY_IDS):
         raise ValueError(f"chunk_files must cover exactly the strategies {sorted(STRATEGY_IDS)}")
+    # the packet must show the excerpts the model saw: the chunk files and answers of the run
+    inputs = [questions_file, ground_truth_file, *(chunk_files[k] for k in STRATEGY_IDS)]
+    require_run(generation_runs_file, "generate", ",".join(STRATEGY_IDS), inputs, [answers_file])
     chunks = {
         key: {c["chunk_id"]: c for c in load_jsonl(path, "run src/chunking.py first")}
         for key, path in chunk_files.items()
@@ -198,7 +192,7 @@ def scaffold(
                 "",
                 "**Excerpts the model saw:**",
                 "",
-                fenced(excerpts(split_ids(answer["sources"]), chunks[key])),
+                fenced(context(split_ids(answer["sources"]), chunks[key])),
             ]
     write_csv(key_file, KEY_HEADER, key_rows)
     write_csv(sheet_file, SHEET_HEADER, sheet_rows)

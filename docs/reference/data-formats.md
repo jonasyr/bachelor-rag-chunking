@@ -1,6 +1,6 @@
 # Datenartefakte und Formate
 
-> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 17.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Dateinamen und Pfade kommen aus [`src/config.py`](../../src/config.py) ([Konfiguration](configuration.md)); welche
 Dateien versioniert sind: [Werkzeuge und Repository](tooling.md#versioniert-und-ignoriert). Beispiele sind echte
@@ -79,12 +79,32 @@ Modell, IDs und Texte unverändert sind; sonst bricht der Lauf ab, bis die Datei
 
 `retrieve.py` (eine Zeile je Lauf; `strategy` listet alle Strategien des Laufs, `vectors`/`dimensions` beziehen sich
 auf die Fragen, `inputs_sha256` belegt alle Eingaben, u. a. die Ground Truth nach
-[ADR 0017](../adr/0017-fragenkatalog.md); Beispiel: erster Lauf des Pilot-Sets `hard`):
+[ADR 0017](../adr/0017-fragenkatalog.md); seit 17.10.2026 zusätzlich `outputs_sha256` mit der Prüfsumme der
+geschriebenen Ergebnisdatei, gegen die `generate.py` prüft (Pflicht für den Hauptlauf; ältere Pilot-Einträge
+ohne sie werden nur an den Eingaben geprüft) ([ADR 0033](../adr/0033-antwortmodell.md)); Beispiel:
+erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 ```json
 {"date":"2026-10-14","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"retrieve","strategy":"C1,C2,C3","dimensions":3072,"vectors":16,"inputs_sha256":{"questions.csv":"6f4a2e9f…","ground_truth.csv":"f9ddb34b…","sections.jsonl":"…","query_embeddings.npz":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…","embeddings_c1.npz":"…","embeddings_c2.npz":"…","embeddings_c3.npz":"…"},"canary_min_cosine":0.9999592304229736,"input_tokens":391,"cost_usd":5.083e-05,"canary_input_tokens":2706,"canary_cost_usd":0.00035178,"api_called":true}
 ```
 
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
+
+**`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`;
+[ADR 0033](../adr/0033-antwortmodell.md)). Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`. Ein
+abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
+
+- `model`, `reasoning_effort`, `temperature`, `seed`, `max_completion_tokens`: die gepinnten Einstellungen; `model_reported`:
+  das Modell, das die API für alle Antworten des Laufs gemeldet hat; `system_fingerprint`: die gemeldete
+  Backend-Konfiguration (`null`, wenn die API keine meldet).
+- `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten).
+- `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
+  `generated_answers.csv`. `evaluate_answers.py --mode scaffold` prüft beide gegen die aktuellen Dateien.
+- `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie
+  ([ADR 0008](../adr/0008-kosten-als-variable.md)).
+
+```json
+{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","system_fingerprint":"…","answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
+```
 
 ## Fragen und Ground Truth
 
@@ -185,7 +205,10 @@ question_id,strategy,rule,hit,reciprocal_rank,precision,recall,context_tokens
 Q001,C1,main,1,0.333333,0.600000,1.000000,610
 ```
 
-**`generated_answers.csv`** (Schema festgelegt, `generate.py` noch nicht umgesetzt)
+**`generated_answers.csv`** (`generate.py`, alle Strategien C1–C3 in einem Lauf, sortiert nach `question_id` und
+Strategie; wird nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md)). `answer` = Text der API unverändert;
+`sources` = die top-k Chunk-IDs in Rangfolge, getrennt durch `;` (genau die Passagen des Prompts);
+`prompt_tokens`/`completion_tokens` = Abrechnung der API (`usage`).
 ```
 question_id,strategy,answer,sources,prompt_tokens,completion_tokens
 Q001,C1,"...",C1_D049_0004,1200,180
@@ -231,7 +254,8 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `query_embeddings.npz` | gespeicherte Fragevektoren | nein |
 | `retrieved_results.csv` | Top-5 für C1–C3 | ja |
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
-| `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` | ja |
+| `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
+| `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 
 | Set | Inhalt |
 |---|---|

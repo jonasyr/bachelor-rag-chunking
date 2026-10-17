@@ -39,6 +39,7 @@ CATALOGUE_REVIEW_FILE = (
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
+GENERATION_RUNS_FILE = DATA_EVAL / "generation_runs.jsonl"  # one line per run of generate.py (D33)
 SCORES_FILE = DATA_EVAL / "scores.csv"
 # Blind rubric scoring (D32): the rater fills the sheet while reading the packet; the key that maps
 # each code to its strategy is opened only by `evaluate_answers.py --mode summarise`.
@@ -215,17 +216,37 @@ CATALOGUE_STOPWORDS = (
 # ---------------------------------------------------------------------------
 # LLM / Embedding (D15, D16)
 # ---------------------------------------------------------------------------
-# Pin exact versions at implementation time and document date of first use.
-# Use neutral placeholders until then; replace before running experiments.
 # Embedding model (D23): OpenAI offers only the alias as snapshot, so vectors are stored once (D24).
 EMBEDDING_MODEL = "text-embedding-3-large"
 EMBEDDING_DIMENSIONS = 3072  # model default
 EMBEDDING_BATCH_SIZE = 100  # API: <= 2048 inputs and <= 300,000 tokens per request
 EMBEDDING_PRICE_PER_MTOK = 0.13  # USD per 1M input tokens, OpenAI model page, accessed 13.10.2026
-LLM_MODEL = "gpt-4o"  # PLACEHOLDER — pin exact snapshot at impl time
-
+# Answer model (D33): pinned 17.10.2026; OpenAI offers only the alias, so answers are generated
+# once and the model the API reports is logged per run.
+LLM_MODEL = "gpt-6-luna"
+LLM_REASONING_EFFORT = "none"  # the only effort at which the API accepts a temperature (D33)
 LLM_TEMPERATURE = 0.0  # constant for reproducibility (D14)
-LLM_MAX_TOKENS = 1024
+LLM_SEED = 20261017  # best-effort deterministic sampling on every request (D33); fixed, never tuned
+LLM_MAX_TOKENS = 1024  # an answer cut off at this limit stops the run (D33)
+LLM_PRICE_INPUT_PER_MTOK = 0.10  # USD per 1M input tokens, OpenAI model page, accessed 17.10.2026
+LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date
+
+# Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
+# the documented text.
+SYSTEM_PROMPT = """You are a helpful assistant that answers questions about Vue.js based solely on
+the provided documentation excerpts.
+Do not use any knowledge outside the provided context.
+If the context does not contain sufficient information to answer the question,
+state that explicitly."""
+USER_PROMPT_TEMPLATE = """Answer the following question based exclusively on the documentation excerpts below.
+
+Question: {question}
+
+Documentation excerpts:
+{context}
+
+Answer:"""  # noqa: E501 (verbatim prompt text)
+CONTEXT_SEPARATOR = "\n---\n"  # between the excerpts; each starts with "[Excerpt N]"
 
 # ---------------------------------------------------------------------------
 # Evaluation

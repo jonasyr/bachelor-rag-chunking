@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D14 im Leitfaden; Quelle: Baseline, übernommen)
+Angenommen (D14 im Leitfaden; Quelle: Baseline, übernommen); Umsetzung mit einem Reasoning-Modell (Effort `none`) in [ADR 0033](0033-antwortmodell.md)
 
 ## Kontext
 
