@@ -125,3 +125,28 @@ def test_rows_round_trip_with_the_rules_version():
 def test_validate_rejects_a_question_without_key_points():
     with pytest.raises(ValueError, match="no frozen key points"):
         rules.validate(checks(points=[]), 0)
+
+
+def point_rows(*rows):
+    return [dict(zip(rules.KEY_POINTS_HEADER, r, strict=True)) for r in rows]
+
+
+def test_key_points_group_by_question_in_point_order():
+    rows = point_rows(("H01", "1", "Core"), ("H02", "1", "Other"), ("H01", "2", "Second"))
+    assert rules.key_points(rows) == {"H01": ["Core", "Second"], "H02": ["Other"]}
+
+
+@pytest.mark.parametrize(
+    ("rows", "message"),
+    [
+        ((("H01", "2", "Second"), ("H01", "1", "Core")), "1 to"),  # out of order
+        ((("H01", "1", "Core"), ("H01", "1", "Again")), "1 to"),  # duplicate
+        ((("H01", "1", "Core"), ("H01", "3", "Gap")), "1 to"),
+        ((("H01", "one", "Core"),), "1 to"),
+        (tuple(("H01", str(n), "x") for n in range(1, 6)), "at most"),
+        ((("H01", "1", " "),), "empty"),
+    ],
+)
+def test_malformed_key_points_are_refused(rows, message):
+    with pytest.raises(ValueError, match=message):
+        rules.key_points(point_rows(*rows))

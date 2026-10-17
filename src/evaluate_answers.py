@@ -339,9 +339,11 @@ def check_derived(
         raise ValueError(
             f"{key_points_file} differs from the frozen key points; restore it from git"
         )
-    counts: dict[str, int] = {}
-    for point in read_csv(key_points_file, rules.KEY_POINTS_HEADER):
-        counts[point["question_id"]] = counts.get(point["question_id"], 0) + 1
+    try:
+        points = rules.key_points(read_csv(key_points_file, rules.KEY_POINTS_HEADER))
+    except ValueError as error:
+        raise ValueError(f"{key_points_file}: {error}") from error
+    counts = {qid: len(texts) for qid, texts in points.items()}
     stored = {r["code"]: r for r in read_csv(checks_file, rules.CHECKS_HEADER)}
     for row in read_csv(sheet_file, SHEET_HEADER):
         if row["code"] not in stored:

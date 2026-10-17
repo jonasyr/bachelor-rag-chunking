@@ -5,7 +5,12 @@ config.RUBRIC_CRITERIA by the rule table in docs/reference/evaluation.md. Same c
 scores; config.RUBRIC_RULES_VERSION names the version of these rules.
 """
 
-from config import RUBRIC_COMPLETENESS_PARTIAL, RUBRIC_CRITERIA, RUBRIC_RULES_VERSION
+from config import (
+    KEY_POINTS_MAX,
+    RUBRIC_COMPLETENESS_PARTIAL,
+    RUBRIC_CRITERIA,
+    RUBRIC_RULES_VERSION,
+)
 
 POINT_MARKS = ("covered", "missing")
 YES_NO = ("yes", "no")
@@ -103,3 +108,23 @@ def to_row(code: str, checks: dict) -> dict[str, str]:
 def from_row(row: dict) -> tuple[str, dict]:
     checks = {"points": row["points"].split(";") if row["points"] else []}
     return row["rules_version"], checks | {c: row[c] for c in CHECKS}
+
+
+def key_points(rows: list[dict]) -> dict[str, list[str]]:
+    """Rows of key_points.csv as texts per question in point order; refused unless every
+    question numbers its points 1..N in file order, N <= config.KEY_POINTS_MAX, texts non-empty."""
+    points: dict[str, list[str]] = {}
+    for row in rows:
+        qid = row["question_id"]
+        texts = points.setdefault(qid, [])
+        if row["point"] != str(len(texts) + 1):
+            raise ValueError(
+                f"{qid}: points must be numbered 1 to N in order, found {row['point']!r} "
+                f"after {len(texts)}"
+            )
+        if not row["text"].strip():
+            raise ValueError(f"{qid}: key point {row['point']} is empty")
+        texts.append(row["text"])
+        if len(texts) > KEY_POINTS_MAX:
+            raise ValueError(f"{qid}: at most {KEY_POINTS_MAX} key points")
+    return points

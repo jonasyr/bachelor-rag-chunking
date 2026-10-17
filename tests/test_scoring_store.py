@@ -336,3 +336,12 @@ def test_save_is_refused_after_a_hand_edit_of_the_key_points(frozen):
         f.write("H01,2,Added later\n")
     with pytest.raises(PermissionError, match="key_points.csv"):
         scoring.save_score(frozen, "H01-B", GOOD, "")
+
+
+def test_a_hand_edited_key_points_file_with_bad_numbering_cannot_be_frozen(hard):
+    hard.key_points_file.write_text(
+        "question_id,point,text\nH01,2,Second\nH01,1,Core\nH02,1,Core two\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="H01"):
+        scoring.freeze_key_points(hard, scoring.load_items(hard))
+    assert not scoring.is_frozen(hard)

@@ -137,10 +137,11 @@ def questions(items: list[dict]) -> list[dict]:
 
 
 def load_key_points(s: ScoringSet) -> dict[str, list[str]]:
-    points: dict[str, list[str]] = {}
-    for row in read_csv(s.key_points_file, KEY_POINTS_HEADER):
-        points.setdefault(row["question_id"], []).append(row["text"])
-    return points
+    """Key points per question; a malformed file (numbering, count, empty text) is refused."""
+    try:
+        return rules.key_points(read_csv(s.key_points_file, KEY_POINTS_HEADER))
+    except ValueError as error:
+        raise ValueError(f"{s.key_points_file}: {error}") from error
 
 
 def is_frozen(s: ScoringSet) -> bool:
