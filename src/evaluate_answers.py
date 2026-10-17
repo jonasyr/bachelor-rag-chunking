@@ -47,6 +47,8 @@ from config import (
 )
 from embed import load_jsonl
 from freeze import require_frozen
+from generate import ANSWERS_HEADER
+from prompt import context
 from retrieve import (
     GROUND_TRUTH_HEADER,
     QUESTIONS_HEADER,
@@ -55,14 +57,6 @@ from retrieve import (
     split_ids,
 )
 
-ANSWERS_HEADER = [
-    "question_id",
-    "strategy",
-    "answer",
-    "sources",
-    "prompt_tokens",
-    "completion_tokens",
-]
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
 KEY_HEADER = ["code", "question_id", "strategy"]
@@ -112,13 +106,6 @@ def fenced(text: str) -> str:
     longest = max((len(run) for run in re.findall(r"`+", text)), default=0)
     fence = "`" * max(3, longest + 1)
     return f"{fence}text\n{text}\n{fence}"
-
-
-def excerpts(chunk_ids: list[str], chunks: dict[str, dict]) -> str:
-    """The context as the prompt shows it (docs/reference/prompts.md), without chunk IDs."""
-    return "\n---\n".join(
-        f"[Excerpt {n}]\n{chunks[cid]['text']}" for n, cid in enumerate(chunk_ids, start=1)
-    )
 
 
 def scaffold(
@@ -198,7 +185,7 @@ def scaffold(
                 "",
                 "**Excerpts the model saw:**",
                 "",
-                fenced(excerpts(split_ids(answer["sources"]), chunks[key])),
+                fenced(context(split_ids(answer["sources"]), chunks[key])),
             ]
     write_csv(key_file, KEY_HEADER, key_rows)
     write_csv(sheet_file, SHEET_HEADER, sheet_rows)

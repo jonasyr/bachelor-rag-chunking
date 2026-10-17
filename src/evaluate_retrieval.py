@@ -60,6 +60,7 @@ SCORES_HEADER = [
 RULES = {"main": RELEVANCE_MIN_OVERLAP, "sensitivity": SENSITIVITY_MIN_OVERLAP}
 METRICS = ["hit", "reciprocal_rank", "precision", "recall", "context_tokens"]
 GROUPS = ["type", "difficulty"]  # questions.csv columns the summary is broken down by
+ALL_STRATEGIES = {**STRATEGY_IDS, **CONTROL_STRATEGIES}  # key -> strategy field of its chunks
 
 
 def question_scores(ranked: list[dict], wanted: list[dict], k: int, min_overlap: int) -> dict:
@@ -87,7 +88,8 @@ def ranked_results(
             raise ValueError(f"{path}: unknown question {row['question_id']}")
         if row["strategy"] not in strategies:
             raise ValueError(f"{path}: unknown strategy {row['strategy']}")
-        if row["chunk_id"] not in chunks:
+        chunk = chunks.get(row["chunk_id"])
+        if chunk is None or chunk.get("strategy") != ALL_STRATEGIES[row["strategy"]]:
             raise ValueError(f"{path}: unknown chunk {row['chunk_id']} of {row['strategy']}")
         grouped.setdefault((row["question_id"], row["strategy"]), []).append(row)
     missing = [f"{q}/{s}" for q in qids for s in strategies if (q, s) not in grouped]
