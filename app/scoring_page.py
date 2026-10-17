@@ -8,6 +8,7 @@ router app/catalogue_editor.py.
 import html
 
 import streamlit as st
+from ui_theme import SCORING_CSS
 
 import scoring_store as scoring
 from config import RUBRIC_CRITERIA, RUBRIC_MAX_SCORE
@@ -25,7 +26,11 @@ ANCHORS = {
     "correctness": ("wrong", "partly correct", "correct"),
     "completeness": ("key points missing", "partly complete", "complete"),
     "groundedness": ("not supported", "partly supported", "clearly supported by the excerpts"),
-    "no_hallucination": ("false or unsupported claims", "small unsupported additions", "none"),
+    "no_hallucination": (
+        "false or unsupported claims",
+        "small unsupported additions",
+        "no hallucinations",
+    ),
     "clarity": ("unclear", "understandable with weaknesses", "clear and precise"),
 }
 SUMMARISE = (
@@ -54,15 +59,17 @@ def sidebar(items: list[dict], scores: dict[str, dict]) -> None:
 
 
 def page(text: str) -> None:
-    st.html(f'<div class="formatted">{scoring.text_html(text)}</div>')
+    st.html(f'<div class="formatted inert">{scoring.text_html(text)}</div>')
 
 
 def form(s: scoring.ScoringSet, item: dict, saved: dict, codes: list[str], locked: bool) -> None:
     code = item["code"]
     st.markdown("**Question**")
-    st.html(f'<div class="formatted reference">{scoring.text_html(item["question"])}</div>')
+    st.html(f'<div class="context inert">{scoring.text_html(item["question"])}</div>')
     st.markdown("**Reference answer**")
-    st.html(f'<div class="formatted reference">{scoring.text_html(item["reference_answer"])}</div>')
+    st.html(
+        f'<div class="context reference inert">{scoring.text_html(item["reference_answer"])}</div>'
+    )
     values = {}
     for criterion in RUBRIC_CRITERIA:
         values[criterion] = st.segmented_control(
@@ -106,6 +113,7 @@ def form(s: scoring.ScoringSet, item: dict, saved: dict, codes: list[str], locke
 
 
 def main() -> None:
+    st.markdown(SCORING_CSS, unsafe_allow_html=True)
     sets = scoring.scoring_sets()
     if not sets:
         st.info(

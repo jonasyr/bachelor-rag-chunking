@@ -59,7 +59,27 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
 .checks li {margin: 0.15rem 0;}
 .checks .ok {color: var(--ok);} .checks .problem {color: var(--problem);}
 ::selection {background: var(--select);}
-.formatted.reference {background: transparent; color: var(--muted); max-height: none;}
+</style>
+"""
+# Scoring page only (injected by app/scoring_page.py): the page has no tabs above its first row,
+# so it clears Streamlit's header itself; question and reference read as context, quieter than
+# the answer under review; links in excerpts stay visible but inert (relative doc links would
+# navigate away from the page and drop unsaved scores).
+SCORING_CSS = """
+<style>
+[data-testid="stMainBlockContainer"] {padding-top: 4.5rem;}
+.context {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 0.98rem;
+  line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; margin-bottom: 0.25rem;}
+.context.reference {color: var(--muted); border-left: 1px solid var(--line); padding-left: 0.85rem;}
+.context p {margin: 0 0 0.5rem;}
+.context code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.86em;
+  background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 3px;}
+.inert a {pointer-events: none; color: inherit; text-decoration: underline dotted var(--muted);}
+[data-testid="stButtonGroup"] button {min-width: 2.75rem; min-height: 2.75rem;}
+@media (max-width: 639px) {
+  [data-testid="stMainBlockContainer"] {padding-top: 3.75rem;}
+  .slot-title span {display: block; font-size: 1rem; margin-top: 0.2rem;}
+}
 </style>
 """
 LIGHT = {
