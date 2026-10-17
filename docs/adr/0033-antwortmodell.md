@@ -34,7 +34,9 @@ PR #14); er ersetzt das einmalige Speichern nicht.
 Wir werden alle Antworten in einem Lauf über C1–C3 erzeugen und speichern; `generated_answers.csv` wird nie
 überschrieben, eine Neuerzeugung erfordert das bewusste Löschen der Datei. Der Lauf schreibt nichts, wenn eine
 Antwort nicht mit `finish_reason = "stop"` endet (z. B. abgeschnitten) oder leer ist oder die API innerhalb des Laufs
-verschiedene Modelle meldet. Das Laufprotokoll hält das von der API gemeldete Modell, die Prüfsummen der Ein- und
+verschiedene Modelle oder verschiedene `system_fingerprint`-Werte (Backend-Konfiguration) meldet; Letzteres nach dem
+Codex-Review von PR #14, weil sonst Strategien auf verschiedenen Backends laufen könnten. Zeigt der Pilotlauf, dass
+OpenAI den Fingerabdruck auch ohne Modelländerung laufend wechselt, wird diese Regel in einer neuen ADR überprüft. Das Laufprotokoll hält das von der API gemeldete Modell, die Prüfsummen der Ein- und
 Ausgaben, SDK-Version, Tokens und Kosten je Strategie fest.
 
 Wir werden jeden Schritt nur auf den Dateien des letzten Laufs seines Vorgängers aufsetzen lassen (Hinweis aus dem

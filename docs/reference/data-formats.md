@@ -94,8 +94,8 @@ Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inpu
 abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
 
 - `model`, `reasoning_effort`, `temperature`, `seed`, `max_completion_tokens`: die gepinnten Einstellungen; `model_reported`:
-  das Modell, das die API für alle Antworten des Laufs gemeldet hat; `system_fingerprints`: alle gemeldeten
-  Fingerabdrücke (sortiert, leer, wenn die API keine meldet).
+  das Modell, das die API für alle Antworten des Laufs gemeldet hat; `system_fingerprint`: die gemeldete
+  Backend-Konfiguration (`null`, wenn die API keine meldet).
 - `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten).
 - `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
   `generated_answers.csv`. `evaluate_answers.py --mode scaffold` prüft beide gegen die aktuellen Dateien.
@@ -103,7 +103,7 @@ abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
 ```json
-{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","system_fingerprints":["…"],"answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
+{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","system_fingerprint":"…","answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
 ```
 
 ## Fragen und Ground Truth

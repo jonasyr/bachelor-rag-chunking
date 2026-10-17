@@ -30,9 +30,10 @@ QUESTIONS = {"Q001": "How do props work?", "Q002": "What is {{ msg }}?"}
 class FakeCompleter:
     """Answers from the prompt it got; records every request (no network)."""
 
-    def __init__(self, models=None, finish_reason="stop", text="Answer."):
+    def __init__(self, models=None, finish_reason="stop", text="Answer.", fingerprints=None):
         self.calls: list[list[dict]] = []
         self.models = models or {}  # call number -> reported model
+        self.fingerprints = fingerprints or {}  # call number -> reported fingerprint
         self.finish_reason = finish_reason
         self.text = text
 
@@ -45,7 +46,7 @@ class FakeCompleter:
             finish_reason=self.finish_reason,
             prompt_tokens=1000 + number,
             completion_tokens=100 + number,
-            system_fingerprint=f"fp_{number % 2}",
+            system_fingerprint=self.fingerprints.get(number, "fp_a"),
         )
 
 
@@ -190,7 +191,7 @@ def test_run_log_records_versions_inputs_and_cost(files):
     assert record["step"] == "generate"
     assert record["model"] == LLM_MODEL
     assert record["model_reported"] == "gpt-6-luna-2026-05-18"
-    assert record["system_fingerprints"] == ["fp_0", "fp_1"]
+    assert record["system_fingerprint"] == "fp_a"
     assert record["temperature"] == LLM_TEMPERATURE
     assert record["reasoning_effort"] == LLM_REASONING_EFFORT
     assert record["seed"] == LLM_SEED
@@ -355,3 +356,18 @@ def test_pilot_retrieval_from_before_output_checksums_is_checked_on_its_inputs(f
 
 def test_pilot_paths_accept_legacy_retrieval_records(tmp_path):
     assert pilot_paths(tmp_path)["legacy_retrieval"] is True
+
+
+def test_changed_backend_fingerprint_writes_nothing(files):
+    with pytest.raises(RuntimeError, match="fp_b"):
+        run(files, FakeCompleter(fingerprints={3: "fp_b"}))
+    assert not files["out_file"].exists()
+    assert not files["runs_file"].exists()
+
+
+def test_missing_fingerprints_do_not_stop_the_run(files):
+    """The API may omit the fingerprint; only two different reported values count as a change."""
+    count = len(QUESTIONS) * len(STRATEGIES)
+    completer = FakeCompleter(fingerprints=dict.fromkeys(range(1, count + 1), None))
+    assert run(files, completer) == count
+    assert runs(files)[0]["system_fingerprint"] is None

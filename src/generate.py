@@ -10,8 +10,9 @@ answers (ADR 0026). The main catalogue is used only while it matches its freeze 
 OpenAI offers the model only as an alias, so the answers are generated once: an existing
 answer file is never overwritten, the results must come from the latest retrieval run over the
 current questions and chunk files, and the run stops without writing anything if an answer is
-cut off or empty, or if the API reports a different model within the run. The run log records
-the model the API reported, the input checksums, tokens and cost per strategy.
+cut off or empty, or if the API reports a different model or system fingerprint within the run.
+The run log records the model and fingerprint the API reported, the input and output checksums,
+tokens and cost per strategy.
 
 Output schema (docs/reference/data-formats.md): question_id, strategy, answer, sources,
 prompt_tokens, completion_tokens
@@ -53,8 +54,9 @@ ANSWERS_HEADER = [
 ]
 
 
-def checked(answer: Completion, label: str, models: set[str]) -> Completion:
-    """The answer, unless it is cut off, empty or from another model than the run so far."""
+def checked(answer: Completion, label: str, models: set[str], fingerprints: set[str]) -> Completion:
+    """The answer, unless it is cut off, empty or from another model or backend configuration
+    (system_fingerprint, when the API reports one) than the run so far."""
     if answer.finish_reason != "stop":
         raise RuntimeError(
             f"{label}: the answer ended with finish_reason={answer.finish_reason!r}, not 'stop'; "
@@ -67,6 +69,13 @@ def checked(answer: Completion, label: str, models: set[str]) -> Completion:
         raise RuntimeError(
             f"{label}: the API reported the models {sorted(models)} within one run; nothing was "
             "written (ADR 0033)"
+        )
+    if answer.system_fingerprint:
+        fingerprints.add(answer.system_fingerprint)
+    if len(fingerprints) > 1:
+        raise RuntimeError(
+            f"{label}: the backend configuration changed within one run (system_fingerprint "
+            f"{sorted(fingerprints)}); nothing was written (ADR 0033)"
         )
     return answer
 
@@ -133,9 +142,8 @@ def generate(
                 completer(messages(question["question"], context(sources, chunks))),
                 f"{qid}/{key}",
                 models,
+                fingerprints,
             )
-            if answer.system_fingerprint:
-                fingerprints.add(answer.system_fingerprint)
             tokens[key][0] += answer.prompt_tokens
             tokens[key][1] += answer.completion_tokens
             rows.append(
@@ -155,7 +163,7 @@ def generate(
             "step": "generate",
             "strategy": ",".join(keys),
             "model_reported": next(iter(models), None),
-            "system_fingerprints": sorted(fingerprints),
+            "system_fingerprint": next(iter(fingerprints), None),
             "answers": len(rows),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
             "outputs_sha256": {out_file.name: sha256_of(out_file)},
