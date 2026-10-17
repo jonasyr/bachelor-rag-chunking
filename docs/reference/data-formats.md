@@ -256,6 +256,8 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `retrieved_results.csv` | Top-5 für C1–C3 | ja |
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
 | `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
+| `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
+| `scoring_packet.md`, `scores.csv` | Lesepaket, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 
 | Set | Inhalt |

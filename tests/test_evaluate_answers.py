@@ -10,6 +10,7 @@ from evaluate_answers import (
     KEY_HEADER,
     SCORES_HEADER,
     SHEET_HEADER,
+    pilot_paths,
     scaffold,
     summarise,
 )
@@ -138,8 +139,8 @@ def run_scaffold(files, record=True, **overrides):
     return scaffold(**{k: files[k] for k in SCAFFOLD_ARGS} | overrides)
 
 
-def run_summarise(files):
-    return summarise(**{k: files[k] for k in SUMMARISE_ARGS})
+def run_summarise(files, **overrides):
+    return summarise(**{k: files[k] for k in SUMMARISE_ARGS} | overrides)
 
 
 def strategy_of(files):
@@ -371,3 +372,64 @@ def test_scaffold_needs_the_answer_checksum_of_the_generation_run(files):
     with pytest.raises(RuntimeError, match="generated_answers.csv"):
         run_scaffold(files, record=False)
     assert_nothing_scaffolded(files)
+
+
+def test_limit_scaffolds_only_the_first_questions(files):
+    assert run_scaffold(files, limit=1) == len(STRATEGIES)
+    assert {r["question_id"] for r in read(files["key_file"])} == {"Q001"}
+    assert {r["question_id"] for r in read(files["sheet_file"])} == {"Q001"}
+    packet = files["packet_file"].read_text(encoding="utf-8")
+    assert "## Q001" in packet and "## Q002" not in packet
+
+
+def test_summarise_with_the_same_limit_covers_the_scored_questions(files):
+    run_scaffold(files, limit=1)
+    fill(files, all_two())
+    summary = run_summarise(files, limit=1)
+    assert {r["question_id"] for r in read(files["scores_file"])} == {"Q001"}
+    assert summary["all", "all", "C1"]["n"] == 1
+
+
+def test_summarise_without_the_limit_misses_the_unscored_questions(files):
+    run_scaffold(files, limit=1)
+    fill(files, all_two())
+    with pytest.raises(ValueError, match="missing"):
+        run_summarise(files)
+
+
+@pytest.mark.parametrize("limit", [0, -1])
+def test_limit_must_be_positive(files, limit):
+    with pytest.raises(ValueError, match="limit"):
+        run_scaffold(files, limit=limit)
+
+
+def test_main_catalogue_is_always_scored_in_full(files, monkeypatch):
+    """ADR 0032: every answer of the experiment is scored; a limit is for pilot sets only."""
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
+    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
+    freeze.write_freeze(
+        *(files[k] for k in ("questions_file", "ground_truth_file", "sections_file")),
+        files["documents_file"],
+        files["freeze_file"],
+    )
+    with pytest.raises(ValueError, match="pilot"):
+        run_scaffold(files, limit=1)
+    with pytest.raises(ValueError, match="pilot"):
+        run_summarise(files, limit=1)
+    assert_nothing_scaffolded(files)
+
+
+def test_pilot_paths_keep_every_file_inside_the_set(tmp_path):
+    paths = pilot_paths(tmp_path)
+    assert set(paths) == {
+        "answers_file",
+        "questions_file",
+        "ground_truth_file",
+        "sheet_file",
+        "packet_file",
+        "key_file",
+        "scores_file",
+        "generation_runs_file",
+    }
+    assert all(p.parent == tmp_path for p in paths.values())
+    assert paths["generation_runs_file"].name == "runs.jsonl"
