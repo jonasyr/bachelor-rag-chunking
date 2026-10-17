@@ -25,6 +25,7 @@ class Completion:
 
 
 Completer = Callable[[list[dict]], Completion]
+ModelCreated = Callable[[], int]
 
 
 def complete(messages: list[dict], client: Any = None) -> Completion:
@@ -47,3 +48,10 @@ def complete(messages: list[dict], client: Any = None) -> Completion:
         completion_tokens=response.usage.completion_tokens,
         system_fingerprint=getattr(response, "system_fingerprint", None),
     )
+
+
+def model_created(client: Any = None) -> int:
+    """Creation time (Unix seconds) of the model object behind config.LLM_MODEL; OpenAI offers
+    no dated snapshot of it, so this is the only version marker the API reports (ADR 0033)."""
+    client = client or _openai_client()
+    return client.models.retrieve(LLM_MODEL).created
