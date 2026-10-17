@@ -8,7 +8,8 @@ answers (ADR 0026). The main catalogue is used only while it matches its freeze 
 0030), and everything is checked before the first API call.
 
 OpenAI offers the model only as an alias, so the answers are generated once: an existing
-answer file is never overwritten, and the run stops without writing anything if an answer is
+answer file is never overwritten, the results must come from the latest retrieval run over the
+current questions and chunk files, and the run stops without writing anything if an answer is
 cut off or empty, or if the API reports a different model within the run. The run log records
 the model the API reported, the input checksums, tokens and cost per strategy.
 
@@ -23,6 +24,7 @@ from config import (
     CATALOGUE_FREEZE_FILE,
     CHUNK_FILES,
     DOCUMENTS_FILE,
+    EMBEDDING_RUNS_FILE,
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
@@ -39,7 +41,7 @@ from freeze import require_frozen
 from llm_client import Completer, Completion, complete
 from prompt import context, messages
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import append_generation_run, generation_cost, sha256_of
+from run_log import append_generation_run, generation_cost, require_run, sha256_of
 
 ANSWERS_HEADER = [
     "question_id",
@@ -80,6 +82,7 @@ def generate(
     chunk_files: dict[str, Path] = CHUNK_FILES,
     out_file: Path = GENERATED_ANSWERS_FILE,
     runs_file: Path = GENERATION_RUNS_FILE,
+    retrieval_runs_file: Path = EMBEDDING_RUNS_FILE,
 ) -> int:
     """Write one answer per question and experiment strategy; return the number of answers."""
     if out_file.exists():
@@ -101,6 +104,9 @@ def generate(
         for c in load_jsonl(chunk_files[key], "run src/chunking.py first")
     }
     qids = [q["question_id"] for q in questions]
+    inputs = [questions_file, ground_truth_file, *(chunk_files[k] for k in keys)]
+    # the results must come from the latest retrieval over exactly these files (ADR 0033)
+    require_run(retrieval_runs_file, "retrieve", ",".join(keys), inputs, [results_file], False)
     grouped = ranked_results(results_file, qids, keys, chunks)
 
     rows: list[dict] = []
@@ -132,7 +138,6 @@ def generate(
             )
 
     write_csv(out_file, ANSWERS_HEADER, rows)
-    inputs = [results_file, questions_file, ground_truth_file, *(chunk_files[k] for k in keys)]
     append_generation_run(
         {
             "step": "generate",
@@ -140,7 +145,8 @@ def generate(
             "model_reported": next(iter(models), None),
             "system_fingerprints": sorted(fingerprints),
             "answers": len(rows),
-            "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
+            "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
+            "outputs_sha256": {out_file.name: sha256_of(out_file)},
             "by_strategy": {
                 key: {
                     "prompt_tokens": p,
@@ -165,6 +171,7 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "ground_truth_file": set_dir / GROUND_TRUTH_FILE.name,
         "out_file": set_dir / GENERATED_ANSWERS_FILE.name,
         "runs_file": set_dir / PILOT_RUNS_FILE_NAME,
+        "retrieval_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }
 
 

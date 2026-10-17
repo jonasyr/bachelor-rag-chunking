@@ -226,6 +226,7 @@ def retrieve(
             "vectors": len(qids),
             "inputs_sha256": {f.name: sha256_of(f) for f in sources},
             "canary_min_cosine": canary_cosine,
+            "outputs_sha256": {out_file.name: sha256_of(out_file)},
         },
         input_tokens,
         runs_file,

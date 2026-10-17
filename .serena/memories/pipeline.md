@@ -3,7 +3,9 @@
 Flow and layout: `docs/explanation/research-design.md`, `docs/reference/tooling.md` (repo tree, script options);
 data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`, `docs/how-to/run-the-experiment.md`.
 - No stubs left: every `src/*.py` is implemented and tested. `generate.py` (ADR 0033) never overwrites
-  `generated_answers.csv`; tests use a fake completer, never the API (`tests/test_generate.py`).
+  `generated_answers.csv`; tests use a fake completer, never the API (`tests/test_generate.py`). Each step checks
+  the latest run record of its predecessor (`run_log.require_run`): re-run retrieve before generate, generate before
+  scaffold, whenever questions or chunk files change.
   `evaluate_retrieval.py` recomputes relevance from chunks and refuses results whose `is_relevant` disagrees. Status and next step: `docs/plan.md#stand`.
 - Question catalogue: `src/catalogue.py` (sections/find/show/check/freeze), how-to
   `docs/how-to/build-the-question-catalogue.md`; `retrieve.py` refuses the main catalogue until

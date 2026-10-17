@@ -8,7 +8,8 @@
                  scoring_key.csv    which strategy each code stands for; not opened while scoring.
                  The answers of a question appear in an order shuffled with config.SCORING_SEED,
                  and nothing in packet or sheet names the strategy (no strategy keys, no chunk
-                 IDs). An existing sheet or key is never overwritten.
+                 IDs). An existing sheet or key is never overwritten, and the answers and chunk
+                 files must be exactly those of the latest generation run (ADR 0033).
 --mode summarise Check the filled sheet against its key (every code exactly once, every
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
@@ -33,6 +34,7 @@ from config import (
     CHUNK_FILES,
     DOCUMENTS_FILE,
     GENERATED_ANSWERS_FILE,
+    GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
@@ -56,6 +58,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
+from run_log import require_run
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -120,6 +123,7 @@ def scaffold(
     packet_file: Path = SCORING_PACKET_FILE,
     key_file: Path = SCORING_KEY_FILE,
     seed: int = SCORING_SEED,
+    generation_runs_file: Path = GENERATION_RUNS_FILE,
 ) -> int:
     """Write packet, sheet and key for blind scoring; return the number of answers."""
     questions, truth = catalogue(
@@ -138,6 +142,9 @@ def scaffold(
     check_grid(answers_file, answers, qids)
     if sorted(chunk_files) != sorted(STRATEGY_IDS):
         raise ValueError(f"chunk_files must cover exactly the strategies {sorted(STRATEGY_IDS)}")
+    # the packet must show the excerpts the model saw: the chunk files and answers of the run
+    inputs = [questions_file, ground_truth_file, *(chunk_files[k] for k in STRATEGY_IDS)]
+    require_run(generation_runs_file, "generate", ",".join(STRATEGY_IDS), inputs, [answers_file])
     chunks = {
         key: {c["chunk_id"]: c for c in load_jsonl(path, "run src/chunking.py first")}
         for key, path in chunk_files.items()

@@ -19,8 +19,10 @@ from generate import ANSWERS_HEADER, generate
 from llm_client import Completion
 from prompt import context, messages
 from retrieve import GROUND_TRUTH_HEADER, HEADER, QUESTIONS_HEADER
+from run_log import sha256_of
 
 STRATEGIES = list(STRATEGY_IDS)
+EXPERIMENT = ",".join(STRATEGIES)  # strategy field of an experiment run record
 QUESTIONS = {"Q001": "How do props work?", "Q002": "What is {{ msg }}?"}
 
 
@@ -111,11 +113,31 @@ def files(tmp_path):
         "chunk_files": {key: chunk_files[key] for key in STRATEGY_IDS},
         "out_file": tmp_path / "generated_answers.csv",
         "runs_file": tmp_path / "runs.jsonl",
+        "retrieval_runs_file": tmp_path / "retrieval_runs.jsonl",
         "control_chunk_file": chunk_files["K1"],
     }
 
 
-def run(files, completer=None, **overrides):
+def record_retrieval(files, strategy=EXPERIMENT, outputs=True, **changed):
+    """A retrieve record as retrieve.py writes it, over the current files unless `changed`."""
+    inputs = [files["questions_file"], files["ground_truth_file"], *files["chunk_files"].values()]
+    record = {
+        "step": "retrieve",
+        "strategy": strategy,
+        "inputs_sha256": {f.name: sha256_of(f) for f in inputs} | changed,
+    }
+    if outputs:
+        record["outputs_sha256"] = {
+            files["results_file"].name: sha256_of(files["results_file"])
+        } | changed
+    with files["retrieval_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+
+
+def run(files, completer=None, record=True, **overrides):
+    """Generate; first log a retrieval run over the current files unless `record` is False."""
+    if record:
+        record_retrieval(files)
     args = {k: v for k, v in files.items() if k != "control_chunk_file"} | overrides
     return generate(completer or FakeCompleter(), **args)
 
@@ -264,3 +286,54 @@ def test_main_catalogue_must_be_frozen(files, monkeypatch):
     with pytest.raises(RuntimeError, match="not frozen"):
         run(files, completer)
     assert completer.calls == []
+
+
+def test_run_log_records_the_checksum_of_the_answers(files):
+    run(files)
+    (record,) = runs(files)
+    assert record["outputs_sha256"] == {"generated_answers.csv": sha256_of(files["out_file"])}
+
+
+def test_retrieval_without_a_run_record_is_refused(files):
+    completer = FakeCompleter()
+    with pytest.raises(RuntimeError, match="no retrieve run"):
+        run(files, completer, record=False)
+    assert completer.calls == []
+
+
+@pytest.mark.parametrize("changed", ["chunks_c2.jsonl", "questions.csv", "ground_truth.csv"])
+def test_retrieval_over_other_inputs_is_refused(files, changed):
+    """The results were retrieved for other questions or chunk files than the current ones."""
+    record_retrieval(files, **{changed: "0" * 64})
+    completer = FakeCompleter()
+    with pytest.raises(RuntimeError, match=changed):
+        run(files, completer, record=False)
+    assert completer.calls == []
+
+
+def test_results_changed_after_their_retrieval_run_are_refused(files):
+    record_retrieval(files)
+    write_csv(files["results_file"], HEADER, result_rows(qids=("Q001", "Q002")))
+    completer = FakeCompleter()
+    with pytest.raises(RuntimeError, match="retrieved_results.csv"):
+        run(files, completer, record=False)
+    assert completer.calls == []
+
+
+def test_only_the_latest_retrieval_run_counts(files):
+    record_retrieval(files)
+    record_retrieval(files, **{"chunks_c1.jsonl": "0" * 64})  # a later run over other chunks
+    with pytest.raises(RuntimeError, match="chunks_c1.jsonl"):
+        run(files, record=False)
+
+
+def test_a_control_retrieval_run_is_not_the_experiment_run(files):
+    record_retrieval(files)
+    record_retrieval(files, strategy="K1", **{"chunks_c1.jsonl": "0" * 64})
+    assert run(files, record=False) == len(QUESTIONS) * len(STRATEGIES)
+
+
+def test_retrieval_run_from_before_output_checksums_is_checked_on_its_inputs(files):
+    """Records written before 17.10.2026 have no outputs_sha256 (pilot sets)."""
+    record_retrieval(files, outputs=False)
+    assert run(files, record=False) == len(QUESTIONS) * len(STRATEGIES)

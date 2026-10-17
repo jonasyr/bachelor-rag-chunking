@@ -79,7 +79,9 @@ Modell, IDs und Texte unverändert sind; sonst bricht der Lauf ab, bis die Datei
 
 `retrieve.py` (eine Zeile je Lauf; `strategy` listet alle Strategien des Laufs, `vectors`/`dimensions` beziehen sich
 auf die Fragen, `inputs_sha256` belegt alle Eingaben, u. a. die Ground Truth nach
-[ADR 0017](../adr/0017-fragenkatalog.md); Beispiel: erster Lauf des Pilot-Sets `hard`):
+[ADR 0017](../adr/0017-fragenkatalog.md); seit 17.10.2026 zusätzlich `outputs_sha256` mit der Prüfsumme der
+geschriebenen Ergebnisdatei, gegen die `generate.py` prüft ([ADR 0033](../adr/0033-antwortmodell.md)); Beispiel:
+erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 ```json
 {"date":"2026-10-14","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"retrieve","strategy":"C1,C2,C3","dimensions":3072,"vectors":16,"inputs_sha256":{"questions.csv":"6f4a2e9f…","ground_truth.csv":"f9ddb34b…","sections.jsonl":"…","query_embeddings.npz":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…","embeddings_c1.npz":"…","embeddings_c2.npz":"…","embeddings_c3.npz":"…"},"canary_min_cosine":0.9999592304229736,"input_tokens":391,"cost_usd":5.083e-05,"canary_input_tokens":2706,"canary_cost_usd":0.00035178,"api_called":true}
 ```
@@ -94,12 +96,13 @@ abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte
   das Modell, das die API für alle Antworten des Laufs gemeldet hat; `system_fingerprints`: alle gemeldeten
   Fingerabdrücke (sortiert, leer, wenn die API keine meldet).
 - `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten).
-- `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien.
+- `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
+  `generated_answers.csv`. `evaluate_answers.py --mode scaffold` prüft beide gegen die aktuellen Dateien.
 - `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
 ```json
-{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","system_fingerprints":["…"],"answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
+{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","system_fingerprints":["…"],"answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
 ```
 
 ## Fragen und Ground Truth

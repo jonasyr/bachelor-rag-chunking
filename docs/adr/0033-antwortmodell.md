@@ -32,8 +32,15 @@ Wir werden die Antworten mit `gpt-6-luna` erzeugen, mit `reasoning_effort = "non
 Wir werden alle Antworten in einem Lauf über C1–C3 erzeugen und speichern; `generated_answers.csv` wird nie
 überschrieben, eine Neuerzeugung erfordert das bewusste Löschen der Datei. Der Lauf schreibt nichts, wenn eine
 Antwort nicht mit `finish_reason = "stop"` endet (z. B. abgeschnitten) oder leer ist oder die API innerhalb des Laufs
-verschiedene Modelle meldet. Das Laufprotokoll hält das von der API gemeldete Modell, die Prüfsummen der Eingaben,
-SDK-Version, Tokens und Kosten je Strategie fest.
+verschiedene Modelle meldet. Das Laufprotokoll hält das von der API gemeldete Modell, die Prüfsummen der Ein- und
+Ausgaben, SDK-Version, Tokens und Kosten je Strategie fest.
+
+Wir werden jeden Schritt nur auf den Dateien des letzten Laufs seines Vorgängers aufsetzen lassen (Hinweis aus dem
+Codex-Review von PR #14): `generate.py` prüft vor dem ersten API-Aufruf, dass Fragen, Ground Truth und Chunk-Dateien
+die Prüfsummen des letzten Retrieval-Laufs über C1–C3 haben und die Ergebnisdatei dessen Ausgabe ist;
+`evaluate_answers.py --mode scaffold` prüft dasselbe gegen den letzten Generierungslauf, damit das Lesepaket genau die
+Passagen zeigt, die das Modell gesehen hat. Retrieval-Einträge vor dem 17.10.2026 haben keine Ausgabe-Prüfsumme und
+werden nur an ihren Eingaben geprüft (Pilot-Sets).
 
 Wechsel auf `gpt-6-sol` (ebenfalls `"none"`) nur, wenn die Antworten der Pilotfragen dafür zu schwach sind, und nur
 vor dem Hauptlauf.
@@ -43,6 +50,8 @@ vor dem Hauptlauf.
 - Gut: Temperatur 0 bleibt möglich (ADR 0014); das Modell ist bis über die Verteidigung hinaus verfügbar.
 - Gut: Die Antworten der Bewertung stammen nachweislich aus einem Modellstand und lassen sich mit dem gemeldeten
   Modellnamen genau angeben.
+- Gut: Veraltete Retrieval-Ergebnisse oder nachträglich neu erzeugte Chunk-Dateien können weder in die Generierung
+  noch in die Bewertung gelangen.
 - Schlecht: Ohne datierten Snapshot lässt sich ein Lauf nach einer Modelländerung nicht exakt wiederholen; die
   gespeicherten Antworten sind die Primärdaten.
 - Neutral: Die Ergebnisse gelten für einen Generator, der direkt antwortet; mit einem Reasoning-Modell könnten die

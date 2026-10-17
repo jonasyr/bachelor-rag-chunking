@@ -77,6 +77,39 @@ def append_generation_run(
     return full
 
 
+def require_run(
+    runs_file: Path,
+    step: str,
+    strategy: str,
+    inputs: list[Path],
+    outputs: list[Path],
+    outputs_required: bool = True,
+) -> dict:
+    """The latest record of `step` over `strategy`; raise unless it hashed `inputs` and `outputs`
+    exactly as they are now, so a later step never builds on files another run produced.
+
+    Without `outputs_required`, a record that predates output checksums (no `outputs_sha256`)
+    is checked on its inputs only.
+    """
+    records = []
+    if runs_file.exists():
+        records = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines()]
+    matching = [r for r in records if r.get("step") == step and r.get("strategy") == strategy]
+    if not matching:
+        raise RuntimeError(f"{runs_file} has no {step} run over {strategy}; run src/{step}.py")
+    record = matching[-1]
+    checks = [("inputs_sha256", f) for f in inputs]
+    if outputs_required or "outputs_sha256" in record:
+        checks += [("outputs_sha256", f) for f in outputs]
+    for field, path in checks:
+        if record.get(field, {}).get(path.name) != sha256_of(path):
+            raise RuntimeError(
+                f"{path.name} differs from the latest {step} run of {record.get('date', '?')} "
+                f"({runs_file}); run src/{step}.py again"
+            )
+    return record
+
+
 def _append(record: dict, runs_file: Path) -> None:
     runs_file.parent.mkdir(parents=True, exist_ok=True)
     with runs_file.open("a", encoding="utf-8") as f:
