@@ -90,7 +90,8 @@ erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
 
 **`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`, dazu je
-neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`, je
+neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","scoring":"rules","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`
+(`scoring` = `config.SCORING_METHOD`: nur regelbasiert zu bewerten, [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md); ältere Einträge ohne das Feld), je
 Einfrieren der Kernpunkte ein Eintrag `"step":"key_points"` (siehe `key_points.csv`);
 [ADR 0033](../adr/0033-antwortmodell.md)). Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`. Ein
 abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
@@ -223,7 +224,7 @@ Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel 
 vor, stimmt der Schlüssel und sind die neuen Einträge byte-gleich zur Prüfsumme im Laufprotokoll, schreibt ein
 erneuter Aufruf nur Lesepaket und `scoring_items.jsonl` neu).
 
-**`scoring_packet.md`** (Lesepaket): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
+**`scoring_packet.md`** (Lesepaket, nur Lesekopie; bewertet wird in der App über die Prüffragen): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
 `### Q001-A` mit der Antwort und den Passagen, die das Modell sah (`[Excerpt N]`, getrennt durch `---`, ohne
 Chunk-IDs), beide in einem Code-Block, dessen Zaun länger ist als jede Backtick-Folge im Text.
 

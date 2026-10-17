@@ -3,7 +3,7 @@
 ## Status
 
 Angenommen (17.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md), [ADR 0032](0032-blinde-rubrik-bewertung.md) und
-[ADR 0034](0034-bewertung-in-der-app.md))
+[ADR 0034](0034-bewertung-in-der-app.md); verpflichtend für neue Scaffolds: [ADR 0036](0036-regelbasierte-bewertung-verpflichtend.md))
 
 ## Kontext
 

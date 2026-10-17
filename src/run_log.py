@@ -19,6 +19,7 @@ from config import (
     LLM_REASONING_EFFORT,
     LLM_SEED,
     LLM_TEMPERATURE,
+    SCORING_METHOD,
 )
 
 
@@ -125,6 +126,7 @@ def append_scaffold_run(
         "date": date.today().isoformat(),
         "step": "scaffold",
         "strategy": strategy,
+        "scoring": SCORING_METHOD,  # rule-based scoring is required for this scaffold (ADR 0036)
         "codes": codes,
         "outputs_sha256": outputs,
     }

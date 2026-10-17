@@ -161,8 +161,21 @@ def write_sheet(files, rows):
     write_csv(files["sheet_file"], SHEET_HEADER, [[r[h] for h in SHEET_HEADER] for r in rows])
 
 
-def fill(files, scores):
-    """scores: {(question_id, strategy): [five criterion values]}, written by code."""
+def as_legacy_scaffold(files):
+    """Drop the rule-based mark from the scaffold records: a set scaffolded before ADR 0036,
+    whose sheet may hold scores entered by hand."""
+    path = files["generation_runs_file"]
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    for record in records:
+        record.pop("scoring", None)
+    path.write_text("".join(json.dumps(r) + "\n" for r in records), encoding="utf-8")
+
+
+def fill(files, scores, legacy=True):
+    """scores: {(question_id, strategy): [five criterion values]}, written by code into the
+    sheet by hand; such a sheet only passes summarise on a legacy scaffold (ADR 0036)."""
+    if legacy:
+        as_legacy_scaffold(files)
     strategy = strategy_of(files)
     rows = read(files["sheet_file"])
     for row in rows:
@@ -712,3 +725,24 @@ def test_summarise_refuses_a_freeze_made_for_an_earlier_scaffold(files):
         f.write(json.dumps(newer) + "\n")
     with pytest.raises(ValueError, match="earlier scaffold"):
         run_summarise(files)
+
+
+def test_a_new_scaffold_is_marked_rule_based(files):
+    run_scaffold(files)
+    lines = files["generation_runs_file"].read_text(encoding="utf-8").splitlines()
+    scaffold = [json.loads(line) for line in lines if json.loads(line)["step"] == "scaffold"][-1]
+    assert scaffold["scoring"] == "rules"
+
+
+def test_summarise_refuses_hand_entered_scores_on_a_rule_based_scaffold(files):
+    run_scaffold(files)
+    fill(files, all_two(), legacy=False)
+    with pytest.raises(ValueError, match="rule-based"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_the_packet_points_to_the_checks_not_to_hand_entered_scores(files):
+    run_scaffold(files)
+    packet = files["packet_file"].read_text(encoding="utf-8")
+    assert "regelbasierte-bewertung" in packet and "integer 0-2" not in packet

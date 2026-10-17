@@ -25,8 +25,10 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    Frage und Referenzantwort sichtbar) und einfrieren (gilt nur für dieses Scaffold; nach einem neuen Scaffold erneut
    einfrieren); Schritt „Score“ je Code die Prüffragen beantworten, die fünf
    Werte folgen aus den Regeln ([Evaluation](../reference/evaluation.md#regelbasierte-bewertung); `notes` frei, z. B.
-   wenn eine Regel nicht passt). Lesepaket `data/evaluation/scoring_packet.md` und Bogen `data/evaluation/scoring_sheet.csv`
-   nur noch für die Zweitbewertung oder ohne App; `scoring_key.csv` dabei nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
+   wenn eine Regel nicht passt). Von Hand eingetragene Werte nimmt `summarise` bei einem neuen Scaffold nicht an
+   ([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)); das Lesepaket `data/evaluation/scoring_packet.md`
+   ist nur Lesekopie. Zweitbewertung: siehe [Evaluation](../reference/evaluation.md#zweitbewertung-empfohlen);
+   `scoring_key.csv` nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
    Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
    Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
 

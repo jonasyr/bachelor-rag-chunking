@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. Übertragen aus dem Decision Log des
-früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0035 sind seit
+früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0036 sind seit
 der Umsetzung hinzugekommen. Hintergrund: [Forschungsdesign](../explanation/research-design.md); offene Entscheidungen: [Plan](../plan.md).
 Format: Michael Nygard (Status, Kontext, Entscheidung, Konsequenzen), Nummern und Dateinamen bleiben fest.
 Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte auf „ersetzt durch …“ setzen.
@@ -44,4 +44,5 @@ bleibt unverändert.
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten (Lesepaket, Bogen, Schlüssel) | Angenommen; ergänzt durch 0034, 0035 |
 | [0033](0033-antwortmodell.md) | Antwortmodell `gpt-6-luna` (Effort `none`, Temperatur 0), Antworten einmal erzeugen | Angenommen |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung als Seite der App, blinde Einträge `scoring_items.jsonl` | Angenommen; ergänzt durch 0035 |
-| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen |
+| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036 |
+| [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |

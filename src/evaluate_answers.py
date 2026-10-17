@@ -1,10 +1,12 @@
-"""Answer quality evaluation: blind manual rubric 0-2 on five criteria (ADR 0013, 0032).
+"""Answer quality evaluation: blind rubric 0-2 on five criteria (ADR 0013, 0032), derived from
+checks by fixed rules (ADR 0035, 0036).
 
 --mode scaffold  From generated_answers.csv write four files:
                  scoring_packet.md  what the rater reads: per question the question and the
                                     reference answer, then each answer under a neutral code
                                     (Q001-A, Q001-B, ...) with the excerpts the model saw;
-                 scoring_sheet.csv  what the rater fills: one row per code, criteria 0-2, notes;
+                 scoring_sheet.csv  one row per code, criteria 0-2 (written by the Scoring page
+                                    from the checks), notes;
                  scoring_key.csv    which strategy each code stands for; not opened while scoring;
                  scoring_items.jsonl the same answers as data for the scoring page (ADR 0034),
                                     equally blind.
@@ -56,6 +58,7 @@ from config import (
     SCORING_CHECKS_FILE,
     SCORING_ITEMS_FILE,
     SCORING_KEY_FILE,
+    SCORING_METHOD,
     SCORING_PACKET_FILE,
     SCORING_SEED,
     SCORING_SHEET_FILE,
@@ -202,9 +205,10 @@ def scaffold(
     packet = [
         "# Scoring packet",
         "",
-        "Score every code in scoring_sheet.csv: each criterion an integer 0-2 "
-        "(rubric: docs/reference/evaluation.md), notes optional. Do not open scoring_key.csv "
-        "before every row is scored.",
+        "A reading copy. Score in the app (page Scoring): freeze the key points, then answer the "
+        "checks per code; the five scores follow from the rules "
+        "(docs/reference/evaluation.md#regelbasierte-bewertung, ADR 0035, 0036). Do not open "
+        "scoring_key.csv before every code is scored.",
     ]
     for qid in scored:
         order = list(STRATEGY_IDS)
@@ -325,21 +329,29 @@ def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
 def check_derived(
     sheet_file: Path, checks_file: Path, key_points_file: Path, runs_file: Path
 ) -> None:
-    """Once key points are frozen or a checks file exists (ADR 0035): the checks file exists, the
-    key points are the frozen ones, every checks row marks as many points as its question has,
-    and every sheet row equals the scores its checks derive under the current rules, so neither a
-    hand-edited score, changed key points nor an older rule version can be unblinded."""
+    """For a rule-based scaffold (ADR 0036), and wherever key points are frozen or a checks file
+    exists (ADR 0035): the checks file exists, the key points are the frozen ones, every checks
+    row marks as many points as its question has, and every sheet row equals the scores its
+    checks derive under the current rules, so neither a hand-entered or hand-edited score,
+    changed key points nor an older rule version can be unblinded. Only a scaffold from before
+    ADR 0036 without key points or checks keeps its hand-entered scores."""
     record = latest_run(runs_file, "key_points", ",".join(STRATEGY_IDS))
+    scaffold = latest_run(runs_file, "scaffold", ",".join(STRATEGY_IDS))
+    rule_based = scaffold is not None and scaffold.get("scoring") == SCORING_METHOD
     if not checks_file.exists():
         if record is not None:  # a rule-based run: its scores must come from the checks
             raise ValueError(
                 f"the key points are frozen ({runs_file}) but {checks_file} is missing; restore it "
                 "from git"
             )
+        if rule_based:
+            raise ValueError(
+                f"the scaffold is rule-based ({runs_file}, ADR 0036): freeze the key points and "
+                "score every code with the checks on the Scoring page"
+            )
         return
     if record is None:
         raise ValueError(f"{checks_file} exists but the key points are not frozen ({runs_file})")
-    scaffold = latest_run(runs_file, "scaffold", ",".join(STRATEGY_IDS))
     items = SCORING_ITEMS_FILE.name
     if scaffold is None or record["outputs_sha256"].get(items) != scaffold["outputs_sha256"].get(
         items
