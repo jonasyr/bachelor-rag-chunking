@@ -59,6 +59,7 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
 .checks li {margin: 0.15rem 0;}
 .checks .ok {color: var(--ok);} .checks .problem {color: var(--problem);}
 ::selection {background: var(--select);}
+.formatted.reference {background: transparent; color: var(--muted); max-height: none;}
 </style>
 """
 LIGHT = {

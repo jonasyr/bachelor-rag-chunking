@@ -15,4 +15,9 @@ from ui_theme import CSS, palette_css  # noqa: E402
 
 st.set_page_config(layout="wide")
 st.markdown(CSS + palette_css(), unsafe_allow_html=True)
-st.navigation([st.Page("catalogue_page.py", title="Catalogue", default=True)]).run()
+st.navigation(
+    [
+        st.Page("catalogue_page.py", title="Catalogue", default=True),
+        st.Page("scoring_page.py", title="Scoring"),
+    ]
+).run()
