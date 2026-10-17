@@ -5,6 +5,8 @@ config.RUBRIC_CRITERIA by the rule table in docs/reference/evaluation.md. Same c
 scores; config.RUBRIC_RULES_VERSION names the version of these rules.
 """
 
+import re
+
 from config import (
     KEY_POINTS_MAX,
     RUBRIC_COMPLETENESS_PARTIAL,
@@ -33,6 +35,8 @@ SKIPPED_WHEN_DECLINING = {
 }
 CHECKS_HEADER = ["code", "rules_version", "points", *CHECKS]
 KEY_POINTS_HEADER = ["question_id", "point", "text"]  # key_points.csv, one row per point
+# a pre-fill boundary: a semicolon, or a sentence end before an upper-case word (not "e.g. use")
+REFERENCE_BREAK = re.compile(r";\s*|(?<=[.!?])\s+(?=[A-Z])")
 LEVEL = {"all": 2, "some": 1, "none": 0}
 HALLUCINATION = {"none": 2, "minor": 1, "substantive": 0}
 
@@ -130,3 +134,13 @@ def key_points(rows: list[dict]) -> dict[str, list[str]]:
         if len(texts) > KEY_POINTS_MAX:
             raise ValueError(f"{qid}: at most {KEY_POINTS_MAX} key points")
     return points
+
+
+def split_reference(reference: str) -> list[str]:
+    """Pre-filled key points (ADR 0037): the reference answer split at semicolons and sentence
+    ends; parts beyond config.KEY_POINTS_MAX stay together in the last point. The rater checks
+    and edits them before saving; nothing here decides what a key point is."""
+    parts = [p.strip() for p in REFERENCE_BREAK.split(reference) if p.strip()]
+    if len(parts) > KEY_POINTS_MAX:
+        parts[KEY_POINTS_MAX - 1 :] = ["; ".join(parts[KEY_POINTS_MAX - 1 :])]
+    return parts

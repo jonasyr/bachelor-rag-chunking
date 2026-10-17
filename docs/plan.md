@@ -17,6 +17,10 @@ Stand 17.10.2026: Antwortmodell `gpt-6-luna` gepinnt (Effort `none`, Temperatur 
 Schritt der Pipeline mehr Platzhalter. Nächster Schritt: Stichprobenplan ziehen, dann 48 Fragen
 in sechs Blöcken zu 8 schreiben und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)),
 Einfrieren bis 06.11.2026 (Meilenstein 09.11.).
+Stand 18.10.2026: Pilot `data/pilot/hard` von einem Agenten als Entwicklungshilfe bewertet (zählt nicht): kaum
+Unterschiede der Antwortqualität zwischen den Strategien trotz unterschiedlichem Retrieval; daraus präzisierte
+Prüfregeln und vorbefüllte Kernpunkte ([ADR 0037](adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)).
+Vor dem Einfrieren prüfen, ob die relevanten Abschnitte auch die API-Referenz abdecken.
 
 ## Zeitplan (13.10.–24.12.2026)
 

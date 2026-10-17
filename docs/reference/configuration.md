@@ -155,5 +155,5 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
-| `RUBRIC_RULES_VERSION` | `"2026-10-17"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
+| `RUBRIC_RULES_VERSION` | `"2026-10-18"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |

@@ -225,8 +225,28 @@ def test_a_new_scaffold_after_the_freeze_reopens_the_key_points(scoring_page):
 @pytest.mark.parametrize("filled", [(2,), (1, 3)])
 def test_key_points_need_a_core_point_and_no_gaps(page, filled):
     at, folder = page
+    at.text_input(key="kp|Pilot: hard|H01|1").input("").run()  # clear the pre-filled core point
     for n in filled:
         at.text_input(key=f"kp|Pilot: hard|H01|{n}").input(f"Point {n} text").run()
     assert at.button(key="kp_save").disabled
     assert any("without gaps" in c.value for c in at.caption)
     assert not (folder / "key_points.csv").exists()
+
+
+def test_key_points_are_prefilled_from_the_reference_but_saved_only_on_save(page):
+    at, folder = page
+    assert at.text_input(key="kp|Pilot: hard|H01|1").value == "Use `ref()`."
+    assert at.text_input(key="kp|Pilot: hard|H01|2").value == ""
+    assert any("reference answer" in c.value for c in at.caption)
+    assert not (folder / "key_points.csv").exists()
+    at.button(key="kp_save").click().run()
+    (s,) = scoring.scoring_sets()
+    assert scoring.load_key_points(s) == {"H01": ["Use `ref()`."]}
+
+
+def test_the_checks_carry_the_rules_of_adr_0037_as_help(scoring_page):
+    at, _ = scoring_page
+    help_of = {g.key.rsplit("|", 1)[1]: g.help for g in at.button_group}
+    assert "in brackets" in help_of["point_1"] and "other words" in help_of["point_1"]
+    assert "illustrative" in help_of["hallucination"]
+    assert "core point" in help_of["direct"]

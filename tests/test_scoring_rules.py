@@ -1,7 +1,12 @@
 import pytest
 
 import scoring_rules as rules
-from config import RUBRIC_COMPLETENESS_PARTIAL, RUBRIC_CRITERIA, RUBRIC_RULES_VERSION
+from config import (
+    KEY_POINTS_MAX,
+    RUBRIC_COMPLETENESS_PARTIAL,
+    RUBRIC_CRITERIA,
+    RUBRIC_RULES_VERSION,
+)
 
 GOOD = {
     "points": ["covered", "covered"],
@@ -152,3 +157,31 @@ def test_key_points_group_by_question_in_point_order():
 def test_malformed_key_points_are_refused(rows, message):
     with pytest.raises(ValueError, match=message):
         rules.key_points(point_rows(*rows))
+
+
+@pytest.mark.parametrize(
+    ("reference", "points"),
+    [
+        (
+            "Use defineModel() (Vue 3.4+); the compiler expands it to a modelValue prop.",
+            ["Use defineModel() (Vue 3.4+)", "the compiler expands it to a modelValue prop."],
+        ),
+        (
+            "Supported from Vue 3.5 on. Earlier versions need toRefs().",
+            ["Supported from Vue 3.5 on.", "Earlier versions need toRefs()."],
+        ),
+        (  # an abbreviation before a lower-case word does not end a sentence
+            'Name them in camelCase starting with "use", e.g. useMouse.',
+            ['Name them in camelCase starting with "use", e.g. useMouse.'],
+        ),
+        ("  ", []),
+    ],
+)
+def test_reference_answers_split_at_semicolons_and_sentence_ends(reference, points):
+    assert rules.split_reference(reference) == points
+
+
+def test_a_long_reference_keeps_the_extra_parts_in_the_last_point():
+    parts = rules.split_reference("A; b; c; d; e; f.")
+    assert parts == ["A", "b", "c", "d; e; f."]
+    assert len(parts) == KEY_POINTS_MAX

@@ -62,18 +62,19 @@ Kriterien in `scores.csv`: `config.RUBRIC_CRITERIA` ([ADR 0013](../adr/0013-antw
 Die Tabelle oben fasst die Stufen zusammen; vergeben werden die Werte nach den folgenden Regeln
 ([ADR 0035](../adr/0035-regelbasierte-bewertung.md), `src/scoring_rules.py`, Version `config.RUBRIC_RULES_VERSION`).
 Vor der Bewertung schreibt Jonas je Frage 1–`config.KEY_POINTS_MAX` Kernpunkte (Punkt 1 = Kernaussage, die direkte
-Antwort auf die Frage) und friert sie ein. Je Antwort werden dann diese Prüffragen beantwortet:
+Antwort auf die Frage) und friert sie ein; die App befüllt sie aus der Referenzantwort vor (getrennt an Semikolon
+und Satzende), Jonas prüft und teilt weiter ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)). Je Antwort werden dann diese Prüffragen beantwortet:
 
 | Prüffrage | Frage | Optionen |
 |---|---|---|
-| `point_<n>` | Steht Kernpunkt *n* mit derselben Bedeutung in der Antwort? (nur teilweise = fehlt) | `covered`, `missing` |
+| `point_<n>` | Steht Kernpunkt *n* mit derselben Bedeutung in der Antwort, auch in anderen Worten? (nur teilweise = fehlt; eine Einschränkung in Klammern muss nicht enthalten sein) | `covered`, `missing` |
 | `declines` | Sagt die Antwort, dass die Passagen die Antwort nicht enthalten, und gibt keine? | `yes`, `no` |
 | `core_wrong` | Gibt die Antwort die Kernaussage falsch wieder oder widerspricht ihr? | `yes`, `no` |
 | `other_error` | Ist eine andere Aussage sachlich falsch? | `yes`, `no` |
 | `grounded` | Wie viele Aussagen der Antwort sind durch die Passagen belegt? | `all`, `some`, `none` |
 | `hallucination` | Enthält die Antwort etwas, das weder Passagen noch Referenz decken? (`minor` = ändert die Antwort nicht, `substantive` = ändert sie oder widerspricht) | `none`, `minor`, `substantive` |
 | `answers_question` | Geht die Antwort auf das Gefragte ein? | `yes`, `no` |
-| `direct` | Steht die Antwort direkt in den ersten zwei Sätzen? | `yes`, `no` |
+| `direct` | Steht die Kernaussage in den ersten zwei Sätzen? (auch wenn ein zweiter Teil der Frage später folgt) | `yes`, `no` |
 | `wordy` | Ist die Antwort wiederholend, aufgebläht oder verwirrend? | `yes`, `no` |
 
 | Kriterium | 2 | 1 | 0 |
@@ -87,7 +88,10 @@ Antwort auf die Frage) und friert sie ein. Je Antwort werden dann diese Prüffra
 Korrektheit wird in dieser Reihenfolge geprüft: `core_wrong` = yes ergibt 0, sonst `other_error` oder `declines` 1,
 sonst 2. Bei `declines` = yes werden Kernpunkte, `core_wrong`, `other_error`, `grounded` und `hallucination` nicht
 gefragt und als `missing`/`no`/`no`/`all`/`none` gespeichert: Korrektheit 1, Vollständigkeit 0, Quellenbezug 2,
-Halluzinationsfreiheit 2, Verständlichkeit nach ihren Prüffragen. Ein manuelles Überschreiben gibt es nicht; passt
+Halluzinationsfreiheit 2, Verständlichkeit nach ihren Prüffragen. Eine wahre Aussage, die weder Passagen noch
+Referenz decken, zählt als nicht belegt (`grounded`) und als Halluzination (`minor`, wenn sie die Antwort nicht
+ändert); ein erfundener Beispielname zur Veranschaulichung ist keine Halluzination. Ein Nebensatz, der zählen soll,
+wird ein eigener Kernpunkt. Ein manuelles Überschreiben gibt es nicht; passt
 eine Regel nicht, wird das in `notes` vermerkt. Die Antworten stehen in `scoring_checks.csv`
 ([Datenformate](data-formats.md)); `--mode summarise` prüft, dass die Kernpunkte die eingefrorenen sind, jede
 Zeile so viele Kernpunkte markiert, wie ihre Frage hat, und jede Zeile des Bogens den abgeleiteten Werten entspricht.

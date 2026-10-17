@@ -44,5 +44,6 @@ bleibt unverändert.
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten (Lesepaket, Bogen, Schlüssel) | Angenommen; ergänzt durch 0034, 0035 |
 | [0033](0033-antwortmodell.md) | Antwortmodell `gpt-6-luna` (Effort `none`, Temperatur 0), Antworten einmal erzeugen | Angenommen |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung als Seite der App, blinde Einträge `scoring_items.jsonl` | Angenommen; ergänzt durch 0035 |
-| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036 |
+| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037 |
 | [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |
+| [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen |
