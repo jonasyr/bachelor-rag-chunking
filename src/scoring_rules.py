@@ -27,6 +27,7 @@ SKIPPED_WHEN_DECLINING = {
     "hallucination": "none",
 }
 CHECKS_HEADER = ["code", "rules_version", "points", *CHECKS]
+KEY_POINTS_HEADER = ["question_id", "point", "text"]  # key_points.csv, one row per point
 LEVEL = {"all": 2, "some": 1, "none": 0}
 HALLUCINATION = {"none": 2, "minor": 1, "substantive": 0}
 

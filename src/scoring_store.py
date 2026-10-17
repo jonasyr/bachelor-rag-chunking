@@ -121,7 +121,7 @@ def load_scores(s: ScoringSet) -> dict[str, dict]:
     }
 
 
-KEY_POINTS_HEADER = ["question_id", "point", "text"]
+KEY_POINTS_HEADER = rules.KEY_POINTS_HEADER
 STRATEGY = ",".join(STRATEGY_IDS)
 
 

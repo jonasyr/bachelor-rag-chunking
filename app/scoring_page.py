@@ -207,7 +207,9 @@ def form(
                 control(
                     f"{point_label(n)}: {text}",
                     rules.POINT_MARKS,
-                    None if declined_before or not stored else stored["points"][n - 1],
+                    None
+                    if declined_before or n > len(stored.get("points", []))
+                    else stored["points"][n - 1],
                     f"{s.name}|{code}|point_{n}",
                     locked,
                 )
@@ -291,6 +293,11 @@ def main() -> None:
         if step == "Score":
             st.caption("Scoring opens once the key points are frozen.")
         key_points_step(s, items, frozen or locked)
+        return
+    try:
+        scoring.require_frozen_key_points(s)
+    except PermissionError as error:  # e.g. key_points.csv edited by hand after the freeze
+        st.error(str(error))
         return
 
     sidebar(items, scores)

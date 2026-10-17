@@ -18,8 +18,8 @@
                  criterion an integer 0-2), unblind it into scores.csv with total_score = mean of
                  the criteria, and print mean, median and standard deviation per strategy,
                  overall and per question type and construction class. With a checks file
-                 (scoring_checks.csv, ADR 0035) every sheet row must equal the scores its checks
-                 derive under the current rules.
+                 (scoring_checks.csv, ADR 0035) the key points must be the frozen ones and every
+                 sheet row must equal the scores its checks derive under the current rules.
 
 Both modes use the main catalogue only while it matches its freeze record (ADR 0030). With --set
 DIR they work on a pilot set instead, and --limit N (pilot sets only) scores its first N
@@ -46,6 +46,7 @@ from config import (
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    KEY_POINTS_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
@@ -72,7 +73,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
-from run_log import append_scaffold_run, latest_run, require_run
+from run_log import append_scaffold_run, latest_run, require_run, sha256_of
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -321,11 +322,26 @@ def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
     return sorted(rows, key=lambda r: (r["question_id"], order.index(r["strategy"])))
 
 
-def check_derived(sheet_file: Path, checks_file: Path) -> None:
-    """With a checks file (ADR 0035): every sheet row equals the scores its checks derive under
-    the current rules, so a hand-edited score or an older rule version cannot be unblinded."""
+def check_derived(
+    sheet_file: Path, checks_file: Path, key_points_file: Path, runs_file: Path
+) -> None:
+    """With a checks file (ADR 0035): the key points are the frozen ones, every checks row marks
+    as many points as its question has, and every sheet row equals the scores its checks derive
+    under the current rules, so neither a hand-edited score, changed key points nor an older rule
+    version can be unblinded."""
     if not checks_file.exists():
         return
+    record = latest_run(runs_file, "key_points", ",".join(STRATEGY_IDS))
+    if record is None:
+        raise ValueError(f"{checks_file} exists but the key points are not frozen ({runs_file})")
+    frozen = record["outputs_sha256"].get(key_points_file.name)
+    if not key_points_file.exists() or sha256_of(key_points_file) != frozen:
+        raise ValueError(
+            f"{key_points_file} differs from the frozen key points; restore it from git"
+        )
+    counts: dict[str, int] = {}
+    for point in read_csv(key_points_file, rules.KEY_POINTS_HEADER):
+        counts[point["question_id"]] = counts.get(point["question_id"], 0) + 1
     stored = {r["code"]: r for r in read_csv(checks_file, rules.CHECKS_HEADER)}
     for row in read_csv(sheet_file, SHEET_HEADER):
         if row["code"] not in stored:
@@ -336,7 +352,10 @@ def check_derived(sheet_file: Path, checks_file: Path) -> None:
                 f"{checks_file}: {row['code']} was scored under rules {version}, current rules are "
                 f"{RUBRIC_RULES_VERSION}; score it again"
             )
-        rules.validate(checks, len(checks["points"]))
+        try:
+            rules.validate(checks, counts.get(row["question_id"], 0))
+        except ValueError as error:
+            raise ValueError(f"{checks_file}: {row['code']}: {error}") from error
         for criterion, value in rules.derive(checks).items():
             if row[criterion].strip() != str(value):
                 raise ValueError(
@@ -354,6 +373,8 @@ def summarise(
     sheet_file: Path = SCORING_SHEET_FILE,
     key_file: Path = SCORING_KEY_FILE,
     checks_file: Path = SCORING_CHECKS_FILE,
+    key_points_file: Path = KEY_POINTS_FILE,
+    generation_runs_file: Path = GENERATION_RUNS_FILE,
     scores_file: Path = SCORES_FILE,
     limit: int | None = None,
 ) -> dict[tuple, dict]:
@@ -363,7 +384,7 @@ def summarise(
         questions_file, ground_truth_file, sections_file, documents_file, freeze_file
     )
     scored = scored_questions(questions, limit, questions_file, ground_truth_file)
-    check_derived(sheet_file, checks_file)
+    check_derived(sheet_file, checks_file, key_points_file, generation_runs_file)
     rows = unblind(sheet_file, key_file, scored)
     write_csv(scores_file, SCORES_HEADER, rows)
 
@@ -407,6 +428,7 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "items_file": set_dir / SCORING_ITEMS_FILE.name,
         "scores_file": set_dir / SCORES_FILE.name,
         "checks_file": set_dir / SCORING_CHECKS_FILE.name,
+        "key_points_file": set_dir / KEY_POINTS_FILE.name,
         "generation_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }
 
@@ -425,7 +447,11 @@ if __name__ == "__main__":
         p.error("--limit needs --set: every experiment answer is scored (ADR 0032)")
     paths = pilot_paths(args.set) if args.set else {}
     if args.mode == "scaffold":
-        scaffold_args = {k: v for k, v in paths.items() if k not in ("scores_file", "checks_file")}
+        scaffold_args = {
+            k: v
+            for k, v in paths.items()
+            if k not in ("scores_file", "checks_file", "key_points_file")
+        }
         count = scaffold(**scaffold_args, limit=args.limit)
         packet = paths.get("packet_file", SCORING_PACKET_FILE)
         sheet = paths.get("sheet_file", SCORING_SHEET_FILE)
@@ -437,6 +463,8 @@ if __name__ == "__main__":
             "sheet_file",
             "key_file",
             "checks_file",
+            "key_points_file",
+            "generation_runs_file",
             "scores_file",
         ]
         print_summary(summarise(**{k: paths[k] for k in keep if k in paths}, limit=args.limit))

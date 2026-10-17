@@ -89,7 +89,8 @@ sonst 2. Bei `declines` = yes werden Kernpunkte, `core_wrong`, `other_error`, `g
 gefragt und als `missing`/`no`/`no`/`all`/`none` gespeichert: Korrektheit 1, Vollständigkeit 0, Quellenbezug 2,
 Halluzinationsfreiheit 2, Verständlichkeit nach ihren Prüffragen. Ein manuelles Überschreiben gibt es nicht; passt
 eine Regel nicht, wird das in `notes` vermerkt. Die Antworten stehen in `scoring_checks.csv`
-([Datenformate](data-formats.md)); `--mode summarise` prüft jede Zeile des Bogens gegen sie.
+([Datenformate](data-formats.md)); `--mode summarise` prüft, dass die Kernpunkte die eingefrorenen sind, jede
+Zeile so viele Kernpunkte markiert, wie ihre Frage hat, und jede Zeile des Bogens den abgeleiteten Werten entspricht.
 
 ## Triangulation (verbindlich)
 

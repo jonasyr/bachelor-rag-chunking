@@ -18,6 +18,7 @@ from evaluate_answers import (
 )
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 from run_log import sha256_of
+from scoring_rules import KEY_POINTS_HEADER
 
 STRATEGIES = list(STRATEGY_IDS)
 QIDS = ("Q001", "Q002")
@@ -91,6 +92,7 @@ def files(tmp_path):
         "items_file": tmp_path / "scoring_items.jsonl",
         "scores_file": tmp_path / "scores.csv",
         "checks_file": tmp_path / "scoring_checks.csv",
+        "key_points_file": tmp_path / "key_points.csv",
         "generation_runs_file": tmp_path / "generation_runs.jsonl",
     }
 
@@ -119,6 +121,8 @@ SUMMARISE_ARGS = [
     "key_file",
     "scores_file",
     "checks_file",
+    "key_points_file",
+    "generation_runs_file",
 ]
 
 
@@ -437,6 +441,7 @@ def test_pilot_paths_keep_every_file_inside_the_set(tmp_path):
         "items_file",
         "scores_file",
         "checks_file",
+        "key_points_file",
         "generation_runs_file",
     }
     assert all(p.parent == tmp_path for p in paths.values())
@@ -561,6 +566,19 @@ GOOD_CHECKS = {
 }
 
 
+def freeze_points(files, points=1):
+    """Key points for every question and their freeze record, as the scoring page writes them."""
+    rows = [[q, str(n), f"Point {n}"] for q in QIDS for n in range(1, points + 1)]
+    write_csv(files["key_points_file"], KEY_POINTS_HEADER, rows)
+    record = {
+        "step": "key_points",
+        "strategy": ",".join(STRATEGIES),
+        "outputs_sha256": {"key_points.csv": sha256_of(files["key_points_file"])},
+    }
+    with files["generation_runs_file"].open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+
+
 def write_checks(files, rows):
     write_csv(
         files["checks_file"],
@@ -573,6 +591,7 @@ def test_summarise_accepts_a_sheet_that_equals_its_checks(files):
     run_scaffold(files)
     fill(files, all_two())
     codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
     write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes])
     run_summarise(files)
     assert files["scores_file"].exists()
@@ -582,6 +601,7 @@ def test_summarise_refuses_a_score_that_differs_from_its_checks(files):
     run_scaffold(files)
     fill(files, all_two())
     codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
     rows = [rules.to_row(c, GOOD_CHECKS) for c in codes]
     rows[0] = rules.to_row(codes[0], GOOD_CHECKS | {"wordy": "yes"})  # clarity 1, sheet says 2
     write_checks(files, rows)
@@ -594,6 +614,7 @@ def test_summarise_refuses_missing_checks_and_older_rules(files):
     run_scaffold(files)
     fill(files, all_two())
     codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
     write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes[1:]])
     with pytest.raises(ValueError, match=f"no checks for {codes[0]}"):
         run_summarise(files)
@@ -609,3 +630,33 @@ def test_summarise_without_a_checks_file_works_as_before(files):
     assert not files["checks_file"].exists()
     run_summarise(files)
     assert files["scores_file"].exists()
+
+
+def scored_with_checks(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes])
+
+
+def test_summarise_refuses_checks_without_frozen_key_points(files):
+    scored_with_checks(files)
+    with pytest.raises(ValueError, match="not frozen"):
+        run_summarise(files)
+    assert not files["scores_file"].exists()
+
+
+def test_summarise_refuses_key_points_changed_after_the_freeze(files):
+    scored_with_checks(files)
+    freeze_points(files)
+    with files["key_points_file"].open("a", encoding="utf-8") as f:
+        f.write("Q001,2,Added later\n")
+    with pytest.raises(ValueError, match="key_points.csv"):
+        run_summarise(files)
+
+
+def test_summarise_refuses_checks_whose_point_count_differs(files):
+    scored_with_checks(files)  # checks mark one point per answer
+    freeze_points(files, points=2)
+    with pytest.raises(ValueError, match="2 key points"):
+        run_summarise(files)

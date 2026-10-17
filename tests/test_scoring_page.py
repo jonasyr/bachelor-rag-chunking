@@ -200,3 +200,14 @@ def test_the_router_offers_the_scoring_page(dirs, corpus_files, tmp_path, monkey
     at.switch_page("scoring_page.py").run()
     assert not at.exception
     assert "H01, answer B" in title(at)
+
+
+def test_key_points_edited_after_scoring_show_the_refusal_not_a_traceback(scoring_page):
+    at, folder = scoring_page
+    answer_all(at, "H01-B", 1)
+    at.button(key="scoring_save").click().run()
+    with (folder / "key_points.csv").open("a", encoding="utf-8") as f:
+        f.write("H01,2,Added later\n")
+    at.selectbox(key="scoring_code|Pilot: hard").set_value("H01-B").run()
+    assert not at.exception
+    assert any("key_points.csv" in e.value for e in at.error)
