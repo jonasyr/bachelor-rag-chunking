@@ -125,7 +125,13 @@ gemischter Reihenfolge, die Zuordnung liegt in einem Schlüssel, den erst die Au
 ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); Dateien: [Datenformate](data-formats.md)).
 
 ## Zweitbewertung (empfohlen)
-Mit Lesepaket und leerem Bewertungsbogen, ohne Schlüssel ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): 10–20 % der Antworten unabhängig durch eine zweite Person bewerten lassen. Einfache Übereinstimmung = gleiche Bewertungen / alle Bewertungen, oder durchschnittliche absolute Abweichung bei 0–2-Skala. Cohen's Kappa optional.
+Mit denselben Prüffragen in der App, ohne Schlüssel ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
+[ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)): eine Kopie des Sets als Ordner unter `data/pilot/`
+(z. B. `data/pilot/zweitbewertung`) mit `scoring_items.jsonl`, `key_points.csv` (die eingefrorenen Kernpunkte),
+`runs.jsonl` (mit dem `scaffold`- und `key_points`-Eintrag) und leerem `scoring_sheet.csv`, ohne `scoring_key.csv` und
+ohne `scoring_checks.csv`; die zweite Person bewertet dort 10–20 % der Antworten unabhängig. Einfache Übereinstimmung
+je Prüffrage und je Kriterium = gleiche Antworten / alle Antworten, oder durchschnittliche absolute Abweichung bei der
+0–2-Skala. Cohen's Kappa optional.
 
 ## Statistische Auswertung
 Deskriptiv ausreichend: Mittelwert, Median, Standardabweichung, Boxplot, Vergleich nach Fragetyp, Korrelation Retrieval vs. Antwortscore. Optional Signifikanztests: Friedman-Test (mehrere verbundene Gruppen), Wilcoxon Signed-Rank (paarweise) — nur bei Sicherheit im Umgang damit.
