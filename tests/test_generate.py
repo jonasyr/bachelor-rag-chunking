@@ -15,7 +15,7 @@ from config import (
     STRATEGY_IDS,
     TOP_K,
 )
-from generate import ANSWERS_HEADER, generate
+from generate import ANSWERS_HEADER, generate, pilot_paths
 from llm_client import Completion
 from prompt import context, messages
 from retrieve import GROUND_TRUTH_HEADER, HEADER, QUESTIONS_HEADER
@@ -333,7 +333,23 @@ def test_a_control_retrieval_run_is_not_the_experiment_run(files):
     assert run(files, record=False) == len(QUESTIONS) * len(STRATEGIES)
 
 
-def test_retrieval_run_from_before_output_checksums_is_checked_on_its_inputs(files):
-    """Records written before 17.10.2026 have no outputs_sha256 (pilot sets)."""
+def test_main_generation_needs_the_checksum_of_the_results(files):
     record_retrieval(files, outputs=False)
-    assert run(files, record=False) == len(QUESTIONS) * len(STRATEGIES)
+    completer = FakeCompleter()
+    with pytest.raises(RuntimeError, match="retrieved_results.csv"):
+        run(files, completer, record=False)
+    assert completer.calls == []
+
+
+def test_pilot_retrieval_from_before_output_checksums_is_checked_on_its_inputs(files):
+    """Pilot records written before 17.10.2026 have no outputs_sha256."""
+    record_retrieval(files, outputs=False)
+    assert run(files, record=False, legacy_retrieval=True) == len(QUESTIONS) * len(STRATEGIES)
+    record_retrieval(files, outputs=False, **{"questions.csv": "0" * 64})
+    files["out_file"].unlink()
+    with pytest.raises(RuntimeError, match="questions.csv"):
+        run(files, record=False, legacy_retrieval=True)
+
+
+def test_pilot_paths_accept_legacy_retrieval_records(tmp_path):
+    assert pilot_paths(tmp_path)["legacy_retrieval"] is True

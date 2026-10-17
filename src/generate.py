@@ -83,8 +83,13 @@ def generate(
     out_file: Path = GENERATED_ANSWERS_FILE,
     runs_file: Path = GENERATION_RUNS_FILE,
     retrieval_runs_file: Path = EMBEDDING_RUNS_FILE,
+    legacy_retrieval: bool = False,
 ) -> int:
-    """Write one answer per question and experiment strategy; return the number of answers."""
+    """Write one answer per question and experiment strategy; return the number of answers.
+
+    `legacy_retrieval` lets a retrieval record without an output checksum (pilot sets, written
+    before 17.10.2026) pass on its inputs; the main experiment always needs the checksum.
+    """
     if out_file.exists():
         raise FileExistsError(
             f"{out_file} exists; answers are generated once (ADR 0033), delete it deliberately "
@@ -106,7 +111,14 @@ def generate(
     qids = [q["question_id"] for q in questions]
     inputs = [questions_file, ground_truth_file, *(chunk_files[k] for k in keys)]
     # the results must come from the latest retrieval over exactly these files (ADR 0033)
-    require_run(retrieval_runs_file, "retrieve", ",".join(keys), inputs, [results_file], False)
+    require_run(
+        retrieval_runs_file,
+        "retrieve",
+        ",".join(keys),
+        inputs,
+        [results_file],
+        outputs_required=not legacy_retrieval,
+    )
     grouped = ranked_results(results_file, qids, keys, chunks)
 
     rows: list[dict] = []
@@ -163,8 +175,9 @@ def generate(
     return len(rows)
 
 
-def pilot_paths(set_dir: Path) -> dict[str, Path]:
-    """The files of a pilot set (data/pilot/...); it has no freeze record and its own run log."""
+def pilot_paths(set_dir: Path) -> dict:
+    """The files of a pilot set (data/pilot/...); it has no freeze record and its own run log,
+    whose retrieval records may predate output checksums."""
     return {
         "results_file": set_dir / RETRIEVED_RESULTS_FILE.name,
         "questions_file": set_dir / QUESTIONS_FILE.name,
@@ -172,6 +185,7 @@ def pilot_paths(set_dir: Path) -> dict[str, Path]:
         "out_file": set_dir / GENERATED_ANSWERS_FILE.name,
         "runs_file": set_dir / PILOT_RUNS_FILE_NAME,
         "retrieval_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
+        "legacy_retrieval": True,
     }
 
 
@@ -185,6 +199,6 @@ if __name__ == "__main__":
         "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/hard) instead"
     )
     args = p.parse_args()
-    paths: dict = pilot_paths(args.set) if args.set else {}
+    paths = pilot_paths(args.set) if args.set else {}
     count = generate(**paths)
     print(f"{count} answers -> {paths.get('out_file', GENERATED_ANSWERS_FILE)}")

@@ -80,7 +80,8 @@ Modell, IDs und Texte unverändert sind; sonst bricht der Lauf ab, bis die Datei
 `retrieve.py` (eine Zeile je Lauf; `strategy` listet alle Strategien des Laufs, `vectors`/`dimensions` beziehen sich
 auf die Fragen, `inputs_sha256` belegt alle Eingaben, u. a. die Ground Truth nach
 [ADR 0017](../adr/0017-fragenkatalog.md); seit 17.10.2026 zusätzlich `outputs_sha256` mit der Prüfsumme der
-geschriebenen Ergebnisdatei, gegen die `generate.py` prüft ([ADR 0033](../adr/0033-antwortmodell.md)); Beispiel:
+geschriebenen Ergebnisdatei, gegen die `generate.py` prüft (Pflicht für den Hauptlauf; ältere Pilot-Einträge
+ohne sie werden nur an den Eingaben geprüft) ([ADR 0033](../adr/0033-antwortmodell.md)); Beispiel:
 erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
 ```json
 {"date":"2026-10-14","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"retrieve","strategy":"C1,C2,C3","dimensions":3072,"vectors":16,"inputs_sha256":{"questions.csv":"6f4a2e9f…","ground_truth.csv":"f9ddb34b…","sections.jsonl":"…","query_embeddings.npz":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…","embeddings_c1.npz":"…","embeddings_c2.npz":"…","embeddings_c3.npz":"…"},"canary_min_cosine":0.9999592304229736,"input_tokens":391,"cost_usd":5.083e-05,"canary_input_tokens":2706,"canary_cost_usd":0.00035178,"api_called":true}

@@ -39,8 +39,8 @@ Wir werden jeden Schritt nur auf den Dateien des letzten Laufs seines Vorgänger
 Codex-Review von PR #14): `generate.py` prüft vor dem ersten API-Aufruf, dass Fragen, Ground Truth und Chunk-Dateien
 die Prüfsummen des letzten Retrieval-Laufs über C1–C3 haben und die Ergebnisdatei dessen Ausgabe ist;
 `evaluate_answers.py --mode scaffold` prüft dasselbe gegen den letzten Generierungslauf, damit das Lesepaket genau die
-Passagen zeigt, die das Modell gesehen hat. Retrieval-Einträge vor dem 17.10.2026 haben keine Ausgabe-Prüfsumme und
-werden nur an ihren Eingaben geprüft (Pilot-Sets).
+Passagen zeigt, die das Modell gesehen hat. Retrieval-Einträge der Pilot-Sets vor dem 17.10.2026 haben keine
+Ausgabe-Prüfsumme und werden nur an ihren Eingaben geprüft; für den Hauptlauf ist die Ausgabe-Prüfsumme Pflicht.
 
 Wechsel auf `gpt-6-sol` (ebenfalls `"none"`) nur, wenn die Antworten der Pilotfragen dafür zu schwach sind, und nur
 vor dem Hauptlauf.
