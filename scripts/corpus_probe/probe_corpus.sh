@@ -3,14 +3,15 @@
 # (ADR 0038): sparse clone of the docs folder, pages and statistics, probes, API run.
 # The Vue row reads data/processed/documents.jsonl, so it only works on a checkout whose
 # snapshot is still Vue at 40aa88a.
-# Usage: scripts/corpus_probe/probe_corpus.sh NAME   (from the repo root; calls the OpenAI API)
+# Usage: scripts/corpus_probe/probe_corpus.sh NAME [--recorded]   (from the repo root; calls the
+# OpenAI API). --recorded repeats the recorded probes instead of drawing a new sample.
 set -euo pipefail
 name=$1
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../.." && pwd)
 data=$root/data/corpus_probe
-row=$(python3 -c "import csv,sys; r={x['name']: x for x in csv.DictReader(open(sys.argv[1]))}[sys.argv[2]]; print('\t'.join([r['repo'], r['docs_path'], r['commit'], r['product'], r['drops']]))" "$data/candidates.csv" "$name")
-IFS=$'\t' read -r repo docs commit product drops <<< "$row"
+row=$(python3 -c "import csv,sys; r={x['name']: x for x in csv.DictReader(open(sys.argv[1]))}[sys.argv[2]]; print('\t'.join([r['repo'], r['docs_path'], r['commit'], r['product']]))" "$data/candidates.csv" "$name")
+IFS=$'\t' read -r repo docs commit product <<< "$row"
 cd "$root"
 if [ "$repo" = "local" ]; then
   source=$docs
@@ -23,6 +24,6 @@ else
   git -C "$dir" checkout -q "$commit"
   source=$dir/$docs
 fi
-uv run python "$here/to_docs.py" "$name" "$source" "$drops"
-uv run python "$here/build_probes.py" "$name"
+uv run python "$here/to_docs.py" "$name" "$source"
+uv run python "$here/build_probes.py" "$name" ${2:-}
 uv run python "$here/run_probes.py" "$name" "$product"

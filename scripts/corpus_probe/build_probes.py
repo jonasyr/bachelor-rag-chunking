@@ -4,7 +4,12 @@ In every prose sentence (outside code blocks, tables, HTML and admonitions) with
 span, that span is masked once; the masked section text is kept for the open-book run. At most
 CORPUS_PROBE_PER_PAGE probes per page, drawn with CORPUS_PROBE_SEED.
 
-Usage: uv run python scripts/corpus_probe/build_probes.py NAME
+The probes of the recorded runs were drawn before the candidates were sorted, so their sample
+depended on Python's hash seed. --recorded rebuilds exactly those probes (with their masked
+section text) from results/<name>.jsonl and the pages, so the recorded runs can be repeated with
+identical inputs; it stops if a recorded probe is not found on the pages.
+
+Usage: uv run python scripts/corpus_probe/build_probes.py NAME [--recorded]
 """
 
 import collections
@@ -12,7 +17,7 @@ import random
 import re
 import sys
 
-from common import DOCS_DIR, PROBES_DIR, read_json, write_json
+from common import DOCS_DIR, PROBES_DIR, RESULTS_DIR, read_json, read_jsonl, write_json
 
 from config import (
     CORPUS_PROBE_PER_PAGE,
@@ -103,9 +108,29 @@ def build(docs: list[dict]) -> list[dict]:
     return probes
 
 
+def recorded(docs: list[dict], results: list[dict]) -> list[dict]:
+    """The recorded probes in their order, rebuilt from the pages (ignores the leak filter's
+    drops, which were never run)."""
+    pool = {}
+    for doc in docs:
+        for c in candidates(doc):
+            pool.setdefault((c["path"], c["section"], c["sentence"], c["answer"]), c)
+    probes = []
+    for r in results:
+        key = (r["path"], r["section"], r["sentence"], r["answer"])
+        if key not in pool:
+            raise ValueError(f"recorded probe not on the pages: {key}")
+        probes.append(pool[key] | {"kind": r["kind"], "area": r["area"]})
+    return probes
+
+
 def main() -> None:
     name = sys.argv[1]
-    probes = build(read_json(DOCS_DIR / f"{name}.json"))
+    docs = read_json(DOCS_DIR / f"{name}.json")
+    if sys.argv[2:] == ["--recorded"]:
+        probes = recorded(docs, read_jsonl(RESULTS_DIR / f"{name}.jsonl"))
+    else:
+        probes = build(docs)
     write_json(PROBES_DIR / f"{name}.json", probes, indent=None)
     print(name, len(probes), "probes", dict(collections.Counter(p["kind"] for p in probes)))
 

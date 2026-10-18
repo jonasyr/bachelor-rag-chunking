@@ -76,9 +76,15 @@ django-ox 2/3/2/3/3, Social SDK 3/3/2/2/1.
 - Die Fehltreffer klassifizierten Agenten, nicht eine Person; Strukturkennzahlen beruhen auf Pfad- und
   Musterheuristiken, Tokens sind Zeichen / 4.
 - Die Stichprobe der aufgezeichneten Läufe hing von Pythons Hash-Seed ab (Reihenfolge einer Menge vor dem Mischen).
-  `build_probes.py` sortiert inzwischen und zieht deterministisch; ein neuer Lauf zieht deshalb eine andere, ebenso
-  zufällige Stichprobe. Belegt sind die Werte durch die abgelegten Ergebnisse, nicht durch eine Wiederholung.
-- Blume und e2e wurden vor der Erweiterung der Übersetzungs- und Changelog-Filter in `to_docs.py` gelesen.
+  `build_probes.py` sortiert inzwischen und zieht deterministisch eine neue Stichprobe; `--recorded` baut dagegen genau
+  die aufgezeichneten Proben samt maskiertem Abschnittstext aus `results/` und den Seiten wieder auf. Geprüft
+  (18.10.2026): Für alle 23 geklonten Kandidaten ergeben gepinnter Commit, `to_docs.py` und `--recorded` dieselben
+  Seiten, dieselbe Seitenstatistik und dieselben Proben wie die aufgezeichneten Läufe, für Vue aus
+  `documents.jsonl` des Snapshots `40aa88a`. Die Antworten selbst sind nicht bitgenau wiederholbar (Modell nur als
+  Alias, `seed` nur „best effort“, [ADR 0033](../adr/0033-antwortmodell.md)); belegt sind die Werte durch die
+  abgelegten Ergebnisse.
+- Blume wurde vor der Erweiterung des Changelog-Filters gelesen und enthält die Seite `advanced/changelog.mdx` (eine
+  Anleitung zur Changelog-Funktion, kein Changelog); `skip_changelogs` = `no` hält das fest.
 
 ## Dateien und Befehle
 
@@ -86,12 +92,13 @@ Skripte in `scripts/corpus_probe/`, Daten in `config.CORPUS_PROBE_DIR` = `data/c
 
 | Datei | Inhalt |
 |---|---|
-| `candidates.csv` | `name`, `repo` (`local` = Vue-Snapshot), `docs_path`, `commit`, `commit_date`, `product` (Name im Prompt), `drops`, `commits30` (Docs-Commits in 30 Tagen), `stars`, `ai` (Anteil KI-geschriebenen Texts, Einschätzung), `new` (nach dem 31.05.2026 veröffentlicht) |
+| `candidates.csv` | `name`, `repo` (`local` = Vue-Snapshot), `docs_path`, `commit`, `commit_date`, `product` (Name im Prompt), `drops`, `skip_changelogs` (`yes` = Changelog-Dateien auslassen), `commits30` (Docs-Commits in 30 Tagen), `stars`, `ai` (Anteil KI-geschriebenen Texts, Einschätzung), `new` (nach dem 31.05.2026 veröffentlicht) |
 | `stats.json` | Seitenstatistik je Korpus (Tokens je Seite, H2–H4 je Seite, JSX-Zeilen, Codeblöcke, Frontmatter-Titel, Ebenensprünge, Referenzanteil) |
 | `results/<name>.jsonl` | eine Zeile je Probe: Satz, Ausdruck, beide Antworten, `closed_ok`, `open_ok` |
 | `misses/<name>.json` | eindeutig gestellte closed-book-Fehltreffer mit `category`; `id` = Zeile in `results/` (ab 0) |
 | `summary.json` | Messwerte, Stufen und Wertung je Korpus, Rangfolgen der Gewichtungen |
 
 `docs/`, `probes/` und `sources/` sind Zwischenstände (ganze Seiten) und nicht versioniert. Ein Korpus neu messen:
-`scripts/corpus_probe/probe_corpus.sh <name>` (ruft die OpenAI-API), dann klassifizieren und
+`scripts/corpus_probe/probe_corpus.sh <name>` (ruft die OpenAI-API; `--recorded` wiederholt die aufgezeichneten
+Proben statt eine neue Stichprobe zu ziehen), dann klassifizieren und
 `uv run python scripts/corpus_probe/summarise.py`.

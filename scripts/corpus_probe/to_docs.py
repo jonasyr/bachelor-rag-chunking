@@ -1,11 +1,12 @@
 """Pages of a candidate's docs folder as one JSON list (ADR 0038).
 
-Keeps .md/.mdx files, drops translations, changelogs and the paths given as drops (prefixes
-relative to the docs folder), takes the title from the frontmatter (else the file name) and
-removes MDX import/export lines. With a documents.jsonl as SOURCE (the Vue snapshot after
-preprocessing) its pages are taken as they are. Also records the page statistics in stats.json.
+Keeps .md/.mdx files, drops translations, changelogs (unless the candidate's skip_changelogs is
+"no") and the candidate's drops (prefixes relative to the docs folder) from candidates.csv,
+takes the title from the frontmatter (else the file name) and removes MDX import/export lines.
+With a documents.jsonl as SOURCE (the Vue snapshot after preprocessing) its pages are taken as
+they are. Also records the page statistics in stats.json.
 
-Usage: uv run python scripts/corpus_probe/to_docs.py NAME SOURCE [DROP,DROP]
+Usage: uv run python scripts/corpus_probe/to_docs.py NAME SOURCE
 """
 
 import json
@@ -13,11 +14,10 @@ import pathlib
 import re
 import sys
 
-from common import DOCS_DIR, STATS_FILE, read_json, write_json
+from common import DOCS_DIR, STATS_FILE, candidates, read_json, write_json
 
-SKIP = re.compile(
-    r"/(hi|ja|de|pt|zh|zh-cn|zh-CN|fr|es|ko|ru)/|\.(zh|ko|ja)\.mdx?$|(^|/)(CHANGELOG|changelog)"
-)
+TRANSLATIONS = re.compile(r"/(hi|ja|de|pt|zh|zh-cn|zh-CN|fr|es|ko|ru)/|\.(zh|ko|ja)\.mdx?$")
+CHANGELOGS = re.compile(r"(^|/)(CHANGELOG|changelog)")
 REFERENCE = re.compile(
     r"(^|/)(reference|references|api|api-reference|api_reference|cli|configuration|config|spec"
     r"|specs|options|policy|policies)(/|\.|-|_|$)",
@@ -25,12 +25,13 @@ REFERENCE = re.compile(
 )
 
 
-def pages(root: pathlib.Path, drops: list[str]) -> list[dict]:
+def pages(root: pathlib.Path, drops: list[str], skip_changelogs: bool = True) -> list[dict]:
     files = sorted(
         p
         for p in root.rglob("*.md*")
         if p.suffix in (".md", ".mdx")
-        and not SKIP.search("/" + str(p.relative_to(root)))
+        and not TRANSLATIONS.search("/" + str(p.relative_to(root)))
+        and not (skip_changelogs and CHANGELOGS.search("/" + str(p.relative_to(root))))
         and not any(str(p.relative_to(root)).startswith(d) for d in drops)
     )
     docs = []
@@ -81,13 +82,14 @@ def stats(docs: list[dict]) -> dict:
 
 def main() -> None:
     name, source = sys.argv[1], pathlib.Path(sys.argv[2])
-    drops = [d for d in (sys.argv[3].split(",") if len(sys.argv) > 3 else []) if d]
+    row = candidates()[name]
+    drops = [d for d in row["drops"].split(",") if d]
     if source.suffix == ".jsonl":
         docs = [
             json.loads(line) for line in source.read_text(encoding="utf-8").splitlines() if line
         ]
     else:
-        docs = pages(source, drops)
+        docs = pages(source, drops, row["skip_changelogs"] == "yes")
     write_json(DOCS_DIR / f"{name}.json", docs, indent=None)
     all_stats = read_json(STATS_FILE) if STATS_FILE.exists() else {}
     all_stats[name] = stats(docs)
