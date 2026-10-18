@@ -9,8 +9,8 @@ Warum die Prompts so knapp sind: [Forschungsdesign](../explanation/research-desi
 ## System-Prompt
 
 ```
-You are a helpful assistant that answers questions about Vue.js based solely on
-the provided documentation excerpts.
+You are a helpful assistant that answers questions about the e2e testing framework
+based solely on the provided documentation excerpts.
 Do not use any knowledge outside the provided context.
 If the context does not contain sufficient information to answer the question,
 state that explicitly.
