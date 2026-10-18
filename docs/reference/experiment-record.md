@@ -15,7 +15,38 @@ Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des
 | Datum des Snapshots | 18.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, SHA-256 je Datei) |
 | Dateien | 62: 60 Seiten (`*.mdx`, genau die Navigation) und `docs.json`, `snippets/model-provider.jsx` |
 | Dokumente, Tokens, Abschnitte | 60 Dokumente, 250.380 Tokens nach dem Preprocessing, 571 Abschnitte (60 H1, 347 H2, 164 H3); je Bereich: [Korpus](corpus.md#bereiche) |
-| K1-Fenster | 375 Tokens: 667 C3-Chunks, Mittel 375,38 → 375 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)); Chunk-Dateien und Vektoren folgen in Schritt 3 ([Plan](../plan.md#stand)) |
+| K1-Fenster | 375 Tokens: 667 C3-Chunks, Mittel 375,38 → 375 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) |
+
+## Chunking (e2e)
+
+Lauf am 18.10.2026 (`src/chunking.py`).
+
+| Strategie | Chunks | Tokens min / Mittel / max | Median |
+|---|---:|---|---:|
+| C1 | 529 | 6 / 473 / 500 | 500 |
+| C2 | 642 | 102 / 481 / 500 | 500 |
+| C3 | 667 | 50 / 375 / 800 | 283 |
+| K1 (Kontrolle, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) | 697 | 3 / 359 / 375 | 375 |
+
+## Embedding (e2e)
+
+Lauf am 18.10.2026 (`src/embed.py`, `text-embedding-3-large`, 3072 Dimensionen, SDK 2.44.0, Chroma 1.5.9; Protokoll
+`data/processed/embedding_runs.jsonl`). Die Vue-Vektoren und der alte Chroma-Index liegen lokal unter
+`data/processed/archive_vue_2026-10-18/` (nicht versioniert). K1 hat einen Eingabe-Token weniger als die
+Korpussumme: Wie beim Vue-Lauf trennt ein fester Fensterschnitt ein Token-Paar, das beim erneuten Kodieren
+verschmilzt; Spannen und Relevanz bleiben unberührt.
+
+| Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
+|---|---:|---:|---:|---:|---:|
+| C1 | 529 | 250.380 | 0,0325 | 11,5 MB | –¹ |
+| C2 | 642 | 308.580 | 0,0401 | 14,0 MB | 0,99999 |
+| C3 | 667 | 250.380 | 0,0325 | 17,7 MB | 0,99996 |
+| K1 | 697 | 250.379 | 0,0325 | 13,8 MB | 0,99994 |
+| Summe | 2.535 | 1.059.719 | 0,1378 (+ 0,0010 Prüfung = 0,1387) | 56,9 MB | alle ≥ 0,999 |
+
+¹ C1 wurde zuerst eingebettet; es gab keine gespeicherte Vektordatei zum Vergleich (die Vue-Dateien sind archiviert).
+Die Prüfungen bei C2, C3 und K1 vergleichen mit den an diesem Tag gespeicherten e2e-Vektoren.
+Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
 
 Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpus bis 18.10.2026.
 
@@ -28,7 +59,7 @@ Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpu
 | Datum des Snapshots | 14.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, Bereiche, Ausschlüsse, SHA-256 je Datei) |
 | Pfade, Dateien, Tokens, Abschnitte | 79 Dateien (Guide 52, API 22, Style Guide 5), 165.723 Tokens, 813 Abschnitte; Details in der Git-Historie von `docs/reference/corpus.md` |
 
-## Chunking
+## Chunking (Vue.js)
 
 | Strategie | Chunks | Tokens min / Mittel / max | Median |
 |---|---:|---|---:|
@@ -41,7 +72,7 @@ K1-Fenster = kaufmännisch gerundetes Mittel der C3-Chunklängen (230,8 → 231)
 davon 12 über 800 Tokens, längstes 1.467 (Obergrenze nach [ADR 0021](../adr/0021-c3-grenzen.md), begründet in
 [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
 
-## Embedding
+## Embedding (Vue.js)
 
 Lauf am 14.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI abgerechneten
 Tokens stimmen für alle vier Strategien exakt mit der eigenen Zählung der gesendeten Texte überein (`src/tokens.py`).
