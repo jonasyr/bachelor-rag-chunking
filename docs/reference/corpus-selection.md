@@ -1,6 +1,6 @@
-# Korpusauswahl (Lückentext-Probe)
+# Korpusauswahl (Lückentext-Probe und Closed-Book-Fragen)
 
-> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026. Entscheidung: [ADR 0038](../adr/0038-korpus-enroute.md).
+> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026. Entscheidung: [ADR 0038](../adr/0038-korpus-e2e.md).
 > Übersicht: [Dokumentation](../README.md).
 
 Einmalige Diagnose, mit der der Korpus gewählt wurde; kein Teil des Experiments. Frage: Welche Dokumentation kennt
@@ -30,7 +30,16 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
    Markdown-Sauberkeit, Struktur, Dokumentationsqualität, Stabilität, Passung; `config.CORPUS_PROBE_WEIGHTS`),
    Stufen in `summarise.py`; dazu fünf Gewichtungen als Sensitivität (`config.CORPUS_PROBE_SENSITIVITY`).
 7. **Qualitative Durchsicht.** Ein unabhängiger Agent las je mindestens sechs Seiten der sechs besten Kandidaten und
-   bewertete Qualität, Passung, Eignung für den Chunking-Vergleich, Fragenpotenzial und Aufbereitungsaufwand (je 0–4).
+   bewertete Qualität, Passung, Eignung für den Chunking-Vergleich, Fragenpotenzial und Aufbereitungsaufwand (je 0–4);
+   ein zweiter Agent später ebenso e2e und TanStack Charts (mindestens acht Seiten).
+8. **Closed-Book-Fragen** (`question_probe.py`) für Vue, Angular, Enroute, e2e, TanStack Charts und xy: je 20
+   Abschnitte (H2/H3, mindestens 60 Prosawörter, höchstens 2 je Seite, ohne Beispiele, Changelogs und Blog; Seed
+   20261018, `config.CORPUS_QUESTIONS_*`). Ein Agent schrieb je Abschnitt eine realistische Frage mit Referenzantwort
+   (je Korpus 4 × faktisch, prozedural, konzeptuell, Grenze, Vergleich; Prompt unten). Das Antwortmodell beantwortete
+   jede Frage ohne Kontext und mit dem Abschnitt; ein weiterer Agent beurteilte alle Antworten blind (gemischt, ohne
+   Angabe der Bedingung): `correct`, `partial`, `wrong`, `abstain`. Retrieval-abhängig = mit Abschnitt `correct`, ohne
+   nicht `correct` (Wilson-Intervall). Die Fragen sind Diagnose, kein Teil des Fragenkatalogs. Urteilslauf 1: die fünf
+   Korpora gemeinsam (Seed 7); Lauf 2: Angular allein (Seed 8, auf Wunsch für die Mail an den Betreuer nachgereicht).
 
 Prompt der Klassifikation (je Korpus; Eingabe `misses/<name>.json` ohne `category`):
 
@@ -46,6 +55,37 @@ own knowledge of the project):
   form).
 - `ambiguous`: several terms would make the sentence true, or the guess is a valid reading.
 ```
+
+Prompt des Fragenschreibers (Kern; je Korpus gleich, Eingabe `questions/<name>-sections.json`):
+
+```text
+For EVERY section write exactly one question and a reference answer:
+- The question is what a real developer using that project might ask. It is answerable from that section alone, and
+  it tests what this documentation specifically says (product-specific behaviour, API, option, default, procedure,
+  concept, limitation), not general programming knowledge.
+- Never ask about names that only occur in example code, and never ask about the documentation itself.
+- The question must not give away its answer. Name the product naturally in the question.
+- Vary the type: use each of factual, procedural, conceptual, limitation, comparative 4 times, assigning by section
+  fit.
+- The reference answer is 1-2 sentences: the core point, taken only from the section text, specific enough that a
+  judge can tell a correct answer from a plausible but wrong one.
+```
+
+Prompt des Urteils (Eingabe `judge-input.json`: Frage, Referenz, Antwort):
+
+```text
+Judge each answer ONLY against the reference; do not use your own knowledge of the projects:
+- `correct`: the answer states the reference's core point (wording may differ; extra detail is fine as long as it
+  does not contradict the reference).
+- `partial`: some of the core point is there, but an essential part is missing or vague.
+- `wrong`: it contradicts the reference or states a different mechanism, value or procedure.
+- `abstain`: it says it does not know, or gives only generic advice without committing to the specific point.
+Be strict and consistent. A plausible but generic answer that does not hit the specific documented point is `abstain`
+if it hedges, or `wrong` if it asserts something else.
+```
+
+Antwort-Prompt: System „You are an expert on {product}.“, Nutzer „Question about {product}: {question}“ (open-book
+zusätzlich der Abschnitt) und „Answer in 1-3 sentences. If you do not know, say so instead of guessing.“
 
 ## Ergebnis
 
@@ -67,12 +107,31 @@ nur das von nub (20,2 %, KI 15,4–25,1) knapp. Enroute liegt in 4
 von 5 Gewichtungen vorn (sonst Dritter). Qualitative Durchsicht (Qualität, Passung, Chunking, Fragen, Aufbereitung):
 Enroute 4/4/4/3/4 (saubere Trennung Tutorial / How-to / Konzepte / Referenz / Interna, reines Markdown, eigene Seite
 zu Grenzen), Strands Box 3/4/4/4/4 (größer, Nutzerteil „wird überarbeitet“), e2e 3/3/3/3/0, xy 3/3/2/2/1,
-django-ox 2/3/2/3/3, Social SDK 3/3/2/2/1.
+django-ox 2/3/2/3/3, Social SDK 3/3/2/2/1. Zweite Durchsicht: e2e 3/3/4/4/2 (klare Trennung Anleitung / Referenz,
+mehrere „Limits“-Abschnitte, Fehlercode-Katalog, dichte Querverweise, Abschnittslängen breit gestreut; Mintlify-MDX
+mit rund zehn Bereinigungsregeln), TanStack Charts 3/2/3/3/4 (überwiegend KI-geschrieben, fast nur H2, rund 22 %
+fast gleiche Framework-Seiten, veraltete Alpha-Seiten).
+
+Closed-Book-Fragen (je 20; `questions/<name>.json`):
+
+| Korpus | ohne Doku richtig | mit Abschnitt richtig | retrieval-abhängig (95-%-KI) |
+|---|---|---|---|
+| Vue.js | 15 | 20 | 25 % (11–47) |
+| Angular | 10 (nie „weiß nicht“) | 20 | 50 % (30–70) |
+| xy | 3 | 20 | 85 % (64–95) |
+| TanStack Charts | 1 | 19 | 95 % (75–99) |
+| e2e | 1 (13 × „weiß nicht“) | 19 | 95 % (75–99) |
+| Enroute | 0 (15 × „weiß nicht“) | 20 | 100 % (84–100) |
+
+Auf Fragenebene trennen sich die bekannten Frameworks klar von den neuen Projekten; Enroute, e2e und TanStack Charts
+sind bei 20 Fragen nicht unterscheidbar. Gewählt wurde e2e ([ADR 0038](../adr/0038-korpus-e2e.md)): gleich
+retrieval-abhängig wie Enroute, aber rund 228.000 statt 81.000 Tokens und real genutzt (11.100 Sterne, 56
+Mitwirkende); Vorgabe war möglichst viel Inhalt in der Wissensbasis.
 
 ## Grenzen
 
-- Die Probe misst Einzelfakten, nicht ganze Fragen; die Closed-Book-Prüfung jeder Katalogfrage bestätigt das auf
-  Fragenebene ([ADR 0038](../adr/0038-korpus-enroute.md)).
+- Die Lückentext-Probe misst Einzelfakten; die Closed-Book-Fragen (20 je Korpus, breite Intervalle) und später die
+  Prüfung jeder Katalogfrage bestätigen das auf Fragenebene ([ADR 0038](../adr/0038-korpus-e2e.md)).
 - Die Fehltreffer klassifizierten Agenten, nicht eine Person; Strukturkennzahlen beruhen auf Pfad- und
   Musterheuristiken, Tokens sind Zeichen / 4.
 - Die Stichprobe der aufgezeichneten Läufe hing von Pythons Hash-Seed ab (Reihenfolge einer Menge vor dem Mischen).
@@ -97,8 +156,10 @@ Skripte in `scripts/corpus_probe/`, Daten in `config.CORPUS_PROBE_DIR` = `data/c
 | `results/<name>.jsonl` | eine Zeile je Probe: Satz, Ausdruck, beide Antworten, `closed_ok`, `open_ok` |
 | `misses/<name>.json` | eindeutig gestellte closed-book-Fehltreffer mit `category`; `id` = Zeile in `results/` (ab 0) |
 | `summary.json` | Messwerte, Stufen und Wertung je Korpus, Rangfolgen der Gewichtungen |
+| `questions/<name>.json` | Closed-Book-Fragen: `id`, `path`, `section`, `type`, `question`, `reference`, `closed`, `open`, `closed_verdict`, `open_verdict`, `judge_batch` |
 
-`docs/`, `probes/` und `sources/` sind Zwischenstände (ganze Seiten) und nicht versioniert. Ein Korpus neu messen:
+`docs/`, `probes/`, `sources/` und `questions/*-sections.json` sind Zwischenstände (ganze Seiten oder Abschnitte) und nicht versioniert. Ein Korpus neu messen:
 `scripts/corpus_probe/probe_corpus.sh <name>` (ruft die OpenAI-API; `--recorded` wiederholt die aufgezeichneten
 Proben statt eine neue Stichprobe zu ziehen), dann klassifizieren und
-`uv run python scripts/corpus_probe/summarise.py`.
+`uv run python scripts/corpus_probe/summarise.py`. Closed-Book-Fragen: `question_probe.py sample NAME…`, Fragen
+schreiben lassen, `answer NAME…` (API), `blind NAME…`, urteilen lassen, `unblind`, `summary`.

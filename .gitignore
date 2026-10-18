@@ -53,3 +53,4 @@ data/pilot/**/scores.csv
 data/corpus_probe/docs/
 data/corpus_probe/probes/
 data/corpus_probe/sources/
+data/corpus_probe/questions/*-sections.json

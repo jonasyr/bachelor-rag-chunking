@@ -316,3 +316,9 @@ CORPUS_PROBE_AI_RATING = {
     "high": 1,
 }  # fit by AI-text share
 CORPUS_PROBE_FEW_STARS = 100  # fewer GitHub stars lower the fit rating by one
+# Question-level closed-book check of the candidates (D38): sections drawn with CORPUS_PROBE_SEED
+CORPUS_QUESTIONS_PER_CORPUS = 20  # diagnostic questions per corpus, one per drawn section
+CORPUS_QUESTIONS_MIN_WORDS = 60  # prose words (3+ letters, outside code) a drawn section needs
+CORPUS_QUESTIONS_PER_PAGE = 2  # drawn sections per page at most
+CORPUS_QUESTIONS_SECTION_CHARS = 5000  # section text shown to the question writer and open-book run
+CORPUS_QUESTIONS_JUDGE_SEED = 7  # order of the blinded answers for the judge

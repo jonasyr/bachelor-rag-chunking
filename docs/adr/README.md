@@ -10,7 +10,7 @@ bleibt unverändert.
 
 | ADR | Entscheidung | Status |
 |---|---|---|
-| [0001](0001-korpus-vuejs.md) | Dokumentkorpus: Vue.js-Dokumentation | Ersetzt durch 0038 (Enroute); vorher konkretisiert durch 0019, 0025 |
+| [0001](0001-korpus-vuejs.md) | Dokumentkorpus: Vue.js-Dokumentation | Ersetzt durch 0038 (e2e); vorher konkretisiert durch 0019, 0025 |
 | [0002](0002-zitierstil-apa.md) | Zitierstil: biblatex + biber, APA 7, `\parencite` | Angenommen |
 | [0003](0003-kein-praxispartner.md) | Kein Praxispartner | Angenommen |
 | [0004](0004-zeitraum-und-abgabe.md) | Bearbeitungszeitraum Juli–Dezember 2026, Abgabe 24.12.2026 | Angenommen |
@@ -47,4 +47,4 @@ bleibt unverändert.
 | [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037 |
 | [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |
 | [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen |
-| [0038](0038-korpus-enroute.md) | Korpus: Enroute-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen |
+| [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen |

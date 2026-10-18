@@ -164,16 +164,21 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
-| `CORPUS_PROBE_DIR` | `data/corpus_probe` | Kandidaten, Seitenstatistik, Ergebnisse, klassifizierte Fehltreffer, Wertung | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_SEED` | `20261018` | Reihenfolge der Kandidatensätze je Seite; fest, nie angepasst | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_PER_PAGE` | `12` | höchstens so viele Proben je Seite | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_SPAN_CHARS` | `(2, 40)` | Länge eines maskierbaren Inline-Code-Ausdrucks (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_SENTENCE_CHARS` | `(40, 400)` | Länge eines verwendbaren Prosasatzes (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_CONTEXT_CHARS` | `6000` | Abschnittstext im Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_WORKERS` | `8` | parallele API-Anfragen | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_GUESS_CHARS` | `120` | gespeicherter Anfang der Closed-Book-Antwort in `misses/<name>.json` | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_WEIGHTS` | Unbekanntheit 35, Sauberkeit 15, Struktur 15, Qualität 15, Stabilität 10, Passung 10 | vorab festgelegte Gewichte der Wertung (Stufen 0–4 in `summarise.py`) | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_SENSITIVITY` | fünf Gewichtungen | Rangfolge je Gewichtung als Sensitivität | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_MIN_TOKENS` | `80000` | untere Größengrenze (Ausschlusskriterium 5) für die Sensitivität | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_TOP` | `5` | Kandidaten je Gewichtung in `summary.json` | [ADR 0038](../adr/0038-korpus-enroute.md) |
-| `CORPUS_PROBE_AI_RATING`, `CORPUS_PROBE_FEW_STARS` | `low` 4 … `high` 1; `100` | Stufe „Passung“ nach KI-Textanteil, minus 1 unter 100 GitHub-Sternen | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_DIR` | `data/corpus_probe` | Kandidaten, Seitenstatistik, Ergebnisse, klassifizierte Fehltreffer, Wertung | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_SEED` | `20261018` | Reihenfolge der Kandidatensätze je Seite; fest, nie angepasst | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_PER_PAGE` | `12` | höchstens so viele Proben je Seite | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_SPAN_CHARS` | `(2, 40)` | Länge eines maskierbaren Inline-Code-Ausdrucks (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_SENTENCE_CHARS` | `(40, 400)` | Länge eines verwendbaren Prosasatzes (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_CONTEXT_CHARS` | `6000` | Abschnittstext im Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_WORKERS` | `8` | parallele API-Anfragen | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_GUESS_CHARS` | `120` | gespeicherter Anfang der Closed-Book-Antwort in `misses/<name>.json` | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_WEIGHTS` | Unbekanntheit 35, Sauberkeit 15, Struktur 15, Qualität 15, Stabilität 10, Passung 10 | vorab festgelegte Gewichte der Wertung (Stufen 0–4 in `summarise.py`) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_SENSITIVITY` | fünf Gewichtungen | Rangfolge je Gewichtung als Sensitivität | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_MIN_TOKENS` | `80000` | untere Größengrenze (Ausschlusskriterium 5) für die Sensitivität | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_TOP` | `5` | Kandidaten je Gewichtung in `summary.json` | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_PER_CORPUS` | `20` | Closed-Book-Diagnosefragen je Korpus, eine je gezogenem Abschnitt | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_MIN_WORDS` | `60` | Prosawörter (ab 3 Buchstaben, außerhalb von Code), die ein gezogener Abschnitt braucht | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_PER_PAGE` | `2` | höchstens so viele gezogene Abschnitte je Seite | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_SECTION_CHARS` | `5000` | Abschnittstext für Fragenschreiber und Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_JUDGE_SEED` | `7` | Reihenfolge der verblindeten Antworten für das Urteil | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_AI_RATING`, `CORPUS_PROBE_FEW_STARS` | `low` 4 … `high` 1; `100` | Stufe „Passung“ nach KI-Textanteil, minus 1 unter 100 GitHub-Sternen | [ADR 0038](../adr/0038-korpus-e2e.md) |

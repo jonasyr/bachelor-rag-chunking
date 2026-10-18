@@ -21,7 +21,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 |---|---|
 | [reference/configuration.md](reference/configuration.md) | Alle Schlüssel aus `src/config.py`: Wert oder Typ, Bedeutung, ADR |
 | [reference/corpus.md](reference/corpus.md) | Korpusbereiche, Commit, Schema von `corpus_manifest.csv` |
-| [reference/corpus-selection.md](reference/corpus-selection.md) | Korpusauswahl: Lückentext-Probe über 24 Dokumentationen, Kriterien, Ergebnis, Dateien |
+| [reference/corpus-selection.md](reference/corpus-selection.md) | Korpusauswahl: Lückentext-Probe über 24 Dokumentationen, Closed-Book-Fragen, Kriterien, Ergebnis, Dateien |
 | [reference/data-formats.md](reference/data-formats.md) | Formate aller Datenartefakte (JSONL, CSV) |
 | [reference/question-catalogue.md](reference/question-catalogue.md) | Fragenkatalog: Umfang, Typen, Felder |
 | [reference/evaluation.md](reference/evaluation.md) | Metriken, Rubrik, Triangulation, Kosten, Statistik, Abbildungen |
