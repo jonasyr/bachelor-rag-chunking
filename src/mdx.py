@@ -1,10 +1,18 @@
 """MDX pages of the e2e documentation (Mintlify) to Markdown (ADR 0038).
 
-nav_areas reads the navigation (docs.json).
+to_markdown turns one page into Markdown with an anchored H1 from the frontmatter (title, then the
+description as first paragraph) and the site's anchor on every H2/H3 heading. Every text a reader of
+the site sees is kept: admonitions, accordions, tabs and steps become bold labels, cards and video
+cards list items, agent prompts text blocks, the provider snippet a table and code blocks; code
+fence titles become labels. Only imports, media embeds and legacy anchors go. Anything else raises,
+naming the body line. preprocess.py then records the sections.
 """
 
 import re
 from dataclasses import dataclass
+from typing import NoReturn
+
+from config import SECTION_MAX_LEVEL
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.S)
 FRONTMATTER_LINE_RE = re.compile(r'^"?([\w:]+)"?:\s*(.*?)\s*$')
@@ -238,3 +246,250 @@ def nav_areas(nav: dict) -> dict[str, str]:
                     raise ValueError(f"page {page!r} listed twice in the navigation")
                 areas[page] = area
     return areas
+
+
+FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
+HEADING_RE = re.compile(r"^ {0,3}(#{1,6})\s+(.*?)\s*$")
+IMPORT_RE = re.compile(r"""^import\s.+\sfrom\s+['"][^'"]+['"];?$""")
+EXPORT_RE = re.compile(r"^export const (\w+) = ")
+TAG_START_RE = re.compile(r"^\s*</?(?:[A-Z]\w*|video|a|span)\b")
+TAG_RE = re.compile(r"<(/?)([A-Za-z]\w*)(.*?)(/?)>", re.S)
+ATTR = r'([\w-]+)(?:=(?:"([^"]*)"|(\{[^{}]*\})))?'
+ATTR_RE = re.compile(ATTR)
+ATTRS_RE = re.compile(rf"(?:\s+{ATTR})*\s*")
+INLINE_PAIR_RE = re.compile(r"^(\s*)(<([A-Z]\w*)(?:\s[^<>]*)?>)(.+)(</\3>)\s*$")
+INLINE_CODE_RE = re.compile(r"`[^`]*`")
+MARKUP_RE = re.compile(r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|\{[^}]*\}")
+FENCE_FLAGS = ("expandable", "wrap")
+ADMONITIONS = ("Note", "Warning", "Tip")
+LABELLED = ("Accordion", "Tab")
+WRAPPERS = (
+    "AccordionGroup",
+    "Tabs",
+    "CodeGroup",
+    "CardGroup",
+    "ShowMore",
+    "Video",
+    "SetupPrompt",
+    "Steps",
+)
+DROPPED = ("video", "a", "span")  # media embeds and legacy anchors, always self-closing
+PROMPT_LABEL = "Agent prompt"  # header text of the SetupPrompt snippet
+
+
+@dataclass
+class _Frame:
+    name: str
+    attrs: dict[str, str]
+    count: int = 0  # steps so far (Steps)
+    body: list[str] | None = None  # collected lines (Card)
+
+
+def _tag_end(text: str) -> int:
+    """Index of the ">" ending the tag at the start of text (quotes and braces skipped), or -1."""
+    quote, depth = "", 0
+    for k, ch in enumerate(text):
+        if quote:
+            quote = "" if ch == quote else quote
+        elif ch in "\"'":
+            quote = ch
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+        elif ch == ">" and depth == 0:
+            return k
+    return -1
+
+
+def _fence_info(info: str) -> tuple[str, str]:
+    """(language, label) of a fence info string: `ts title="a.ts" expandable` -> ("ts", "a.ts"),
+    `bash npm` -> ("bash", "npm")."""
+    title = re.search(r'title="([^"]*)"', info)
+    words = re.sub(r'\s*title="[^"]*"', "", info).split()
+    rest = [w for w in words[1:] if w not in FENCE_FLAGS]
+    if any(c in w for w in rest for c in "={}") or (title and rest):
+        raise ValueError(f"unsupported fence info {info!r}")
+    return (words[0] if words else ""), (title.group(1) if title else " ".join(rest))
+
+
+def _dedent(line: str, indent: int) -> str:
+    return line[min(indent, len(line) - len(line.lstrip(" "))) :]
+
+
+def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) -> str:
+    meta, body = parse_frontmatter(text)
+    if not meta.get("title"):
+        raise ValueError("no title in the frontmatter")
+    out = [f"# {meta['title']} {{#{slug(page)}}}", ""]
+    if meta.get("description"):
+        out += [meta["description"], ""]
+    lines = body.split("\n")
+    exports: dict[str, str] = {}
+    stack: list[_Frame] = []
+    fence: tuple[str, int] | None = None  # (marker, indent) of the open fence
+    i = 0
+
+    def fail(message: str) -> NoReturn:
+        raise ValueError(f"line {i}: {message}")
+
+    def emit(line: str) -> None:
+        if stack and stack[-1].body is not None:
+            stack[-1].body.append(line)
+        elif line.strip() or out[-1].strip():  # runs of blank lines collapse to one
+            out.append(line)
+
+    def label(textline: str) -> None:
+        emit("")
+        emit(textline)
+
+    def open_tag(name: str, attrs: dict[str, str]) -> None:
+        frame = _Frame(name, attrs)
+        if name in ADMONITIONS:
+            label(f"**{name}**")
+        elif name in LABELLED:
+            label(f"**{attrs.get('title', '')}**")
+        elif name == "Step":
+            if not stack or stack[-1].name != "Steps":
+                fail("<Step> outside <Steps>")
+            stack[-1].count += 1
+            label(f"**{stack[-1].count}. {attrs.get('title', '')}**")
+        elif name == "Card":
+            frame.body = []
+        elif name not in WRAPPERS:
+            fail(f"unknown component <{name}>")
+        stack.append(frame)
+
+    def close_tag(name: str) -> None:
+        if not stack or stack[-1].name != name:
+            fail(f"</{name}> closes <{stack[-1].name if stack else 'nothing'}>")
+        frame = stack.pop()
+        if frame.body is not None:
+            card = " ".join(t.strip() for t in frame.body if t.strip())
+            title, href = frame.attrs.get("title", ""), frame.attrs.get("href")
+            head = f"[{title}]({href})" if href else f"**{title}**"
+            emit(f"- {head}: {card}" if card else f"- {head}")
+        elif name in ADMONITIONS or name in LABELLED or name == "Step":
+            emit("")
+
+    def self_closing(name: str, attrs: dict[str, str]) -> None:
+        if name in DROPPED:
+            return
+        if name == "ModelProvider":
+            if snippet is None:
+                fail("<ModelProvider> needs the provider snippet")
+            label("")
+            for row in render_provider(attrs.get("show", ""), snippet):
+                emit(row)
+            emit("")
+        elif name == "Prompt":
+            if not stack or stack[-1].name != "SetupPrompt":
+                fail("<Prompt> outside <SetupPrompt>")
+            ref = attrs.get("children", "").strip("{} ")
+            if ref not in exports:
+                fail(f"<Prompt> names unknown export {ref!r}")
+            label(f"**{PROMPT_LABEL}**")
+            emit("")
+            for row in ["```text", *exports[ref].split("\n"), "```"]:
+                emit(row)
+        elif name == "VideoCard":
+            emit(f"- **{attrs.get('title', '')}**: {attrs.get('subtitle', '')}")
+        else:
+            fail(f"unknown component <{name} />")
+
+    while i < len(lines):
+        line = lines[i].rstrip()
+        i += 1
+        f = FENCE_RE.match(line)
+        if fence is not None:
+            marker, indent = fence
+            if (
+                f
+                and f.group(2)[0] == marker[0]
+                and len(f.group(2)) >= len(marker)
+                and not f.group(3).strip()
+            ):
+                fence = None
+                emit(f.group(2))
+            else:
+                emit(_dedent(line, indent))
+            continue
+        if f and not (f.group(2)[0] == "`" and "`" in f.group(3)):
+            try:
+                lang, name = _fence_info(f.group(3).strip())
+            except ValueError as e:
+                fail(str(e))
+            if stack and stack[-1].body is not None:
+                fail("code fence inside <Card>")
+            if name:
+                emit("")
+                emit(f"**{name}**")
+            fence = (f.group(2), len(f.group(1)))
+            emit(f"{f.group(2)}{lang}")
+            continue
+        stripped = line.strip()
+        if not stack and IMPORT_RE.match(stripped):
+            continue
+        e = EXPORT_RE.match(line)
+        if e:
+            block = "\n".join(lines[i - 1 :])
+            try:
+                value, end = parse_js_literal(block, e.end())
+            except ValueError as err:
+                fail(f"export {e.group(1)}: {err}")
+            tail = re.match(r"[ \t]*;?[ \t]*(?:\n|$)", block[end:])
+            if not isinstance(value, str) or tail is None:
+                fail(f"export {e.group(1)} is not a string constant")
+            exports[e.group(1)] = value
+            i += block[: end + tail.end()].rstrip("\n").count("\n")
+            continue
+        pair = INLINE_PAIR_RE.match(line)
+        if pair:
+            lines[i:i] = [pair.group(4), pair.group(1) + pair.group(5)]
+            line = pair.group(1) + pair.group(2)
+        if TAG_START_RE.match(line):
+            tag = line.strip()
+            while (end := _tag_end(tag)) < 0:
+                if i >= len(lines):
+                    fail(f"unclosed tag {tag[:40]!r}")
+                tag += "\n" + lines[i].strip()
+                i += 1
+            if tag[end + 1 :].strip():
+                fail(f"text after a tag: {tag!r}")
+            t = TAG_RE.fullmatch(tag[: end + 1])
+            if t is None or not ATTRS_RE.fullmatch(t.group(3)):
+                fail(f"unparsed tag {tag!r}")
+            closing, name, raw, selfclose = t.groups()
+            attrs = {
+                a.group(1): a.group(2) if a.group(2) is not None else (a.group(3) or "")
+                for a in ATTR_RE.finditer(raw)
+            }
+            if closing:
+                close_tag(name)
+            elif selfclose:
+                self_closing(name, attrs)
+            elif name in DROPPED:
+                fail(f"<{name}> must be self-closing")
+            else:
+                open_tag(name, attrs)
+            continue
+        h = HEADING_RE.match(line)
+        if h:
+            level, title = len(h.group(1)), h.group(2)
+            if level == 1:
+                fail("H1 in the page body")
+            if level <= SECTION_MAX_LEVEL:
+                anchor = slug(title)
+                if not anchor:
+                    fail(f"heading without slug: {line!r}")
+                emit(f"{h.group(1)} {title} {{#{anchor}}}")
+                continue
+        if MARKUP_RE.search(INLINE_CODE_RE.sub("", line)):
+            fail(f"unhandled markup: {line!r}")
+        emit(line)
+
+    if fence is not None:
+        raise ValueError("unclosed code fence")
+    if stack:
+        raise ValueError(f"unclosed <{stack[-1].name}>")
+    return "\n".join(out).rstrip("\n") + "\n"
