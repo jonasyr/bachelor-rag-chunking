@@ -27,8 +27,8 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
    ihnen ordnete ein unabhängiger Agent mit demselben Prompt für alle Korpora ein (unten). Wissenslücke = `fact` /
    eindeutig gestellte Proben, mit 95-%-Konfidenzintervall (Normalapproximation).
 6. **Wertung** (`summarise.py`): sechs Kriterien je 0–4 aus Messwerten, gewichtet 35/15/15/15/10/10 (Unbekanntheit,
-   Markdown-Sauberkeit, Struktur, Dokumentationsqualität, Stabilität, Passung), Stufen in `summarise.py`; dazu fünf
-   alternative Gewichtungen als Sensitivität.
+   Markdown-Sauberkeit, Struktur, Dokumentationsqualität, Stabilität, Passung; `config.CORPUS_PROBE_WEIGHTS`),
+   Stufen in `summarise.py`; dazu fünf Gewichtungen als Sensitivität (`config.CORPUS_PROBE_SENSITIVITY`).
 7. **Qualitative Durchsicht.** Ein unabhängiger Agent las je mindestens sechs Seiten der sechs besten Kandidaten und
    bewertete Qualität, Passung, Eignung für den Chunking-Vergleich, Fragenpotenzial und Aufbereitungsaufwand (je 0–4).
 

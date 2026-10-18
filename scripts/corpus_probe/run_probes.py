@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 
 from config import (
     CORPUS_PROBE_CONTEXT_CHARS,
+    CORPUS_PROBE_GUESS_CHARS,
     CORPUS_PROBE_WORKERS,
     LLM_PRICE_INPUT_PER_MTOK,
     LLM_PRICE_OUTPUT_PER_MTOK,
@@ -32,7 +33,6 @@ HEAD = (
 )
 CONTEXT = "Section text (the term is masked there too):\n{context}\n\n"
 TAIL = "Reply with the masked code term only, without backticks or explanation."
-GUESS_CHARS = 120  # of the closed-book reply in misses/<name>.json
 
 
 def norm(term: str) -> str:
@@ -86,7 +86,7 @@ def main() -> None:
                     "section": p["section"],
                     "sentence": p["sentence"],
                     "answer": p["answer"],
-                    "closed_book_guess": p["closed"].strip()[:GUESS_CHARS],
+                    "closed_book_guess": p["closed"].strip()[:CORPUS_PROBE_GUESS_CHARS],
                     "category": "",
                 }
             )

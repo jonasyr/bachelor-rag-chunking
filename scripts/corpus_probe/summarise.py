@@ -24,32 +24,14 @@ from common import (
     write_json,
 )
 
-WEIGHTS = {"unknown": 35, "clean": 15, "struct": 15, "quality": 15, "stable": 10, "fit": 10}
-SENSITIVITY = {  # alternative weightings; the ranking is reported for each
-    "preregistered": WEIGHTS,
-    "equal": dict.fromkeys(WEIGHTS, 1),
-    "unknown50": {"unknown": 50, "clean": 10, "struct": 10, "quality": 10, "stable": 10, "fit": 10},
-    "no_stability_fit": {
-        "unknown": 35,
-        "clean": 20,
-        "struct": 20,
-        "quality": 25,
-        "stable": 0,
-        "fit": 0,
-    },
-    "quality_heavy": {
-        "unknown": 25,
-        "clean": 15,
-        "struct": 20,
-        "quality": 25,
-        "stable": 5,
-        "fit": 10,
-    },
-}
-SENSITIVITY_MIN_TOKENS = 80_000  # exclusion criterion 5, lower bound
-SENSITIVITY_TOP = 5
-AI_RATING = {"low": 4, "medium": 3, "medium-high": 2, "high": 1}
-FEW_STARS = 100  # fewer GitHub stars lower the fit rating by one
+from config import (
+    CORPUS_PROBE_AI_RATING,
+    CORPUS_PROBE_FEW_STARS,
+    CORPUS_PROBE_MIN_TOKENS,
+    CORPUS_PROBE_SENSITIVITY,
+    CORPUS_PROBE_TOP,
+    CORPUS_PROBE_WEIGHTS,
+)
 
 
 def band(x: float, cuts: list[float]) -> int:
@@ -107,7 +89,9 @@ def ratings(m: dict, c: dict) -> dict:
         "struct": max(0, struct),
         "quality": round(quality),
         "stable": 4 - band(int(c["commits30"]), [11, 31, 61, 151]),
-        "fit": max(0, AI_RATING[c["ai"]] - (1 if stars < FEW_STARS else 0)),
+        "fit": max(
+            0, CORPUS_PROBE_AI_RATING[c["ai"]] - (1 if stars < CORPUS_PROBE_FEW_STARS else 0)
+        ),
     }
 
 
@@ -117,17 +101,17 @@ def main() -> None:
     for name, c in cands.items():
         m = measure(name, stats[name])
         r = ratings(m, c)
-        total = sum(WEIGHTS[k] * r[k] / 4 for k in WEIGHTS)
+        total = sum(CORPUS_PROBE_WEIGHTS[k] * r[k] / 4 for k in CORPUS_PROBE_WEIGHTS)
         rows.append(
             {"name": name, "eligible": c["new"] == "yes", **m, **r, "total": round(total, 1)}
         )
     rows.sort(key=lambda r: (-r["total"], -r["gap"]))
-    pool = [r for r in rows if r["eligible"] and r["tokens"] >= SENSITIVITY_MIN_TOKENS]
+    pool = [r for r in rows if r["eligible"] and r["tokens"] >= CORPUS_PROBE_MIN_TOKENS]
     sensitivity = {
         k: [r["name"] for r in sorted(pool, key=lambda r: -sum(w[c] * r[c] for c in w))][
-            :SENSITIVITY_TOP
+            :CORPUS_PROBE_TOP
         ]
-        for k, w in SENSITIVITY.items()
+        for k, w in CORPUS_PROBE_SENSITIVITY.items()
     }
     write_json(SUMMARY_FILE, {"corpora": rows, "sensitivity": sensitivity})
     for r in rows:
