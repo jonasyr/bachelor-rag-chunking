@@ -69,11 +69,10 @@ def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None
                 rows.append(f"| {value} | {done} of {quota} |")
             st.markdown("\n".join(rows))
         used = {r["question_id"]: r["area"] for r in plan if r["status"] == "used"}
-        areas = "; ".join(
-            f"{a} {sum(1 for v in used.values() if v == a)} of at least {n}"
-            for a, n in AREA_MIN_QUESTIONS.items()
-        )
-        st.caption(f"Areas: {areas}")
+        rows = ["| Area | Written |", "|---|---:|"]
+        for a, n in AREA_MIN_QUESTIONS.items():
+            rows.append(f"| {a} | {sum(1 for v in used.values() if v == a)} of {n} |")
+        st.markdown("\n".join(rows))
         for line in catalogue_plan.plan_summary(plan):
             st.caption(line)
         st.caption(catalogue_review.review_summary(review))

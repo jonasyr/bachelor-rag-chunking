@@ -9,10 +9,14 @@ import numpy as np
 import pytest
 
 from catalogue import find, load_corpus, section_index
+from catalogue_plan import candidates, draw_plan, plan_integrity, read_plan
 from chunking import chunk
 from config import (
     C3_MAX_TOKENS,
     C3_MIN_TOKENS,
+    CATALOGUE_AREA_SLOTS,
+    CATALOGUE_PLAN_FILE,
+    CATALOGUE_RESERVE,
     CHUNK_FILES,
     CONTROL_STRATEGIES,
     CORPUS_AREAS,
@@ -144,3 +148,22 @@ def test_section_index_covers_the_real_corpus():
     assert all(sid in corpus.by_id for sid in ids)
     assert {row.split(" | ")[1] for row in rows} == set(CORPUS_AREAS)
     assert any(s["section_id"].startswith("D") for s, _ in find(corpus, "toHaveScreenshot"))
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+def test_every_area_has_enough_candidates():
+    pools = candidates(load_corpus())
+    for area in CORPUS_AREAS:
+        assert len(pools[area]) >= CATALOGUE_AREA_SLOTS[area] + CATALOGUE_RESERVE[area], area
+
+
+@pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
+def test_committed_plan_matches_a_fresh_draw():
+    corpus = load_corpus()
+    fresh = draw_plan(corpus)
+    assert draw_plan(corpus) == fresh  # deterministic
+    rows = read_plan(CATALOGUE_PLAN_FILE)
+    assert [r["area"] for r in rows if r["slot_id"]] == [
+        a for a in CORPUS_AREAS for _ in range(CATALOGUE_AREA_SLOTS[a])
+    ]
+    assert plan_integrity(rows, fresh) == []

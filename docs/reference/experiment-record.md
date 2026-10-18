@@ -50,6 +50,15 @@ Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl`
 
 Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpus bis 18.10.2026.
 
+## Stichprobenplan (e2e)
+
+| Feld | Wert |
+|---|---|
+| Gezogen | 18.10.2026, `uv run python src/catalogue.py plan`, Seed `20261014` ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) |
+| Datei | `data/evaluation/catalogue_plan.csv`, 48 Slots und 48 Reserveabschnitte, SHA-256 `0e348c317fe1a202a0a48a54ea7eed64f045be37aa01ce2f3c45580321dff8c9` |
+| Slots je Bereich | nach Tokenanteil, mindestens 1: [Korpus](corpus.md#bereiche) |
+| Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 14.10.2026, nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
+
 ## Snapshot (Vue.js, bis 18.10.2026)
 
 | Feld | Wert |
