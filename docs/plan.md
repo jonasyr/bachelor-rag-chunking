@@ -25,10 +25,11 @@ Stand 18.10.2026 (später): Das Antwortmodell kennt Vue.js (Pilot an der Obergre
 Retrieval vollständig, Lückentext-Probe: 7 % Wissenslücke, Closed-Book-Fragen: 15 von 20 richtig). Korpuswechsel zur
 Dokumentation von e2e beschlossen, mit Closed-Book-Prüfung
 jeder Frage und Kontrolle K0 ([ADR 0038](adr/0038-korpus-e2e.md), Messung: [Korpusauswahl](reference/corpus-selection.md)).
-Umsetzung in eigenen Pull Requests: (1) Entscheidung und Messung (dieser Stand); (2) Snapshot und Preprocessing für
-e2e (MDX-Bereinigung ohne Inhaltsverlust), Jonas prüft die Nachschlageliste; (3) Chunking, Embeddings und K1 neu; (4) Katalogwerkzeuge: Bereiche,
-Stichprobenplan, Closed-Book-Prüfung im Editor; (5) neuer Pilot auf e2e. Bis dahin beschreiben Korpus-Seiten und
-Pipeline noch Vue.js.
+Umsetzung in eigenen Pull Requests: (1) Entscheidung und Messung (erledigt); (2) Snapshot und Preprocessing für
+e2e (MDX-Umwandlung ohne Inhaltsverlust, erledigt 18.10.2026: 60 Seiten, 250.380 Tokens, 571 Abschnitte, K1-Fenster
+375; [Korpus](reference/corpus.md)), Jonas prüft die Nachschlageliste; (3) Chunk-Dateien und Embeddings neu; (4)
+Katalogwerkzeuge: Quoten je Bereich, Stichprobenplan, Stoppwörter, Closed-Book-Prüfung im Editor, K0; (5) neuer
+Pilot auf e2e. Bis Schritt 4 tragen die Katalog-Quoten in `src/config.py` noch Vue-Bereiche.
 
 ## Zeitplan (13.10.–24.12.2026)
 

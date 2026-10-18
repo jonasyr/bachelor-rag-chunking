@@ -6,7 +6,7 @@
 
 Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
 RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
-documentation of the end-to-end testing tool e2e (ADR 0038; the switch from Vue.js is in progress) in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
+documentation of the end-to-end testing tool e2e (ADR 0038; corpus switched from Vue.js, rebuild in progress) in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
 Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
 ## Commands

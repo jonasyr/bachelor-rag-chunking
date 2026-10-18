@@ -12,7 +12,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 |-------|----------|
 | Sprache | Python ≥ 3.11 |
 | Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs; Gruppe `dev`: pytest, Jupyter) |
-| Dokumentverarbeitung | Standardbibliothek: `re`, `html`, `pathlib`, `csv`, `json` (`src/preprocess.py`) |
+| Dokumentverarbeitung | Standardbibliothek: `re`, `pathlib`, `csv`, `json` (`src/mdx.py`, `src/preprocess.py`) |
 | Token-Zählung | `tiktoken` 0.13.0 (gepinnt), gekapselt in `src/tokens.py` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)) |
 | Embeddings | OpenAI API (`openai` 2.44.0, gepinnt), Modell `config.EMBEDDING_MODEL` ([ADR 0023](../adr/0023-embedding-modell.md)) |
 | Vector Store | Chroma (`chromadb` 1.5.9, gepinnt; lokal, persistent; Kosinus, exakte Suche geprüft; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) |
@@ -42,7 +42,7 @@ bachelor-rag-chunking/
 ├── .serena/                                 (Agenten-Notizen, versioniert)
 ├── src/
 │   ├── config.py                            (alle Parameter; Konfiguration)
-│   ├── snapshot.py  ingest.py  preprocess.py  tokens.py
+│   ├── snapshot.py  ingest.py  mdx.py  preprocess.py  tokens.py
 │   ├── chunking.py
 │   ├── embedding_client.py  canary.py  embed.py  run_log.py
 │   ├── llm_client.py  prompt.py
@@ -56,7 +56,7 @@ bachelor-rag-chunking/
 │   └── corpus_probe/                        (Korpusauswahl: Lückentext-Probe, ADR 0038)
 ├── tests/                                   (pytest; conftest.py, test_*.py)
 ├── data/
-│   ├── raw/vue_docs_snapshot/               (Snapshot: api/, guide/, style-guide/)
+│   ├── raw/e2e_docs_snapshot/               (Snapshot: *.mdx, docs.json, snippets/model-provider.jsx)
 │   ├── processed/                           (documents, sections, chunks_*, embeddings_*, embedding_runs)
 │   ├── evaluation/                          (questions, ground_truth, query_embeddings, retrieved_results*, generation_runs, …)
 │   ├── pilot/                               (Pilot-Sets: ., hard/, hard_posthoc/)
@@ -88,7 +88,7 @@ Nach `.gitignore`:
 
 | Pfad | Status |
 |---|---|
-| `data/raw/vue_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
+| `data/raw/e2e_docs_snapshot/*`, `data/processed/*` | ignoriert; die Ordner bleiben über `.gitkeep` erhalten |
 | `chroma_db/` | ignoriert (ganzer Ordner, kein `.gitkeep`; entsteht beim ersten `embed.py`) |
 | `data/evaluation/retrieved_results*.csv`, `retrieval_scores*.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `query_embeddings.npz` | ignoriert |
 | `data/evaluation/generated_answers.csv` (Primärdaten, nicht exakt wiederholbar, [ADR 0033](../adr/0033-antwortmodell.md)), `scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` (Primärdaten der Bewertung) | versioniert |
@@ -135,5 +135,5 @@ Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. 
   Einheitsvektoren aus dem Text-Hash und zeichnet jeden Aufruf auf; ein anderer `salt` simuliert ein geändertes Modell
   hinter demselben Namen. Kein Test ruft die OpenAI API auf.
 - Korpus-Integrationstests (`tests/test_corpus_integration.py`) werden übersprungen, solange (1) kein Snapshot in
-  `data/raw/vue_docs_snapshot/` liegt (Bereichsordner fehlen), (2) `data/processed/sections.jsonl` fehlt (nicht vorverarbeitet) oder (3) die
+  `data/raw/e2e_docs_snapshot/` liegt (`docs.json` fehlt), (2) `data/processed/sections.jsonl` fehlt (nicht vorverarbeitet) oder (3) die
   Vektordatei einer Strategie fehlt (nicht eingebettet). In CI greifen alle drei.
