@@ -118,7 +118,7 @@ def test_show_rejects_an_unknown_section(corpus):
 
 
 def test_content_words_drop_stopwords_and_punctuation():
-    assert content_words("How do I use ref() in Vue?") == {"use", "ref"}
+    assert content_words("How do I use expect() in e2e?") == {"use", "expect"}
 
 
 def test_forms_fold_plural_endings_only_for_longer_words():
@@ -351,8 +351,8 @@ def test_find_keeps_spaces_in_the_term(corpus):
     assert find(corpus, "ref") != find(corpus, " ref")
 
 
-def test_single_letter_directive_prefix_is_not_a_shared_word():
-    assert shared_words("What does the v-if directive do?", ["v-show"]) == []
+def test_product_name_is_not_a_shared_word():
+    assert shared_words("How does e2e retry a step?", ["e2e test lifecycle"]) == []
 
 
 def test_empty_catalogue_says_no_questions_yet(corpus, tmp_path, pilot):

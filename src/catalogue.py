@@ -332,7 +332,7 @@ def _overview(
     split = ", ".join(
         f"{a} {areas[a]}"
         + (f" (at least {AREA_MIN_QUESTIONS[a]})" if a in AREA_MIN_QUESTIONS else "")
-        for a in sorted(set(areas) | set(AREA_MIN_QUESTIONS))
+        for a in [*AREA_MIN_QUESTIONS, *sorted(set(areas) - set(AREA_MIN_QUESTIONS))]
     )
     lines += ["", f"Areas (questions with a relevant section there): {split}"]
     multi = [q for q in questions if q["difficulty"] == "multi-section"]

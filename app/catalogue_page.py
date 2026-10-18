@@ -28,7 +28,6 @@ from config import (  # noqa: E402
 )
 
 VIEWS = ["Formatted", "Source text"]  # how the section is shown; the source text is what counts
-AREA_NAMES = {"api": "API reference", "guide": "Guide", "style-guide": "Style guide"}
 SKIP_LABELS = {
     "code-or-links": "Only code or links",
     "too-short": "Too short to ask about",
@@ -71,7 +70,7 @@ def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None
             st.markdown("\n".join(rows))
         used = {r["question_id"]: r["area"] for r in plan if r["status"] == "used"}
         areas = "; ".join(
-            f"{AREA_NAMES[a]} {sum(1 for v in used.values() if v == a)} of at least {n}"
+            f"{a} {sum(1 for v in used.values() if v == a)} of at least {n}"
             for a, n in AREA_MIN_QUESTIONS.items()
         )
         st.caption(f"Areas: {areas}")
@@ -161,10 +160,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
     qid = row["question_id"] if row["status"] == "used" else None
     saved_q = next((q for q in questions if q["question_id"] == qid), None)
     saved_t = truth.get(qid or "", {})
-    title.html(
-        f'<h2 class="slot-title">Slot {sid} '
-        f"<span>{AREA_NAMES[row['area']]}, {row['class']}</span></h2>"
-    )
+    title.html(f'<h2 class="slot-title">Slot {sid} <span>{row["area"]}, {row["class"]}</span></h2>')
 
     # Reload the form when the saved rows changed on disk (hand edit, review decision).
     fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))

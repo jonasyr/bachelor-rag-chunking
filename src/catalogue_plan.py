@@ -12,6 +12,7 @@ from __future__ import annotations
 import csv
 import hashlib
 from bisect import bisect_right
+from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -47,9 +48,11 @@ def _hash_int(text: str) -> int:
     return int(hashlib.sha256(text.encode("utf-8")).hexdigest(), 16)
 
 
-def candidates(corpus: Corpus) -> dict[str, list[dict]]:
+def candidates(
+    corpus: Corpus, areas: Iterable[str] = CATALOGUE_AREA_SLOTS
+) -> dict[str, list[dict]]:
     """Innermost sections of level 2 or 3 per area, in sections.jsonl order."""
-    result: dict[str, list[dict]] = {area: [] for area in CATALOGUE_AREA_SLOTS}
+    result: dict[str, list[dict]] = {area: [] for area in areas}
     for s in corpus.sections:
         if s["level"] < 2:
             continue
@@ -104,7 +107,7 @@ def draw_plan(
         )
     order = sorted(range(len(values)), key=lambda i: _hash_int(f"{seed}:class:{i}"))
     shuffled = [values[i] for i in order]
-    pools = candidates(corpus)
+    pools = candidates(corpus, slots)
     rows: list[dict] = []
     slot = 0
     for area, count in slots.items():
