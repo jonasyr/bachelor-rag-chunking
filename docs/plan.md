@@ -27,7 +27,8 @@ Dokumentation von e2e beschlossen, mit Closed-Book-Prüfung
 jeder Frage und Kontrolle K0 ([ADR 0038](adr/0038-korpus-e2e.md), Messung: [Korpusauswahl](reference/corpus-selection.md)).
 Umsetzung in eigenen Pull Requests: (1) Entscheidung und Messung (erledigt); (2) Snapshot und Preprocessing für
 e2e (MDX-Umwandlung ohne Inhaltsverlust, erledigt 18.10.2026: 60 Seiten, 250.380 Tokens, 571 Abschnitte, K1-Fenster
-375; [Korpus](reference/corpus.md)), Jonas prüft die Nachschlageliste; (3) Chunk-Dateien und Embeddings neu; (4)
+375; [Korpus](reference/corpus.md)), Nachschlageliste geprüft; (3) Chunk-Dateien und Embeddings neu (erledigt 18.10.2026: C1 529, C2 642, C3 667, K1 697
+Chunks, 0,14 USD; [Experiment-Protokoll](reference/experiment-record.md#embedding-e2e)); (4)
 Katalogwerkzeuge: Quoten je Bereich, Stichprobenplan, Stoppwörter, Closed-Book-Prüfung im Editor, K0; (5) neuer
 Pilot auf e2e. Bis Schritt 4 tragen die Katalog-Quoten in `src/config.py` noch Vue-Bereiche.
 
