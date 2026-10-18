@@ -106,7 +106,7 @@ C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 # Size-matched control (D26): fixed windows of the rounded mean C3 chunk length, no overlap;
 # retrieval only. Not in STRATEGY_IDS: the experiment compares C1-C3 (D5). chunking.py aborts if
 # this value no longer equals the rule (round half up of the mean C3 chunk length).
-K1_CHUNK_SIZE = 231  # tokens; rounded mean of the C3 chunks at 40aa88a, measured 14.10.2026
+K1_CHUNK_SIZE = 375  # tokens; rounded mean of the C3 chunks at ef977f4, measured 18.10.2026
 K1_OVERLAP = 0
 CONTROL_STRATEGIES = {"K1": f"fixed_{K1_CHUNK_SIZE}_no_overlap"}
 

@@ -1,5 +1,6 @@
 """Checks on the real corpus; skipped until the snapshot and processed files exist."""
 
+import collections
 import hashlib
 import json
 import re
@@ -14,6 +15,11 @@ from config import (
     C3_MIN_TOKENS,
     CHUNK_FILES,
     CONTROL_STRATEGIES,
+    CORPUS_AREAS,
+    CORPUS_NAV_FILE,
+    CORPUS_PAGE_SUFFIX,
+    CORPUS_PROVIDER_SNIPPET,
+    CORPUS_SUPPORT_FILES,
     DATA_RAW,
     DOCUMENTS_FILE,
     EMBEDDING_DIMENSIONS,
@@ -21,27 +27,35 @@ from config import (
     SECTIONS_FILE,
     SNAPSHOT_INFO_FILE,
     STRATEGY_IDS,
-    VUE_DOCS_AREAS,
-    VUE_DOCS_EXCLUDED,
 )
+from mdx import parse_provider_snippet, to_markdown
 from preprocess import ESCAPED_LT_RE, clean_markdown
 
-SNAPSHOT_DIRS = [DATA_RAW / area for area in VUE_DOCS_AREAS]
-HAS_SNAPSHOT = all(d.is_dir() for d in SNAPSHOT_DIRS)
-EXPECTED_FILES = 79  # ADR 0025: guide 52, API 22, style guide 5
+HAS_SNAPSHOT = (DATA_RAW / CORPUS_NAV_FILE).is_file()
+EXPECTED_FILES = 60  # ADR 0038: every page of the navigation at ef977f4
+EXPECTED_SECTIONS = 571  # H1-H3 sections, measured 18.10.2026
+AREA_PAGES = {
+    "Get started": 5, "Platforms": 3, "Features": 6, "Models and agents": 3, "Run in CI": 6,
+    "Hosted browsers and devices": 7, "Extend": 3, "Deep dive": 5, "Migrate": 5, "Test API": 5,
+    "Project": 8, "Web": 1, "Mobile": 1, "Engine contract": 1, "Examples": 1,
+}  # fmt: skip
 
 
 def snapshot_files():
-    return sorted(p for d in SNAPSHOT_DIRS for p in d.rglob("*.md"))
+    return sorted(DATA_RAW.rglob(f"*{CORPUS_PAGE_SUFFIX}"))
 
 
 @pytest.mark.skipif(not HAS_SNAPSHOT, reason="no snapshot; run src/snapshot.py")
 def test_every_snapshot_file_cleans():
     files = snapshot_files()
     assert len(files) == EXPECTED_FILES
+    snippet = parse_provider_snippet(
+        (DATA_RAW / CORPUS_PROVIDER_SNIPPET).read_text(encoding="utf-8")
+    )
     for path in files:
-        result = clean_markdown(path.read_text(encoding="utf-8"))
-        assert result.headings[0].level == 1, path
+        page = path.relative_to(DATA_RAW).as_posix().removesuffix(CORPUS_PAGE_SUFFIX)
+        markdown = to_markdown(path.read_text(encoding="utf-8"), page, snippet)
+        assert clean_markdown(markdown).headings[0].level == 1, path
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
@@ -57,7 +71,7 @@ def test_processed_artifacts_are_consistent():
         prose = re.sub(r"`[^`\n]*`", "", prose)
         prose = ESCAPED_LT_RE.sub(r"\1", prose)  # an escaped `\<` is text, not a tag
         leftover = re.search(
-            r'</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|class="options-api"|\{#|vuejs\.org/#', prose
+            r"</?[A-Za-z][\w-]*(?:\s[^>]*)?/?>|\{#|^\s*(?:import|export) ", prose, re.M
         )
         assert leftover is None, f"{d['path']}: markup left in prose: {leftover.group(0)!r}"
     tokens_by_doc = {d["doc_id"]: d["tokens"] for d in docs}
@@ -88,17 +102,17 @@ def test_snapshot_matches_the_versioned_checksums():
             digest, rel = line.split("  ", 1)
             recorded[rel] = digest
     files = {p.relative_to(DATA_RAW).as_posix(): p for p in snapshot_files()}
+    files |= {rel: DATA_RAW / rel for rel in CORPUS_SUPPORT_FILES}
     assert set(recorded) == set(files)
     for rel, path in files.items():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == recorded[rel], rel
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
-def test_corpus_areas_and_exclusions():
+def test_corpus_areas():
     docs = [json.loads(line) for line in DOCUMENTS_FILE.read_text(encoding="utf-8").splitlines()]
-    areas = [d["path"].split("/", 1)[0] for d in docs]
-    assert {a: areas.count(a) for a in VUE_DOCS_AREAS} == {"api": 22, "guide": 52, "style-guide": 5}
-    assert not {d["path"] for d in docs} & set(VUE_DOCS_EXCLUDED)
+    assert collections.Counter(d["area"] for d in docs) == AREA_PAGES
+    assert list(AREA_PAGES) == list(CORPUS_AREAS)
 
 
 @pytest.mark.skipif(not SECTIONS_FILE.exists(), reason="not preprocessed; run src/preprocess.py")
@@ -126,7 +140,7 @@ def test_section_index_covers_the_real_corpus():
     corpus = load_corpus()
     rows = [line for line in section_index(corpus).splitlines() if line.startswith("| `")]
     ids = [row.split("`")[1] for row in rows]
-    assert len(rows) == len(corpus.sections) == 813
+    assert len(rows) == len(corpus.sections) == EXPECTED_SECTIONS
     assert all(sid in corpus.by_id for sid in ids)
-    assert {row.split(" | ")[1] for row in rows} == {"api", "guide", "style-guide"}
-    assert any(s["section_id"].startswith("D") for s, _ in find(corpus, "defineProps"))
+    assert {row.split(" | ")[1] for row in rows} == set(CORPUS_AREAS)
+    assert any(s["section_id"].startswith("D") for s, _ in find(corpus, "toHaveScreenshot"))
