@@ -334,3 +334,8 @@ def test_error_line_counts_source_lines_after_inline_pairs():
 def test_error_inside_a_split_pair_names_its_source_line():
     with pytest.raises(ValueError, match="line 2:"):
         md("<Note>Text with {x}.</Note>\n")
+
+
+def test_inline_code_spanning_a_line_break_is_not_markup():
+    out = md("Use `{ record:\n'all' }` here.\n")
+    assert "Use `{ record:\n'all' }` here." in out

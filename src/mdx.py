@@ -313,6 +313,21 @@ def _fence_info(info: str) -> tuple[str, str]:
     return (words[0] if words else ""), (title.group(1) if title else " ".join(rest))
 
 
+def _prose(line: str, open_span: bool) -> tuple[str, bool]:
+    """The line without inline code, and whether a code span stays open into the next line. A
+    blank line ends the paragraph and with it any open span."""
+    if not line.strip():
+        return "", False
+    if open_span:
+        if "`" not in line:
+            return "", True
+        line = line[line.index("`") + 1 :]
+    line = INLINE_CODE_RE.sub("", line)
+    if "`" in line:
+        return line[: line.index("`")], True
+    return line, False
+
+
 def _dedent(line: str, indent: int) -> str:
     return line[min(indent, len(line) - len(line.lstrip(" "))) :]
 
@@ -329,6 +344,7 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
     stack: list[_Frame] = []
     fence: tuple[str, int] | None = None  # (marker, indent) of the open fence
     i = 0
+    open_span = False  # an inline code span continues from the previous line (CommonMark)
     origin = list(range(1, len(lines) + 1))  # source line of each entry (tag pairs get split)
 
     def fail(message: str) -> NoReturn:
@@ -475,7 +491,7 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
             else:
                 open_tag(name, attrs)
             continue
-        prose = INLINE_CODE_RE.sub("", line)
+        prose, open_span = _prose(line, open_span)
         # a JSX expression may span lines: an unbalanced brace marks one as well
         if MARKUP_RE.search(prose) or prose.count("{") != prose.count("}"):
             fail(f"unhandled markup: {line!r}")
