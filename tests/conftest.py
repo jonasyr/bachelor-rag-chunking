@@ -69,6 +69,7 @@ def build_corpus(tmp_path, pages):
                 "doc_id": doc_id,
                 "path": path,
                 "title": spans[0]["title"],
+                "area": path.split("/")[0],
                 "text": result.text,
                 "tokens": tokens.count(result.text),
             }

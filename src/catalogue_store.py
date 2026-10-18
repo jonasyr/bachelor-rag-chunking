@@ -19,6 +19,7 @@ from config import (
     CATALOGUE_FREEZE_FILE,
     CATALOGUE_PLAN_FILE,
     CATALOGUE_REVIEW_FILE,
+    CORPUS_SITE_URL,
     DOCUMENTS_FILE,
     GROUND_TRUTH_FILE,
     ID_SEPARATOR,
@@ -28,7 +29,6 @@ from config import (
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTIONS_FILE,
-    VUE_DOCS_SITE_URL,
 )
 from preprocess import closes_fence, fence_marker
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
@@ -294,7 +294,7 @@ def _prose(text: str, words: list[str]) -> str:
         out.append(_mark(plain, words))
         piece = text[start:end]
         if piece.startswith("](/"):
-            piece = f"]({VUE_DOCS_SITE_URL}{piece[2:-1]})"
+            piece = f"]({CORPUS_SITE_URL}{piece[2:-1]})"
         out.append(piece)
         last = end
     plain = text[last:].replace("\\<", "&lt;").replace("<", "&lt;")

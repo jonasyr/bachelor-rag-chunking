@@ -100,8 +100,8 @@ class Corpus:
         return self.docs[section["doc_id"]]["text"][start:end]
 
     def area(self, section: dict) -> str:
-        """First path segment of the section's document: a key of config.VUE_DOCS_AREAS."""
-        return self.docs[section["doc_id"]]["path"].split("/")[0]
+        """Area of the section's document (documents.jsonl `area`: its navigation group, D38)."""
+        return self.docs[section["doc_id"]]["area"]
 
     def page_title(self, section: dict) -> str:
         return self._h1[section["doc_id"]]["title"]

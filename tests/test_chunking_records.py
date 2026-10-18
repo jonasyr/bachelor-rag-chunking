@@ -119,7 +119,7 @@ def test_unknown_strategy(tmp_path):
 @pytest.mark.parametrize("key", list(STRATEGY_IDS))
 def test_raw_reingested_documents_are_rejected(inputs, tmp_path, key):
     docs, docs_file, sections_file = inputs
-    raw = '# Intro {#intro}\n\n<div class="options-api">\n\nOld API.\n\n</div>\n\nShort page.\n'
+    raw = "---\ntitle: Intro\n---\n\nShort page.\n"  # a raw page, not preprocessed
     stale = [docs[0], {**docs[1], "text": raw, "tokens": tokens.count(raw)}]
     docs_file.write_text("".join(json.dumps(d) + "\n" for d in stale), encoding="utf-8")
     with pytest.raises(ValueError, match="D002: sections.jsonl does not match"):
