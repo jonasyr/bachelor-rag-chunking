@@ -9,7 +9,7 @@ Date: 18.10.2026. Status: approved in chat (18.10.2026). Decision basis: [ADR 00
 
 The catalogue tools work on the 15 e2e areas: area slots, reserve and minimums replace the Vue keys, the stopword list
 names the e2e product instead of Vue, and the e2e sampling plan is drawn once. Afterwards Jonas can write questions.
-No OpenAI calls; catalogue size (48), types (4 × 12) and classes (12/12/6/6) stay.
+No OpenAI calls; catalogue size (48), types and classes (4 × 12 each) stay.
 
 Success criteria:
 
