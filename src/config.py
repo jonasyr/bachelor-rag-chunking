@@ -263,3 +263,62 @@ RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completenes
 RUBRIC_RULES_VERSION = "2026-10-18"  # version of the rules in src/scoring_rules.py (D35, D37)
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
+
+# ---------------------------------------------------------------------------
+# Corpus selection probe (D38): a diagnostic run once to choose the corpus, not part of the
+# experiment; scripts/corpus_probe/, method in docs/reference/corpus-selection.md
+# ---------------------------------------------------------------------------
+CORPUS_PROBE_DIR = ROOT / "data" / "corpus_probe"
+CORPUS_PROBE_SEED = 20261018  # order of the candidate sentences per page; fixed, never tuned
+CORPUS_PROBE_PER_PAGE = 12  # probes per page at most, so long pages do not dominate
+CORPUS_PROBE_SPAN_CHARS = (2, 40)  # length of a maskable inline code span
+CORPUS_PROBE_SENTENCE_CHARS = (40, 400)  # length of a usable prose sentence
+CORPUS_PROBE_CONTEXT_CHARS = 6000  # section text shown in the open-book run
+CORPUS_PROBE_WORKERS = 8  # parallel API requests
+CORPUS_PROBE_GUESS_CHARS = 120  # closed-book reply kept in misses/<name>.json
+# Preregistered score (data/corpus_probe/preregistration.md): weights sum to 100, each criterion
+# rated 0-4; the rating bands are in scripts/corpus_probe/summarise.py.
+CORPUS_PROBE_WEIGHTS = {
+    "unknown": 35,
+    "clean": 15,
+    "struct": 15,
+    "quality": 15,
+    "stable": 10,
+    "fit": 10,
+}
+CORPUS_PROBE_SENSITIVITY = {  # alternative weightings; the ranking is reported for each
+    "preregistered": CORPUS_PROBE_WEIGHTS,
+    "equal": dict.fromkeys(CORPUS_PROBE_WEIGHTS, 1),
+    "unknown50": {"unknown": 50, "clean": 10, "struct": 10, "quality": 10, "stable": 10, "fit": 10},
+    "no_stability_fit": {
+        "unknown": 35,
+        "clean": 20,
+        "struct": 20,
+        "quality": 25,
+        "stable": 0,
+        "fit": 0,
+    },
+    "quality_heavy": {
+        "unknown": 25,
+        "clean": 15,
+        "struct": 20,
+        "quality": 25,
+        "stable": 5,
+        "fit": 10,
+    },
+}
+CORPUS_PROBE_MIN_TOKENS = 80_000  # exclusion criterion 5, lower bound (sensitivity pool)
+CORPUS_PROBE_TOP = 5  # candidates listed per weighting
+CORPUS_PROBE_AI_RATING = {
+    "low": 4,
+    "medium": 3,
+    "medium-high": 2,
+    "high": 1,
+}  # fit by AI-text share
+CORPUS_PROBE_FEW_STARS = 100  # fewer GitHub stars lower the fit rating by one
+# Question-level closed-book check of the candidates (D38): sections drawn with CORPUS_PROBE_SEED
+CORPUS_QUESTIONS_PER_CORPUS = 20  # diagnostic questions per corpus, one per drawn section
+CORPUS_QUESTIONS_MIN_WORDS = 60  # prose words (3+ letters, outside code) a drawn section needs
+CORPUS_QUESTIONS_PER_PAGE = 2  # drawn sections per page at most
+CORPUS_QUESTIONS_SECTION_CHARS = 5000  # section text shown to the question writer and open-book run
+CORPUS_QUESTIONS_JUDGE_SEEDS = {1: 7, 2: 8}  # order of the blinded answers per judge batch

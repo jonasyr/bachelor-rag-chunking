@@ -1,0 +1,2027 @@
+[
+ {
+  "id": 13,
+  "page": "Android edge-to-edge",
+  "section": "The keyboard",
+  "sentence": "Recent Android reports the keyboard's final height as it starts to open, so `[MASK]` and the other views that follow the keyboard jump into place when it starts to open, rather than moving alongside it as they do on iOS.",
+  "answer": "<keyboard-avoiding-view>",
+  "closed_book_guess": "adjustResize",
+  "category": "fact"
+ },
+ {
+  "id": 29,
+  "page": "Architecture",
+  "section": "CSS",
+  "sentence": "React Native does not inherit text properties: a view's `[MASK]` does not affect its text children.",
+  "answer": "color",
+  "closed_book_guess": "fontSize",
+  "category": "ambiguous"
+ },
+ {
+  "id": 44,
+  "page": "Angular Native compared",
+  "section": "Ionic and Capacitor",
+  "sentence": "Angular Native's `<view>` and `[MASK]` render as `UIView`s and Android `View`s; see [Architecture](/guide/architecture).",
+  "answer": "<text>",
+  "closed_book_guess": "<content-view>",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "Deployment",
+  "section": "Locally",
+  "sentence": "Add `[MASK]` (iOS) or `--variant release` (Android) for a local release build with no dev tools or Metro connection, the closest thing locally to what a store submission runs.",
+  "answer": "--configuration Release",
+  "closed_book_guess": "--env.production",
+  "category": "fact"
+ },
+ {
+  "id": 46,
+  "page": "Deployment",
+  "section": "Submit to a store",
+  "sentence": "Android requires a Google Play service account key and uploads to the track selected in `[MASK]` or on the command line.",
+  "answer": "eas.json",
+  "closed_book_guess": "nativescript.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 54,
+  "page": "Deployment",
+  "section": "What a release build strips",
+  "sentence": " The Metro preset replaces `[MASK]` with `false` in minified bundles, including release and preview builds.",
+  "answer": "ngDevMode",
+  "closed_book_guess": "__DEV__",
+  "category": "fact"
+ },
+ {
+  "id": 58,
+  "page": "Build a form",
+  "section": "Define the form",
+  "sentence": " `form()` from `[MASK]` takes a data signal and a schema that adds validators to field paths:   `data` is the readable, writable state signal; `f` is its field tree, and `[formField]` binds a control to a path.",
+  "answer": "@angular/forms/signals",
+  "closed_book_guess": "@angular/forms/experimental",
+  "category": "fact"
+ },
+ {
+  "id": 65,
+  "page": "Build a form",
+  "section": "Define the form",
+  "sentence": "The same applies to `[MASK]` and Reactive Forms directives.",
+  "answer": "ngModel",
+  "closed_book_guess": "Template-driven Forms",
+  "category": "ambiguous"
+ },
+ {
+  "id": 66,
+  "page": "Build a form",
+  "section": "Arrays",
+  "sentence": "An array in the model is an array of fields in the form: `@for` runs over it, and each item goes to a component of its own as a `[MASK]`:   Adding, removing and reordering are updates of the array's own value, `f.lines().value.update()`.",
+  "answer": "FieldTree",
+  "closed_book_guess": "FormField<Line>",
+  "category": "fact"
+ },
+ {
+  "id": 71,
+  "page": "Getting started",
+  "section": "Edit `app.ts` and check the counter",
+  "sentence": "An uppercase name such as `[MASK]` matches no component's selector, and the Metro transform fails the build on it.",
+  "answer": "<View>",
+  "closed_book_guess": "CounterComponent",
+  "category": "ambiguous"
+ },
+ {
+  "id": 79,
+  "page": "Inspecting an app",
+  "section": "Reach the server from a device",
+  "sentence": "A bare React Native app needs a polyfill, such as `[MASK]`, since React Native's own `URL` is read-only.",
+  "answer": "react-native-url-polyfill",
+  "closed_book_guess": "react-native-url-polyxyfill",
+  "category": "equivalent"
+ },
+ {
+  "id": 81,
+  "page": "Inspecting an app",
+  "section": "Reach the server from a device",
+  "sentence": "A bare React Native app needs a polyfill, such as `react-native-url-polyfill`, since React Native's own `[MASK]` is read-only.",
+  "answer": "URL",
+  "closed_book_guess": "URL polyfill",
+  "category": "fact"
+ },
+ {
+  "id": 85,
+  "page": "Inspecting an app",
+  "section": "Set it up",
+  "sentence": "The `[MASK]` check keeps it out of a release build:   Start the server from the app's folder, and open the **Angular Native apps** address it prints, `http://localhost:9999/?view=angular-native`:   `--no-auth` is needed because the app cannot answer the one-time code the server otherwise asks for.",
+  "answer": "__DEV__",
+  "closed_book_guess": "no-auth",
+  "category": "fact"
+ },
+ {
+  "id": 88,
+  "page": "Known limitations",
+  "section": "There is no DOM",
+  "sentence": "`mount()` provides a `[MASK]` stub only to prevent `TransferState` errors when creating a `resource()`; see [Bootstrapping](/packages/platform/bootstrapping#what-is-in-the-injector).",
+  "answer": "DOCUMENT",
+  "closed_book_guess": "document.cookie",
+  "category": "fact"
+ },
+ {
+  "id": 91,
+  "page": "Known limitations",
+  "section": "`HttpClient` needs `provideNativeHttpClient()`",
+  "sentence": "With `EXPO_PUBLIC_USE_RN_FETCH` set to `1` or `true`[MASK]`fetch` in place, so every build gets the one with no `body`.",
+  "answer": ", Expo's runtime leaves React Native's ",
+  "closed_book_guess": ", you get RN’s native",
+  "category": "ambiguous"
+ },
+ {
+  "id": 100,
+  "page": "Extracting messages",
+  "section": "Extracting messages",
+  "sentence": "Copy `messages.json` to `messages.fr.json`, set `[MASK]`, and translate the values, preserving every `{$...}` placeholder:   `ng extract-i18n` requires a browser build, which fails for the template app with 164 errors across native properties (`Can't bind to 'zoomScale' since it isn't a known property of 'scroll-view'`), DOM/native event types and React Native's Flow syntax.",
+  "answer": "\"locale\": \"fr\"",
+  "closed_book_guess": "\"fr\"",
+  "category": "ambiguous"
+ },
+ {
+  "id": 113,
+  "page": "Formatting and right to left",
+  "section": "Timezones",
+  "sentence": " `date` accepts the same timezones as in a browser through its third argument: offsets such as `'+0530'` or `'-05:00'`, `'UTC'`, `[MASK]`, and North American abbreviations such as `'EST'` or `'PDT'`.",
+  "answer": "'GMT'",
+  "closed_book_guess": "'Asia/Kolkata'",
+  "category": "ambiguous"
+ },
+ {
+  "id": 119,
+  "page": "Formatting and right to left",
+  "section": "Timezones",
+  "sentence": "`Locale.calendars()` exposes `uses24hourClock`, `firstWeekday` and `timeZone` to help choose formats such as `[MASK]` instead of `'shortTime'`.",
+  "answer": "'HH:mm'",
+  "closed_book_guess": "mediumTime",
+  "category": "ambiguous"
+ },
+ {
+  "id": 120,
+  "page": "Formatting and right to left",
+  "section": "Dates, numbers and currency",
+  "sentence": "For regional variants (`fr-CA`, `en-GB`), register the matching `@angular/common/locales/` data file and use the full `[MASK]` tag.",
+  "answer": "LOCALE_ID",
+  "closed_book_guess": "locale",
+  "category": "ambiguous"
+ },
+ {
+  "id": 125,
+  "page": "Loading a language",
+  "section": "Loading a language",
+  "sentence": "Next: [Switching language](/guide/localization-switching) covers changing `[MASK]` after startup.",
+  "answer": "LOCALE_ID",
+  "closed_book_guess": "the active language",
+  "category": "ambiguous"
+ },
+ {
+  "id": 135,
+  "page": "Switching language",
+  "section": "Switching language",
+  "sentence": "With `[MASK]`, iOS and Android 13+ expose per-app language settings, which `Locale` reports:   iOS terminates the app after a Settings language change; the next launch uses the new language.",
+  "answer": "supportedLocales",
+  "closed_book_guess": "LocaleManager",
+  "category": "fact"
+ },
+ {
+  "id": 156,
+  "page": "Adding it to an existing app",
+  "section": "Configure TypeScript",
+  "sentence": "These packages ship TypeScript with `[MASK]` imports so Metro's Angular compiler processes library and app components together.",
+  "answer": ".ts",
+  "closed_book_guess": "preserveSymlinks",
+  "category": "fact"
+ },
+ {
+  "id": 163,
+  "page": "Adding it to an existing app",
+  "section": "Install the framework packages",
+  "sentence": "Expo modules are optional peers, so `[MASK]` installs no native code.",
+  "answer": "@ng-native/expo",
+  "closed_book_guess": "npm install",
+  "category": "fact"
+ },
+ {
+  "id": 168,
+  "page": "Native and web",
+  "section": "The layout reset",
+  "sentence": "Tag selectors would miss `[MASK]` and `switch`, rendered as `<textarea>` and `<input>`.",
+  "answer": "text-input",
+  "closed_book_guess": "text-field",
+  "category": "fact"
+ },
+ {
+  "id": 184,
+  "page": "Use NativeScript",
+  "section": "Wrap it in an Angular service",
+  "sentence": " Expose the NativeScript runtime through an `[MASK]` that requires `@nativescript/react-native` lazily and answers `null` in Node so unit tests run without a simulator.",
+  "answer": "InjectionToken",
+  "closed_book_guess": "Angular service",
+  "category": "fact"
+ },
+ {
+  "id": 204,
+  "page": "Working offline",
+  "section": "The worked example: a note feed",
+  "sentence": "Each `notesDb` call therefore has its own `[MASK]`/`catch`.",
+  "answer": "try",
+  "closed_book_guess": "then",
+  "category": "ambiguous"
+ },
+ {
+  "id": 222,
+  "page": "Updating an app",
+  "section": "A plain Expo app",
+  "sentence": "Run the migrations with `[MASK]`, before installing the new versions:   It reads the `@ng-native/*` version the app's `package.json` lists, runs every migration newer than that version, oldest first, and moves the `@ng-native/*` versions in `package.json` to the new release.",
+  "answer": "npx",
+  "closed_book_guess": "ng update @ng-native/core",
+  "category": "fact"
+ },
+ {
+  "id": 225,
+  "page": "Updating an app",
+  "section": "A plain Expo app",
+  "sentence": "Pass the version the app was on with `[MASK]` to run the migrations since then.",
+  "answer": "--from",
+  "closed_book_guess": "--from-version",
+  "category": "fact"
+ },
+ {
+  "id": 230,
+  "page": "Updating an app",
+  "section": "An Angular CLI workspace",
+  "sentence": "  `ng update` moves every `[MASK]` package in the root `package.json`, installs them, and runs the migrations the update crosses.",
+  "answer": "@ng-native/*",
+  "closed_book_guess": "@angular/cli",
+  "category": "fact"
+ },
+ {
+  "id": 240,
+  "page": "Analog",
+  "section": "Setup",
+  "sentence": "Add `withAnalog` to the Metro config, after `withAngularNative`:   It turns on `require.context`, which finds the pages, and resolves `@analogjs/router`'s import of `[MASK]` to an empty module.",
+  "answer": "@analogjs/content",
+  "closed_book_guess": "@analogjs/router/testing",
+  "category": "fact"
+ },
+ {
+  "id": 254,
+  "page": "Activity indicator",
+  "section": "Activity indicator",
+  "sentence": "`[MASK]` (default `true`) starts and stops it, and `hidesWhenStopped` (iOS) hides the spinner entirely rather than leaving a still one on screen while stopped.",
+  "answer": "animating",
+  "closed_book_guess": "busy",
+  "category": "fact"
+ },
+ {
+  "id": 255,
+  "page": "Animation",
+  "section": "AnimatedStyle",
+  "sentence": "Import `Animated` and `Easing` from the same file, and bind `[animatedStyle]` to a style object built from `Animated` nodes:   With `[MASK]` the whole animation runs on the UI thread and this directive hands over the element's native tag once, doing nothing per frame; without it, every frame runs in JavaScript and gets written to the node from there.",
+  "answer": "useNativeDriver: true",
+  "closed_book_guess": "animatedStyle",
+  "category": "fact"
+ },
+ {
+  "id": 270,
+  "page": "Gestures",
+  "section": "Testing a component with gestures",
+  "sentence": "`[MASK]` and the other builders take any configuration call and keep the callbacks they were given on `callbacks`, so a test of what a gesture does calls one directly.",
+  "answer": "Gesture.Pan()",
+  "closed_book_guess": "PanBuilder",
+  "category": "fact"
+ },
+ {
+  "id": 275,
+  "page": "Gestures",
+  "section": "Imports come from their own file",
+  "sentence": "Import these from their own files `@ng-native/components/gestures`, `@ng-native/components/animations`, `[MASK]` - covered on the gestures and [animation](/packages/components/animation) pages.",
+  "answer": "@ng-native/components/reanimated",
+  "closed_book_guess": "@ng-native/components/animation",
+  "category": "fact"
+ },
+ {
+  "id": 293,
+  "page": "Image",
+  "section": "Sources and sizing",
+  "sentence": "`resizeMode` (defaults to `cover`), `[MASK]` and `fadeDuration` (Android, default 300ms) apply on both.",
+  "answer": "blurRadius",
+  "closed_book_guess": "stretch",
+  "category": "fact"
+ },
+ {
+  "id": 298,
+  "page": "Image",
+  "section": "Sources and sizing",
+  "sentence": "Android also reads `loadingIndicatorSource`, an image shown in place of the loading indicator, `[MASK]` (how a large image is scaled down while decoding) and `resizeMultiplier`.",
+  "answer": "resizeMethod",
+  "closed_book_guess": "decodeWidthHeightRatio",
+  "category": "fact"
+ },
+ {
+  "id": 310,
+  "page": "Text input",
+  "section": "Keyboards and behavior",
+  "sentence": "`[MASK]` names the key in `$event.nativeEvent.key`: `Backspace`, `Enter`, or the character typed (`' '` for a space), on a device and in a browser alike.",
+  "answer": "(keyPress)",
+  "closed_book_guess": "key",
+  "category": "fact"
+ },
+ {
+  "id": 319,
+  "page": "Keyboard-avoiding view",
+  "section": "Your own style",
+  "sentence": "With `behavior=\"position\"`, `contentContainerStyle` styles the inner view that gets shifted, and `[MASK]` gives it classes, matched as if the view were written in your own template, as on [`<scroll-view>`](/packages/components/scroll-view).",
+  "answer": "contentContainerClass",
+  "closed_book_guess": "className",
+  "category": "fact"
+ },
+ {
+  "id": 321,
+  "page": "Keyboard-avoiding view",
+  "section": "A bar that rides the keyboard",
+  "sentence": "On iOS, with [react-native-keyboard-controller](https://kirillzyusko.github.io/react-native-keyboard-controller/) installed and `[MASK]` in the app's providers, the dock's bar is moved by the keyboard's height on the native side, every frame: as the keyboard rises and falls, and through an interactive dismissal.",
+  "answer": "provideKeyboardController()",
+  "closed_book_guess": "KeyboardControllerProvider",
+  "category": "fact"
+ },
+ {
+  "id": 326,
+  "page": "Keyboard-avoiding view",
+  "section": "A bar that rides the keyboard",
+  "sentence": "`[MASK]` fills the bar and the inset under it.",
+  "answer": "backgroundColor",
+  "closed_book_guess": "KeyboardAvoidingView",
+  "category": "fact"
+ },
+ {
+  "id": 332,
+  "page": "Layout and views",
+  "section": "A component's host is a flex item",
+  "sentence": "Its `[MASK]` styles it like any other host: a background or padding there reaches that view, and a `height` there replaces the default.",
+  "answer": ":host",
+  "closed_book_guess": "hostViewStyle",
+  "category": "fact"
+ },
+ {
+  "id": 336,
+  "page": "Layout and views",
+  "section": "A component's host is a flex item",
+  "sentence": "A component that fills the space it is given needs `[MASK]` on its host.",
+  "answer": "flex: 1",
+  "closed_book_guess": "flexGrow: 1",
+  "category": "ambiguous"
+ },
+ {
+  "id": 341,
+  "page": "Lists",
+  "section": "Identity, recycling and row state",
+  "sentence": "The list is a native scroll view and takes the scroll view's own props as `[MASK]` does: `pagingEnabled`, `snapToInterval`, `decelerationRate`, `showsHorizontalScrollIndicator`, `scrollEventThrottle`, `keyboardDismissMode`, `contentInsetAdjustmentBehavior` and the rest, with the same defaults, so a horizontal list rubber-bands sideways and `'fast'` is resolved to the rate UIKit takes.",
+  "answer": "FlatList",
+  "closed_book_guess": "ScrollView",
+  "category": "fact"
+ },
+ {
+  "id": 347,
+  "page": "Lists",
+  "section": "Section list",
+  "sentence": "Heights are fixed per row, as `[MASK]` makes them: `itemHeight`, `sectionHeaderHeight` and `sectionFooterHeight` are numbers or functions, and an item's height includes its separators.",
+  "answer": "getItemLayout",
+  "closed_book_guess": "ListView",
+  "category": "fact"
+ },
+ {
+  "id": 357,
+  "page": "Markdown",
+  "section": "Links",
+  "sentence": " Pressing a link emits `(linkPress)` with the `[MASK]` and `title`.",
+  "answer": "href",
+  "closed_book_guess": "url",
+  "category": "fact"
+ },
+ {
+  "id": 368,
+  "page": "Modal",
+  "section": "Other props",
+  "sentence": "`[MASK]` gives the modal's window a hardware-accelerated surface.",
+  "answer": "hardwareAccelerated",
+  "closed_book_guess": "hardwareAcceleratedSurface",
+  "category": "fact"
+ },
+ {
+  "id": 372,
+  "page": "Modal",
+  "section": "Events",
+  "sentence": "`(show)`, `[MASK]` and `(orientationChange)` are the others.",
+  "answer": "(dismiss)",
+  "closed_book_guess": "(close)",
+  "category": "fact"
+ },
+ {
+  "id": 375,
+  "page": "Pressable",
+  "section": "Composing pressability onto a component",
+  "sentence": "A component that reacts to its own press, such as a checkbox toggling itself, forwards `press` in its `[MASK]` entry and listens for it in `host`:   A component like that often has a reason of its own to refuse presses, a `loading` input for one, which its caller's `disabled` knows nothing of.",
+  "answer": "hostDirectives",
+  "closed_book_guess": "outputs",
+  "category": "fact"
+ },
+ {
+  "id": 385,
+  "page": "Pressable",
+  "section": "Composing pressability onto a component",
+  "sentence": " A component that wants to _be_ pressable rather than _contain_ something pressable - a custom button, say - composes `PressBehavior` through `[MASK]` instead of wrapping a `<pressable>`.",
+  "answer": "hostDirectives",
+  "closed_book_guess": "PressableDirective",
+  "category": "fact"
+ },
+ {
+  "id": 390,
+  "page": "Safe area",
+  "section": "Safe area",
+  "sentence": "The same insets are also published as CSS custom properties - `--safe-area-inset-top`, `-right`, `-bottom` and `[MASK]` - so a stylesheet can reach for them directly, the native equivalent of `env(safe-area-inset-bottom)` on the web:   `env(safe-area-inset-bottom)` and the other three sides compile to the same custom properties, so a stylesheet shared with the web can keep its `env()`.",
+  "answer": "-left",
+  "closed_book_guess": "--safe-area-inset-left",
+  "category": "equivalent"
+ },
+ {
+  "id": 392,
+  "page": "Safe area",
+  "section": "Safe area",
+  "sentence": "A per-edge object lets one edge take the larger of its own padding or the inset (`[MASK]`), add to it (`'additive'`, the default for a listed edge), or ignore it (`'off'`).",
+  "answer": "'maximum'",
+  "closed_book_guess": "inset-padding",
+  "category": "fact"
+ },
+ {
+  "id": 400,
+  "page": "Scroll view",
+  "section": "Methods",
+  "sentence": " `[MASK]`, `scrollToEnd({ animated })`, `flashScrollIndicators()` and, on iOS, `zoomToRect(rect, animated)` are available as methods through a template reference.",
+  "answer": "scrollTo({ x, y, animated })",
+  "closed_book_guess": "scrollTo",
+  "category": "equivalent"
+ },
+ {
+  "id": 402,
+  "page": "Scroll view",
+  "section": "Refresh control",
+  "sentence": "Android reads `colors` (the colors the spinner cycles through), `progressBackgroundColor`, `size` (`'default'` or `'large'`) and `[MASK]` (whether pulling does anything at all, default true).",
+  "answer": "enabled",
+  "closed_book_guess": "refreshing",
+  "category": "fact"
+ },
+ {
+  "id": 405,
+  "page": "Scroll view",
+  "section": "Refresh control",
+  "sentence": "iOS also reads `[MASK]`, `title` and `titleColor` for a label under the spinner.",
+  "answer": "tintColor",
+  "closed_book_guess": "attributedTitle",
+  "category": "fact"
+ },
+ {
+  "id": 407,
+  "page": "Scroll view",
+  "section": "Keyboard taps",
+  "sentence": " `[MASK]` controls what a tap elsewhere in the scroll view does while a `<text-input>` has focus: `'never'` (the default) dismisses the keyboard immediately and nothing else happens with the tap, `'handled'` lets whatever was tapped handle it first and only dismisses if nothing did, and `'always'` never dismisses at all.",
+  "answer": "keyboardShouldPersistTaps",
+  "closed_book_guess": "keyboardDismissMode",
+  "category": "fact"
+ },
+ {
+  "id": 415,
+  "page": "Switch",
+  "section": "Colors on both platforms at once",
+  "sentence": " The two platforms spell the same props differently - iOS reads `onTintColor`, `[MASK]` and `thumbTintColor`; Android reads `trackColorForTrue`, `trackColorForFalse`, `trackTintColor` and `thumbTintColor` (plus `on` for the value itself).",
+  "answer": "tintColor",
+  "closed_book_guess": "trackTintColorForTrue",
+  "category": "fact"
+ },
+ {
+  "id": 421,
+  "page": "Text",
+  "section": "Text",
+  "sentence": "It does not inherit from an inline `[style]` set on an ancestor `<view>`, which is easy to assume works like a cascading `[MASK]` and does not: put text styles in a stylesheet rule or on the `<text>` itself.",
+  "answer": "color",
+  "closed_book_guess": "CSS property",
+  "category": "ambiguous"
+ },
+ {
+  "id": 425,
+  "page": "Text",
+  "section": "Presses",
+  "sentence": " React Native only makes a piece of text pressable when a press handler is actually attached to it, and an Angular template gives no way to ask \"is `[MASK]` bound to this element\" from inside the component.",
+  "answer": "(press)",
+  "closed_book_guess": "onPress",
+  "category": "equivalent"
+ },
+ {
+  "id": 439,
+  "page": "Components",
+  "section": "Components",
+  "sentence": "Every element is a separate Angular component, and Angular's own import rules apply to it like anything else: a template that writes `[MASK]` must have `ScrollView` in its `imports` array.",
+  "answer": "<scroll-view>",
+  "closed_book_guess": "<ScrollView>",
+  "category": "equivalent"
+ },
+ {
+  "id": 452,
+  "page": "Accessibility",
+  "section": "Accessibility",
+  "sentence": "`[MASK]` means the system font is heavier, so a hand-tuned weight may need to give way.",
+  "answer": "boldText",
+  "closed_book_guess": "fontScale",
+  "category": "fact"
+ },
+ {
+  "id": 456,
+  "page": "Android permissions",
+  "section": "Android permissions",
+  "sentence": "`request()` maps Android's `[MASK]` result onto `canAskAgain: false`, which is Android's way of saying the dialog is over; anything else is a no the user can still change their mind about, so `canAskAgain` stays `true`.",
+  "answer": "never_ask_again",
+  "closed_book_guess": "PERMISSION_DENIED_DO_NOT_ASK_AGAIN",
+  "category": "fact"
+ },
+ {
+  "id": 458,
+  "page": "Android permissions",
+  "section": "Android permissions",
+  "sentence": "`check()` cannot tell \"denied\" from \"not yet asked\" - `[MASK]` only answers yes or no - so a permission nobody has asked about yet answers `undetermined` rather than `denied`, which is the honest answer and lets a caller decide whether to ask.",
+  "answer": "PermissionsAndroid.check",
+  "closed_book_guess": "checkPermission",
+  "category": "fact"
+ },
+ {
+  "id": 459,
+  "page": "Android permissions",
+  "section": "Android permissions",
+  "sentence": "`[MASK]` cannot tell \"denied\" from \"not yet asked\" - `PermissionsAndroid.check` only answers yes or no - so a permission nobody has asked about yet answers `undetermined` rather than `denied`, which is the honest answer and lets a caller decide whether to ask.",
+  "answer": "check()",
+  "closed_book_guess": "PermissionsAndroid.check",
+  "category": "fact"
+ },
+ {
+  "id": 460,
+  "page": "Android permissions",
+  "section": "Android permissions",
+  "sentence": "`[MASK]` maps Android's `never_ask_again` result onto `canAskAgain: false`, which is Android's way of saying the dialog is over; anything else is a no the user can still change their mind about, so `canAskAgain` stays `true`.",
+  "answer": "request()",
+  "closed_book_guess": "requestPermission",
+  "category": "fact"
+ },
+ {
+  "id": 468,
+  "page": "App state",
+  "section": "Off a device and on the web",
+  "sentence": " Off a device `current` reports `[MASK]` and never changes, because there is no `AppState` module underneath it to ask - the same as an app that is always in front of somebody.",
+  "answer": "active",
+  "closed_book_guess": "true",
+  "category": "fact"
+ },
+ {
+  "id": 487,
+  "page": "Deep links",
+  "section": "Deep links",
+  "sentence": "An app that needs the whole address reads the platform's source itself: `deepLinkSource()` returns the `DeepLinkSource` that `DeepLinks` is built on, with `launchUrl()`, `[MASK]`, `open()` and `openSettings()`, all in terms of the url as it arrived.",
+  "answer": "subscribe()",
+  "closed_book_guess": "getInitialUrl()",
+  "category": "fact"
+ },
+ {
+  "id": 488,
+  "page": "Deep links",
+  "section": "Deep links",
+  "sentence": " `DeepLinks` delivers the URL an app was launched with (`[MASK]`, once it is known) and every link that arrives while it is running (`subscribe()`), both normalized to a path your router can navigate to.",
+  "answer": "initialUrl()",
+  "closed_book_guess": "getCurrentUrl()",
+  "category": "fact"
+ },
+ {
+  "id": 489,
+  "page": "Deep links",
+  "section": "Deep links",
+  "sentence": "Both happen - the promise that resolves `initialUrl()` races the first navigation and neither order is guaranteed - so call `initialUrl()` and `[MASK]` both, as above, rather than picking one.",
+  "answer": "subscribe()",
+  "closed_book_guess": "navigateByUrl()",
+  "category": "fact"
+ },
+ {
+  "id": 491,
+  "page": "Deep links",
+  "section": "Deep links",
+  "sentence": "The launch url is delivered whichever way is true at the time: as `initialUrl()` if it is known before anything asks, and through `[MASK]` if the app is already up.",
+  "answer": "subscribe()",
+  "closed_book_guess": "url$",
+  "category": "fact"
+ },
+ {
+  "id": 494,
+  "page": "Dev menu",
+  "section": "Dev menu",
+  "sentence": "In development in an Expo app, that is Expo's `[MASK]`, since React Native's `DevSettings.reload()` brings an app in Expo Go back without Expo's native modules; a reload Expo cannot do falls back to React Native's, with the error logged.",
+  "answer": "reloadAppAsync()",
+  "closed_book_guess": "DevLauncher.reload()",
+  "category": "fact"
+ },
+ {
+  "id": 497,
+  "page": "Dev menu",
+  "section": "Dev menu",
+  "sentence": "Registering the same title again swaps in the new handler rather than adding a second entry - React Native's own `[MASK]` keys on `title` which is what makes it safe for a hot reload to re-run the constructor that calls `add()`: the menu keeps one entry, wired to whichever handler registered most recently.",
+  "answer": "DevSettings.addMenuItem",
+  "closed_book_guess": "DevMenu.addItem",
+  "category": "fact"
+ },
+ {
+  "id": 501,
+  "page": "Dev menu",
+  "section": "Dev menu",
+  "sentence": "`available` is whether anything registered here will appear - `false` in a release build - checked by reading `__DEV__` rather than assuming, because `[MASK]` exists in a release bundle and its `addMenuItem` is a no-op there; an app that registers twenty items is still doing twenty things at startup for no reason if `available` is not checked first.",
+  "answer": "DevSettings",
+  "closed_book_guess": "DevMenu",
+  "category": "fact"
+ },
+ {
+  "id": 521,
+  "page": "Direction",
+  "section": "Off a device and on the web",
+  "sentence": "The browser source is the exception: `[MASK]` is a mutable attribute, so a consumer should not have to know which platform it is on to read the signal.",
+  "answer": "document.dir",
+  "closed_book_guess": "navigator.languages",
+  "category": "fact"
+ },
+ {
+  "id": 536,
+  "page": "Keyboard",
+  "section": "When it changes",
+  "sentence": "Each carries the keyboard's `duration` and `[MASK]`, usually `'keyboard'`, the curve iOS moves it on, so a layout configured from them moves with the keyboard rather than after it.",
+  "answer": "easing",
+  "closed_book_guess": "curve",
+  "category": "fact"
+ },
+ {
+  "id": 543,
+  "page": "Layout animation",
+  "section": "On Android",
+  "sentence": "The [`@ng-native/metro` config plugin](/packages/metro) turns the flag on when asked:   Run `npx expo prebuild` and build the app again afterwards: the plugin writes the override into `[MASK]`, so it takes effect in a build of the app's own.",
+  "answer": "MainApplication.kt",
+  "closed_book_guess": "gradle.properties",
+  "category": "fact"
+ },
+ {
+  "id": 546,
+  "page": "Layout animation",
+  "section": "Layout animation",
+  "sentence": "Because the change commits inside `[MASK]`, make every change that belongs to the animation inside the function.",
+  "answer": "animate()",
+  "closed_book_guess": "requestAnimationFrame",
+  "category": "fact"
+ },
+ {
+  "id": 548,
+  "page": "Layout animation",
+  "section": "Layout animation",
+  "sentence": "One made after `[MASK]` returns lands in a later commit, without it.",
+  "answer": "animate()",
+  "closed_book_guess": "commit()",
+  "category": "fact"
+ },
+ {
+  "id": 552,
+  "page": "Navigation bar",
+  "section": "Buttons and contrast",
+  "sentence": "A development build that wants the buttons drawn straight over its own content turns the band off with the plugin's `[MASK]` option in `app.json`, then rebuilds; Expo Go keeps it on:  ",
+  "answer": "enforceContrast",
+  "closed_book_guess": "enforceNavigationBarContrast",
+  "category": "fact"
+ },
+ {
+  "id": 557,
+  "page": "Navigation bar",
+  "section": "Navigation bar",
+  "sentence": "`NavigationBarState` takes `style` and `[MASK]`:  `style` is `'light' | 'dark' | 'auto'` and names the colour of the buttons, the way `StatusBarStyle` names the colour of the status bar's text: `'dark'` is dark buttons, for a light screen behind them, and `'light'` is light buttons, for a dark one.",
+  "answer": "hidden",
+  "closed_book_guess": "color",
+  "category": "fact"
+ },
+ {
+  "id": 569,
+  "page": "Screen",
+  "section": "In a test",
+  "sentence": " In a test the window is the `conditions` the render was given, the size `@media` sees, so `render(Menu, { conditions: { width: 390, height: 844, colorScheme: 'light' } })`[MASK]`inject(Screen).window()` 390 by 844, and it follows `engine.updateConditions()`.",
+  "answer": " gives ",
+  "closed_book_guess": "; const screen = 390 by 844, and it follows `engine.updateConditions()`.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 580,
+  "page": "Sharing",
+  "section": "Sharing",
+  "sentence": "At least one of `[MASK]` or `url` is required; a request with neither resolves to `false` without opening anything.",
+  "answer": "message",
+  "closed_book_guess": "text",
+  "category": "fact"
+ },
+ {
+  "id": 589,
+  "page": "Status bar",
+  "section": "Following the color scheme",
+  "sentence": "`[MASK]` is only ever non-zero on Android; on iOS the number a layout wants instead is the safe-area top inset, from [`SafeArea`](/packages/device/safe-area).",
+  "answer": "height",
+  "closed_book_guess": "statusBarHeight",
+  "category": "fact"
+ },
+ {
+  "id": 591,
+  "page": "Status bar",
+  "section": "Status bar",
+  "sentence": "`[MASK]` adds a claim on top of whatever is there and returns the function that drops it, ready to hand to `DestroyRef.onDestroy`.",
+  "answer": "push()",
+  "closed_book_guess": "pushStyle",
+  "category": "fact"
+ },
+ {
+  "id": 595,
+  "page": "Status bar",
+  "section": "Status bar",
+  "sentence": "It also takes `[MASK]` and `translucent`, which are deprecated and do nothing.",
+  "answer": "backgroundColor",
+  "closed_book_guess": "hidden",
+  "category": "fact"
+ },
+ {
+  "id": 596,
+  "page": "Status bar",
+  "section": "Following the color scheme",
+  "sentence": " `[MASK]` is dark content while [`ColorScheme`](/packages/device/color-scheme) reports light, and light content while it reports dark.",
+  "answer": "'auto'",
+  "closed_book_guess": "StatusBarStyle",
+  "category": "fact"
+ },
+ {
+  "id": 603,
+  "page": "Vibration",
+  "section": "Vibration",
+  "sentence": "`pattern(millis, options?)` is a pattern of waits and buzzes in milliseconds, starting with a wait; `[MASK]` runs it until `stop()`, which is for something that must be answered - an alarm, a call - and is a promise to call `stop()` rather than a decoration.",
+  "answer": "repeat: true",
+  "closed_book_guess": "repeat",
+  "category": "equivalent"
+ },
+ {
+  "id": 605,
+  "page": "Device",
+  "section": "Off a device",
+  "sentence": "Most services also expose a `SOURCE` injection token, which a test overrides to drive the service without a device underneath it (`SafeArea` is the exception - it has no native module behind it, only `report()`, which `<safe-area-provider>` calls):   The same `[MASK]` work in `render()`, for a component that injects the service.",
+  "answer": "providers",
+  "closed_book_guess": "SOURCE",
+  "category": "fact"
+ },
+ {
+  "id": 610,
+  "page": "Device",
+  "section": "Off a device",
+  "sentence": "Most services also expose a `SOURCE` injection token, which a test overrides to drive the service without a device underneath it (`[MASK]` is the exception - it has no native module behind it, only `report()`, which `<safe-area-provider>` calls):   The same `providers` work in `render()`, for a component that injects the service.",
+  "answer": "SafeArea",
+  "closed_book_guess": "SafeAreaService",
+  "category": "fact"
+ },
+ {
+  "id": 611,
+  "page": "Device",
+  "section": "The OS version",
+  "sentence": " `[MASK]` is the major version of the operating system the app runs on, for a default that follows what the platform draws in that version: `26` on iOS 26.5, and the API level on Android.",
+  "answer": "OS_VERSION",
+  "closed_book_guess": "sdkVersion",
+  "category": "fact"
+ },
+ {
+  "id": 615,
+  "page": "Device",
+  "section": "Off a device",
+  "sentence": "Most services also expose a `[MASK]` injection token, which a test overrides to drive the service without a device underneath it (`SafeArea` is the exception - it has no native module behind it, only `report()`, which `<safe-area-provider>` calls):   The same `providers` work in `render()`, for a component that injects the service.",
+  "answer": "SOURCE",
+  "closed_book_guess": "MOCK_NATIVE_MODULE",
+  "category": "fact"
+ },
+ {
+  "id": 618,
+  "page": "App info",
+  "section": "What it reports",
+  "sentence": "`brand` `os`** - `iOS`, `[MASK]`, `Android`.",
+  "answer": "iPadOS",
+  "closed_book_guess": "macOS",
+  "category": "fact"
+ },
+ {
+  "id": 619,
+  "page": "App info",
+  "section": "Without the module",
+  "sentence": " On iOS and Android, a missing `[MASK]` and `expo-device` - never installed, or installed without the app being rebuilt since - leaves the service made, so injecting it does not throw.",
+  "answer": "expo-application",
+  "closed_book_guess": "expo-device",
+  "category": "fact"
+ },
+ {
+  "id": 621,
+  "page": "App info",
+  "section": "What it reports",
+  "sentence": " From `[MASK]`:  `version`** - the version people see: `CFBundleShortVersionString` on iOS, Android's `versionName`.",
+  "answer": "expo-application",
+  "closed_book_guess": "getVersionName",
+  "category": "fact"
+ },
+ {
+  "id": 629,
+  "page": "Sign in with Apple",
+  "section": "Signing in",
+  "sentence": "`AppleAuthenticationScope`, `[MASK]`, `AppleAuthenticationButtonType` and `AppleAuthenticationButtonStyle` are the module's own enums, exported here as the same values so code that uses them runs in a test, where the module cannot load.",
+  "answer": "AppleAuthenticationCredentialState",
+  "closed_book_guess": "AppleAuthenticationButtonStyle",
+  "category": "fact"
+ },
+ {
+  "id": 630,
+  "page": "Sign in with Apple",
+  "section": "Signing in",
+  "sentence": "`[MASK]`** resolves to whether a user's credential is still authorized, for a check at launch: `AppleAuthenticationCredentialState.AUTHORIZED`, `REVOKED`, `NOT_FOUND` or `TRANSFERRED`.",
+  "answer": "credentialState(user)",
+  "closed_book_guess": "getCredentialStateAsync",
+  "category": "fact"
+ },
+ {
+  "id": 632,
+  "page": "Sign in with Apple",
+  "section": "The button",
+  "sentence": "Its color and corners come from `[MASK]` and `cornerRadius`; a CSS background or border radius does not apply to it.",
+  "answer": "buttonStyle",
+  "closed_book_guess": "style",
+  "category": "fact"
+ },
+ {
+  "id": 659,
+  "page": "Background task",
+  "section": "What it does",
+  "sentence": " `[MASK]`** - whether the platform will run background work: `BackgroundTaskStatus.Available` on a device, `Restricted` on the web.",
+  "answer": "status()",
+  "closed_book_guess": "Availability",
+  "category": "fact"
+ },
+ {
+  "id": 670,
+  "page": "Battery",
+  "section": "What it reports",
+  "sentence": "`[MASK]`** - under a fifth and not charging: the point at which an app should start doing less.",
+  "answer": "low",
+  "closed_book_guess": "Low battery level",
+  "category": "fact"
+ },
+ {
+  "id": 685,
+  "page": "Biometrics",
+  "section": "Without the module",
+  "sentence": "On the web, and in a test that provides no fake, **`[MASK]` fails rather than passes without the module - `{ success: false, error: 'not_available' }` - unlike every other service here, which falls back to reporting nothing.",
+  "answer": "authenticate()",
+  "closed_book_guess": "Biometrics.authenticate",
+  "category": "equivalent"
+ },
+ {
+  "id": 692,
+  "page": "Brightness",
+  "section": "What it does",
+  "sentence": "`set(level)`** - clamps to `0..1`, applies it, and returns the function that puts back what was there before: the level an earlier `[MASK]` still holds, such as the screen underneath a pushed one, or the system's own brightness once nothing does.",
+  "answer": "set()",
+  "closed_book_guess": "set(level)",
+  "category": "equivalent"
+ },
+ {
+  "id": 695,
+  "page": "Brightness",
+  "section": "Without the module",
+  "sentence": "`[MASK]` and `restore()` do nothing and do not throw.",
+  "answer": "set()",
+  "closed_book_guess": "getBrightness",
+  "category": "fact"
+ },
+ {
+  "id": 700,
+  "page": "Browser",
+  "section": "Opening a page and signing in",
+  "sentence": "`[MASK]`** opens the system's _authentication_ session instead `ASWebAuthenticationSession` on iOS, a Custom Tab on Android - which shares the browser's cookies (so an existing session is picked up) and closes itself when the page redirects to `redirectUrl`.",
+  "answer": "signIn(url, redirectUrl)",
+  "closed_book_guess": "openUrl",
+  "category": "fact"
+ },
+ {
+  "id": 701,
+  "page": "Browser",
+  "section": "Opening a page and signing in",
+  "sentence": " `[MASK]`** shows any page in the in-app browser - `SFSafariViewController` on iOS, a Custom Tab on Android - and resolves when the person closes it.",
+  "answer": "open(url)",
+  "closed_book_guess": "openUrl",
+  "category": "fact"
+ },
+ {
+  "id": 714,
+  "page": "Camera",
+  "section": "The camera permission",
+  "sentence": "Nothing in `Camera` asks for it the directive only takes pictures - so ask yourself, with `[MASK]` against `expo-camera`'s own permission functions (see [Permissions](/packages/expo/permissions)):   Add to `Info.plist`:   The `CAMERA` (and, for video with audio, `RECORD_AUDIO`) Android permissions are added automatically by the module's config plugin.",
+  "answer": "Permission.of()",
+  "closed_book_guess": "expo-camera",
+  "category": "fact"
+ },
+ {
+  "id": 723,
+  "page": "Clipboard",
+  "section": "What it does",
+  "sentence": "`[MASK]`** - resolves to what is on the clipboard.",
+  "answer": "read()",
+  "closed_book_guess": "getText()",
+  "category": "fact"
+ },
+ {
+  "id": 725,
+  "page": "Clipboard",
+  "section": "What it does",
+  "sentence": " `[MASK]`** - a signal: how many times the pasteboard has changed since the app started reading it.",
+  "answer": "changes",
+  "closed_book_guess": "changeCount",
+  "category": "fact"
+ },
+ {
+  "id": 729,
+  "page": "Crypto",
+  "section": "What it does",
+  "sentence": "`randomValues(array)`** - fills an integer typed array with secure random values in place and hands it back, as Web Crypto's `[MASK]` does.",
+  "answer": "getRandomValues",
+  "closed_book_guess": "getRandomValues(array)",
+  "category": "equivalent"
+ },
+ {
+  "id": 738,
+  "page": "Database",
+  "section": "In a test",
+  "sentence": "It needs Node 22.13 or later, where `[MASK]` loads without a flag.",
+  "answer": "node:sqlite",
+  "closed_book_guess": "require(esm)",
+  "category": "fact"
+ },
+ {
+  "id": 744,
+  "page": "Database",
+  "section": "Foreign keys and other connection settings",
+  "sentence": "`[MASK]` runs on every open, before the migrations and outside any transaction:   Without it a schema's `REFERENCES ...",
+  "answer": "onOpen",
+  "closed_book_guess": "onOpenSchemaChange",
+  "category": "fact"
+ },
+ {
+  "id": 745,
+  "page": "Database",
+  "section": "In a test",
+  "sentence": "The stand-in has `execAsync`, `runAsync`, `getFirstAsync`, `getAllAsync`, `withTransactionAsync` and `[MASK]`.",
+  "answer": "closeAsync",
+  "closed_book_guess": "withExclusiveTransactionAsync",
+  "category": "fact"
+ },
+ {
+  "id": 746,
+  "page": "Database",
+  "section": "Foreign keys and other connection settings",
+  "sentence": "If `[MASK]` throws, the connection is closed and `ready()` rejects with its error.",
+  "answer": "onOpen",
+  "closed_book_guess": "ready()",
+  "category": "fact"
+ },
+ {
+  "id": 749,
+  "page": "Database",
+  "section": "Without the module",
+  "sentence": " `ready()` rejects with a `MissingModuleError` when `[MASK]` is missing - never installed, or installed without the app being rebuilt since - on iOS, Android and the web alike.",
+  "answer": "expo-sqlite",
+  "closed_book_guess": "NativeScriptSQLiteModule",
+  "category": "fact"
+ },
+ {
+  "id": 780,
+  "page": "Expo UI",
+  "section": "The system's close button",
+  "sentence": "Inside the element the sheet is wrapped as `@expo/ui`'s own component wraps it: a `ui-host`, the sheet, on iOS a `[MASK]` carrying the presentation modifiers, and a `ui-view-host` holding one view around the content.",
+  "answer": "ui-group",
+  "closed_book_guess": "ui-sheet-host",
+  "category": "fact"
+ },
+ {
+  "id": 785,
+  "page": "File system",
+  "section": "`cache(name)` and `document(name)`",
+  "sentence": "`File` carries `uri`, `exists`, `size`, and its own `text()`, `textSync()`, `bytes()`, `create()` and `[MASK]` - use those directly for anything beyond writing.",
+  "answer": "delete()",
+  "closed_book_guess": "remove()",
+  "category": "fact"
+ },
+ {
+  "id": 787,
+  "page": "File system",
+  "section": "`cache(name)` and `document(name)`",
+  "sentence": "`File` carries `uri`, `exists`, `[MASK]`, and its own `text()`, `textSync()`, `bytes()`, `create()` and `delete()` - use those directly for anything beyond writing.",
+  "answer": "size",
+  "closed_book_guess": "parent",
+  "category": "fact"
+ },
+ {
+  "id": 790,
+  "page": "File system",
+  "section": "`cache(name)` and `document(name)`",
+  "sentence": "`File` carries `[MASK]`, `exists`, `size`, and its own `text()`, `textSync()`, `bytes()`, `create()` and `delete()` - use those directly for anything beyond writing.",
+  "answer": "uri",
+  "closed_book_guess": "extension",
+  "category": "fact"
+ },
+ {
+  "id": 804,
+  "page": "Fonts",
+  "section": "Reading what loaded: `Fonts`",
+  "sentence": "`[MASK]`** - whether `expo-font` is installed at all.",
+  "answer": "available",
+  "closed_book_guess": "isLoadedAsync()",
+  "category": "fact"
+ },
+ {
+  "id": 807,
+  "page": "Fonts",
+  "section": "Declaring faces",
+  "sentence": "`[MASK]` takes any number of compiled sheets and does nothing at all when none of them declare a face, so bootstrap can call it unconditionally.",
+  "answer": "loadFonts()",
+  "closed_book_guess": "FontFaceSet.load",
+  "category": "fact"
+ },
+ {
+  "id": 808,
+  "page": "Fonts",
+  "section": "Install",
+  "sentence": "   Unlike most services in this package, this goes through `[MASK]`'s own JavaScript rather than its native module directly: the module takes descriptors the JavaScript builds out of an asset, and rebuilding those here would be copying its internals rather than using it.",
+  "answer": "expo-font",
+  "closed_book_guess": "FontSourceTS",
+  "category": "fact"
+ },
+ {
+  "id": 811,
+  "page": "Fonts",
+  "section": "A variable font",
+  "sentence": " A variable font is one file that covers a range of weights, declared as CSS declares it:   A weight inside the range is covered by that face, and the text keeps its `[MASK]`, since the weight is what native picks the instance by.",
+  "answer": "font-weight",
+  "closed_book_guess": "fontFamily",
+  "category": "fact"
+ },
+ {
+  "id": 815,
+  "page": "Haptics",
+  "section": "Haptics",
+  "sentence": "It talks to Expo's native module directly rather than through `[MASK]`'s own JavaScript, which adds exactly one thing on top: a throw when the module is missing.",
+  "answer": "expo-haptics",
+  "closed_book_guess": "NativeScript",
+  "category": "fact"
+ },
+ {
+  "id": 821,
+  "page": "Haptics",
+  "section": "What it does",
+  "sentence": " `[MASK]`** - a collision between interface elements.",
+  "answer": "impact(style)",
+  "closed_book_guess": "Impact",
+  "category": "fact"
+ },
+ {
+  "id": 826,
+  "page": "Image editor",
+  "section": "What it does",
+  "sentence": "`[MASK]` or `FlipType.Vertical`.",
+  "answer": "{ flip: FlipType.Horizontal }",
+  "closed_book_guess": "FlipType.Horizontal",
+  "category": "equivalent"
+ },
+ {
+  "id": 828,
+  "page": "Image editor",
+  "section": "What it does",
+  "sentence": "The options are `format` (`SaveFormat.JPEG` by default, `PNG` or `WEBP`), `compress` from 0 to 1, and `[MASK]`.",
+  "answer": "base64",
+  "closed_book_guess": "quality",
+  "category": "fact"
+ },
+ {
+  "id": 843,
+  "page": "Image picker",
+  "section": "Picking and capturing",
+  "sentence": "`options` is `[MASK]`'s own `ImagePickerOptions`, passed straight through: `mediaTypes` (`'images'`, `'videos'`, `'livePhotos'`), `allowsEditing`, `quality`, `allowsMultipleSelection` and the rest.",
+  "answer": "expo-image-picker",
+  "closed_book_guess": "Expo ImagePicker",
+  "category": "equivalent"
+ },
+ {
+  "id": 847,
+  "page": "Image picker",
+  "section": "Permissions",
+  "sentence": "Add to `[MASK]`:   Android's permissions are added automatically by the module's config plugin.",
+  "answer": "Info.plist",
+  "closed_book_guess": "app/App_Resources/Android/src/main/AndroidManifest.xml",
+  "category": "fact"
+ },
+ {
+  "id": 867,
+  "page": "On-device AI",
+  "section": "Streaming an answer into a template",
+  "sentence": " `stream()` returns a `[MASK]`: the text so far as a signal, a status, an error, and `cancel()`.",
+  "answer": "LanguageModelStream",
+  "closed_book_guess": "StreamResult",
+  "category": "fact"
+ },
+ {
+  "id": 868,
+  "page": "On-device AI",
+  "section": "The whole answer at once",
+  "sentence": "`[MASK]`** - a cap on the answer's length.",
+  "answer": "maxTokens",
+  "closed_book_guess": "maxOutputTokens",
+  "category": "fact"
+ },
+ {
+  "id": 877,
+  "page": "Live Activities",
+  "section": "What a layout can hold",
+  "sentence": "A `ui-image`** is an SF Symbol by `systemName`, an asset by `[MASK]`, or a file by `uiImage`.",
+  "answer": "assetName",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 878,
+  "page": "Live Activities",
+  "section": "What a layout can hold",
+  "sentence": "The template** is inline, and draws `ui-text`, `ui-hstack`, `ui-vstack`, `ui-zstack`, `ui-spacer`, `ui-divider`, `ui-image`, `ui-progress`, `ui-gauge`, `ui-chart`, `ui-label`, `[MASK]`, `ui-accessory-widget-background` and the shapes (`ui-rectangle`, `ui-rounded-rectangle`, `ui-uneven-rounded-rectangle`, `ui-capsule`, `ui-circle`, `ui-ellipse`), imported from `@ng-native/expo/expo-ui-components`.",
+  "answer": "ui-link",
+  "closed_book_guess": "ui-date-picker",
+  "category": "fact"
+ },
+ {
+  "id": 884,
+  "page": "Live Activities",
+  "section": "Time between updates",
+  "sentence": "A `[MASK]` with a `date` or a `timerInterval` does not draw its text.",
+  "answer": "ui-text",
+  "closed_book_guess": "TextField",
+  "category": "fact"
+ },
+ {
+  "id": 885,
+  "page": "Live Activities",
+  "section": "Time between updates",
+  "sentence": "One whose props hold neither yet, or hold something that is not a moment, draws its text instead, as does one whose `[MASK]` ends before it starts.",
+  "answer": "timerInterval",
+  "closed_book_guess": "endDate",
+  "category": "fact"
+ },
+ {
+  "id": 887,
+  "page": "Live Activities",
+  "section": "What it does",
+  "sentence": "`[MASK]`** holds why the last start or update failed, for example Live Activities turned off in Settings.",
+  "answer": "error",
+  "closed_book_guess": "activityError",
+  "category": "fact"
+ },
+ {
+  "id": 889,
+  "page": "Locale",
+  "section": "What it reports",
+  "sentence": " `[MASK]`** - every preferred locale, most preferred first, always at least one entry.",
+  "answer": "locales",
+  "closed_book_guess": "preferredLanguages",
+  "category": "fact"
+ },
+ {
+  "id": 893,
+  "page": "Locale",
+  "section": "What it reports",
+  "sentence": "`locale`** - the first entry of `[MASK]`, the one to format with.",
+  "answer": "locales",
+  "closed_book_guess": "preferredLocales",
+  "category": "fact"
+ },
+ {
+  "id": 912,
+  "page": "Maps",
+  "section": "Install",
+  "sentence": "`[MASK]`' config plugin adds it when asked, writing `NSLocationWhenInUseUsageDescription` into `Info.plist` and the location permissions into the Android manifest:   Then ask for it at runtime, for example with [Location](/packages/expo/location).",
+  "answer": "expo-maps",
+  "closed_book_guess": "expo-location",
+  "category": "fact"
+ },
+ {
+  "id": 913,
+  "page": "Maps",
+  "section": "Inputs",
+  "sentence": "`polylines`** - lines, such as a route: `[MASK]`.",
+  "answer": "{ id, coordinates, color, width }",
+  "closed_book_guess": "Polyline[]",
+  "category": "fact"
+ },
+ {
+  "id": 923,
+  "page": "Media library",
+  "section": "What it does",
+  "sentence": "`[MASK]`** - the handle for an asset whose id is already known.",
+  "answer": "asset(id)",
+  "closed_book_guess": "getAssetById",
+  "category": "fact"
+ },
+ {
+  "id": 925,
+  "page": "Media library",
+  "section": "What it does",
+  "sentence": "`[MASK]`** and **`metadata(query?)`** - the assets a query finds, as handles or as details.",
+  "answer": "assets(query?)",
+  "closed_book_guess": "getAssets(query?)",
+  "category": "fact"
+ },
+ {
+  "id": 929,
+  "page": "Media library",
+  "section": "Without the module",
+  "sentence": "On the web, and in a test that provides no fake, both permissions are refused, `save()`, `album()` and `[MASK]` resolve to `null`, `asset()` returns `null`, the queries and `albums()` resolve to empty lists, `watch()` stays `null`, and every other method resolves without doing anything.",
+  "answer": "createAlbum()",
+  "closed_book_guess": "requestPermissions()",
+  "category": "fact"
+ },
+ {
+  "id": 935,
+  "page": "Native views",
+  "section": "Community views",
+  "sentence": "`[MASK]` is the typed component over the element, as `SegmentedControl` is over its own.",
+  "answer": "DateTimePicker",
+  "closed_book_guess": "SegmentedBar",
+  "category": "fact"
+ },
+ {
+  "id": 942,
+  "page": "Native views",
+  "section": "Expo's own views",
+  "sentence": "`options.viewName` names one of several views a module has (the _default_ view, the module's first, takes no name), or `{ ios, android }` for a view named differently on each platform; `options.defaultProps` are props the module's React component would have applied before native saw them - `[MASK]` resolving a `contentFit` string, for instance.",
+  "answer": "expo-image",
+  "closed_book_guess": "e.g. `Image`’s component resolving a `contentFit` string, for instance.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 959,
+  "page": "Notifications",
+  "section": "App configuration",
+  "sentence": "None of this is checked at build time - a missing `[MASK]` surfaces as `getExpoPushToken()` rejecting, and a missing FCM config surfaces as a token that silently never arrives on Android.",
+  "answer": "projectId",
+  "closed_book_guess": "GoogleService-Info.plist",
+  "category": "fact"
+ },
+ {
+  "id": 965,
+  "page": "Notifications",
+  "section": "Action buttons and replies",
+  "sentence": "A notification opts in with `[MASK]`.",
+  "answer": "categoryIdentifier",
+  "closed_book_guess": "actionsType: 'inline'",
+  "category": "fact"
+ },
+ {
+  "id": 968,
+  "page": "Ongoing notifications",
+  "section": "What it does",
+  "sentence": "`[MASK]`** holds why the last start or update failed, for example notifications turned off for the app.",
+  "answer": "error",
+  "closed_book_guess": "lastError",
+  "category": "fact"
+ },
+ {
+  "id": 979,
+  "page": "Device orientation",
+  "section": "What it reports and does",
+  "sentence": "`lock(lock)`** - pins the screen to `[MASK]` (portrait, and on a phone nothing else), `'all'`, `'portrait'` or `'landscape'`.",
+  "answer": "'default'",
+  "closed_book_guess": "orientation",
+  "category": "fact"
+ },
+ {
+  "id": 990,
+  "page": "Permissions",
+  "section": "Reading and asking",
+  "sentence": "`[MASK]`** is the method most call sites want: it has the permission if it can be had, and only shows a dialog if showing one would do something.",
+  "answer": "ensure()",
+  "closed_book_guess": "requestPermission",
+  "category": "fact"
+ },
+ {
+  "id": 998,
+  "page": "Video and audio player",
+  "section": "`videoPlayer(source, options?)` and `audioPlayer(source, options?)`",
+  "sentence": "Video reports these across several named events; audio reports all of them together on one status event, since that is how `[MASK]` emits them.",
+  "answer": "expo-audio",
+  "closed_book_guess": "AVPlayer",
+  "category": "fact"
+ },
+ {
+  "id": 1005,
+  "page": "Video and audio player",
+  "section": "`videoPlayer(source, options?)` and `audioPlayer(source, options?)`",
+  "sentence": "`state`** - a signal, updated from the player's own change events: `playing`, `status` (`'idle'`, `'loading'`, `[MASK]`, `'error'`), `currentTime`, `duration`, `muted`, `volume`, and `ended` (set once playback runs to the end, cleared when it starts again).",
+  "answer": "'readyToPlay'",
+  "closed_book_guess": "'ready'",
+  "category": "fact"
+ },
+ {
+  "id": 1013,
+  "page": "Screen capture",
+  "section": "Without the module",
+  "sentence": "On the web, and in a test that provides no fake, `screenshots` stays at `0`, `available()`[MASK]`false`, the permission is refused, and every other method resolves without doing anything.",
+  "answer": " resolves to ",
+  "closed_book_guess": "returns",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1021,
+  "page": "Search field",
+  "section": "Inputs and events",
+  "sentence": "The field's text and placeholder take the `font-family`, `font-size`, `[MASK]` and `font-style` its CSS resolves to, from a class on the field, its own style, or what it inherits, as a `<text>` beside it does.",
+  "answer": "font-weight",
+  "closed_book_guess": "color",
+  "category": "fact"
+ },
+ {
+  "id": 1024,
+  "page": "Search field",
+  "section": "Inputs and events",
+  "sentence": "The system font, or a family no `@font-face` declares, is drawn at that weight, and slanted for `[MASK]`, as a `<text>` is.",
+  "answer": "italic",
+  "closed_book_guess": "italicized",
+  "category": "equivalent"
+ },
+ {
+  "id": 1029,
+  "page": "Search field",
+  "section": "In a form",
+  "sentence": "The form's `[MASK]` rule disables it, and leaving the field marks it touched:  ",
+  "answer": "disabled()",
+  "closed_book_guess": "required",
+  "category": "fact"
+ },
+ {
+  "id": 1037,
+  "page": "Sensors",
+  "section": "What each one reports",
+  "sentence": "`[MASK]`** - everything at once: `acceleration`, `accelerationIncludingGravity`, `rotation`, `rotationRate`, `orientation`, `interval`.",
+  "answer": "DeviceMotion",
+  "closed_book_guess": "DeviceMotionEvent",
+  "category": "fact"
+ },
+ {
+  "id": 1038,
+  "page": "Sensors",
+  "section": "What each one reports",
+  "sentence": "`DeviceMotion`** - everything at once: `acceleration`, `[MASK]`, `rotation`, `rotationRate`, `orientation`, `interval`.",
+  "answer": "accelerationIncludingGravity",
+  "closed_book_guess": "gravity",
+  "category": "fact"
+ },
+ {
+  "id": 1041,
+  "page": "Sensors",
+  "section": "Sensors",
+  "sentence": " Six motion and environment sensors, bound to `expo-sensors`: `Accelerometer`, `Gyroscope`, `Magnetometer`, `DeviceMotion`, `Barometer` and `[MASK]`.",
+  "answer": "LightSensor",
+  "closed_book_guess": "Pedometer",
+  "category": "fact"
+ },
+ {
+  "id": 1042,
+  "page": "Sensors",
+  "section": "What each one reports",
+  "sentence": "Call the returned cleanup function when one caller no longer needs readings, and `[MASK]` only to end all of them.",
+  "answer": "stop()",
+  "closed_book_guess": "stopSensors",
+  "category": "fact"
+ },
+ {
+  "id": 1046,
+  "page": "Splash screen",
+  "section": "Without the module",
+  "sentence": " On iOS and Android, a missing `[MASK]` - never installed, or installed without the app being rebuilt since - throws a `MissingModuleError` when `hold()` is called.",
+  "answer": "expo-splash-screen",
+  "closed_book_guess": "SplashScreenModule",
+  "category": "fact"
+ },
+ {
+  "id": 1057,
+  "page": "Storage",
+  "section": "`signal(key, initial)`",
+  "sentence": "A stored `null` is not that: it is valid JSON, so a `signal<string | null>('choice', 'fallback')` whose stored value is `null`[MASK]`null`, not `'fallback'`.",
+  "answer": " reads back ",
+  "closed_book_guess": "returns",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1058,
+  "page": "Storage",
+  "section": "The smallest useful example",
+  "sentence": "  Reading `[MASK]` is reading the preference.",
+  "answer": "theme()",
+  "closed_book_guess": "getString(key)",
+  "category": "example_name"
+ },
+ {
+  "id": 1070,
+  "page": "Store review",
+  "section": "Without the module",
+  "sentence": "On the web, and in a test that provides no fake, `available()` and `hasAction()` resolve to `false`, `[MASK]` is `null`, and `request()` resolves without doing anything.",
+  "answer": "storeUrl()",
+  "closed_book_guess": "reviewUrl",
+  "category": "fact"
+ },
+ {
+  "id": 1074,
+  "page": "Store review",
+  "section": "What it does",
+  "sentence": "`[MASK]`** - that store page, for a \"rate us\" link that opens the store directly.",
+  "answer": "storeUrl()",
+  "closed_book_guess": "market://details?id=PACKAGE_NAME",
+  "category": "fact"
+ },
+ {
+  "id": 1087,
+  "page": "Tracking",
+  "section": "Install",
+  "sentence": "   The text in Apple's dialog is `NSUserTrackingUsageDescription`, which the module's config plugin sets from its `[MASK]` option, with a generic sentence when the option is not given.",
+  "answer": "userTrackingPermission",
+  "closed_book_guess": "userTrackingUsageDescription",
+  "category": "fact"
+ },
+ {
+  "id": 1102,
+  "page": "Using a module",
+  "section": "Faking a module in a test",
+  "sentence": "One that has no answer to give without its module, `[MASK]` and `FileSystem` among them, throws a `MissingModuleError` that says so.",
+  "answer": "Crypto",
+  "closed_book_guess": "CameraRoll",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1114,
+  "page": "Apple Watch",
+  "section": "Add the watch app",
+  "sentence": "Add it to the plugins in `[MASK]`, then create `targets/watch/expo-target.config.js`:   Every Swift file in `targets/watch` belongs to the watch app.",
+  "answer": "app.json",
+  "closed_book_guess": "app.config.js",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1115,
+  "page": "Apple Watch",
+  "section": "Add the watch app",
+  "sentence": "A device build is signed with your team, set as `ios.appleTeamId` in `[MASK]`.",
+  "answer": "app.json",
+  "closed_book_guess": "nativescript.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 1123,
+  "page": "Apple Watch",
+  "section": "Reachability",
+  "sentence": " `[MASK]` is true only while the watch app is open and its session active: live messages need that.",
+  "answer": "reachable",
+  "closed_book_guess": "isReachable",
+  "category": "fact"
+ },
+ {
+  "id": 1127,
+  "page": "Home screen widgets",
+  "section": "What its user chooses",
+  "sentence": "List them in `[MASK]`, as the widget's `configuration`:   The layout reads what was chosen from `environment().configuration`, typed by the `environment` input:    A widget with settings needs iOS 17.** Before it, the widget is not offered at all, with its defaults or otherwise.",
+  "answer": "app.json",
+  "closed_book_guess": "AppIntentConfiguration",
+  "category": "fact"
+ },
+ {
+  "id": 1161,
+  "page": "The CSS engine",
+  "section": "Custom properties and tokens",
+  "sentence": "`[MASK]` resolves per node against whatever tokens are in scope, so a design token set from a parent `--primary` retheming a child's internals - works, while writing a selector to reach inside a component's own markup does not.",
+  "answer": "var()",
+  "closed_book_guess": "var(--primary)",
+  "category": "equivalent"
+ },
+ {
+  "id": 1173,
+  "page": "What CSS reaches a device",
+  "section": "Selectors that are dropped",
+  "sentence": "Tailwind's `[MASK]` and `has-data-[...]` variants are supported.",
+  "answer": "has-[...]",
+  "closed_book_guess": "group-data-[...]",
+  "category": "fact"
+ },
+ {
+  "id": 1179,
+  "page": "Fabric",
+  "section": "From an element to a native view",
+  "sentence": "A third-party Fabric component - `react-native-screens`, for instance - is added with `registerViewName('rns-screen', 'RNSScreen')`, optionally with `defaultProps` for a native view whose React wrapper normally supplies a base style in JavaScript (`[MASK]` and `Modal` both need this, and it is already applied for you).",
+  "answer": "ScrollView",
+  "closed_book_guess": "ScreenContainer",
+  "category": "fact"
+ },
+ {
+  "id": 1183,
+  "page": "Fabric",
+  "section": "From an element to a native view",
+  "sentence": "Element names must also be lowercase - a capitalized tag such as `[MASK]` matches no component's selector, so it would be an unmapped name too.",
+  "answer": "<View>",
+  "closed_book_guess": "StackLayout",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1187,
+  "page": "Icons",
+  "section": "Sizing",
+  "sentence": " Icons are square and drawn from their `[MASK]`, so `size` sets both width and height in points.",
+  "answer": "viewBox",
+  "closed_book_guess": "center",
+  "category": "fact"
+ },
+ {
+  "id": 1192,
+  "page": "Icons",
+  "section": "Sizing",
+  "sentence": " Icons are square and drawn from their `viewBox`, so `[MASK]` sets both width and height in points.",
+  "answer": "size",
+  "closed_book_guess": "fontSize",
+  "category": "fact"
+ },
+ {
+  "id": 1196,
+  "page": "Icons",
+  "section": "Icons",
+  "sentence": "React Native has no `[MASK]` to insert into and no CSS engine to size against, so there is no other way to get an SVG on screen.",
+  "answer": "innerHTML",
+  "closed_book_guess": "DOM",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1210,
+  "page": "Metro",
+  "section": "What it does, roughly",
+  "sentence": "`[MASK]` is an optional peer, needed only when the app has a `.md` file.",
+  "answer": "marked",
+  "closed_book_guess": "react-native-markdown-display",
+  "category": "fact"
+ },
+ {
+  "id": 1218,
+  "page": "Metro",
+  "section": "The smallest setup",
+  "sentence": "`android.layoutAnimations` turns on React Native's `enableLayoutAnimationsOnAndroid` feature flag in the `MainApplication.kt` that `[MASK]` writes, keeping every other flag as the app's React Native release level sets it:   React Native ships that flag off, and with it off [`LayoutAnimation`](/packages/device/layout-animation) makes its change on Android without animating it.",
+  "answer": "expo prebuild",
+  "closed_book_guess": "the NativeScript CLI",
+  "category": "fact"
+ },
+ {
+  "id": 1219,
+  "page": "Metro",
+  "section": "The smallest setup",
+  "sentence": "With the option on, a prebuild fails when `[MASK]` is not the Kotlin class Expo's template writes, or already overrides the flag some other way, and says so.",
+  "answer": "MainApplication",
+  "closed_book_guess": "MainApplication.kt",
+  "category": "equivalent"
+ },
+ {
+  "id": 1230,
+  "page": "Nx",
+  "section": "The files",
+  "sentence": " The app is the template's: `src/app/app.ts`, `src/main.ts` and `src/app/app.test.ts` as they are, and an `[MASK]` named for the project.",
+  "answer": "app.json",
+  "closed_book_guess": "app.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 1237,
+  "page": "Bootstrapping",
+  "section": "Telling native from the web",
+  "sentence": " `[MASK]` is `'native'` in an app on a device.",
+  "answer": "PLATFORM_ID",
+  "closed_book_guess": "platformBrowserDynamic().platformId",
+  "category": "fact"
+ },
+ {
+  "id": 1251,
+  "page": "The renderer",
+  "section": "What `Renderer2` calls become",
+  "sentence": "Events map by name.** `[MASK]` becomes Fabric's `topTouchEnd`.",
+  "answer": "(touchEnd)",
+  "closed_book_guess": "touchend",
+  "category": "equivalent"
+ },
+ {
+  "id": 1255,
+  "page": "The renderer",
+  "section": "`@defer` triggers",
+  "sentence": "`on viewport` honors a `[MASK]` option; `rootMargin` is not applied, and the root is always the window.",
+  "answer": "threshold",
+  "closed_book_guess": "rootMargin",
+  "category": "fact"
+ },
+ {
+  "id": 1256,
+  "page": "The renderer",
+  "section": "`@defer` triggers",
+  "sentence": "`[MASK]` honors a `threshold` option; `rootMargin` is not applied, and the root is always the window.",
+  "answer": "on viewport",
+  "closed_book_guess": "viewport",
+  "category": "equivalent"
+ },
+ {
+  "id": 1262,
+  "page": "Platform",
+  "section": "Platform",
+  "sentence": "`mount` also returns an `engine` you can hold onto: it carries commit stats (counts and timings) and is what [`[MASK]`](/packages/device)'s `watchConditions(engine)` re-resolves media queries against on rotation or a system theme change.",
+  "answer": "@ng-native/device",
+  "closed_book_guess": "device",
+  "category": "equivalent"
+ },
+ {
+  "id": 1264,
+  "page": "Platform",
+  "section": "Platform",
+  "sentence": "Reach for this package exactly once, in your app's entry file, to call `[MASK]`.",
+  "answer": "mount()",
+  "closed_book_guess": "platformNativeScriptDynamic",
+  "category": "fact"
+ },
+ {
+  "id": 1272,
+  "page": "File routes",
+  "section": "routeMeta",
+  "sentence": " A page's `routeMeta` is its route config, as in Analog:   It takes `[MASK]` (a string or a resolver), `canActivate`, `canActivateChild`, `canDeactivate`, `canMatch`, `resolve`, `data`, `providers` and `runGuardsAndResolvers`.",
+  "answer": "title",
+  "closed_book_guess": "path",
+  "category": "fact"
+ },
+ {
+  "id": 1273,
+  "page": "File routes",
+  "section": "routeMeta",
+  "sentence": "What the file's place sets (`path`, `matcher`, `[MASK]`, `children` and the rest) throws if `routeMeta` sets it too.",
+  "answer": "component",
+  "closed_book_guess": "redirectTo",
+  "category": "fact"
+ },
+ {
+  "id": 1274,
+  "page": "File routes",
+  "section": "Testing",
+  "sentence": "A glob that loads each file routes its pages lazily, and an eager one (`[MASK]`) routes them as they are.",
+  "answer": "{ eager: true }",
+  "closed_book_guess": "eagerGlob",
+  "category": "fact"
+ },
+ {
+  "id": 1276,
+  "page": "File routes",
+  "section": "Markdown pages",
+  "sentence": "It reads its file with `injectMarkdownPage()` and draws the tokens with `<markdown>`:    `injectMarkdownPage()` returns `filename` (the path from the pages folder, `about.md`), `[MASK]`, `attributes`, `content` and `tokens`.",
+  "answer": "slug",
+  "closed_book_guess": "frontmatter",
+  "category": "fact"
+ },
+ {
+  "id": 1277,
+  "page": "File routes",
+  "section": "routeMeta",
+  "sentence": "`runGuardsAndResolvers`** is `[MASK]` unless the page says otherwise, as in Analog, so a resolver runs again when the query changes.",
+  "answer": "'paramsOrQueryParamsChange'",
+  "closed_book_guess": "always",
+  "category": "fact"
+ },
+ {
+  "id": 1279,
+  "page": "File routes",
+  "section": "Testing",
+  "sentence": "Replace the module that calls it with an `import.meta.glob` of the same files, which `fileRoutes` takes as it is:   A glob's keys are read from the first `pages/` in them, so `/src/app/pages/about.page.ts` and `[MASK]` are both `/about`.",
+  "answer": "./pages/about.page.ts",
+  "closed_book_guess": "/src/app/pages/about/index.page.ts",
+  "category": "example_name"
+ },
+ {
+  "id": 1288,
+  "page": "The native header",
+  "section": "A bottom toolbar",
+  "sentence": "`type=\"fluidSpacer\"` takes all the room there is, so what follows it sits at the trailing edge, and `[MASK]` is a gap of `width` points.",
+  "answer": "type=\"fixedSpacer\"",
+  "closed_book_guess": "spacer",
+  "category": "fact"
+ },
+ {
+  "id": 1289,
+  "page": "The native header",
+  "section": "Defaults for every header",
+  "sentence": "The defaults cover the header's appearance: `userInterfaceStyle`, `backgroundColor`, `color`, `blurEffect`, `hideShadow`, `[MASK]`, the `title*` and `largeTitle*` colors and fonts, `largeTitleHideShadow`, `backTitleFontFamily`, `backTitleFontSize` and `backButtonDisplayMode`.",
+  "answer": "translucent",
+  "closed_book_guess": "backButtonColor",
+  "category": "fact"
+ },
+ {
+  "id": 1294,
+  "page": "Screens and navigation",
+  "section": "Screens and navigation",
+  "sentence": "A guard that redirects, by returning a `UrlTree`, sends the navigation to its page with the same intent: `reset('/home')` from a signed-out user whose `home` guard redirects to `/login` leaves the sign-in page alone on the stack, `replace()` swaps the top screen for it, and `[MASK]` presents it the way it was asked for.",
+  "answer": "present()",
+  "closed_book_guess": "navigate()",
+  "category": "fact"
+ },
+ {
+  "id": 1308,
+  "page": "Tabs",
+  "section": "Tabs",
+  "sentence": "That is why `[MASK]` takes no content while `<native-header-item>` does, and why customization beyond the basics lives in the `standardAppearance`/`scrollEdgeAppearance` inputs rather than in markup.",
+  "answer": "<native-tab>",
+  "closed_book_guess": "<native-tab-item>",
+  "category": "fact"
+ },
+ {
+  "id": 1326,
+  "page": "Router",
+  "section": "Setting it up",
+  "sentence": "`[MASK]` loads every lazy route right after start-up instead:  ",
+  "answer": "withPreloading(PreloadAllModules)",
+  "closed_book_guess": "PreloadAllModules",
+  "category": "equivalent"
+ },
+ {
+  "id": 1361,
+  "page": "Variants",
+  "section": "Platform, disabled and dark variants",
+  "sentence": "`mount` puts it there itself - on a phone from `nativePlatform()`, and `[MASK]` from `@ng-native/web`'s `mount` - so `ios:`, `android:`, `web:` and `native:` (either native platform) work with nothing to set up.",
+  "answer": "platform-web",
+  "closed_book_guess": "webPlatform()",
+  "category": "fact"
+ },
+ {
+  "id": 1374,
+  "page": "Tailwind",
+  "section": "A shared library in an Nx workspace",
+  "sentence": "Add the preset's file name to the rule's `[MASK]` list in the root `eslint.config.mjs`, beside the pattern Nx puts there for the ESLint configurations it requires the same way:  ",
+  "answer": "allow",
+  "closed_book_guess": "ignores",
+  "category": "fact"
+ },
+ {
+  "id": 1379,
+  "page": "API reference",
+  "section": "Asserting how much re-rendered",
+  "sentence": "`commits` counts commits, and `[MASK]` those after the mount that took longer than 8ms, a frame at 120Hz; the timings beside them (`firstCommitMs`, `worstCommitMs`, `worstRenderMs`) are real time, and belong in a benchmark rather than an assertion.",
+  "answer": "slowCommits",
+  "closed_book_guess": "slowCommits counts",
+  "category": "equivalent"
+ },
+ {
+  "id": 1392,
+  "page": "End-to-end tests",
+  "section": "Selectors",
+  "sentence": "Note that it is `[MASK]`, not `id` or `nativeID`: those commit as `nativeID`, which native does not expose to the accessibility tree.",
+  "answer": "testID",
+  "closed_book_guess": "automationText",
+  "category": "fact"
+ },
+ {
+  "id": 1394,
+  "page": "End-to-end tests",
+  "section": "Selectors",
+  "sentence": "Note that it is `testID`, not `[MASK]` or `nativeID`: those commit as `nativeID`, which native does not expose to the accessibility tree.",
+  "answer": "id",
+  "closed_book_guess": "automationText",
+  "category": "fact"
+ },
+ {
+  "id": 1399,
+  "page": "Setup",
+  "section": "`SyntaxError: Unexpected token 'typeof'` in a component with gestures or animations",
+  "sentence": "It stands in for the animation entry points too: `@ng-native/components/reanimated`, `[MASK]` and `react-native-worklets`.",
+  "answer": "react-native-reanimated",
+  "closed_book_guess": "@ng-native/components/gesture-handler",
+  "category": "fact"
+ },
+ {
+  "id": 1404,
+  "page": "Setup",
+  "section": "A syntax error at a decorator",
+  "sentence": "  with nothing more to go on, from a file that has a `@Component` or `[MASK]` in it, means the file reached the runtime uncompiled.",
+  "answer": "@Injectable",
+  "closed_book_guess": "@NgModule",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1417,
+  "page": "Testing a form",
+  "section": "Testing a form",
+  "sentence": "And a node's `props` are what native receives: a disabled button is one whose `[MASK]` says so, which is also what a screen reader announces.",
+  "answer": "accessibilityState",
+  "closed_book_guess": "isEnabled",
+  "category": "fact"
+ },
+ {
+  "id": 1419,
+  "page": "Testing a form",
+  "section": "Testing a form",
+  "sentence": "`getByLabelText` finds the field by its `[MASK]`, and `getByDisplayValue` finds a field by what is in it.",
+  "answer": "accessibilityLabel",
+  "closed_book_guess": "label",
+  "category": "fact"
+ },
+ {
+  "id": 1421,
+  "page": "Testing a form",
+  "section": "Testing a form",
+  "sentence": "`[MASK]` focuses the field, sends one native change per character, and blurs it at the end, as the keyboard would.",
+  "answer": "user.type",
+  "closed_book_guess": "typeText",
+  "category": "fact"
+ },
+ {
+  "id": 1423,
+  "page": "Testing a form",
+  "section": "Testing a form",
+  "sentence": "And a node's `[MASK]` are what native receives: a disabled button is one whose `accessibilityState` says so, which is also what a screen reader announces.",
+  "answer": "props",
+  "closed_book_guess": "accessibility props",
+  "category": "fact"
+ },
+ {
+  "id": 1425,
+  "page": "Testing HttpClient",
+  "section": "Testing HttpClient",
+  "sentence": "Requests go to `HttpTestingController` instead of the network, and the test answers them:   `[MASK]` is the component's injector, so anything the app provides can be reached from the test the same way.",
+  "answer": "componentRef.injector",
+  "closed_book_guess": "TestBed",
+  "category": "fact"
+ },
+ {
+  "id": 1428,
+  "page": "Testing the router",
+  "section": "Testing the router",
+  "sentence": "A page that takes a route parameter as an input needs `[MASK]` in the test's providers, the same as the app does, or the input is never set and a required one throws on first render:   `provideNativeRouter`'s native-specific features, such as `withLinkParent`, sit alongside Angular's own router features in the same call, and both still route:  ",
+  "answer": "withComponentInputBinding()",
+  "closed_book_guess": "provideNativeRouter",
+  "category": "fact"
+ },
+ {
+  "id": 1430,
+  "page": "Testing the router",
+  "section": "Testing the router",
+  "sentence": "Pressing a `nativeRouterLink` pushes the next screen:   With eagerly declared routes the pushed screen is already there when the press resolves, but a `loadComponent`, a guard or a resolver each put the screen a few tasks further away, and `[MASK]` keeps working when a route gains one.",
+  "answer": "findByText",
+  "closed_book_guess": "waitForAngularStability",
+  "category": "fact"
+ },
+ {
+  "id": 1431,
+  "page": "Testing the router",
+  "section": "Testing the router",
+  "sentence": "A page that takes a route parameter as an input needs `withComponentInputBinding()` in the test's providers, the same as the app does, or the input is never set and a required one throws on first render:   `[MASK]`'s native-specific features, such as `withLinkParent`, sit alongside Angular's own router features in the same call, and both still route:  ",
+  "answer": "provideNativeRouter",
+  "closed_book_guess": "provideRouter",
+  "category": "fact"
+ },
+ {
+  "id": 1434,
+  "page": "Testing the router",
+  "section": "Testing the router",
+  "sentence": "Pressing a `[MASK]` pushes the next screen:   With eagerly declared routes the pushed screen is already there when the press resolves, but a `loadComponent`, a guard or a resolver each put the screen a few tasks further away, and `findByText` keeps working when a route gains one.",
+  "answer": "nativeRouterLink",
+  "closed_book_guess": "button",
+  "category": "fact"
+ },
+ {
+  "id": 1436,
+  "page": "Testing the router",
+  "section": "Following a deep link",
+  "sentence": "Pass the same function the app gives `[MASK]`, then check the parent is underneath as well as the page:   Give `provideNativeRouter` the same router features the app does - a test whose providers are missing one the app declares will pass for routes that do not need it and fail, confusingly, only on the ones that do.",
+  "answer": "withLinkParent",
+  "closed_book_guess": "provideNativeRouter",
+  "category": "fact"
+ },
+ {
+  "id": 1437,
+  "page": "Testing the router",
+  "section": "Testing the router",
+  "sentence": "Routing works with the native stack, the same providers the app uses, and `[MASK]` as the root.",
+  "answer": "NativeStackOutlet",
+  "closed_book_guess": "NativeScriptRouterOutlet",
+  "category": "fact"
+ },
+ {
+  "id": 1439,
+  "page": "Testing with services",
+  "section": "A service on its own",
+  "sentence": " A service with no component to render goes through `[MASK]`.",
+  "answer": "injectService()",
+  "closed_book_guess": "unit testing",
+  "category": "fact"
+ },
+ {
+  "id": 1444,
+  "page": "Testing with services",
+  "section": "A service on its own",
+  "sentence": "It creates the service in an app's root injector, built with the `[MASK]` given, so a `@Service()` and every root service it injects resolve as they do in the app.",
+  "answer": "providers",
+  "closed_book_guess": "TestBed.providers",
+  "category": "equivalent"
+ },
+ {
+  "id": 1454,
+  "page": "Testing styles",
+  "section": "A style with a transition",
+  "sentence": "Or render with `[MASK]` in `conditions`, where the component has a `@media (prefers-reduced-motion: reduce)` rule that drops the transition, and assert at once.",
+  "answer": "reducedMotion: true",
+  "closed_book_guess": "reducedMotion",
+  "category": "equivalent"
+ },
+ {
+  "id": 1456,
+  "page": "Testing styles",
+  "section": "Testing styles",
+  "sentence": "A global stylesheet, which is what Tailwind classes resolve against, is passed to `render()` as `[MASK]`, compiled by the same CSS compiler Metro uses:   Styles flatten onto a node's props rather than sitting under a `style` key, so `backgroundColor` on the node is exactly what the native view is told to paint.",
+  "answer": "globalStyles",
+  "closed_book_guess": "cssProvider",
+  "category": "fact"
+ },
+ {
+  "id": 1458,
+  "page": "Testing styles",
+  "section": "Testing styles",
+  "sentence": "A global stylesheet, which is what Tailwind classes resolve against, is passed to `[MASK]` as `globalStyles`, compiled by the same CSS compiler Metro uses:   Styles flatten onto a node's props rather than sitting under a `style` key, so `backgroundColor` on the node is exactly what the native view is told to paint.",
+  "answer": "render()",
+  "closed_book_guess": "renderToStaticMarkup",
+  "category": "fact"
+ },
+ {
+  "id": 1509,
+  "page": "Storybook",
+  "section": "With Tailwind",
+  "sentence": " Add `[MASK]` beside `ngNativeWeb()` in `.storybook/main.ts`:   Then import the app's stylesheet at the top of `.storybook/preview.ts`:   The stylesheet is the one [With Tailwind](/packages/web#with-tailwind) sets up.",
+  "answer": "tailwindcss()",
+  "closed_book_guess": "withTailwind()",
+  "category": "fact"
+ },
+ {
+  "id": 1511,
+  "page": "Storybook",
+  "section": "Setting it up",
+  "sentence": "`[MASK]`:   `.storybook/preview.ts`:   Each story mounts as an app of its own.",
+  "answer": ".storybook/main.ts",
+  "closed_book_guess": "Configure the preview file",
+  "category": "fact"
+ },
+ {
+  "id": 1512,
+  "page": "Storybook",
+  "section": "Setting it up",
+  "sentence": "Storybook calls `[MASK]` again when a control changes, which mounts the component afresh with the new inputs, and runs the cleanup `beforeEach` returns when it leaves the story.",
+  "answer": "render",
+  "closed_book_guess": "renderStoryFn",
+  "category": "fact"
+ },
+ {
+  "id": 1522,
+  "page": "Web",
+  "section": "With Tailwind 3",
+  "sentence": "`src/styles.css`, linked from `[MASK]` as above, holds the directives.",
+  "answer": "index.html",
+  "closed_book_guess": "angular.json",
+  "category": "fact"
+ },
+ {
+  "id": 1523,
+  "page": "Web",
+  "section": "Beside a native app",
+  "sentence": "`[MASK]` is the one above with the web entry as its module script:   `src/main.web.ts`:   `npm run web` then serves the app in a browser, and `npm start` still runs it on a device.",
+  "answer": "index.html",
+  "closed_book_guess": "The web target is the one above with the web entry as its module script",
+  "category": "fact"
+ },
+ {
+  "id": 1525,
+  "page": "Web",
+  "section": "With Tailwind",
+  "sentence": "An `import './styles.css';` in the web entry works too where TypeScript knows `.css` modules, as `[MASK]`'s types declare them.",
+  "answer": "vite/client",
+  "closed_book_guess": "Vite",
+  "category": "fact"
+ }
+]

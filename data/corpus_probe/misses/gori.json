@@ -1,0 +1,506 @@
+[
+ {
+  "id": 4,
+  "page": "ai-setup",
+  "section": "3. Hand off safely with read-only",
+  "sentence": "To give an agent (or a teammate you do not fully trust with the target) only the read tools, install it read-only:   Read-only keeps `list_history`, `get_flow`, `list_sitemap`, and the other inspection tools while disabling `[MASK]`, issue writes, and the intercept mutators.",
+  "answer": "send_request",
+  "closed_book_guess": "replay tools",
+  "category": "fact"
+ },
+ {
+  "id": 7,
+  "page": "ai-setup",
+  "section": "1. Install the server into your client",
+  "sentence": "Hermes reads `[MASK]` when it is set, and otherwise `~/.hermes` (`%LOCALAPPDATA%\\hermes` on Windows).",
+  "answer": "$HERMES_HOME",
+  "closed_book_guess": "HERMES_HOME",
+  "category": "equivalent"
+ },
+ {
+  "id": 8,
+  "page": "ai-setup",
+  "section": "1. Install the server into your client",
+  "sentence": "If they do not appear, confirm the client was restarted and that `[MASK]` is on the `PATH` the client uses.",
+  "answer": "gori",
+  "closed_book_guess": "gori-server",
+  "category": "fact"
+ },
+ {
+  "id": 43,
+  "page": "quick-start",
+  "section": "Option D: Set up an Android emulator over adb",
+  "sentence": "`[MASK]` puts gori's root in the system store as root, so apps trust it without a network security config.",
+  "answer": "--system",
+  "closed_book_guess": "adb install-cert",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "quick-start",
+  "section": "First-run wizard",
+  "sentence": "If the port is busy, `[MASK]` again keeps it.",
+  "answer": "Enter",
+  "closed_book_guess": "retry",
+  "category": "fact"
+ },
+ {
+  "id": 64,
+  "page": "authorize",
+  "section": "Reading a Verdict",
+  "sentence": "`[MASK]` on a second admin session is exactly right.",
+  "answer": "same",
+  "closed_book_guess": "Polling",
+  "category": "fact"
+ },
+ {
+  "id": 67,
+  "page": "authorize",
+  "section": "Reading a Verdict",
+  "sentence": "`[MASK]` on a low-privilege identity is a likely bypass.",
+  "answer": "same",
+  "closed_book_guess": "Allowing a request",
+  "category": "fact"
+ },
+ {
+  "id": 70,
+  "page": "cookie",
+  "section": "Two Lenses",
+  "sentence": "**OPTIONS** pins how it is read: the format (`Ctrl-A` cycles `auto` / `flask` / `rack` / `[MASK]`; `auto` detects it from the punctuation), the Django HMAC algorithm, and a signing salt.",
+  "answer": "django",
+  "closed_book_guess": "tornado",
+  "category": "fact"
+ },
+ {
+  "id": 71,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "Over MCP, `[MASK]` / `cookie_verify` / `cookie_crack` / `cookie_forge` are read tools available even under `--read-only`, since they touch no network or state.",
+  "answer": "cookie_decode",
+  "closed_book_guess": "cookie_inspect",
+  "category": "fact"
+ },
+ {
+  "id": 72,
+  "page": "cookie",
+  "section": "Two Lenses",
+  "sentence": "**OPTIONS** pins how it is read: the format (`Ctrl-A` cycles `auto` / `[MASK]` / `rack` / `django`; `auto` detects it from the punctuation), the Django HMAC algorithm, and a signing salt.",
+  "answer": "flask",
+  "closed_book_guess": "json",
+  "category": "fact"
+ },
+ {
+  "id": 73,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "`--type` pins the format (default: auto-detect), `--salt` sets the Flask/Django signing salt, `--algorithm` the Django HMAC algorithm (`sha256` or `sha1`; `--forge` defaults to `sha256`, while `--verify`/`[MASK]` read it off the cookie's signature length when you leave it unset, so an older SHA-1 app is not misread as a bad key), and `--format` is `text` or `json`.",
+  "answer": "--crack",
+  "closed_book_guess": "--unsign",
+  "category": "fact"
+ },
+ {
+  "id": 74,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "Over MCP, `cookie_decode` / `cookie_verify` / `[MASK]` / `cookie_forge` are read tools available even under `--read-only`, since they touch no network or state.",
+  "answer": "cookie_crack",
+  "closed_book_guess": "cookie_encode",
+  "category": "fact"
+ },
+ {
+  "id": 77,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "Over MCP, `cookie_decode` / `[MASK]` / `cookie_crack` / `cookie_forge` are read tools available even under `--read-only`, since they touch no network or state.",
+  "answer": "cookie_verify",
+  "closed_book_guess": "cookie_encode",
+  "category": "fact"
+ },
+ {
+  "id": 78,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "Flask/Django `--forge` takes a `--payload` JSON; Rack takes the opaque `[MASK]`; `--timestamp UNIX` stamps the forged cookie with that second instead of now.",
+  "answer": "--value",
+  "closed_book_guess": "--rack-session",
+  "category": "fact"
+ },
+ {
+  "id": 81,
+  "page": "cookie",
+  "section": "Headless",
+  "sentence": "Over MCP, `cookie_decode` / `cookie_verify` / `cookie_crack` / `[MASK]` are read tools available even under `--read-only`, since they touch no network or state.",
+  "answer": "cookie_forge",
+  "closed_book_guess": "cookie_encode",
+  "category": "fact"
+ },
+ {
+  "id": 85,
+  "page": "decoder",
+  "section": "Converters",
+  "sentence": "The JSON is a *projection*, not a re-encoding: what JSON has no room for comes back named rather than folded away (`[MASK]` for a byte string, `{\"$tag\": …}` for a CBOR tag, `{\"$ext\": …}` for a MessagePack extension, a decimal string for an integer too wide for a JSON number).",
+  "answer": "{\"$bin\": …}",
+  "closed_book_guess": "$bytes",
+  "category": "fact"
+ },
+ {
+  "id": 94,
+  "page": "hotkeys",
+  "section": "Editor Keysets {#editor-keysets}",
+  "sentence": "A line selection stays whole lines while it grows: `[MASK]` / `⇧↓` add a line at a time under both keysets, and under `vim-ish` a plain `j` / `k` does too, so `⇧V` `j` `j` `d` deletes three lines.",
+  "answer": "⇧↑",
+  "closed_book_guess": "⇧J",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "hotkeys",
+  "section": "The same nine letters on all nine strips",
+  "sentence": "`[MASK]` and `Ctrl-W` are shown beside their rows, and they work from any pane on all nine tabs.",
+  "answer": "Ctrl-N",
+  "closed_book_guess": "Ctrl-Q",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "jwt",
+  "section": "Headless",
+  "sentence": "Over MCP, `jwt_decode` / `jwt_verify` / `[MASK]` / `jwt_attacks` are read tools available even under `--read-only`: they touch no network and write nothing.",
+  "answer": "jwt_encode",
+  "closed_book_guess": "jwt_sign",
+  "category": "fact"
+ },
+ {
+  "id": 111,
+  "page": "jwt",
+  "section": "Headless",
+  "sentence": "On `--encode`, `--set KEY=VALUE` patches one claim (repeatable; the value is JSON when it parses, so `[MASK]` is a boolean and `role=admin` a string) and `--payload JSON` replaces the whole claims object; the two are mutually exclusive.",
+  "answer": "admin=true",
+  "closed_book_guess": "true",
+  "category": "ambiguous"
+ },
+ {
+  "id": 112,
+  "page": "jwt",
+  "section": "Encrypted Tokens (JWE)",
+  "sentence": "gori recognizes it everywhere it recognizes a JWS (the JWT tab, the Decoder, the body pretty-printer, `gori run jwt`, MCP `jwt_decode`) and shows the **protected header**: the `alg` that wrapped the content-encryption key, the `enc` that encrypted the claims, and the `[MASK]`.",
+  "answer": "kid",
+  "closed_book_guess": "zip",
+  "category": "ambiguous"
+ },
+ {
+  "id": 115,
+  "page": "jwt",
+  "section": "Headless",
+  "sentence": "`--verify` needs `--secret` or `[MASK]` (pass `--secret ''` to check the empty secret), prints `verified: yes|no` with a `reason` on a no, and exits 1 unless the token verifies, as `gori run cookie --verify` does.",
+  "answer": "--key",
+  "closed_book_guess": "--public-key",
+  "category": "fact"
+ },
+ {
+  "id": 156,
+  "page": "repeater-and-fuzzer",
+  "section": "Payloads from the Project",
+  "sentence": "What ended a read short is said, never silent: `[MASK]` and `--payload-from-max-values` raise the first two.",
+  "answer": "--payload-from-max-flows",
+  "closed_book_guess": "--payload-from-max-keys",
+  "category": "fact"
+ },
+ {
+  "id": 161,
+  "page": "repeater-and-fuzzer",
+  "section": "Environment Variables",
+  "sentence": "Fix it to `$ENV.NAME` / `[MASK]`, or write `$$NAME` if the literal text really is what you meant.",
+  "answer": "$BIND.NAME",
+  "closed_book_guess": "${ENV.NAME}",
+  "category": "fact"
+ },
+ {
+  "id": 166,
+  "page": "scanning",
+  "section": "Discover: Spider & Brute-Force",
+  "sentence": "It reads the response headers.** `Link` (how a paginated API names its next page, and nowhere else), `[MASK]`, `Refresh`, and the `Path` a `Set-Cookie` scopes itself to (the application saying which subtree it is mounted under, exactly the kind of unlinked directory this engine is for).",
+  "answer": "Content-Location",
+  "closed_book_guess": "Location",
+  "category": "ambiguous"
+ },
+ {
+  "id": 226,
+  "page": "statusline",
+  "section": "When one line is not enough {#script}",
+  "sentence": " Past a segment or two, `[MASK]` stops being a field you type into and becomes a script you keep.",
+  "answer": "command",
+  "closed_book_guess": "statusline",
+  "category": "fact"
+ },
+ {
+  "id": 229,
+  "page": "statusline",
+  "section": "When the command fails {#failures}",
+  "sentence": "A run that overruns `[MASK]` is terminated and the row reads `⋯ (timed out)`, and a command gori could not start at all reads `⋯ (statusline failed)` (or `⋯ (statusline error)` for an internal fault).",
+  "answer": "timeout",
+  "closed_book_guess": "statusline-timeout",
+  "category": "fact"
+ },
+ {
+  "id": 241,
+  "page": "themes",
+  "section": "Custom Themes",
+  "sentence": " You can add your own themes as JSON files, dropped into:   (`[MASK]` is the gori home directory; override it with `$GORI_HOME`.) The file name is the theme name.",
+  "answer": "~/.gori",
+  "closed_book_guess": "~/.gori/themes",
+  "category": "fact"
+ },
+ {
+  "id": 250,
+  "page": "attack-a-jwt",
+  "section": "3. Run the attack presets",
+  "sentence": "Over MCP the `[MASK]` tool returns the identical list, taking the same key as `public_key` (and `jwt_decode` / `jwt_verify` / `jwt_encode` cover steps 1 and 2).",
+  "answer": "jwt_attacks",
+  "closed_book_guess": "jwt_attack",
+  "category": "equivalent"
+ },
+ {
+  "id": 256,
+  "page": "attack-a-jwt",
+  "section": "3. Run the attack presets",
+  "sentence": "Over MCP the `jwt_attacks` tool returns the identical list, taking the same key as `[MASK]` (and `jwt_decode` / `jwt_verify` / `jwt_encode` cover steps 1 and 2).",
+  "answer": "public_key",
+  "closed_book_guess": "attack_preset",
+  "category": "fact"
+ },
+ {
+  "id": 259,
+  "page": "attack-a-jwt",
+  "section": "2. Tamper a claim",
+  "sentence": "If the token is `ES256` / `RS256` / `EdDSA` and you hold the signing key, `[MASK]` takes it (inline PEM or a path), and `--verify` answers the question the decode cannot:   Checkpoint.** OUTPUT holds a token carrying your edited claim, re-signed with the algorithm and secret you chose.",
+  "answer": "--key",
+  "closed_book_guess": "--sign-key",
+  "category": "fact"
+ },
+ {
+  "id": 264,
+  "page": "carry-a-session",
+  "section": "5. Carry more than one session",
+  "sentence": "Checkpoint.** `gori run session list` shows both slots, and a `[MASK]` run prints `slot: sending as low-priv` before its first request.",
+  "answer": "--slot low-priv",
+  "closed_book_guess": "gori run session use low-priv",
+  "category": "fact"
+ },
+ {
+  "id": 287,
+  "page": "crack-and-forge-cookies",
+  "section": "3. Crack the secret",
+  "sentence": "Crack re-signs the cookie with each candidate and stops at the one whose signature matches, drawing candidates from a newline-delimited file (`[MASK]`) or a comma-separated list (`--secrets`):   Over MCP this is `cookie_crack`.",
+  "answer": "--wordlist",
+  "closed_book_guess": "--secrets-file",
+  "category": "fact"
+ },
+ {
+  "id": 300,
+  "page": "decode-and-transform",
+  "section": "4. Save and reuse a named chain",
+  "sentence": "Save it with `[MASK]` (or the palette's **Save chain by name**); saving under an existing name updates it.",
+  "answer": "Ctrl-S",
+  "closed_book_guess": "Ctrl+S",
+  "category": "equivalent"
+ },
+ {
+  "id": 303,
+  "page": "decode-and-transform",
+  "section": "4. Save and reuse a named chain",
+  "sentence": "Load one later with `[MASK]`, which opens a picker over everything you've saved, each name shown next to its spec, where you type to filter and `Ctrl-X` deletes the highlighted entry.",
+  "answer": "Ctrl-O",
+  "closed_book_guess": "chain load",
+  "category": "fact"
+ },
+ {
+  "id": 304,
+  "page": "decode-and-transform",
+  "section": "2. Build a chain",
+  "sentence": "Steps run left to right, and each one's output feeds the next:   Add a step to hash or re-encode the result: `[MASK]`, `url-encode`, `hex-encode`.",
+  "answer": "sha256",
+  "closed_book_guess": "base64-encode",
+  "category": "ambiguous"
+ },
+ {
+  "id": 315,
+  "page": "fuzz-a-parameter",
+  "section": "When the only difference is the clock",
+  "sentence": "A send that **timed out** counts as a match on `[MASK]`, because a payload that pushed the origin past your own timeout is the loudest version of the same signal, and it used to be discarded as an error while the sleep that failed came back in 40 ms and got reported.",
+  "answer": "--mt",
+  "closed_book_guess": "timeout",
+  "category": "fact"
+ },
+ {
+  "id": 341,
+  "page": "intercept-and-modify",
+  "section": "1. Arm intercept",
+  "sentence": "The same tokens the History filter speaks work here (`host:`, `path:`, `[MASK]`, `scheme:`, `status:`, plus `AND` / `OR` / `NOT`).",
+  "answer": "method:",
+  "closed_book_guess": "method",
+  "category": "equivalent"
+ },
+ {
+  "id": 345,
+  "page": "map-the-attack-surface",
+  "section": "map-the-attack-surface",
+  "sentence": "This playbook folds your captured History into a deduplicated `[MASK]` tree, collapses the id noise that hides the shape, then runs Discover to pull in the endpoints no click ever reached.",
+  "answer": "host → path",
+  "closed_book_guess": "endpoint",
+  "category": "fact"
+ },
+ {
+  "id": 350,
+  "page": "map-the-attack-surface",
+  "section": "4. Read and act on the surface",
+  "sentence": "`p` on a host or subtree lists every parameter name its requests carried, where it appeared and whether a value came back reflected (**Target → Params**, `[MASK]`).",
+  "answer": "gori run sitemap params",
+  "closed_book_guess": "Params pane",
+  "category": "fact"
+ },
+ {
+  "id": 353,
+  "page": "map-the-attack-surface",
+  "section": "1. Browse to seed the map",
+  "sentence": "`[MASK]` limits it to in-scope hosts, matching the scope lens, and `--hide-static` leaves out images, fonts and media (in the TUI, `Space` `Z` `s` under **Display…**, a lens History shares).",
+  "answer": "--in-scope",
+  "closed_book_guess": "--scope",
+  "category": "fact"
+ },
+ {
+  "id": 354,
+  "page": "run-an-ai-co-pilot",
+  "section": "1. Install the MCP server",
+  "sentence": " `[MASK]` is a JSON-RPC server the client spawns over stdio: it sends requests on STDIN and reads results on STDOUT.",
+  "answer": "gori mcp",
+  "closed_book_guess": "gori-mcp",
+  "category": "fact"
+ },
+ {
+  "id": 360,
+  "page": "run-an-ai-co-pilot",
+  "section": "1. Install the MCP server",
+  "sentence": "If they don't appear, confirm the client restarted and that `[MASK]` is on the `PATH` it uses.",
+  "answer": "gori",
+  "closed_book_guess": "gori-mcp-server",
+  "category": "fact"
+ },
+ {
+  "id": 362,
+  "page": "run-an-ai-co-pilot",
+  "section": "4. Hand off safely",
+  "sentence": " To hand the project to an agent, or a teammate, you don't fully trust with the target, install it read-only:   Read-only keeps the inspection tools (`list_history`, `get_flow`, `list_sitemap`, `compare_flows`) and the pure-compute helpers (`decode`, `jwt_decode`) while disabling `[MASK]`, issue writes, and the intercept mutators.",
+  "answer": "send_request",
+  "closed_book_guess": "replay_request",
+  "category": "fact"
+ },
+ {
+  "id": 365,
+  "page": "run-an-ai-co-pilot",
+  "section": "2. Give the agent a task",
+  "sentence": "Checkpoint.** A new flow from the agent's `[MASK]` appears in your **History**, and any issue it filed shows up on the **Issues** tab.",
+  "answer": "send_request",
+  "closed_book_guess": "session",
+  "category": "fact"
+ },
+ {
+  "id": 389,
+  "page": "test-access-control",
+  "section": "2. Make an identity for the weaker user",
+  "sentence": "Checkpoint.** `gori run session list` (or `i` on the Authorize tab) shows three identities: `as-captured`, `[MASK]` and `low-priv`.",
+  "answer": "anonymous",
+  "closed_book_guess": "as-admin",
+  "category": "fact"
+ },
+ {
+  "id": 394,
+  "page": "triage-and-report",
+  "section": "3. Prove it with the Comparer",
+  "sentence": "Checkpoint.** The diff highlights the change that proves the finding: a status flip like `[MASK]`, or the one value that moved.",
+  "answer": "403 → 200",
+  "closed_book_guess": "200 → 500",
+  "category": "ambiguous"
+ },
+ {
+  "id": 401,
+  "page": "triage-and-report",
+  "section": "4. Keep notes and links",
+  "sentence": "The cursor opens on `[MASK]` when nothing has been filed against what you are linking yet (the common first filing), and on the first existing issue once it has links.",
+  "answer": "+ New issue…",
+  "closed_book_guess": "the issue title field",
+  "category": "fact"
+ },
+ {
+  "id": 411,
+  "page": "capabilities",
+  "section": "Current boundaries",
+  "sentence": "An upstream `https://` spelling is legacy, not TLS to the proxy.** Bare `host:port`, `[MASK]`, and `https://…` currently all mean a plaintext HTTP CONNECT proxy in `network.upstream_proxy` and a project pin (only in `HTTPS_PROXY` and its siblings does `https://` mean TLS to the proxy).",
+  "answer": "http://…",
+  "closed_book_guess": "socks5://…",
+  "category": "fact"
+ },
+ {
+  "id": 422,
+  "page": "cli",
+  "section": "run project",
+  "sentence": "In `--format json` those are the `current` and `tui_active` fields, beside a `[MASK]` count and the project `description` (read in the same pass as the count, so it costs no extra open); the count of what was hidden goes to stderr, so a JSON pipe stays a clean array.",
+  "answer": "flows",
+  "closed_book_guess": "request_count",
+  "category": "fact"
+ },
+ {
+  "id": 430,
+  "page": "cli",
+  "section": "run retest",
+  "sentence": "`run` exits `0`[MASK]`pass` and `1` otherwise.",
+  "answer": " on ",
+  "closed_book_guess": "if",
+  "category": "equivalent"
+ },
+ {
+  "id": 442,
+  "page": "config",
+  "section": "strip_alt_svc {#strip-alt-svc}",
+  "sentence": "Every flow whose response was stripped carries an advisory naming what was removed and quoting the removed value, in the History detail pane, `gori run history --format json` and the MCP `[MASK]` tool.",
+  "answer": "get_flow",
+  "closed_book_guess": "flow_detail",
+  "category": "fact"
+ },
+ {
+  "id": 452,
+  "page": "miss-ring",
+  "section": "miss-ring",
+  "sentence": "The [Settings guide](/guide/settings/) covers what she does and the [`[MASK]` key](/reference/config/) covers how to configure her.",
+  "answer": "companion",
+  "closed_book_guess": "config",
+  "category": "fact"
+ },
+ {
+  "id": 455,
+  "page": "miss-ring",
+  "section": "Poses {#poses}",
+  "sentence": "A winking `[MASK]` or `doze` would read as a rendering glitch:   The badge in column 7 is the only thing outside the ring, and it says what she could not fit into a face:  ",
+  "answer": "alert",
+  "closed_book_guess": "blink",
+  "category": "fact"
+ },
+ {
+  "id": 475,
+  "page": "query-language",
+  "section": "Combining Terms",
+  "sentence": "An unknown `field:` name is read as a typo, not as free text: `gori run history`, `[MASK]` (and its `params`, `js` and `export` verbs) and `gori run probe` **refuse** it, name the nearest real field, and exit non-zero.",
+  "answer": "gori run sitemap",
+  "closed_book_guess": "`gori run replay`",
+  "category": "fact"
+ },
+ {
+  "id": 478,
+  "page": "query-language",
+  "section": "Matching Request and Response Content",
+  "sentence": "`[MASK]` works for a held **WebSocket message** and for an **extract-rule** condition, where the payload is in hand, but not at an HTTP hold gate, because that gate is what decides whether the body gets buffered in the first place.",
+  "answer": "body:",
+  "closed_book_guess": "body_contains",
+  "category": "fact"
+ }
+]

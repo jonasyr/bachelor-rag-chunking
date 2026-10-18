@@ -21,6 +21,14 @@ Stand 18.10.2026: Pilot `data/pilot/hard` von einem Agenten als Entwicklungshilf
 Unterschiede der Antwortqualität zwischen den Strategien trotz unterschiedlichem Retrieval; daraus präzisierte
 Prüfregeln und vorbefüllte Kernpunkte ([ADR 0037](adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)).
 Vor dem Einfrieren prüfen, ob die relevanten Abschnitte auch die API-Referenz abdecken.
+Stand 18.10.2026 (später): Das Antwortmodell kennt Vue.js (Pilot an der Obergrenze, 14 von 16 Pilotfragen ohne
+Retrieval vollständig, Lückentext-Probe: 7 % Wissenslücke, Closed-Book-Fragen: 15 von 20 richtig). Korpuswechsel zur
+Dokumentation von e2e beschlossen, mit Closed-Book-Prüfung
+jeder Frage und Kontrolle K0 ([ADR 0038](adr/0038-korpus-e2e.md), Messung: [Korpusauswahl](reference/corpus-selection.md)).
+Umsetzung in eigenen Pull Requests: (1) Entscheidung und Messung (dieser Stand); (2) Snapshot und Preprocessing für
+e2e (MDX-Bereinigung ohne Inhaltsverlust), Jonas prüft die Nachschlageliste; (3) Chunking, Embeddings und K1 neu; (4) Katalogwerkzeuge: Bereiche,
+Stichprobenplan, Closed-Book-Prüfung im Editor; (5) neuer Pilot auf e2e. Bis dahin beschreiben Korpus-Seiten und
+Pipeline noch Vue.js.
 
 ## Zeitplan (13.10.–24.12.2026)
 
@@ -29,7 +37,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 
 | Zeitraum | Phase | Schwerpunkte | Ergebnis |
 |----------|-------|--------------|----------|
-| 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py` (test-first), Korpusmanifest; am 14.10. auf Guide + API + Style Guide erweitert (erledigt) | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll |
+| 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py` (test-first), Korpusmanifest; am 14.10. auf Guide + API + Style Guide erweitert (erledigt); am 18.10. Wechsel zu e2e beschlossen ([ADR 0038](adr/0038-korpus-e2e.md)), Snapshot und Neuaufbau ab 19.10. | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll |
 | 20.10.–02.11. | Pipeline | Chunking C1–C3 und K1, Embedding, Chroma, Retrieval; Embedding-Modell, SDK und Chroma gepinnt (erledigt 13.–14.10.); Generierung und GPT-Modell erledigt 17.10.; offen: Prototyp mit einer Frage | lauffähige Pipeline, Modellversionen dokumentiert |
 | 20.10.–08.11. | Fragenkatalog (parallel) | 48 Fragen in sechs Blöcken zu 8 (zwei je Woche ab 20.10., Einfrieren 06.11.; Stichprobenplan und KI-Durchsicht nach jedem Block, [ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)), Referenzantworten, `relevant_section_ids` (blind annotiert, [ADR 0027](adr/0027-blinde-annotation.md)); Vortest von Prompt und Rubrik (entschieden 17.10.): die vorhandenen Pilotfragen des Sets `hard` (nicht aus dem Katalog, mit Referenzantworten) über die ganze Kette inkl. Generierung und blinder Bewertung, bewertet werden nur die ersten Fragen (`--limit`); ergänzt die Retrieval-Pilotproben mit 8 und 16 Fragen vom 14.10. ([Experiment-Protokoll](reference/experiment-record.md)) und hält den Katalog unberührt ([ADR 0027](adr/0027-blinde-annotation.md)) | `questions.csv`, `ground_truth.csv` |
 | 03.–09.11. | Auswertungsskripte | Relevanz per Token-Überlappung (erledigt in `retrieve.py`/`relevance.py`); Recall/Precision/MRR/Hit@5, RAGAS, Kostenerfassung, Kontext-Tokens je Antwort | `evaluate_retrieval.py`, `evaluate_answers.py` getestet |

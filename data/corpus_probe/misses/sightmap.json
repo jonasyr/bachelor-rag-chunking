@@ -1,0 +1,335 @@
+[
+ {
+  "id": 20,
+  "page": "Sightmap Browser Commands: Managing Chrome Sessions",
+  "section": "Typical flow",
+  "sentence": "`[MASK]` confirms `● running` and lists open tabs.",
+  "answer": "sightmap browser status",
+  "closed_book_guess": "`browser status`",
+  "category": "equivalent"
+ },
+ {
+  "id": 22,
+  "page": "Sightmap Browser Commands: Managing Chrome Sessions",
+  "section": "`browser inject`",
+  "sentence": "It is backed by CDP `[MASK]`, held on the daemon's session-lifetime connection (a script added over a per-command connection would be dropped the moment that command exits).",
+  "answer": "Page.addScriptToEvaluateOnNewDocument",
+  "closed_book_guess": "session.evaluate",
+  "category": "fact"
+ },
+ {
+  "id": 27,
+  "page": "Sightmap Browser Commands: Managing Chrome Sessions",
+  "section": "`browser mcp`",
+  "sentence": "`[MASK]` distinguishes three states: **native** WebMCP (a browser-provided `document.modelContext`), a **polyfilled** one (provided by a page script), and **absent**.",
+  "answer": "mcp list",
+  "closed_book_guess": "WebMCP status",
+  "category": "fact"
+ },
+ {
+  "id": 30,
+  "page": "Sightmap CLI: Snapshot, Capture, and Inspect",
+  "section": "`inspect`",
+  "sentence": "By default, it includes `data-*`, `aria-*`, `role`, `type`, `href`, `name`, `for`, `action`, `src`, and `[MASK]`.",
+  "answer": "placeholder",
+  "closed_book_guess": "alt",
+  "category": "fact"
+ },
+ {
+  "id": 36,
+  "page": "Sightmap CLI: Snapshot, Capture, and Inspect",
+  "section": "Typical flow",
+  "sentence": " Run `[MASK]` from the directory containing your `.sightmap/` corpus.",
+  "answer": "sightmap browser start",
+  "closed_book_guess": "sightmap snapshot",
+  "category": "fact"
+ },
+ {
+  "id": 49,
+  "page": "Sightmap CLI: Corpus Health Tools Reference",
+  "section": "`sightmap stats`",
+  "sentence": "The field names are consumed by CI outside this repo, so they are stable: `views`, `components`, `requests`, `properties`, `[MASK]`, and `per_view`, whose rows carry `name`, `route`, `components`, and `requests`.",
+  "answer": "memory",
+  "closed_book_guess": "per_component",
+  "category": "fact"
+ },
+ {
+  "id": 77,
+  "page": "Sightmap CLI: Integration Tools Reference",
+  "section": "Typical flow",
+  "sentence": "Save a `[MASK]` or `.yml` file under a watched corpus directory.",
+  "answer": ".yaml",
+  "closed_book_guess": ".sightmap",
+  "category": "fact"
+ },
+ {
+  "id": 84,
+  "page": "Sightmap CLI: Integration Tools Reference",
+  "section": "`sightmap atlas list`",
+  "sentence": "Takes `--category`, `[MASK]`, `--json`, `--index`, and `--refresh`.",
+  "answer": "--limit",
+  "closed_book_guess": "--tag",
+  "category": "fact"
+ },
+ {
+  "id": 92,
+  "page": "Sightmap Browser Commands: Interacting with the Live Page",
+  "section": "Sightmap Browser Commands: Interacting with the Live Page",
+  "sentence": "Pass `[MASK]` whenever two or more content tabs are open.",
+  "answer": "--tab",
+  "closed_book_guess": "--tab-index",
+  "category": "fact"
+ },
+ {
+  "id": 101,
+  "page": "Sightmap CLI Reference: Conventions, Shared Flags, and Exit Codes",
+  "section": "Global conventions",
+  "sentence": "`browser navigate` and `browser eval` parse `--addr` and `[MASK]` directly, so use the double-dash form shown in this reference.",
+  "answer": "--tab",
+  "closed_book_guess": "--wait-Until",
+  "category": "fact"
+ },
+ {
+  "id": 120,
+  "page": "Sightmap View Sets: Capture Layout, the Novelty Gate, and Pruning",
+  "section": "The capture layout",
+  "sentence": "`{stamp}` is a UTC timestamp in `YYYYMMDDTHHMMSSZ` form, so lexical and chronological order match:   Two files per capture:  `[MASK]`** contains the human-readable annotated tree.",
+  "answer": "{stamp}.snap",
+  "closed_book_guess": "tree.txt",
+  "category": "fact"
+ },
+ {
+  "id": 137,
+  "page": "Selectors and Match Strategy in Sightmap",
+  "section": "Three matching rules",
+  "sentence": "A broad request entry such as `[MASK]` and a specific entry such as `/api/flights/search` can both match one call.",
+  "answer": "/api/**",
+  "closed_book_guess": "`/api/*`",
+  "category": "ambiguous"
+ },
+ {
+  "id": 145,
+  "page": "Selectors and Match Strategy in Sightmap",
+  "section": "The `data-component` convention",
+  "sentence": "If the app already exposes a stable `[MASK]`, ID, or semantic attribute, use that instead of adding another marker.",
+  "answer": "data-testid",
+  "closed_book_guess": "class",
+  "category": "ambiguous"
+ },
+ {
+  "id": 161,
+  "page": "Sightmap: Runtime Context for Agents Using Your Web App",
+  "section": "How Sightmap works",
+  "sentence": "Run `npm install -g @sightmap/sightmap`, then `sightmap skills install` to add the `sightmap-authoring` and `[MASK]` skills to your agent harness.",
+  "answer": "sightmap-browser",
+  "closed_book_guess": "sightmap-runtime",
+  "category": "fact"
+ },
+ {
+  "id": 162,
+  "page": "Sightmap: Runtime Context for Agents Using Your Web App",
+  "section": "How Sightmap works",
+  "sentence": "Run `npm install -g @sightmap/sightmap`, then `[MASK]` to add the `sightmap-authoring` and `sightmap-browser` skills to your agent harness.",
+  "answer": "sightmap skills install",
+  "closed_book_guess": "sightmap init",
+  "category": "fact"
+ },
+ {
+  "id": 172,
+  "page": "Sightmap Conformance Fixtures: The Language-Agnostic Test Suite",
+  "section": "Contributing a new fixture",
+  "sentence": "Write `sightmap/*.yaml` and `[MASK]`.",
+  "answer": "expected.json",
+  "closed_book_guess": "sightmap/*.json",
+  "category": "fact"
+ },
+ {
+  "id": 212,
+  "page": "Sightmap JSON Schema: Editor Validation and CI Setup",
+  "section": "Pinning and vendoring",
+  "sentence": " The `$id` URL above tracks `[MASK]`, so its contents can change.",
+  "answer": "main",
+  "closed_book_guess": "the latest schema version",
+  "category": "ambiguous"
+ },
+ {
+  "id": 222,
+  "page": "Sightmap Schema Reference",
+  "section": "Global vs view-scoped",
+  "sentence": "Global** (`[MASK]` or `requests:` at file root): matched against every view.",
+  "answer": "components:",
+  "closed_book_guess": "routes:",
+  "category": "fact"
+ },
+ {
+  "id": 232,
+  "page": "Sightmap Schema Reference",
+  "section": "Message properties",
+  "sentence": "A `stack` source has no meaningful bare-regex scan, the same reasoning that requires `[MASK]` for a request's headers source.",
+  "answer": "path",
+  "closed_book_guess": "`headers`",
+  "category": "fact"
+ },
+ {
+  "id": 234,
+  "page": "Sightmap Versioning Policy: Spec Stream vs Project SemVer",
+  "section": "Pre-1.0 (today)",
+  "sentence": "We won't introduce a `version: 2` until the project hits `[MASK]` and we have a real break to commit to.",
+  "answer": "1.0.0",
+  "closed_book_guess": "1.0",
+  "category": "equivalent"
+ },
+ {
+  "id": 249,
+  "page": "Sightkick CLI Reference: build, browser, call, runtime, and skills",
+  "section": "Sightkick CLI Reference: build, browser, call, runtime, and skills",
+  "sentence": "It shells out to the `[MASK]` CLI for browser work, so both need to be on your `PATH`.",
+  "answer": "sightmap",
+  "closed_book_guess": "sightkick",
+  "category": "fact"
+ },
+ {
+  "id": 251,
+  "page": "Sightkick CLI Reference: build, browser, call, runtime, and skills",
+  "section": "`sightkick skills install`",
+  "sentence": " Installs the agent skills into `[MASK]`, or a directory you name.",
+  "answer": "~/.agents/skills",
+  "closed_book_guess": "`.agents/skills`",
+  "category": "fact"
+ },
+ {
+  "id": 278,
+  "page": "Sightkick: Compile WebMCP Tools From Your Sightmap",
+  "section": "A first tool",
+  "sentence": " The corpus already names a `FareCard` component with `price` and `[MASK]` properties.",
+  "answer": "stops",
+  "closed_book_guess": "zone",
+  "category": "example_name"
+ },
+ {
+  "id": 282,
+  "page": "Sightkick: Compile WebMCP Tools From Your Sightmap",
+  "section": "Sightkick: Compile WebMCP Tools From Your Sightmap",
+  "sentence": " Sightkick compiles a `[MASK]` corpus and a `.sightkick/` tool layer into [WebMCP](https://webmachinelearning.github.io/webmcp/) tool IR.",
+  "answer": ".sightmap/",
+  "closed_book_guess": "Sightmap",
+  "category": "equivalent"
+ },
+ {
+  "id": 284,
+  "page": "Sightkick: Compile WebMCP Tools From Your Sightmap",
+  "section": "Install",
+  "sentence": "That writes four agent skills into `[MASK]`:  ",
+  "answer": "~/.agents/skills",
+  "closed_book_guess": ".agents/skills",
+  "category": "fact"
+ },
+ {
+  "id": 305,
+  "page": "Sightmap Environments and Origins: Deploy Targets and Hosts",
+  "section": "Origin URLs",
+  "sentence": "Wildcards are allowed in three places only:  `*` inside the leftmost host label: `https://deploy-preview-*--acme.netlify.app` `**` as the whole leftmost label, matching one or more labels: `[MASK]` `*` as the port: `http://localhost:*`  A host pattern never matches its own bare suffix: `https://*.acme.com` does not match `https://acme.com`.",
+  "answer": "https://**.acme.com",
+  "closed_book_guess": "https://**.preview.acme.com",
+  "category": "ambiguous"
+ },
+ {
+  "id": 310,
+  "page": "Sightmap Environments and Origins: Deploy Targets and Hosts",
+  "section": "Environments",
+  "sentence": "A **native** environment (`platform: ios` or `android`) is identified by its `[MASK]` (bundle ID or application ID) and an optional `build_type`.",
+  "answer": "app_id",
+  "closed_book_guess": "application_id",
+  "category": "fact"
+ },
+ {
+  "id": 317,
+  "page": "Sightmap Messages and Signals: Console Patterns and Named Predicates",
+  "section": "Messages",
+  "sentence": "The reference capture emits `log`, `debug`, `info`, `warn`, `error`, and `[MASK]`.",
+  "answer": "exception",
+  "closed_book_guess": "trace",
+  "category": "fact"
+ },
+ {
+  "id": 319,
+  "page": "Sightmap Messages and Signals: Console Patterns and Named Predicates",
+  "section": "Messages",
+  "sentence": "**An uncaught exception or unhandled rejection arrives as `exception`, not `error`**, so a corpus that wants exceptions must say `[MASK]`.",
+  "answer": "level: EXCEPTION",
+  "closed_book_guess": "exception",
+  "category": "equivalent"
+ },
+ {
+  "id": 328,
+  "page": "The Sightmap Specification: YAML Format Overview",
+  "section": "Top-level fields",
+  "sentence": "`components` and `[MASK]` at the file root are global and match against every view.",
+  "answer": "requests",
+  "closed_book_guess": "patterns",
+  "category": "fact"
+ },
+ {
+  "id": 332,
+  "page": "The Sightmap Specification: YAML Format Overview",
+  "section": "Top-level fields",
+  "sentence": "`[MASK]` and `requests` at the file root are global and match against every view.",
+  "answer": "components",
+  "closed_book_guess": "headers",
+  "category": "fact"
+ },
+ {
+  "id": 346,
+  "page": "Sightmap Requests: Routes, Methods, and Payload Shapes",
+  "section": "Properties",
+  "sentence": "Each entry has a `[MASK]` and an `extract` object:    `pattern` is an [RE2](/reference/schema#regular-expressions) regex applied to the value `path` selects; capture group 1 is the value when the pattern has one.",
+  "answer": "name",
+  "closed_book_guess": "pattern",
+  "category": "fact"
+ },
+ {
+  "id": 347,
+  "page": "Sightmap Requests: Routes, Methods, and Payload Shapes",
+  "section": "Properties",
+  "sentence": "Each entry has a `name` and an `extract` object:    `pattern` is an [RE2](/reference/schema#regular-expressions) regex applied to the value `[MASK]` selects; capture group 1 is the value when the pattern has one.",
+  "answer": "path",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 357,
+  "page": "Sightmap Views: Routes, Specificity, and Scoping",
+  "section": "Most specific wins",
+  "sentence": "`[MASK]` matches both routes and resolves to `UserAdmin`.",
+  "answer": "/users/admin",
+  "closed_book_guess": "I can’t determine the masked term from the sentence alone.",
+  "category": "example_name"
+ },
+ {
+  "id": 369,
+  "page": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "section": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "sentence": "`[MASK]` nodes sit inside a named component.",
+  "answer": "T2",
+  "closed_book_guess": "Route",
+  "category": "fact"
+ },
+ {
+  "id": 372,
+  "page": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "section": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "sentence": "Run `[MASK]` from your project root, leave it in the foreground, and use another terminal for the loop commands below.",
+  "answer": "sightmap browser start",
+  "closed_book_guess": "sightmap serve",
+  "category": "fact"
+ },
+ {
+  "id": 377,
+  "page": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "section": "Sightmap Quickstart: Build a .sightmap/ From a Running App",
+  "sentence": "Start a browser session, inspect the main routes with `[MASK]`, verify each selector with `sightmap sel-probe`, and name components until every view has zero orphaned T3 nodes.",
+  "answer": "sightmap snapshot --coverage",
+  "closed_book_guess": "sightmap browse",
+  "category": "fact"
+ }
+]

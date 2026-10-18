@@ -1,0 +1,25 @@
+name,repo,docs_path,commit,commit_date,product,drops,skip_changelogs,commits30,stars,ai,new
+vue,local,data/processed/documents.jsonl,40aa88af0094f7bab4aaf786e55c748a6a251d88,2026-09-15,Vue.js,,yes,0,,low,no
+angular,angular/angular,adev/src/content,5d69bf4f4ae8f99c46d0d6481ec0709cb4be69d9,2026-10-17,Angular,"ai,aria,best-practices,cdk,cli,ecosystem,events,examples,introduction,tools,tutorials,error.md,kitchen-sink.md",yes,96,101075,low,no
+blume,haydenbleasel/blume,apps/docs/content/docs,8d84df343070bcc23b7982ba70493679bd714a96,2026-10-17,Blume (a documentation site framework),,no,288,1790,medium,yes
+e2e,tester-army/e2e,docs,ef977f4856da009cac26d78d2e9bb14e5991ee41,2026-10-17,e2e (an end-to-end testing framework),,yes,376,11079,medium,yes
+shipyard,cosscom/shipyard,docs,2928a430dbc12b22ffb955f4e3a4a0f6499842dc,2026-10-17,Shipyard (a coding-agent orchestration tool),"changelog.mdx,contributing",yes,362,316,high,yes
+strandsbox,strands-agents/box,docs,069c39cfd29f830aaadd2a1af362753a57c7b202,2026-10-16,Strands Box (a sandbox for AI agents),dev,yes,5,431,medium,yes
+nvx,microsoft/nvx,doc,e67a06f4015a0d5d50f5c8e0070a781035785b60,2026-10-16,NVX (a virtual machine monitor),,yes,475,407,medium,yes
+pgcontext,Evokoa/pgContext,docs,aa91710e69bd6882a37f1c859d2f56d0e8a30ab9,2026-08-13,pgContext (a Postgres retrieval extension),benchmarks,yes,0,265,high,yes
+enroute,enroute-sh/enroute,docs,bc0dc6efce9cbbce9a5368e594a9b28f18a12d40,2026-10-14,Enroute (git on object storage),,yes,2,253,low,yes
+zuke,zuke-build/zuke,docs,010554576b560180eaf8c4f0f6597de75c28d775,2026-10-15,Zuke (a typed build automation tool for Deno),,yes,53,46,high,yes
+sightmap,sightmap/sightmap,docs,e229565648f34a9af4a8deca79d5afe23cd8ac6c,2026-10-07,Sightmap (a site map format and CLI),"changelog,changelog.mdx,AGENTS.md",yes,19,60,high,yes
+gori,hahwul/gori,docs/content,bd2142ebc2b92621b3b048f96016f336a6f86aae,2026-10-18,gori (a terminal HTTP intercepting proxy),,yes,271,123,medium,yes
+nub,nubjs/nub,site/content,02466954c428871e91f4de5733e713c498f80720,2026-10-11,nub (a JavaScript runtime and package script CLI),blog,yes,15,4396,high,yes
+decionis,decionis/agent-safe-pipeline,docs,fc08a17c0542e68eeaa42d11c3df6b29710eef49,2026-10-13,Decionis agent-safe-pipeline (a gateway for AI agents),"banking,PullRequestBot.md",yes,58,688,high,yes
+tscharts,TanStack/charts,docs,f8f8ed7a326471e61faa0129688679f3eca9e388,2026-10-16,TanStack Charts (a charting library),examples,yes,28,842,medium,yes
+ngnative,ng-native/ng-native,apps/documentation/src/content,1ec3d699517a2b2a60da825f5c0a53454bb36d14,2026-10-17,Angular Native (Angular for native mobile apps),,yes,320,553,medium-high,yes
+xy,reflex-dev/xy,docs,7a75a983c3d9ea203495a879dbfd427df7fd0913,2026-10-15,xy (a Python charting library by Reflex),,yes,5,1878,medium,yes
+nimbus,cloudflare/nimbus,apps/www/src/content,0474e07d662796c1b5fe4ced400e8d10637664b3,2026-10-17,Nimbus (a documentation framework by Cloudflare),,yes,188,1428,medium,yes
+lattice,lattice-php/lattice,docs/content/docs,9c83c070a1ac9e99927d588c93e0ceab68387976,2026-09-11,Lattice (a PHP admin UI framework),contributing,yes,0,63,medium,yes
+microcharts,ganapativs/microcharts,apps/docs/content,378d4fe2207bc1e1c8e7bd3b2957765fe005505c,2026-09-28,microcharts (a small charts library for React),,yes,0,201,medium-high,yes
+socialsdk,opencoredev/social-sdk,apps/docs/docs,af61377586735dc51f6737a62c6d4ab2e05dd1b4,2026-10-12,Social SDK (a TypeScript SDK for social platforms),contributing,yes,49,677,medium-high,yes
+djangoox,oxpull/django-ox,docs,8429abcd6c48e0647f7963a333f7350248864268,2026-10-17,django-ox (a Django background task library),changelog.md,yes,53,89,medium,yes
+betterdrizzle,almeidazs/better-drizzle,apps/web/content/docs,0174cbd718d4ad4f79864078b9e4bae6b43c20b2,2026-10-17,better-drizzle (a Drizzle ORM extension library),,yes,85,373,medium,yes
+vela,LuxAlgo/Vela,docs,850fa1f431e2065e9b0074c4b0555a48a2999eaf,2026-10-13,Vela (a charting engine by LuxAlgo),,yes,44,1184,medium,yes

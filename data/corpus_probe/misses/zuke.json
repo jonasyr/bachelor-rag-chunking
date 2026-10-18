@@ -1,0 +1,443 @@
+[
+ {
+  "id": 8,
+  "page": "README",
+  "section": "Zuke documentation",
+  "sentence": "[Authoring API](./authoring.md) — `[MASK]`, `Build`, `run()`, and gotchas.",
+  "answer": "target()",
+  "closed_book_guess": "Task",
+  "category": "fact"
+ },
+ {
+  "id": 26,
+  "page": "ai-review-github-app",
+  "section": "2. Install the App on the repository",
+  "sentence": "An App that is created but not installed mints nothing: the token source below then falls back to `[MASK]`, with a warning in the job log naming the failed mint.",
+  "answer": "GITHUB_TOKEN",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "ai-review",
+  "section": "On demand: a comment command",
+  "sentence": "The mention is a prefix, not an account: `@acme-bot` reads well when a GitHub App of that name posts the reviews (below), and `[MASK]`-style words work just as well with none.",
+  "answer": "/review",
+  "closed_book_guess": "@review-bot",
+  "category": "ambiguous"
+ },
+ {
+  "id": 46,
+  "page": "ai-review",
+  "section": "On demand: a comment command",
+  "sentence": "The job passes the commenter's login, the least role and the admitted logins as `ZUKE_REVIEW_ACTOR`, `ZUKE_REVIEW_ROLE` and `[MASK]`.",
+  "answer": "ZUKE_REVIEW_USERS",
+  "closed_book_guess": "ZUKE_REVIEW_ADMINS",
+  "category": "fact"
+ },
+ {
+  "id": 72,
+  "page": "caching",
+  "section": "Interaction with the rest of the build",
+  "sentence": "`[MASK]`** (or `execute(..., { cache: false })`) ignores the cache entirely and re-runs every target.",
+  "answer": "--no-cache",
+  "closed_book_guess": "`execute()`",
+  "category": "fact"
+ },
+ {
+  "id": 80,
+  "page": "caching",
+  "section": "Non-file inputs — `.cacheKey()`",
+  "sentence": "A `.cacheKey()` **on its own makes a target cacheable** — you don't need `[MASK]` for it to take effect.",
+  "answer": ".inputs()",
+  "closed_book_guess": ".cache()",
+  "category": "fact"
+ },
+ {
+  "id": 84,
+  "page": "canary",
+  "section": "Docker Compose",
+  "sentence": "`[MASK]` counts stopped replicas and one-off `docker compose run` containers as well as running ones, so one left on another image makes `stage` refuse until it is removed (`docker compose rm`; use `run --rm`).",
+  "answer": "images",
+  "closed_book_guess": "--all",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "cli",
+  "section": "Inspecting runs",
+  "sentence": "The MCP server's `list_runs`/`[MASK]` tools (see [`./zuke mcp`](#zuke-mcp) above) read the same store.",
+  "answer": "show_run",
+  "closed_book_guess": "get_run",
+  "category": "fact"
+ },
+ {
+  "id": 99,
+  "page": "cli",
+  "section": "`zuke mcp`",
+  "sentence": "`--http <host:port>` serves the streamable-HTTP transport instead of stdio (loopback by default; a non-loopback bind must authenticate its callers — a `ZUKE_MCP_TOKEN` bearer token, or an authenticator declared with [`[MASK]`](./mcp.md)), and `--allowed-origin <origin>` permits one extra browser origin.",
+  "answer": "mcpAuth()",
+  "closed_book_guess": "mcp.authenticator",
+  "category": "fact"
+ },
+ {
+  "id": 105,
+  "page": "comparison",
+  "section": "How Zuke compares",
+  "sentence": "The package a consumer actually installs is the `@zuke/cli` command — `1.x` too, and the front door to the `mcp`, `resume` and `[MASK]` surface below.",
+  "answer": "cancel",
+  "closed_book_guess": "task",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "comparison",
+  "section": "How Zuke compares",
+  "sentence": "The package a consumer actually installs is the `@zuke/cli` command — `1.x` too, and the front door to the `mcp`, `[MASK]` and `cancel` surface below.",
+  "answer": "resume",
+  "closed_book_guess": "task",
+  "category": "fact"
+ },
+ {
+  "id": 108,
+  "page": "comparison",
+  "section": "How Zuke compares",
+  "sentence": "The package a consumer actually installs is the `@zuke/cli` command — `1.x` too, and the front door to the `[MASK]`, `resume` and `cancel` surface below.",
+  "answer": "mcp",
+  "closed_book_guess": "run",
+  "category": "fact"
+ },
+ {
+  "id": 117,
+  "page": "console",
+  "section": "Tables",
+  "sentence": "`divider` draws a rule under the header, `separator` sets the gap between columns, and `[MASK]` / `dividerStyle` style those rows.",
+  "answer": "headerStyle",
+  "closed_book_guess": "rowStyle",
+  "category": "fact"
+ },
+ {
+  "id": 130,
+  "page": "extending",
+  "section": "3. Components — reusable target bundles",
+  "sentence": "Targets reference each other across components via the field (`[MASK]`), so declare a component field above anything that depends on it.",
+  "answer": "this.release.publish",
+  "closed_book_guess": "deps",
+  "category": "example_name"
+ },
+ {
+  "id": 135,
+  "page": "extending",
+  "section": "1. Plugins — observe the lifecycle",
+  "sentence": "`onRunStateChange` receives the full [`RunRecord`](./state.md) whenever the run goes `running`, `[MASK]`, `succeeded`, `failed`, `cancelling`, or `cancelled` — per-target timings, waits, and the audit trail in one payload — and only fires when a state store is configured (a plain build with no store never produces a record).",
+  "answer": "suspended",
+  "closed_book_guess": "skipped",
+  "category": "fact"
+ },
+ {
+  "id": 145,
+  "page": "getting-started",
+  "section": "Scaffold a project with `zuke setup`",
+  "sentence": "The wizard asks which launchers you want: by default they bootstrap a pinned, checksum-verified Deno when none is on `PATH` — the same scripts this repository runs on — so a clone needs nothing installed first; `[MASK]` writes launchers that require Deno on `PATH` and fail closed without it.",
+  "answer": "--no-bootstrap-deno",
+  "closed_book_guess": "--no-bootstrap",
+  "category": "fact"
+ },
+ {
+  "id": 146,
+  "page": "graph",
+  "section": "Zuke's build graph",
+  "sentence": "Regenerate with `./zuke graphDoc`; the `[MASK]` target in the CI gate fails when this page drifts from the build.",
+  "answer": "graphDocCheck",
+  "closed_book_guess": "graphDoc",
+  "category": "fact"
+ },
+ {
+  "id": 160,
+  "page": "install",
+  "section": "With Homebrew (macOS and Linux)",
+  "sentence": "`[MASK]` runs right away, and the `./zuke` launcher it writes installs Deno the first time the build runs; from then on `zuke <target>` forwards to that Deno.",
+  "answer": "zuke setup",
+  "closed_book_guess": "brew install zuke",
+  "category": "fact"
+ },
+ {
+  "id": 161,
+  "page": "installing-tools",
+  "section": "`toolchain()` — many tools",
+  "sentence": "Add tools with `.tool((s) => …)` (a single binary), `[MASK]` (a [multi-file runtime](#tooltasksinstalltree--a-multi-file-tree)), or `.npm(...)` (an [npm package](#npm-package-tools)) — all the same settings-lambda — then `install()` fetches them all **concurrently** — pinned, verified, and cached — and returns a `Map<name, AbsolutePath>` (a tree's entry is its extracted root directory).",
+  "answer": ".tree((s) => …)",
+  "closed_book_guess": ".toolTree((s) => …)",
+  "category": "fact"
+ },
+ {
+  "id": 163,
+  "page": "installing-tools",
+  "section": "`ToolTasks.installTree()` — a multi-file tree",
+  "sentence": "Everything else — `.name(...)`, `.url(...)`, `.destDir(...)`, `.checksum(...)`, `.platform(...)`, `.download(...)` — behaves as for [`install()`](#settings); the tree lands at `[MASK]`.",
+  "answer": "<destDir>/<name>",
+  "closed_book_guess": "destDir",
+  "category": "fact"
+ },
+ {
+  "id": 194,
+  "page": "mcp",
+  "section": "HTTP transport",
+  "sentence": "A notification (no `id`) is answered `[MASK]` with no body.",
+  "answer": "202 Accepted",
+  "closed_book_guess": "204",
+  "category": "fact"
+ },
+ {
+  "id": 198,
+  "page": "node-projects",
+  "section": "Other package managers",
+  "sentence": "To download and run a package binary in one step, [`@zuke/npx`](../packages/npx) (`[MASK]`) wraps `npx` — npm's sibling of `bun x` and `pnpm dlx`.",
+  "answer": "NpxTasks",
+  "closed_book_guess": "zuke npx",
+  "category": "fact"
+ },
+ {
+  "id": 207,
+  "page": "node-projects",
+  "section": "Using Zuke in a Node/npm project",
+  "sentence": "Create `[MASK]` — targets drive the repo root via `.cwd(\"..\")`:    4.",
+  "answer": "build/zuke.ts",
+  "closed_book_guess": "a zuke.ts file",
+  "category": "fact"
+ },
+ {
+  "id": 212,
+  "page": "observability",
+  "section": "What it exports",
+  "sentence": "Each **target span** carries `zuke.target` and `[MASK]`; a failed target's span is marked `error` with its (redacted) message, so a broken build is a red span, not just a log line.",
+  "answer": "zuke.target.status",
+  "closed_book_guess": "zuke.target.name",
+  "category": "fact"
+ },
+ {
+  "id": 233,
+  "page": "packages",
+  "section": "Packages",
+  "sentence": "The complete, typed surface of every package is in [`llms-full.txt`](../llms-full.txt) (one file), summarised in [`llms.txt`](../llms.txt); for a single package run `[MASK]`.",
+  "answer": "deno doc jsr:@zuke/<package>",
+  "closed_book_guess": "zuke package info",
+  "category": "fact"
+ },
+ {
+  "id": 237,
+  "page": "parameters",
+  "section": "Parameters",
+  "sentence": "a command-line flag — `[MASK]` or `--environment=production` 2.",
+  "answer": "--environment production",
+  "closed_book_guess": "-e=production",
+  "category": "ambiguous"
+ },
+ {
+  "id": 244,
+  "page": "parameters",
+  "section": "Naming",
+  "sentence": "A run of capitals has no internal transition and so stays together — but a digit ends a run, which is where the rule surprises people:   `skipE2E` gives `[MASK]` because the `2` ends the run of capitals, making `2E` a transition of its own.",
+  "answer": "--skip-e2-e",
+  "closed_book_guess": "skipE2E",
+  "category": "fact"
+ },
+ {
+  "id": 245,
+  "page": "parameters",
+  "section": "Declaring",
+  "sentence": "Configure it fluently; each call refines the value type, so `value` is exactly as strong as the declaration:   `.number()` and `[MASK]` come first (they change the kind); `.options()` applies to strings; `.required()`/`.default()` set optionality; and `.array()` comes **last** and composes with everything before it — so a required list is `.required().array()` (in that order).",
+  "answer": ".boolean()",
+  "closed_book_guess": ".string()",
+  "category": "fact"
+ },
+ {
+  "id": 248,
+  "page": "paths",
+  "section": "Repo root (`repoRoot`)",
+  "sentence": " `repoRoot` is `absolutePath` anchored at your repository root, so you can build paths relative to the project no matter where the build is invoked from:    The root is the directory containing `[MASK]`, the config file `zuke setup` scaffolds at your project root.",
+  "answer": "zuke.json",
+  "closed_book_guess": "zuke.ts",
+  "category": "fact"
+ },
+ {
+  "id": 256,
+  "page": "programmatic-api",
+  "section": "Inspecting the CLI shape — `describeCli`",
+  "sentence": "Use it to build tooling around a build without shelling out or parsing `[MASK]` text.",
+  "answer": "--help",
+  "closed_book_guess": "help",
+  "category": "equivalent"
+ },
+ {
+  "id": 265,
+  "page": "generate-ci",
+  "section": "One declaration, four providers",
+  "sentence": " The same `[MASK]` emits GitHub Actions, GitLab CI, Azure Pipelines, or Bitbucket Pipelines.",
+  "answer": "cicd()",
+  "closed_book_guess": "workflow",
+  "category": "fact"
+ },
+ {
+  "id": 286,
+  "page": "release-a-library",
+  "section": "Why a chain beats a script",
+  "sentence": "The release notes write themselves.** `[MASK]` turns the merged pull requests since the previous tag into the release body.",
+  "answer": "--generate-notes",
+  "closed_book_guess": "zuke.changelog",
+  "category": "fact"
+ },
+ {
+  "id": 294,
+  "page": "release-a-library",
+  "section": "Why a chain beats a script",
+  "sentence": "The version is a typed input.** `parameter(…).required()` is read from `[MASK]` or `RELEASE_VERSION`, checked before the first target runs, and used in the targets as `this.releaseVersion.value`.",
+  "answer": "--release-version",
+  "closed_book_guess": "Deno.args",
+  "category": "fact"
+ },
+ {
+  "id": 304,
+  "page": "replace-shell-scripts",
+  "section": "What you gained",
+  "sentence": "`[MASK]` is the explicit opt-out, and `.code()` gives you the exit code as a number when that is what you want.",
+  "answer": ".noThrow()",
+  "closed_book_guess": ".raw()",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "replace-shell-scripts",
+  "section": "When to take the next step",
+  "sentence": "`[MASK]`, `graph`, `--parallel` and `./zuke mcp` come with the targets for free.",
+  "answer": "./zuke --list",
+  "closed_book_guess": "zuke --help",
+  "category": "fact"
+ },
+ {
+  "id": 316,
+  "page": "registry",
+  "section": "Quick start",
+  "sentence": "  Registration is **idempotent**: re-running `[MASK]` refreshes the descriptor (and its `updatedAt`) while preserving the original `createdAt`.",
+  "answer": "register",
+  "closed_book_guess": "zuke registry register",
+  "category": "equivalent"
+ },
+ {
+  "id": 332,
+  "page": "schedules",
+  "section": "The supported grammar",
+  "sentence": "`[MASK]` at UTC+5:30), a day-constrained schedule that would **cross midnight** once shifted to UTC — which can't be expressed as a single cron without moving the day field too.",
+  "answer": "Asia/Kolkata",
+  "closed_book_guess": "`0 0 * * 1`",
+  "category": "example_name"
+ },
+ {
+  "id": 347,
+  "page": "secrets",
+  "section": "Errors",
+  "sentence": "A source whose value never resolved has nothing registered for redaction, so **this one message is not masked**: choose a source command that reports failures on stderr without echoing the secret itself (secret managers such as `[MASK]`, `vault`, and `gcloud` do).",
+  "answer": "op",
+  "closed_book_guess": "aws secretsmanager",
+  "category": "ambiguous"
+ },
+ {
+  "id": 354,
+  "page": "self-healing",
+  "section": "What a remediation is given",
+  "sentence": " A remediation receives a `RemediationContext` carrying exactly three things: the failed target's name, the 1-based `attempt` number, and the `[MASK]` itself.",
+  "answer": "error",
+  "closed_book_guess": "target definition",
+  "category": "fact"
+ },
+ {
+  "id": 358,
+  "page": "self-healing",
+  "section": "Other knobs",
+  "sentence": "`.comment()` / `[MASK]` — toggle PR posting (the job summary is always written).",
+  "answer": ".noComment()",
+  "closed_book_guess": ".comment(false)",
+  "category": "fact"
+ },
+ {
+  "id": 371,
+  "page": "services",
+  "section": "Starting: `.start()` and `spawn()`",
+  "sentence": "A `SpawnedProcess` is a valid handle, so the common case needs no explicit stop:   A handle is anything with a `stop()` method, so you can start a service any way you like — an in-process HTTP server, a library's `listen()` — and return something that shuts it down:   When the thing you start isn't self-stopping, provide `[MASK]` explicitly; it receives whatever `.start()` returned:  ",
+  "answer": ".stop()",
+  "closed_book_guess": "stopFn",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "shell",
+  "section": "Shell wrapper (`$`)",
+  "sentence": " Ergonomic process execution built on `Deno.Command`, imported from the `shell` submodule:     Awaiting a command resolves to a `CommandOutput` (`{ code, stdout, stderr, truncated }`, plus a `[MASK]` helper for trimmed stdout).",
+  "answer": ".text()",
+  "closed_book_guess": "text()",
+  "category": "equivalent"
+ },
+ {
+  "id": 387,
+  "page": "state-api",
+  "section": "`PUT /locks/:key`",
+  "sentence": "Body `[MASK]`; extend the deadline to `now + ttlMs` only when `token` matches the current holder.",
+  "answer": "{ token, ttlMs }",
+  "closed_book_guess": "token, ttlMs",
+  "category": "equivalent"
+ },
+ {
+  "id": 390,
+  "page": "state-api",
+  "section": "Notes for implementers",
+  "sentence": "There is no `[MASK]` argument: passing one is refused, because a credential in argv is readable by every local process and lands in the transcript of whatever invoked the kit.",
+  "answer": "--token",
+  "closed_book_guess": "password",
+  "category": "fact"
+ },
+ {
+  "id": 391,
+  "page": "state-api",
+  "section": "`PUT /locks/:key`",
+  "sentence": "`409` or `[MASK]` — the token no longer holds the lock.",
+  "answer": "404",
+  "closed_book_guess": "410",
+  "category": "fact"
+ },
+ {
+  "id": 396,
+  "page": "state-api",
+  "section": "`PUT /runs/:id`",
+  "sentence": "Update** — the client sends `[MASK]`.",
+  "answer": "If-Match: <etag>",
+  "closed_book_guess": "the full run object",
+  "category": "fact"
+ },
+ {
+  "id": 401,
+  "page": "state",
+  "section": "Forcing a target — `overrides`",
+  "sentence": "`[MASK]` prints every override, and over [MCP](./mcp.md) the same operation is the `force_target` tool.",
+  "answer": "zuke runs show",
+  "closed_book_guess": "--overrides",
+  "category": "fact"
+ },
+ {
+  "id": 417,
+  "page": "tools",
+  "section": "Define your own tool",
+  "sentence": "Build the argv with `arg` / `flag` / `[MASK]` (in call order), and the shared chainers (`cwd`, `env`, `noThrow`, `quiet`, `toolPath`, `args`) all apply.",
+  "answer": "option",
+  "closed_book_guess": "args",
+  "category": "fact"
+ },
+ {
+  "id": 424,
+  "page": "versioning",
+  "section": "The failure mode, concretely",
+  "sentence": " This happened in this repo (fixed in [`d8f51c0`](https://github.com/zuke-build/zuke/commit/d8f51c0939d26faa6eb5d7d4bb75bbba241890bb), \"fix: raise the `[MASK]` floor to 1.31.0 in wrappers using `SubcommandSettings`\"):  1.",
+  "answer": "@zuke/core",
+  "closed_book_guess": "Deno",
+  "category": "fact"
+ }
+]

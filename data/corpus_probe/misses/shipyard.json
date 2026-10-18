@@ -1,0 +1,524 @@
+[
+ {
+  "id": 23,
+  "page": "The laptop agent",
+  "section": "A box's own name",
+  "sentence": "A server's redirect to its own `localhost:PORT` goes back to the address you opened, and one to another port on the box's loopback (an auth server on `[MASK]`) goes to that port's name, `http://4000.devl.localhost:1377`, since `localhost` there means the box, not your laptop.",
+  "answer": "localhost:4000",
+  "closed_book_guess": "localhost:3000",
+  "category": "example_name"
+ },
+ {
+  "id": 29,
+  "page": "The laptop agent",
+  "section": "A relayed link",
+  "sentence": "You can check with `[MASK]` on each end: `MappingVariesByDestIP: true` is a hard NAT.",
+  "answer": "tailscale netcheck",
+  "closed_book_guess": "traceroute",
+  "category": "fact"
+ },
+ {
+  "id": 30,
+  "page": "The laptop agent",
+  "section": "Running it",
+  "sentence": "The updated app restarts it as it starts (`[MASK]`), whether the app started it or it starts at login: the agent first finishes what it's doing (adding or upgrading a box, setting up this Mac's box, sending a queued prompt), and agents' sessions keep running on their boxes throughout.",
+  "answer": "berth agent restart --if-stale",
+  "closed_book_guess": "launchd",
+  "category": "fact"
+ },
+ {
+  "id": 32,
+  "page": "Projects and worktrees",
+  "section": "Worktrees",
+  "sentence": "`[MASK]` nests the new worktree under another of the location's in the sidebar, such as a stacked branch under the one it builds on.",
+  "answer": "--parent",
+  "closed_book_guess": "Parent worktree",
+  "category": "fact"
+ },
+ {
+  "id": 43,
+  "page": "Security model",
+  "section": "A plugin's helper",
+  "sentence": "Whatever `[MASK]` the app sent is taken off first.",
+  "answer": "Authorization",
+  "closed_book_guess": "arguments",
+  "category": "ambiguous"
+ },
+ {
+  "id": 50,
+  "page": "Security model",
+  "section": "Secrets and prompts",
+  "sentence": "A prompt typed into a session (`[MASK]`, a flow's `prompt` step, the phone) never appears in events or logs: `session.sent` carries only the session's name, and agent tool hooks forward only identifiers and paths.",
+  "answer": "berth session send",
+  "closed_book_guess": "shipyard send",
+  "category": "fact"
+ },
+ {
+  "id": 67,
+  "page": "Add a box",
+  "section": "With a pairing link",
+  "sentence": "On the laptop, paste it in the app (**Add a box**, under \"Paste what it printed\"; pasting all of the output is fine), or:   The link carries the box's fingerprint, so the laptop knows exactly which box to trust, and a single-use code that expires after ten minutes (`[MASK]` changes that, up to an hour).",
+  "answer": "--ttl",
+  "closed_book_guess": "--pairing-code-ttl",
+  "category": "fact"
+ },
+ {
+  "id": 69,
+  "page": "Add a box",
+  "section": "Agent CLIs you installed yourself",
+  "sentence": "If the shell can't answer within ten seconds, berthd looks in those folders itself: `[MASK]`, `npm prefix -g`, nvm's and fnm's default Node (then their other versions), `~/.volta/bin`, `~/.bun/bin`, `~/.npm-global/bin` and Homebrew's.",
+  "answer": "~/.local/bin",
+  "closed_book_guess": "which -a codex claude gemini opencode",
+  "category": "ambiguous"
+ },
+ {
+  "id": 73,
+  "page": "Add a box",
+  "section": "Agent CLIs you installed yourself",
+  "sentence": "Agents start with it, by the `PATH` it was found with, so an npm CLI finds the `[MASK]` beside it.",
+  "answer": "node",
+  "closed_book_guess": "node_modules",
+  "category": "ambiguous"
+ },
+ {
+  "id": 81,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "`[MASK]` (which `berth add ssh` and the install script run) installs them for every agent CLI it finds on the box, and says so:   An agent you install on the box later has none.",
+  "answer": "berthd install",
+  "closed_book_guess": "shipyard agent install",
+  "category": "fact"
+ },
+ {
+  "id": 83,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "To skip all this, install with `[MASK]`.",
+  "answer": "--no-integrations",
+  "closed_book_guess": "--no-report",
+  "category": "fact"
+ },
+ {
+  "id": 85,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "The hooks record berthd's full path, so they work whatever `[MASK]` the agent has.",
+  "answer": "PATH",
+  "closed_book_guess": "working directory",
+  "category": "ambiguous"
+ },
+ {
+  "id": 86,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "Or run, from the laptop:   Use `codex`, `[MASK]` or `all` for other agents.",
+  "answer": "cursor",
+  "closed_book_guess": "claude",
+  "category": "ambiguous"
+ },
+ {
+  "id": 88,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "The full path matters: a command over SSH may not have `[MASK]`, where berthd lives, on its `PATH`.",
+  "answer": "~/.local/bin",
+  "closed_book_guess": "/usr/local/bin",
+  "category": "ambiguous"
+ },
+ {
+  "id": 90,
+  "page": "First agent",
+  "section": "Let the box report agent state",
+  "sentence": "Or run, from the laptop:   Use `[MASK]`, `cursor` or `all` for other agents.",
+  "answer": "codex",
+  "closed_book_guess": "claude",
+  "category": "ambiguous"
+ },
+ {
+  "id": 91,
+  "page": "First project and worktree",
+  "section": "Make a worktree",
+  "sentence": "Worktrees made by any other tool, including plain `[MASK]`, show up too: berthd watches its locations.",
+  "answer": "git worktree add",
+  "closed_book_guess": "git worktree",
+  "category": "equivalent"
+ },
+ {
+  "id": 97,
+  "page": "First project and worktree",
+  "section": "Make a worktree",
+  "sentence": "a `[MASK]` event goes to anything listening; 2.",
+  "answer": "worktree.created",
+  "closed_book_guess": "worktree_created",
+  "category": "fact"
+ },
+ {
+  "id": 107,
+  "page": "Install",
+  "section": "The berth command",
+  "sentence": "If `[MASK]` isn't on your `PATH`, add it (`export PATH=\"$HOME/.local/bin:$PATH\"` in your shell's profile); these pages write `berth`.",
+  "answer": "~/.local/bin",
+  "closed_book_guess": "berth",
+  "category": "ambiguous"
+ },
+ {
+  "id": 127,
+  "page": "Agent integrations",
+  "section": "Claude Code, Codex, Cursor, Gemini CLI, OpenCode",
+  "sentence": "Cursor**: appends `sessionStart`, `beforeSubmitPrompt` and `stop` hooks to `[MASK]`, after any hooks already there (Orca's are kept).",
+  "answer": "~/.cursor/hooks.json",
+  "closed_book_guess": ".cursor/hooks.json",
+  "category": "equivalent"
+ },
+ {
+  "id": 129,
+  "page": "Agent integrations",
+  "section": "The sidebar's reminder",
+  "sentence": "If a `[MASK]` gate refuses, or the box goes offline on the way, the notice says why, with **Retry** and **Settings**, which opens Settings → Agents on that box.",
+  "answer": "before:skills.install",
+  "closed_book_guess": "approval",
+  "category": "fact"
+ },
+ {
+  "id": 139,
+  "page": "Artifacts",
+  "section": "Safety",
+  "sentence": "Secrets.** The box refuses a version that looks like it holds one (private keys, cloud and API tokens, passwords in URLs, `[MASK]`-style lines): a pattern check, so the skill also says never to include any.",
+  "answer": ".env",
+  "closed_book_guess": ".env-style lines",
+  "category": "equivalent"
+ },
+ {
+  "id": 147,
+  "page": "Artifacts",
+  "section": "Safety",
+  "sentence": "WebRTC**, which no policy's `[MASK]` covers, is blocked with the `webrtc 'block'` directive where the browser supports it, and the page's first script removes its constructors.",
+  "answer": "connect-src",
+  "closed_book_guess": "network policy",
+  "category": "fact"
+ },
+ {
+  "id": 166,
+  "page": "Browser and Preview tabs",
+  "section": "Browser and Preview tabs",
+  "sentence": " A worktree's dev server has an address on your laptop, `http://WORKTREE.LOCATION.BOX.localhost:1377/`[MASK]`http://checkout.shop.devl.localhost:1377/`), served by the [laptop agent's proxy](/concepts/laptop-agent).",
+  "answer": " (such as ",
+  "closed_book_guess": "(e.g. `",
+  "category": "equivalent"
+ },
+ {
+  "id": 175,
+  "page": "Database",
+  "section": "From the worktree's .env files",
+  "sentence": "The files are read as dotenv writes them, not as a shell would run them:  `NAME=value`, with or without `[MASK]`, and `#` comments.",
+  "answer": "export",
+  "closed_book_guess": "quotes",
+  "category": "ambiguous"
+ },
+ {
+  "id": 180,
+  "page": "Database",
+  "section": "Which databases appear",
+  "sentence": "Database learns of it from a service, from the worktree's `[MASK]`, or [from you](#connecting-a-database-yourself).",
+  "answer": ".env",
+  "closed_book_guess": "devcontainer.json",
+  "category": "ambiguous"
+ },
+ {
+  "id": 211,
+  "page": "Kits",
+  "section": "Using one",
+  "sentence": "Shipyard remembers the link and the commit, so `[MASK]` fetches the newest version and the app flags projects running an older one.",
+  "answer": "update",
+  "closed_book_guess": "shipyard kit update",
+  "category": "equivalent"
+ },
+ {
+  "id": 219,
+  "page": "Labs",
+  "section": "Chat controls",
+  "sentence": "Picking one types `[MASK]` or `/effort`; if Claude Code asks to confirm, its own screen shows inline, and the chip says \"Switching…\" until Claude Code says it switched.",
+  "answer": "/model",
+  "closed_book_guess": "/fast",
+  "category": "fact"
+ },
+ {
+  "id": 220,
+  "page": "Labs",
+  "section": "Commands in the chat",
+  "sentence": "The agent's own commands (`/cost`, `[MASK]`, `!ls`…) start no turn, so they never hold up a queued prompt or a `berth session send --wait`.",
+  "answer": "/model",
+  "closed_book_guess": "/clear",
+  "category": "ambiguous"
+ },
+ {
+  "id": 227,
+  "page": "Labs",
+  "section": "History",
+  "sentence": "These need a box with the `history` capability: `GET …/transcript?before=`, `GET …/subagents` (and each one's `…/transcript` and `…/tool/{id}`), `[MASK]` and `POST …/rewind`.",
+  "answer": "POST …/fork",
+  "closed_book_guess": "POST …/steer",
+  "category": "fact"
+ },
+ {
+  "id": 240,
+  "page": "Leadline",
+  "section": "Limits",
+  "sentence": "An app that overrides its environment from `[MASK]`** connects round Leadline.",
+  "answer": ".env",
+  "closed_book_guess": "shipyard.yaml",
+  "category": "ambiguous"
+ },
+ {
+  "id": 266,
+  "page": "The offline queue",
+  "section": "API",
+  "sentence": " The queue is on the laptop agent's API: `GET`, `POST`, `PATCH` and `DELETE` under `/v1/queue`, plus `[MASK]` and `POST /v1/queue/{id}/send`.",
+  "answer": "POST /v1/queue/{id}/retry",
+  "closed_book_guess": "GET /v1/queue/{id}",
+  "category": "fact"
+ },
+ {
+  "id": 268,
+  "page": "The offline queue",
+  "section": "How it behaves",
+  "sentence": "At most once.** An item is marked `[MASK]` and saved before the request goes out.",
+  "answer": "sending",
+  "closed_book_guess": "in-flight",
+  "category": "fact"
+ },
+ {
+  "id": 272,
+  "page": "The offline queue",
+  "section": "How it behaves",
+  "sentence": "If its agent reported `[MASK]`, the prompt waits (state `waiting`) for `idle`, `waiting` or `finished`, for up to 30 minutes, then goes anyway: agents take input mid-turn, they just read it later.",
+  "answer": "running",
+  "closed_book_guess": "busy",
+  "category": "fact"
+ },
+ {
+  "id": 293,
+  "page": "The phone companion",
+  "section": "Threat model",
+  "sentence": "Pushes go to public addresses and your tailnet (`[MASK]`), so a self-hosted ntfy on the tailnet works as it is.",
+  "answer": "100.64.0.0/10",
+  "closed_book_guess": "ntfy.sh",
+  "category": "fact"
+ },
+ {
+  "id": 294,
+  "page": "The phone companion",
+  "section": "What works where",
+  "sentence": "Serving the app over HTTPS would take a certificate for each box's `*.ts.net` name (`[MASK]`), which is the next step if notifications without ntfy are wanted.",
+  "answer": "tailscale cert",
+  "closed_book_guess": "Tailscale Serve",
+  "category": "fact"
+ },
+ {
+  "id": 300,
+  "page": "Writing a plugin",
+  "section": "Publish it to the listing",
+  "sentence": "It bundles every marketplace plugin the way `build.mjs` above does, into `site/plugins/<id>/<version>/` (the manifest, the `main` module, and any `themes` and `kits` the manifest names), and writes `[MASK]`.",
+  "answer": "site/plugins/index.json",
+  "closed_book_guess": "plugins.json",
+  "category": "fact"
+ },
+ {
+  "id": 312,
+  "page": "Project config",
+  "section": "Trusting a repository's config",
+  "sentence": "From a terminal, `berth location config devl/shop` prints what the file wants and its hash; `--trust HASH` trusts that version, `[MASK]` stops it.",
+  "answer": "--untrust",
+  "closed_book_guess": "--deny HASH",
+  "category": "fact"
+ },
+ {
+  "id": 314,
+  "page": "Project config",
+  "section": "Setup and teardown",
+  "sentence": "One a person locked with `[MASK]` is left alone, and the error says how to unlock it.",
+  "answer": "git worktree lock",
+  "closed_book_guess": "shipyard lock",
+  "category": "fact"
+ },
+ {
+  "id": 331,
+  "page": "Review a PR",
+  "section": "Keys",
+  "sentence": "A kit that copies the main checkout's `[MASK]` into each worktree copies what is in it: keep personal keys out of that file, or have the kit skip them when `BERTH_REVIEW` is set.",
+  "answer": ".env",
+  "closed_book_guess": ".gitignore",
+  "category": "fact"
+ },
+ {
+  "id": 342,
+  "page": "Durable runs",
+  "section": "Attempts",
+  "sentence": "Each attempt gets the worktree `<name>-a<n>` and its agent, with the prompt (and its suffix), on its own `model` and `[MASK]` when given (so \"Opus against Sonnet\" is a run).",
+  "answer": "effort",
+  "closed_book_guess": "reasoning",
+  "category": "fact"
+ },
+ {
+  "id": 365,
+  "page": "Task templates",
+  "section": "Task templates",
+  "sentence": "Every other `{{var}}` in `[MASK]` or `prompt` becomes an input; `variables` gives them labels (`label`), a `default`, and makes long ones `multiline`.",
+  "answer": "branch",
+  "closed_book_guess": "template",
+  "category": "fact"
+ },
+ {
+  "id": 366,
+  "page": "Task templates",
+  "section": "Task templates",
+  "sentence": "A branch that already exists, locally or on `[MASK]`, is checked out as it is, so a template can review or continue existing work.",
+  "answer": "origin",
+  "closed_book_guess": "the remote",
+  "category": "equivalent"
+ },
+ {
+  "id": 369,
+  "page": "Task templates",
+  "section": "Task templates",
+  "sentence": "Every other `{{var}}` in `branch` or `[MASK]` becomes an input; `variables` gives them labels (`label`), a `default`, and makes long ones `multiline`.",
+  "answer": "prompt",
+  "closed_book_guess": "title",
+  "category": "fact"
+ },
+ {
+  "id": 375,
+  "page": "Team setup",
+  "section": "Repositories you already cloned",
+  "sentence": "Of each repository it meets it reads `[MASK]` and nothing else; only the clones of your team's repos are looked at further, with git (their branch, uncommitted changes and last commit, without taking git's locks).",
+  "answer": "remote.origin.url",
+  "closed_book_guess": ".git/config",
+  "category": "fact"
+ },
+ {
+  "id": 376,
+  "page": "Team setup",
+  "section": "How Shipyard notices your team's setup",
+  "sentence": "Quietly.** Nothing is asked when the computer is offline, and a failure (offline, signed out of `[MASK]`, rate limited) is silent and tried again later, after a wait that grows.",
+  "answer": "gh",
+  "closed_book_guess": "GitHub",
+  "category": "ambiguous"
+ },
+ {
+  "id": 377,
+  "page": "Team setup",
+  "section": "From the command line",
+  "sentence": "  `[MASK]` follows the setup until it ends; the steps run in the box's terminal, which `berth attach devbox/team-acme` opens.",
+  "answer": "berth team setup",
+  "closed_book_guess": "The agent",
+  "category": "fact"
+ },
+ {
+  "id": 386,
+  "page": "Themes",
+  "section": "Your own",
+  "sentence": "A theme needs `id` (defaulting to the file name), `[MASK]` and `terminal`; `appearance` is `dark` or `light`.",
+  "answer": "colors",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 392,
+  "page": "Themes",
+  "section": "Your own",
+  "sentence": "A theme needs `id` (defaulting to the file name), `colors` and `[MASK]`; `appearance` is `dark` or `light`.",
+  "answer": "terminal",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 394,
+  "page": "Themes",
+  "section": "Your own",
+  "sentence": "A theme needs `[MASK]` (defaulting to the file name), `colors` and `terminal`; `appearance` is `dark` or `light`.",
+  "answer": "id",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 400,
+  "page": "Visual diffs",
+  "section": "Where it lives, and safety",
+  "sentence": "The app draws a visual diff from its data, and reads its images with the box's credentials into `[MASK]` URLs: no image is ever served from an origin of its own, and nothing an agent wrote runs.",
+  "answer": "blob:",
+  "closed_book_guess": "blob: URLs",
+  "category": "equivalent"
+ },
+ {
+  "id": 421,
+  "page": "The app's API",
+  "section": "Transport",
+  "sentence": "Host check.** Requests whose `Host` is not `[MASK]` or `localhost:1378` are refused, so a web page cannot reach the agent through DNS rebinding.",
+  "answer": "127.0.0.1:1378",
+  "closed_book_guess": "127.0.0.1",
+  "category": "fact"
+ },
+ {
+  "id": 429,
+  "page": "berthd CLI",
+  "section": "Plugin helpers",
+  "sentence": "What the helper answers for it goes into the service's environment like any other, so a recording proxy ends up in front of a database whose address is only in `[MASK]`.",
+  "answer": ".env",
+  "closed_book_guess": "DATABASE_URL",
+  "category": "ambiguous"
+ },
+ {
+  "id": 433,
+  "page": "berthd CLI",
+  "section": "Plugin helpers",
+  "sentence": "Removed with its plugin.** Turning the plugin off on the laptop, or removing it there, has the laptop remove its helper from this box, as `[MASK]` does (with `--purge` when the plugin was removed): see [a helper does not outlive its plugin](/guides/plugins#a-helper-does-not-outlive-its-plugin).",
+  "answer": "berthd helper rm",
+  "closed_book_guess": "shipyard plugin disable",
+  "category": "fact"
+ },
+ {
+  "id": 442,
+  "page": "berth CLI",
+  "section": "Boxes",
+  "sentence": "Each machine has `name`, `[MASK]`, `ip`, `os`, `online`, `ssh` (it runs Tailscale SSH), `host_keys` (the SHA256 fingerprints of the SSH host keys the tailnet reports for it) and `box` (the box it is paired as, if any).",
+  "answer": "dns_name",
+  "closed_book_guess": "tailscale_ip",
+  "category": "fact"
+ },
+ {
+  "id": 455,
+  "page": "Config reference",
+  "section": "How layers merge",
+  "sentence": "`--trust HASH` trusts the file as shown, `[MASK]` stops running it.",
+  "answer": "--untrust",
+  "closed_book_guess": "--deny HASH",
+  "category": "fact"
+ },
+ {
+  "id": 463,
+  "page": "Events and gates",
+  "section": "Agents and sessions",
+  "sentence": "Shipyard does not publish a tool use (`[MASK]` with `signal: \"tool\"`) for an agent that is already working: it would change nothing.",
+  "answer": "agent.started",
+  "closed_book_guess": "agent_message",
+  "category": "fact"
+ },
+ {
+  "id": 488,
+  "page": "Plugin SDK",
+  "section": "Home widgets",
+  "sentence": "Hold your size while loading.** Show `[MASK]` rows, never nothing, so Home doesn't move when data arrives.",
+  "answer": "WidgetSkeleton",
+  "closed_book_guess": "skeleton",
+  "category": "fact"
+ },
+ {
+  "id": 490,
+  "page": "Plugin SDK",
+  "section": "Home widgets",
+  "sentence": "The other built-in widgets from plugins are worth reading: Pull requests and CI failures in `plugins/pull-request/src/home.tsx`, Agent usage in `[MASK]`, Notes in `plugins/notes/src/home.tsx`, and the smallest, Hello ports, in `plugins/hello-ports`.",
+  "answer": "plugins/usage/src/home.tsx",
+  "closed_book_guess": "plugins/agent-usage/src/home.tsx",
+  "category": "example_name"
+ }
+]

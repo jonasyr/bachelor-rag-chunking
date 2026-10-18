@@ -1,0 +1,380 @@
+[
+ {
+  "id": 7,
+  "page": "0004-enforce-layering-with-import-acl",
+  "section": "Decision",
+  "sentence": "Dependency injection (`[MASK]` / `deps.engines` / `deps.dataFeed`) is the sanctioned path for supplying concrete backends from outside; it does not breach the ACL, because injected backends flow through the composition root's wiring (overriding the named built-in options) rather than through any core import.",
+  "answer": "deps.renderer",
+  "closed_book_guess": "deps.backend",
+  "category": "fact"
+ },
+ {
+  "id": 17,
+  "page": "0005-core-owns-user-drawings",
+  "section": "Decision",
+  "sentence": "Commands flow **down (`setToolbar` / `showToolbar` / `syncDrawings` / `[MASK]` / `setSelection`); a single `onDrawingIntent` channel carries discriminated-union intents **up**.",
+  "answer": "setActiveTool",
+  "closed_book_guess": "deleteDrawing",
+  "category": "ambiguous"
+ },
+ {
+  "id": 27,
+  "page": "0006-workspace-composes-charts",
+  "section": "Decision",
+  "sentence": "Uniform renderer budget.** Beyond `[MASK]` (default 8) every cell uses canvas2d — a uniform look inside the browser's WebGL context cap, switched by rebuilding all cells through the pool.",
+  "answer": "maxWebglCells",
+  "closed_book_guess": "maxWebGLRenderers",
+  "category": "fact"
+ },
+ {
+  "id": 29,
+  "page": "0006-workspace-composes-charts",
+  "section": "Decision",
+  "sentence": "`[MASK]` is a live getter: the instance survives every market change and dies only when its cell leaves the layout.",
+  "answer": "cell.chart",
+  "closed_book_guess": "ChartInstance",
+  "category": "fact"
+ },
+ {
+  "id": 41,
+  "page": "README",
+  "section": "Conventions",
+  "sentence": "Status**: one of `Proposed`, `Accepted`, `Superseded by NNNN`, or `[MASK]`.",
+  "answer": "Deprecated",
+  "closed_book_guess": "Rejected",
+  "category": "ambiguous"
+ },
+ {
+  "id": 84,
+  "page": "settings-rows",
+  "section": "Adding a NEW inline control kind",
+  "sentence": "**The dialog renderer** — in `src/renderers/native/chrome/SettingsDialog.ts`, add a branch to `inlineControl` building the control's DOM: read the current value from the bag with a **type guard** falling back to `defval`, write through `[MASK]`.",
+  "answer": "put(key, value)",
+  "closed_book_guess": "setValue",
+  "category": "fact"
+ },
+ {
+  "id": 87,
+  "page": "adding-a-data-provider",
+  "section": "A minimal worked shape",
+  "sentence": "  If you never add `listSymbols`/`[MASK]`/`subscribe`, nothing breaks — the provider is reachable by `MYVENUE:SYMBOL`, syminfo is synthesized, and live ticks come from polling `getBars`.",
+  "answer": "getSymbolInfo",
+  "closed_book_guess": "resolveSymbol",
+  "category": "fact"
+ },
+ {
+  "id": 112,
+  "page": "adding-a-renderer",
+  "section": "Reuse the shared, backend-neutral building blocks",
+  "sentence": "Subtlety — a series is shown per surface, not on/off.** A value series carries an optional `[MASK]` with one flag per surface — `pane` (painted), `priceScale` (kept in the pane's autoscale and backing any axis value label you draw), `legend` (its value beside the indicator title), `dataWindow` (its row in the data window) — and a `visible: false` shorthand that hides it everywhere.",
+  "answer": "display",
+  "closed_book_guess": "visibility",
+  "category": "fact"
+ },
+ {
+  "id": 126,
+  "page": "adding-a-ui-component",
+  "section": "Form primitives",
+  "sentence": "`[MASK]` is 28px/13px and hugs the widest option (max-width 200px).",
+  "answer": "sm",
+  "closed_book_guess": "SelectMenu",
+  "category": "fact"
+ },
+ {
+  "id": 136,
+  "page": "adding-an-engine",
+  "section": "The session: the control surface the core drives",
+  "sentence": "`strategy` and `trades` are neutral.** A language with simulated order execution translates its own vocabulary into `StrategyState` (`position`, `equity`, `openPnl`, `netPnl`, `wins`/`losses`, drawdown/runup) and `StrategyTrade` (round trips: `entry`, optional `exit`, `side`, `qty`, and — when the engine keeps a per-trade ledger — the optional `[MASK]`, `commission`, `maxDrawdown`, `maxRunup`).",
+  "answer": "pnl",
+  "closed_book_guess": "slippage",
+  "category": "ambiguous"
+ },
+ {
+  "id": 141,
+  "page": "adding-an-engine",
+  "section": "How the core picks an engine for an indicator",
+  "sentence": "Otherwise the chart's `[MASK]`.",
+  "answer": "defaultLanguage",
+  "closed_book_guess": "default_engine",
+  "category": "fact"
+ },
+ {
+  "id": 142,
+  "page": "adding-an-engine",
+  "section": "History backfill: partial bars, engine-owned run policy",
+  "sentence": "The Pine engines hold: a session that starts during a backfill defers its first run, `'backfill'` pokes are ignored, and the first execution happens on `[MASK]` — because scripts are stateful over **all** bars, so a run over a partial prefix computes values that are simply wrong, at full-history cost, once per chunk.",
+  "answer": "'complete'",
+  "closed_book_guess": "the first live bar",
+  "category": "fact"
+ },
+ {
+  "id": 143,
+  "page": "adding-an-engine",
+  "section": "The session: the control surface the core drives",
+  "sentence": "**`[MASK]`** = the history load finished (fires exactly once per load).",
+  "answer": "'complete'",
+  "closed_book_guess": "onHistoryLoaded",
+  "category": "fact"
+ },
+ {
+  "id": 144,
+  "page": "adding-an-engine",
+  "section": "Registering and selecting engines",
+  "sentence": "Note these register through `registerEngine` *after* construction, so they do **not** seed `defaultLanguage` (below): with the widget, a non-`[MASK]` language needs the `defaultLanguage` option or a per-indicator `language`.",
+  "answer": "'pine'",
+  "closed_book_guess": "defaultLanguage",
+  "category": "fact"
+ },
+ {
+  "id": 152,
+  "page": "plugin-sdk",
+  "section": "Native indicators — `registerNativeIndicator`",
+  "sentence": "A type is **single-instance** by default: a second `[MASK]` of the same type returns the existing handle.",
+  "answer": "addNativeIndicator",
+  "closed_book_guess": "registration",
+  "category": "fact"
+ },
+ {
+  "id": 159,
+  "page": "setup",
+  "section": "The toolchain",
+  "sentence": "One npm quirk worth internalizing: **`test` runs as `npm test`**, while everything else needs the `run` keyword (`npm run build`, `[MASK]`, and so on).",
+  "answer": "npm run lint",
+  "closed_book_guess": "npm run dev",
+  "category": "ambiguous"
+ },
+ {
+  "id": 164,
+  "page": "setup",
+  "section": "Prerequisites",
+  "sentence": " Node.js and npm.** There is no pinned Node version in this repo (no `.nvmrc`, no `[MASK]` range), so a current Node.js LTS and its bundled npm is the safe choice.",
+  "answer": "engines",
+  "closed_book_guess": "engines.node",
+  "category": "equivalent"
+ },
+ {
+  "id": 185,
+  "page": "workflow",
+  "section": "Where to make a change, by layer",
+  "sentence": "Add a renderer** — implement `IChartRenderer` and declare honest capabilities, then pass the class as the `renderer` option (built-in or your own), or inject an already-constructed instance via `[MASK]`.",
+  "answer": "deps.renderer",
+  "closed_book_guess": "rendererInstance",
+  "category": "fact"
+ },
+ {
+  "id": 186,
+  "page": "workflow",
+  "section": "Where to make a change, by layer",
+  "sentence": "For full control, implement the whole `MarketDataFeed` port (`load`/`subscribe` required; `loadRange`/`symbolInfo` optional) and inject it via `[MASK]` — used bare, with no registry or auto-cache.",
+  "answer": "deps.dataFeed",
+  "closed_book_guess": "datafeed",
+  "category": "fact"
+ },
+ {
+  "id": 188,
+  "page": "workflow",
+  "section": "The playground",
+  "sentence": "The index page links the two surfaces:  `/widget.html`** (`[MASK]`) — mounts the **Vela™ widget** straight from `src/`.",
+  "answer": "playground/widget.ts",
+  "closed_book_guess": "playground.html",
+  "category": "fact"
+ },
+ {
+  "id": 195,
+  "page": "api-reference",
+  "section": "Tick replay",
+  "sentence": " `setTicks(source)` makes a playing replay build each bar the way a live one forms: `[MASK]` returns the bar's intrabar updates, oldest first — `{ price, high?, low?, open?, volume?",
+  "answer": "source(bar, { end, signal })",
+  "closed_book_guess": "getTicks",
+  "category": "fact"
+ },
+ {
+  "id": 206,
+  "page": "api-reference",
+  "section": "`chart.marks` — the timeline-marks control surface",
+  "sentence": "}` (`'circle'` · `'square'` · `'diamond'` · `'pin'`, one or two characters in auto-contrasted ink) or `{ shape?, color, icon }` with an id from the icon registry (`[MASK]` from `vela/ui`).",
+  "answer": "registerIcon",
+  "closed_book_guess": "iconRegistry",
+  "category": "fact"
+ },
+ {
+  "id": 214,
+  "page": "data-providers",
+  "section": "The load lifecycle",
+  "sentence": "Deep history loads in chunks.** A `bars` count beyond one ~10k-bar chunk paints the recent window first (that's what `[MASK]` awaits), then backfills older bars **backward in bounded ranged requests** — each a quick `getBars({ to, limit })` the provider answers from its own pagination.",
+  "answer": "ready()",
+  "closed_book_guess": "firstPaintPromise",
+  "category": "fact"
+ },
+ {
+  "id": 223,
+  "page": "drawing-tools",
+  "section": "Driving drawings from code",
+  "sentence": "See the [`[MASK]` reference](./api-reference.md#chartdrawings-control-surface) for the full method list and which methods are gated by renderer support.",
+  "answer": "chart.drawings",
+  "closed_book_guess": "ChartDrawings",
+  "category": "equivalent"
+ },
+ {
+  "id": 224,
+  "page": "drawing-tools",
+  "section": "Persistence, undo & clipboard",
+  "sentence": "Saved styles.** `[MASK]` returns every tool's saved styles and `setToolTemplates()` replaces them, and `drawing:templates` follows changes.",
+  "answer": "chart.drawings.toolTemplates()",
+  "closed_book_guess": "getToolTemplates",
+  "category": "fact"
+ },
+ {
+  "id": 228,
+  "page": "drawing-tools",
+  "section": "Persistence, undo & clipboard",
+  "sentence": "Clipboard.** `copyToClipboard(ids)` + `paste()`, or `[MASK]` / `clone(id)`, mint fresh copies (new ids) and select them — an in-memory, per-chart clipboard.",
+  "answer": "duplicate(ids)",
+  "closed_book_guess": "duplicate(id)",
+  "category": "equivalent"
+ },
+ {
+  "id": 240,
+  "page": "examples",
+  "section": "A fully-featured setup",
+  "sentence": "Swap `[MASK]` for `data: myBars` to run the same thing offline (minus the live feed).",
+  "answer": "symbol",
+  "closed_book_guess": "feed: myBars",
+  "category": "fact"
+ },
+ {
+  "id": 242,
+  "page": "faq",
+  "section": "Which renderer and which engine should I use?",
+  "sentence": "For Pine Script, the `@luxalgo/vela-pinets` addon exports two forms with identical semantics:  In-process** (`[MASK]`) — runs on the main thread; simplest setup.",
+  "answer": "PineEngine",
+  "closed_book_guess": "VelaPineTSRenderer",
+  "category": "fact"
+ },
+ {
+  "id": 246,
+  "page": "faq",
+  "section": "Which renderer and which engine should I use?",
+  "sentence": "Register whichever form you want under the `[MASK]` language id — the call site is identical:   Default to the worker form; reach for the in-process one when you want the simplest possible setup or a debugger stepping through engine code on the main thread.",
+  "answer": "pine",
+  "closed_book_guess": "vela",
+  "category": "fact"
+ },
+ {
+  "id": 256,
+  "page": "installation",
+  "section": "Browser bundle (script tag)",
+  "sentence": " For script-tag usage without a bundler, the package ships self-contained browser builds:  `[MASK]` is the readable development build.",
+  "answer": "dist/vela.global.js",
+  "closed_book_guess": "vela.js",
+  "category": "fact"
+ },
+ {
+  "id": 257,
+  "page": "installation",
+  "section": "Browser bundle (script tag)",
+  "sentence": "`[MASK]` is the minified build to reference in production.",
+  "answer": "dist/vela.global.min.js",
+  "closed_book_guess": "vela.min.js",
+  "category": "fact"
+ },
+ {
+  "id": 267,
+  "page": "options",
+  "section": "The `settings` option — hiding settings-dialog entries",
+  "sentence": "Any subset works; a parent id makes its children redundant:   Conditional entries hide-and-stay-hidden: `trading-session` only appears on symbols that have sessions, `status-line` only when the shell's status line is on, `[MASK]` only when the host wires the theme switch — hiding them is safe either way.",
+  "answer": "canvas.theme",
+  "closed_book_guess": "theme-switch",
+  "category": "fact"
+ },
+ {
+  "id": 275,
+  "page": "quickstart",
+  "section": "Step 3 — Add an indicator from source",
+  "sentence": "`addIndicator` returns a handle synchronously, but the data fills in asynchronously.** The handle is usable right away — you can read its `[MASK]` and `title`, change inputs, or remove it — but the plotted values appear once execution resolves.",
+  "answer": "id",
+  "closed_book_guess": "outputs",
+  "category": "ambiguous"
+ },
+ {
+  "id": 278,
+  "page": "quickstart",
+  "section": "Step 1 — Create a chart",
+  "sentence": "With offline `[MASK]`, `timeframe` is still used — for bar spacing and axis labels — while `symbol`/`bars` are ignored (those drive the fetch path you are opting out of).",
+  "answer": "data",
+  "closed_book_guess": "mode",
+  "category": "fact"
+ },
+ {
+  "id": 280,
+  "page": "quickstart",
+  "section": "Step 2 — Register a scripting engine",
+  "sentence": "The addon also exports `[MASK]`, the same Pine semantics off the main thread.",
+  "answer": "PineWorkerEngine",
+  "closed_book_guess": "createPineEngine",
+  "category": "fact"
+ },
+ {
+  "id": 283,
+  "page": "renderer-features",
+  "section": "In-chart UI",
+  "sentence": "The drawing toolbar** is also in-chart UI, but it lives on its own facade — `[MASK]`, not `chart.renderer` — and is **shown by default**.",
+  "answer": "chart.drawings",
+  "closed_book_guess": "chart.drawingToolbar",
+  "category": "fact"
+ },
+ {
+  "id": 287,
+  "page": "renderer-features",
+  "section": "Styling the `shadeRight` veil",
+  "sentence": "It sits below the crosshair layer and above the candles, indicators and drawings, so a `[MASK]` on it reaches the bars under the veil but never the crosshair line or the veil color itself:    The element is transparent unless you style it, ignores the pointer, is hidden from assistive technology, and carries the `hidden` attribute whenever no veil is painted.",
+  "answer": "backdrop-filter",
+  "closed_book_guess": "background-color",
+  "category": "fact"
+ },
+ {
+  "id": 293,
+  "page": "scripting-engines",
+  "section": "Script tag / CDN",
+  "sentence": "**Load order is the contract** — `[MASK]` first, because the addon resolves `@luxalgo/vela` to the page's `window.Vela` rather than bundling a second copy of the library:  ",
+  "answer": "vela.global.js",
+  "closed_book_guess": "Vela CDN script",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "timeline-marks",
+  "section": "The popup",
+  "sentence": "Links open in a new tab with `[MASK]`; images must have an absolute `http(s)` source.",
+  "answer": "rel=\"noopener noreferrer\"",
+  "closed_book_guess": "target=\"_blank\"",
+  "category": "ambiguous"
+ },
+ {
+  "id": 307,
+  "page": "timeline-marks",
+  "section": "Groups, clusters, and stacks",
+  "sentence": "The user's choice is **persisted with the chart's cosmetic config** (`chart.renderer.getConfig()` → `[MASK]`), so it survives a reload and rides workspace templates.",
+  "answer": "marks.groups",
+  "closed_book_guess": "timelineMarks.grouping",
+  "category": "fact"
+ },
+ {
+  "id": 316,
+  "page": "workspace",
+  "section": "Single chart (`layout: false`)",
+  "sentence": " `layout: false` pins the workspace to **one chart**: the layout picker and the sync switches disappear (desktop and mobile), `[MASK]` is a no-op, and no `cells` entry is needed — the top-level chart options seed the single chart.",
+  "answer": "setLayout",
+  "closed_book_guess": "activeChartIndex",
+  "category": "fact"
+ },
+ {
+  "id": 317,
+  "page": "workspace",
+  "section": "Single chart (`layout: false`)",
+  "sentence": "Migrating from `[MASK]`.** The old single-chart class is deprecated and now wraps exactly this.",
+  "answer": "VelaWidget",
+  "closed_book_guess": "layout: true",
+  "category": "fact"
+ }
+]

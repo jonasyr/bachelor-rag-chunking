@@ -1,0 +1,953 @@
+{
+ "corpora": [
+  {
+   "name": "enroute",
+   "eligible": true,
+   "docs": 53,
+   "tokens": 81395,
+   "probes": 475,
+   "well_posed": 141,
+   "wp_share": 0.2968421052631579,
+   "misses": 90,
+   "categories": {
+    "fact": 71,
+    "example_name": 10,
+    "equivalent": 8,
+    "ambiguous": 1
+   },
+   "gap": 0.5035460992907801,
+   "ci": [
+    0.42101728667452093,
+    0.5860749119070392
+   ],
+   "jsx_per_10k": 0.4914306775600467,
+   "head_median": 6,
+   "page_iqr": [
+    677.0,
+    1917.0
+   ],
+   "code_blocks_per_10k": 19.0,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.16,
+   "unknown": 4,
+   "clean": 2,
+   "struct": 3,
+   "quality": 2,
+   "stable": 4,
+   "fit": 4,
+   "total": 81.2
+  },
+  {
+   "name": "xy",
+   "eligible": true,
+   "docs": 81,
+   "tokens": 159453,
+   "probes": 740,
+   "well_posed": 243,
+   "wp_share": 0.32837837837837835,
+   "misses": 93,
+   "categories": {
+    "fact": 77,
+    "example_name": 1,
+    "equivalent": 9,
+    "ambiguous": 6
+   },
+   "gap": 0.3168724279835391,
+   "ci": [
+    0.2583737478409088,
+    0.3753711081261694
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 7,
+   "page_iqr": [
+    1110.0,
+    2106.5
+   ],
+   "code_blocks_per_10k": 20.9,
+   "frontmatter_titles": 0.96,
+   "heading_jumps_per_page": 0.04,
+   "reference_share": 0.05,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 3,
+   "quality": 3,
+   "stable": 4,
+   "fit": 3,
+   "total": 73.8
+  },
+  {
+   "name": "djangoox",
+   "eligible": true,
+   "docs": 21,
+   "tokens": 135132,
+   "probes": 231,
+   "well_posed": 82,
+   "wp_share": 0.354978354978355,
+   "misses": 44,
+   "categories": {
+    "fact": 34,
+    "example_name": 0,
+    "equivalent": 5,
+    "ambiguous": 5
+   },
+   "gap": 0.4146341463414634,
+   "ci": [
+    0.30800022750391237,
+    0.5212680651790144
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 10,
+   "page_iqr": [
+    2069.5,
+    7169.0
+   ],
+   "code_blocks_per_10k": 13.5,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.19,
+   "reference_share": 0.08,
+   "unknown": 4,
+   "clean": 3,
+   "struct": 3,
+   "quality": 1,
+   "stable": 2,
+   "fit": 2,
+   "total": 71.2
+  },
+  {
+   "name": "socialsdk",
+   "eligible": true,
+   "docs": 63,
+   "tokens": 173668,
+   "probes": 618,
+   "well_posed": 243,
+   "wp_share": 0.3932038834951456,
+   "misses": 131,
+   "categories": {
+    "fact": 99,
+    "example_name": 18,
+    "equivalent": 5,
+    "ambiguous": 9
+   },
+   "gap": 0.4074074074074074,
+   "ci": [
+    0.3456277487669984,
+    0.46918706604781635
+   ],
+   "jsx_per_10k": 6.909735817767234,
+   "head_median": 5,
+   "page_iqr": [
+    973.0,
+    3298.0
+   ],
+   "code_blocks_per_10k": 18.3,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.21,
+   "unknown": 4,
+   "clean": 2,
+   "struct": 2,
+   "quality": 3,
+   "stable": 2,
+   "fit": 2,
+   "total": 71.2
+  },
+  {
+   "name": "strandsbox",
+   "eligible": true,
+   "docs": 40,
+   "tokens": 164627,
+   "probes": 383,
+   "well_posed": 101,
+   "wp_share": 0.26370757180156656,
+   "misses": 50,
+   "categories": {
+    "fact": 39,
+    "example_name": 6,
+    "equivalent": 1,
+    "ambiguous": 4
+   },
+   "gap": 0.38613861386138615,
+   "ci": [
+    0.2911870419234228,
+    0.4810901857993495
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 10.0,
+   "page_iqr": [
+    2066.5,
+    4688.25
+   ],
+   "code_blocks_per_10k": 18.7,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.03,
+   "reference_share": 0.13,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 4,
+   "quality": 1,
+   "stable": 4,
+   "fit": 3,
+   "total": 70.0
+  },
+  {
+   "name": "e2e",
+   "eligible": true,
+   "docs": 61,
+   "tokens": 228266,
+   "probes": 662,
+   "well_posed": 203,
+   "wp_share": 0.3066465256797583,
+   "misses": 98,
+   "categories": {
+    "fact": 74,
+    "example_name": 1,
+    "equivalent": 11,
+    "ambiguous": 12
+   },
+   "gap": 0.3645320197044335,
+   "ci": [
+    0.2983221505678363,
+    0.4307418888410307
+   ],
+   "jsx_per_10k": 18.005309594946247,
+   "head_median": 8,
+   "page_iqr": [
+    1222.0,
+    4600.0
+   ],
+   "code_blocks_per_10k": 38.1,
+   "frontmatter_titles": 0.92,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.59,
+   "unknown": 3,
+   "clean": 1,
+   "struct": 4,
+   "quality": 4,
+   "stable": 0,
+   "fit": 3,
+   "total": 67.5
+  },
+  {
+   "name": "tscharts",
+   "eligible": true,
+   "docs": 90,
+   "tokens": 219823,
+   "probes": 931,
+   "well_posed": 333,
+   "wp_share": 0.3576799140708915,
+   "misses": 110,
+   "categories": {
+    "fact": 99,
+    "example_name": 2,
+    "equivalent": 4,
+    "ambiguous": 5
+   },
+   "gap": 0.2972972972972973,
+   "ci": [
+    0.24820478618482603,
+    0.34638980840976863
+   ],
+   "jsx_per_10k": 2.1380838219840506,
+   "head_median": 6.0,
+   "page_iqr": [
+    1220.75,
+    2699.25
+   ],
+   "code_blocks_per_10k": 26.2,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.61,
+   "unknown": 2,
+   "clean": 3,
+   "struct": 3,
+   "quality": 3,
+   "stable": 3,
+   "fit": 3,
+   "total": 66.2
+  },
+  {
+   "name": "vela",
+   "eligible": true,
+   "docs": 35,
+   "tokens": 106951,
+   "probes": 327,
+   "well_posed": 104,
+   "wp_share": 0.3180428134556575,
+   "misses": 42,
+   "categories": {
+    "fact": 33,
+    "example_name": 0,
+    "equivalent": 3,
+    "ambiguous": 6
+   },
+   "gap": 0.3173076923076923,
+   "ci": [
+    0.2278552491433234,
+    0.4067601354720612
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 7,
+   "page_iqr": [
+    1032.0,
+    3586.0
+   ],
+   "code_blocks_per_10k": 10.7,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.18,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 3,
+   "quality": 2,
+   "stable": 2,
+   "fit": 3,
+   "total": 65.0
+  },
+  {
+   "name": "vue",
+   "eligible": false,
+   "docs": 79,
+   "tokens": 177951,
+   "probes": 685,
+   "well_posed": 517,
+   "wp_share": 0.7547445255474453,
+   "misses": 101,
+   "categories": {
+    "fact": 36,
+    "example_name": 33,
+    "equivalent": 27,
+    "ambiguous": 5
+   },
+   "gap": 0.06963249516441006,
+   "ci": [
+    0.04769212020889288,
+    0.09157287011992724
+   ],
+   "jsx_per_10k": 8.935043916583778,
+   "head_median": 9,
+   "page_iqr": [
+    1135.0,
+    3108.0
+   ],
+   "code_blocks_per_10k": 60.7,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.01,
+   "reference_share": 0.26,
+   "unknown": 0,
+   "clean": 4,
+   "struct": 4,
+   "quality": 4,
+   "stable": 4,
+   "fit": 4,
+   "total": 65.0
+  },
+  {
+   "name": "betterdrizzle",
+   "eligible": true,
+   "docs": 80,
+   "tokens": 141910,
+   "probes": 848,
+   "well_posed": 341,
+   "wp_share": 0.40212264150943394,
+   "misses": 121,
+   "categories": {
+    "fact": 107,
+    "example_name": 7,
+    "equivalent": 5,
+    "ambiguous": 2
+   },
+   "gap": 0.31378299120234604,
+   "ci": [
+    0.2645309402127846,
+    0.36303504219190746
+   ],
+   "jsx_per_10k": 22.619970403777042,
+   "head_median": 7.0,
+   "page_iqr": [
+    1116.0,
+    2211.75
+   ],
+   "code_blocks_per_10k": 43.6,
+   "frontmatter_titles": 0.99,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.09,
+   "unknown": 3,
+   "clean": 1,
+   "struct": 3,
+   "quality": 3,
+   "stable": 1,
+   "fit": 3,
+   "total": 62.5
+  },
+  {
+   "name": "ngnative",
+   "eligible": true,
+   "docs": 141,
+   "tokens": 227912,
+   "probes": 1530,
+   "well_posed": 580,
+   "wp_share": 0.3790849673202614,
+   "misses": 225,
+   "categories": {
+    "fact": 181,
+    "example_name": 2,
+    "equivalent": 21,
+    "ambiguous": 21
+   },
+   "gap": 0.3120689655172414,
+   "ci": [
+    0.27436041695771235,
+    0.34977751407677043
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 5,
+   "page_iqr": [
+    719.5,
+    2010.5
+   ],
+   "code_blocks_per_10k": 28.1,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.05,
+   "unknown": 3,
+   "clean": 3,
+   "struct": 2,
+   "quality": 3,
+   "stable": 0,
+   "fit": 2,
+   "total": 61.2
+  },
+  {
+   "name": "microcharts",
+   "eligible": true,
+   "docs": 131,
+   "tokens": 159130,
+   "probes": 583,
+   "well_posed": 173,
+   "wp_share": 0.2967409948542024,
+   "misses": 71,
+   "categories": {
+    "fact": 57,
+    "example_name": 1,
+    "equivalent": 8,
+    "ambiguous": 5
+   },
+   "gap": 0.32947976878612717,
+   "ci": [
+    0.259438607336047,
+    0.39952093023620733
+   ],
+   "jsx_per_10k": 149.18619996229498,
+   "head_median": 9,
+   "page_iqr": [
+    856.0,
+    1210.0
+   ],
+   "code_blocks_per_10k": 4.5,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.0,
+   "unknown": 3,
+   "clean": 0,
+   "struct": 4,
+   "quality": 1,
+   "stable": 4,
+   "fit": 2,
+   "total": 60.0
+  },
+  {
+   "name": "lattice",
+   "eligible": true,
+   "docs": 106,
+   "tokens": 145227,
+   "probes": 1019,
+   "well_posed": 403,
+   "wp_share": 0.39548577036310106,
+   "misses": 182,
+   "categories": {
+    "fact": 115,
+    "example_name": 8,
+    "equivalent": 42,
+    "ambiguous": 17
+   },
+   "gap": 0.2853598014888337,
+   "ci": [
+    0.24126943932396092,
+    0.3294501636537065
+   ],
+   "jsx_per_10k": 16.870141227182273,
+   "head_median": 5.0,
+   "page_iqr": [
+    500.25,
+    1982.75
+   ],
+   "code_blocks_per_10k": 39.2,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.03,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 2,
+   "quality": 3,
+   "stable": 4,
+   "fit": 2,
+   "total": 58.8
+  },
+  {
+   "name": "nimbus",
+   "eligible": true,
+   "docs": 70,
+   "tokens": 86794,
+   "probes": 395,
+   "well_posed": 110,
+   "wp_share": 0.27848101265822783,
+   "misses": 54,
+   "categories": {
+    "fact": 43,
+    "example_name": 3,
+    "equivalent": 7,
+    "ambiguous": 1
+   },
+   "gap": 0.39090909090909093,
+   "ci": [
+    0.29972088467784397,
+    0.4820972971403379
+   ],
+   "jsx_per_10k": 57.0315920455331,
+   "head_median": 5.0,
+   "page_iqr": [
+    311.75,
+    1465.0
+   ],
+   "code_blocks_per_10k": 20.0,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.25,
+   "unknown": 3,
+   "clean": 0,
+   "struct": 2,
+   "quality": 4,
+   "stable": 0,
+   "fit": 3,
+   "total": 56.2
+  },
+  {
+   "name": "gori",
+   "eligible": true,
+   "docs": 46,
+   "tokens": 247971,
+   "probes": 480,
+   "well_posed": 124,
+   "wp_share": 0.25833333333333336,
+   "misses": 56,
+   "categories": {
+    "fact": 46,
+    "example_name": 0,
+    "equivalent": 5,
+    "ambiguous": 5
+   },
+   "gap": 0.3709677419354839,
+   "ci": [
+    0.28594213107006383,
+    0.4559933528009039
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 6.0,
+   "page_iqr": [
+    1424.75,
+    4171.25
+   ],
+   "code_blocks_per_10k": 12.3,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.15,
+   "reference_share": 0.37,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 2,
+   "quality": 2,
+   "stable": 0,
+   "fit": 3,
+   "total": 56.2
+  },
+  {
+   "name": "sightmap",
+   "eligible": true,
+   "docs": 38,
+   "tokens": 79174,
+   "probes": 390,
+   "well_posed": 84,
+   "wp_share": 0.2153846153846154,
+   "misses": 37,
+   "categories": {
+    "fact": 27,
+    "example_name": 2,
+    "equivalent": 4,
+    "ambiguous": 4
+   },
+   "gap": 0.32142857142857145,
+   "ci": [
+    0.22155364965138052,
+    0.4213034932057624
+   ],
+   "jsx_per_10k": 21.219087074039457,
+   "head_median": 6.0,
+   "page_iqr": [
+    933.25,
+    2379.25
+   ],
+   "code_blocks_per_10k": 30.1,
+   "frontmatter_titles": 0.97,
+   "heading_jumps_per_page": 0.05,
+   "reference_share": 0.86,
+   "unknown": 3,
+   "clean": 0,
+   "struct": 3,
+   "quality": 3,
+   "stable": 3,
+   "fit": 0,
+   "total": 56.2
+  },
+  {
+   "name": "blume",
+   "eligible": true,
+   "docs": 65,
+   "tokens": 158850,
+   "probes": 719,
+   "well_posed": 305,
+   "wp_share": 0.4242002781641168,
+   "misses": 112,
+   "categories": {
+    "fact": 81,
+    "example_name": 3,
+    "equivalent": 14,
+    "ambiguous": 14
+   },
+   "gap": 0.26557377049180325,
+   "ci": [
+    0.21600903065322943,
+    0.31513851033037704
+   ],
+   "jsx_per_10k": 14.038401007239534,
+   "head_median": 5,
+   "page_iqr": [
+    971.5,
+    3234.5
+   ],
+   "code_blocks_per_10k": 33.9,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.43,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 2,
+   "quality": 4,
+   "stable": 0,
+   "fit": 3,
+   "total": 55.0
+  },
+  {
+   "name": "angular",
+   "eligible": false,
+   "docs": 256,
+   "tokens": 508000,
+   "probes": 680,
+   "well_posed": 452,
+   "wp_share": 0.6647058823529411,
+   "misses": 118,
+   "categories": {
+    "fact": 58,
+    "example_name": 27,
+    "equivalent": 19,
+    "ambiguous": 14
+   },
+   "gap": 0.12831858407079647,
+   "ci": [
+    0.09748595722746858,
+    0.15915121091412435
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 5.0,
+   "page_iqr": [
+    436.5,
+    2828.25
+   ],
+   "code_blocks_per_10k": 31.9,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.04,
+   "reference_share": 0.16,
+   "unknown": 1,
+   "clean": 4,
+   "struct": 2,
+   "quality": 3,
+   "stable": 1,
+   "fit": 4,
+   "total": 55.0
+  },
+  {
+   "name": "pgcontext",
+   "eligible": true,
+   "docs": 66,
+   "tokens": 179407,
+   "probes": 515,
+   "well_posed": 169,
+   "wp_share": 0.32815533980582523,
+   "misses": 72,
+   "categories": {
+    "fact": 60,
+    "example_name": 0,
+    "equivalent": 3,
+    "ambiguous": 9
+   },
+   "gap": 0.35502958579881655,
+   "ci": [
+    0.28288314870542514,
+    0.42717602289220796
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 3.0,
+   "page_iqr": [
+    676.75,
+    2630.5
+   ],
+   "code_blocks_per_10k": 10.6,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.02,
+   "reference_share": 0.08,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 1,
+   "quality": 1,
+   "stable": 4,
+   "fit": 1,
+   "total": 53.8
+  },
+  {
+   "name": "shipyard",
+   "eligible": true,
+   "docs": 46,
+   "tokens": 151311,
+   "probes": 497,
+   "well_posed": 133,
+   "wp_share": 0.2676056338028169,
+   "misses": 58,
+   "categories": {
+    "fact": 35,
+    "example_name": 2,
+    "equivalent": 7,
+    "ambiguous": 14
+   },
+   "gap": 0.2631578947368421,
+   "ci": [
+    0.18831929209391457,
+    0.3379964973797696
+   ],
+   "jsx_per_10k": 2.7096509837354854,
+   "head_median": 8.0,
+   "page_iqr": [
+    1256.75,
+    4348.75
+   ],
+   "code_blocks_per_10k": 9.8,
+   "frontmatter_titles": 1.0,
+   "heading_jumps_per_page": 0.02,
+   "reference_share": 0.27,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 4,
+   "quality": 3,
+   "stable": 0,
+   "fit": 1,
+   "total": 53.8
+  },
+  {
+   "name": "nub",
+   "eligible": true,
+   "docs": 47,
+   "tokens": 114918,
+   "probes": 506,
+   "well_posed": 262,
+   "wp_share": 0.5177865612648221,
+   "misses": 80,
+   "categories": {
+    "fact": 53,
+    "example_name": 3,
+    "equivalent": 15,
+    "ambiguous": 9
+   },
+   "gap": 0.20229007633587787,
+   "ci": [
+    0.15364765197597718,
+    0.25093250069577855
+   ],
+   "jsx_per_10k": 14.532101150385492,
+   "head_median": 6,
+   "page_iqr": [
+    897.0,
+    2658.0
+   ],
+   "code_blocks_per_10k": 53.2,
+   "frontmatter_titles": 0.96,
+   "heading_jumps_per_page": 0.13,
+   "reference_share": 0.06,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 2,
+   "quality": 3,
+   "stable": 3,
+   "fit": 1,
+   "total": 53.8
+  },
+  {
+   "name": "decionis",
+   "eligible": true,
+   "docs": 64,
+   "tokens": 154947,
+   "probes": 645,
+   "well_posed": 129,
+   "wp_share": 0.2,
+   "misses": 69,
+   "categories": {
+    "fact": 37,
+    "example_name": 3,
+    "equivalent": 13,
+    "ambiguous": 16
+   },
+   "gap": 0.2868217054263566,
+   "ci": [
+    0.2087728961818497,
+    0.3648705146708635
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 6.0,
+   "page_iqr": [
+    1088.75,
+    2725.0
+   ],
+   "code_blocks_per_10k": 7.2,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.0,
+   "reference_share": 0.15,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 3,
+   "quality": 2,
+   "stable": 2,
+   "fit": 1,
+   "total": 51.2
+  },
+  {
+   "name": "zuke",
+   "eligible": true,
+   "docs": 42,
+   "tokens": 175086,
+   "probes": 434,
+   "well_posed": 125,
+   "wp_share": 0.2880184331797235,
+   "misses": 49,
+   "categories": {
+    "fact": 40,
+    "example_name": 2,
+    "equivalent": 4,
+    "ambiguous": 3
+   },
+   "gap": 0.32,
+   "ci": [
+    0.238223125029138,
+    0.401776874970862
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 6.0,
+   "page_iqr": [
+    1251.0,
+    4924.25
+   ],
+   "code_blocks_per_10k": 13.8,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.12,
+   "reference_share": 0.1,
+   "unknown": 3,
+   "clean": 2,
+   "struct": 2,
+   "quality": 1,
+   "stable": 2,
+   "fit": 0,
+   "total": 50.0
+  },
+  {
+   "name": "nvx",
+   "eligible": true,
+   "docs": 45,
+   "tokens": 138779,
+   "probes": 254,
+   "well_posed": 62,
+   "wp_share": 0.2440944881889764,
+   "misses": 25,
+   "categories": {
+    "fact": 18,
+    "example_name": 0,
+    "equivalent": 3,
+    "ambiguous": 4
+   },
+   "gap": 0.2903225806451613,
+   "ci": [
+    0.1773348911152945,
+    0.40331027017502813
+   ],
+   "jsx_per_10k": 0.0,
+   "head_median": 5,
+   "page_iqr": [
+    866.0,
+    3270.0
+   ],
+   "code_blocks_per_10k": 11.2,
+   "frontmatter_titles": 0.0,
+   "heading_jumps_per_page": 0.02,
+   "reference_share": 0.0,
+   "unknown": 2,
+   "clean": 2,
+   "struct": 2,
+   "quality": 1,
+   "stable": 0,
+   "fit": 3,
+   "total": 43.8
+  }
+ ],
+ "sensitivity": {
+  "preregistered": [
+   "enroute",
+   "xy",
+   "djangoox",
+   "socialsdk",
+   "strandsbox"
+  ],
+  "equal": [
+   "enroute",
+   "xy",
+   "strandsbox",
+   "tscharts",
+   "djangoox"
+  ],
+  "unknown50": [
+   "enroute",
+   "djangoox",
+   "socialsdk",
+   "xy",
+   "strandsbox"
+  ],
+  "no_stability_fit": [
+   "e2e",
+   "socialsdk",
+   "enroute",
+   "djangoox",
+   "xy"
+  ],
+  "quality_heavy": [
+   "enroute",
+   "e2e",
+   "xy",
+   "socialsdk",
+   "tscharts"
+  ]
+ }
+}

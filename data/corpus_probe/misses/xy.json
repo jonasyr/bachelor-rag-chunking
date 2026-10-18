@@ -1,0 +1,839 @@
+[
+ {
+  "id": 3,
+  "page": "Custom Marks",
+  "section": "Registry rules",
+  "sentence": "Pass `[MASK]` when that is genuinely what you want.",
+  "answer": "replace=True",
+  "closed_book_guess": "None",
+  "category": "fact"
+ },
+ {
+  "id": 11,
+  "page": "XY Architecture",
+  "section": "2. Send a compact payload",
+  "sentence": "Geometry is offset-encoded to `[MASK]` for efficient GPU upload while keeping visible differences in large values such as timestamps.",
+  "answer": "float32",
+  "closed_book_guess": "f32",
+  "category": "equivalent"
+ },
+ {
+  "id": 16,
+  "page": "Choosing a Runtime and Deployment Mode",
+  "section": "Applications run on Reflex",
+  "sentence": "The integration is experimental and ships inside the published `[MASK]` distribution.",
+  "answer": "xy",
+  "closed_book_guess": "reflex",
+  "category": "fact"
+ },
+ {
+  "id": 17,
+  "page": "Choosing a Runtime and Deployment Mode",
+  "section": "Applications run on Reflex",
+  "sentence": "Install `[MASK]` so the environment also selects a supported Reflex version, then import it as `reflex_xy`.",
+  "answer": "xy[reflex]",
+  "closed_book_guess": "reflex[xy]",
+  "category": "fact"
+ },
+ {
+  "id": 37,
+  "page": "Events and Callbacks",
+  "section": "Reflex Integration Events",
+  "sentence": "`on_select_end` includes `total`, `cleared`, and either box bounds or the data-space `[MASK]` used by a lasso selection.",
+  "answer": "polygon",
+  "closed_book_guess": "points",
+  "category": "fact"
+ },
+ {
+  "id": 41,
+  "page": "Events and Callbacks",
+  "section": "Core Python Callbacks",
+  "sentence": "Depending on the mark's channels, they can also contain `color_value`, `color_category`, or `[MASK]`.",
+  "answer": "size_value",
+  "closed_book_guess": "color_gradient",
+  "category": "fact"
+ },
+ {
+  "id": 42,
+  "page": "Events and Callbacks",
+  "section": "Core Python Callbacks",
+  "sentence": "Depending on the mark's channels, they can also contain `[MASK]`, `color_category`, or `size_value`.",
+  "answer": "color_value",
+  "closed_book_guess": "x_value",
+  "category": "fact"
+ },
+ {
+  "id": 53,
+  "page": "Figure Methods",
+  "section": "Data Readout and Mutation",
+  "sentence": "`[MASK]` translates a shipped vertex index to an exact canonical row when possible and returns `None` for an invalid index.",
+  "answer": "pick()",
+  "closed_book_guess": "get_row_index",
+  "category": "fact"
+ },
+ {
+  "id": 57,
+  "page": "Figure Methods",
+  "section": "Data Readout and Mutation",
+  "sentence": "`[MASK]` extends supported scatter or line traces.",
+  "answer": "append()",
+  "closed_book_guess": "FigureWidget",
+  "category": "fact"
+ },
+ {
+  "id": 80,
+  "page": "Marks and Components",
+  "section": "Chrome and Behavior",
+  "sentence": "`[MASK]` derives its domain and colormap from the last supported continuous mark, while `title`, `ticks`, and `orientation` control its presentation.",
+  "answer": "colorbar()",
+  "closed_book_guess": "ColorScale",
+  "category": "fact"
+ },
+ {
+  "id": 82,
+  "page": "Public Types",
+  "section": "Output and Interaction Types",
+  "sentence": "  `Engine.auto` is the default for `[MASK]` and `write_image()`: it selects XY's native, browser-free renderer unless `custom_css` requires a browser CSS engine.",
+  "answer": "to_image()",
+  "closed_book_guess": "show",
+  "category": "fact"
+ },
+ {
+  "id": 83,
+  "page": "Public Types",
+  "section": "Output and Interaction Types",
+  "sentence": "`[MASK]` explicitly selects the native renderer, while `Engine.chromium` selects browser-fidelity export.",
+  "answer": "Engine.default",
+  "closed_book_guess": "Engine.native",
+  "category": "fact"
+ },
+ {
+  "id": 87,
+  "page": "Public Types",
+  "section": "Public Constants",
+  "sentence": "`[MASK]` reports the installed package version.",
+  "answer": "__version__",
+  "closed_book_guess": "VERSION",
+  "category": "fact"
+ },
+ {
+  "id": 90,
+  "page": "Public Types",
+  "section": "Output and Interaction Types",
+  "sentence": "`Engine.default` explicitly selects the native renderer, while `[MASK]` selects browser-fidelity export.",
+  "answer": "Engine.chromium",
+  "closed_book_guess": "Engine.browser",
+  "category": "fact"
+ },
+ {
+  "id": 92,
+  "page": "Public Types",
+  "section": "Public Constants",
+  "sentence": "The old fluent `[MASK]` class is not root-exported.",
+  "answer": "Figure",
+  "closed_book_guess": "ChartBuilder",
+  "category": "fact"
+ },
+ {
+  "id": 104,
+  "page": "AGENTS",
+  "section": "Conventions",
+  "sentence": "Use `[MASK]` fences for code with a live preview.",
+  "answer": "python demo exec",
+  "closed_book_guess": "```xy",
+  "category": "fact"
+ },
+ {
+  "id": 119,
+  "page": "Area Charts in Python",
+  "section": "Key Options",
+  "sentence": " `[MASK]` uses `color`, `width`, `opacity`, `curve`, and `dash`.",
+  "answer": "line",
+  "closed_book_guess": "stroke",
+  "category": "fact"
+ },
+ {
+  "id": 134,
+  "page": "Bar Chart in Python",
+  "section": "Create a Bar Chart",
+  "sentence": " Pass a list of categories and a matching array of values to `bar`, and set `[MASK]` so the bars run left to right.",
+  "answer": "orientation=\"horizontal\"",
+  "closed_book_guess": "horizontal=True",
+  "category": "fact"
+ },
+ {
+  "id": 161,
+  "page": "Funnel Chart in Python",
+  "section": "Style a Funnel",
+  "sentence": " Per-stage paint is a channel, not a style: pass `[MASK]` for one CSS color per stage, `color=` for a single constant, or let the theme palette assign colors in declared stage order.",
+  "answer": "colors=",
+  "closed_book_guess": "fill",
+  "category": "fact"
+ },
+ {
+  "id": 167,
+  "page": "Funnel Chart in Python",
+  "section": "Shape the Silhouette",
+  "sentence": "`[MASK]` floors drawn cross widths at a fraction of the widest stage so tiny stages stay visible.",
+  "answer": "min_width",
+  "closed_book_guess": "min_width_ratio",
+  "category": "fact"
+ },
+ {
+  "id": 169,
+  "page": "Funnel Chart in Python",
+  "section": "Shape the Silhouette",
+  "sentence": " `[MASK]` separates segments along the stage axis as a fraction of the stage pitch.",
+  "answer": "gap",
+  "closed_book_guess": "stage_gap",
+  "category": "fact"
+ },
+ {
+  "id": 171,
+  "page": "Heatmap in Python",
+  "section": "How do I change the heatmap colors?",
+  "sentence": " Set `colormap` on `heatmap`, for example `[MASK]`.",
+  "answer": "colormap=\"viridis\"",
+  "closed_book_guess": "heatmap(data, colormap=\"viridis\")",
+  "category": "equivalent"
+ },
+ {
+  "id": 178,
+  "page": "Heatmap in Python",
+  "section": "Add a Colorbar Scale",
+  "sentence": "Use `[MASK]` to blend the grid over other marks when you overlay a heatmap on additional context.",
+  "answer": "opacity",
+  "closed_book_guess": "blend=\"multiply\"",
+  "category": "fact"
+ },
+ {
+  "id": 190,
+  "page": "Hexbin Plot in Python",
+  "section": "Count Bins and Value Channels",
+  "sentence": "To color by a quantity instead of a raw count, pass a `C`[MASK]`reduce_C_function` (for example `np.mean`) to reduce the values that fall in each cell into a single color.",
+  "answer": " value array and set ",
+  "closed_book_guess": "= np.mean, to the `C` parameter and set `reduce_C_function`",
+  "category": "ambiguous"
+ },
+ {
+  "id": 194,
+  "page": "Histogram in Python",
+  "section": "Overlay Two Distributions",
+  "sentence": " Stack two `histogram` marks in one chart with shared `bins` and `range`, name each with `[MASK]`, lower `opacity` so both stay readable, and add `xy.legend()`.",
+  "answer": "name=",
+  "closed_book_guess": "label",
+  "category": "fact"
+ },
+ {
+  "id": 195,
+  "page": "Histogram in Python",
+  "section": "Overlay Two Distributions",
+  "sentence": " Stack two `histogram` marks in one chart with shared `bins` and `range`, name each with `name=`, lower `opacity` so both stay readable, and add `[MASK]`.",
+  "answer": "xy.legend()",
+  "closed_book_guess": "legend=True",
+  "category": "fact"
+ },
+ {
+  "id": 199,
+  "page": "Histogram in Python",
+  "section": "Probability Density with Styled Bars",
+  "sentence": " Set `[MASK]` to normalize the bars, clamp binning to a `(min, max)` window with `range`, and soften the bars with `corner_radius` and `opacity`.",
+  "answer": "density=True",
+  "closed_book_guess": "density",
+  "category": "equivalent"
+ },
+ {
+  "id": 200,
+  "page": "Histogram in Python",
+  "section": "Overlay Two Distributions",
+  "sentence": " Stack two `histogram` marks in one chart with shared `bins` and `[MASK]`, name each with `name=`, lower `opacity` so both stay readable, and add `xy.legend()`.",
+  "answer": "range",
+  "closed_book_guess": "density=True",
+  "category": "fact"
+ },
+ {
+  "id": 205,
+  "page": "Line Chart in Python",
+  "section": "Large and Real-Time Line Charts",
+  "sentence": " `[MASK]` is built for large data: a line with millions of points renders as a decimated path sized to the screen, then refines when the viewport changes, so navigation never blocks.",
+  "answer": "xy",
+  "closed_book_guess": "LineChart",
+  "category": "fact"
+ },
+ {
+  "id": 223,
+  "page": "Polar Charts in Python",
+  "section": "Configure the Radial Axis",
+  "sentence": "`[MASK]` places the shared radial origin in data space, so an origin below the visible minimum creates an annulus.",
+  "answer": "origin=",
+  "closed_book_guess": "radial_axis_origin",
+  "category": "fact"
+ },
+ {
+  "id": 224,
+  "page": "Polar Charts in Python",
+  "section": "Use `xy.pyplot`",
+  "sentence": "The `polar=True` alias is accepted by `subplot()`, `add_subplot()`, and `[MASK]`, or inside `subplot_kw`; it is not a direct `plt.subplots(polar=True)` argument.",
+  "answer": "axes()",
+  "closed_book_guess": "figure.add_subplot()",
+  "category": "fact"
+ },
+ {
+  "id": 235,
+  "page": "Radar Charts in Python",
+  "section": "Choose Filled Areas or Outlines",
+  "sentence": "If `[MASK]` is omitted, it falls back to the area's `color`.",
+  "answer": "line_color",
+  "closed_book_guess": "fill_color",
+  "category": "fact"
+ },
+ {
+  "id": 238,
+  "page": "Radar Charts in Python",
+  "section": "Choose Filled Areas or Outlines",
+  "sentence": "Give each series a `name` and add `[MASK]` when the chart contains more than one profile.",
+  "answer": "xy.legend()",
+  "closed_book_guess": "fillOpacity",
+  "category": "fact"
+ },
+ {
+  "id": 248,
+  "page": "Radial Bar Charts in Python",
+  "section": "Inner Radius and Sector Geometry",
+  "sentence": "A single sector with `[MASK]` on a degree axis (or a full `2π` width on a radian axis) and a positive `base` draws a complete annulus.",
+  "answer": "width=360",
+  "closed_book_guess": "360°",
+  "category": "ambiguous"
+ },
+ {
+  "id": 253,
+  "page": "Radial Bar Charts in Python",
+  "section": "Inner Radius and Sector Geometry",
+  "sentence": "`[MASK]` belongs to the mark and may differ per bar.",
+  "answer": "base=",
+  "closed_book_guess": "inner_radius",
+  "category": "fact"
+ },
+ {
+  "id": 255,
+  "page": "Radial Bar Charts in Python",
+  "section": "Inner Radius and Sector Geometry",
+  "sentence": "For one chart-wide opening, use `r_axis(hole=...)` to reserve a display-space inner fraction or `[MASK]` to set a data-space radial origin.",
+  "answer": "r_axis(origin=...)",
+  "closed_book_guess": "r_axis(min=...)",
+  "category": "fact"
+ },
+ {
+  "id": 258,
+  "page": "Sankey Diagram in Python",
+  "section": "Compare Sink Alignment",
+  "sentence": "With `[MASK]`, an early sink stays in the first layer where the graph places it.",
+  "answer": "align=\"left\"",
+  "closed_book_guess": "sink_align=\"left\"",
+  "category": "fact"
+ },
+ {
+  "id": 259,
+  "page": "Sankey Diagram in Python",
+  "section": "How do I move terminal nodes to the right edge?",
+  "sentence": "Choose `\"left\"`, `\"right\"`, or `[MASK]` when a different layer alignment better matches the story in your data.",
+  "answer": "\"center\"",
+  "closed_book_guess": "\"justify\"",
+  "category": "ambiguous"
+ },
+ {
+  "id": 260,
+  "page": "Sankey Diagram in Python",
+  "section": "Trace a Dense Energy Network",
+  "sentence": "This energy balance uses four stages, a compact `[MASK]`, and extra crossing-minimization `iterations`.",
+  "answer": "node_padding",
+  "closed_book_guess": "node_pad",
+  "category": "fact"
+ },
+ {
+  "id": 266,
+  "page": "Sankey Diagram in Python",
+  "section": "How do I move terminal nodes to the right edge?",
+  "sentence": "Choose `[MASK]`, `\"right\"`, or `\"center\"` when a different layer alignment better matches the story in your data.",
+  "answer": "\"left\"",
+  "closed_book_guess": "\"justify\"",
+  "category": "ambiguous"
+ },
+ {
+  "id": 275,
+  "page": "Scatter Plot in Python",
+  "section": "How do I make a bubble chart in Python?",
+  "sentence": " Pass a value array to `size` along with `[MASK]` to map it to pixel diameters — a bubble chart is a scatter plot with a third variable encoded as point size.",
+  "answer": "size_range",
+  "closed_book_guess": "scale_linear()",
+  "category": "fact"
+ },
+ {
+  "id": 302,
+  "page": "Error Bar and Band Charts in Python",
+  "section": "Key Options",
+  "sentence": " `errorbar` uses `xerr`, `yerr`, `cap_size`, `width`, `color`, and `[MASK]`.",
+  "answer": "opacity",
+  "closed_book_guess": "fmt",
+  "category": "fact"
+ },
+ {
+  "id": 308,
+  "page": "Violin Plot in Python",
+  "section": "Violin Plots in Python",
+  "sentence": "With `[MASK]` you build a violin plot in Python that compares several groups side by side and stays interactive — pan, zoom, and hover across every curve.",
+  "answer": "xy",
+  "closed_book_guess": "go.Figure.add_trace(go.Violin)",
+  "category": "fact"
+ },
+ {
+  "id": 314,
+  "page": "Wind Rose Charts in Python",
+  "section": "Why are some observations missing?",
+  "sentence": "With authored `[MASK]`, make sure the final upper edge covers the fastest finite observation.",
+  "answer": "speed_bins",
+  "closed_book_guess": "bins",
+  "category": "fact"
+ },
+ {
+  "id": 347,
+  "page": "Colorbars in Python",
+  "section": "Built-in declarative colorbars",
+  "sentence": "A field or mark name supplies the default title; `title=` overrides it, `[MASK]` supplies finite tick positions, and `orientation=` accepts `\"vertical\"` or `\"horizontal\"`.",
+  "answer": "ticks=",
+  "closed_book_guess": "tickCount=",
+  "category": "fact"
+ },
+ {
+  "id": 355,
+  "page": "Colorbars in Python",
+  "section": "Built-in declarative colorbars",
+  "sentence": "A field or mark name supplies the default title; `title=` overrides it, `ticks=` supplies finite tick positions, and `[MASK]` accepts `\"vertical\"` or `\"horizontal\"`.",
+  "answer": "orientation=",
+  "closed_book_guess": "orient=",
+  "category": "fact"
+ },
+ {
+  "id": 370,
+  "page": "Legends in Python",
+  "section": "Basic Legend from Named Series",
+  "sentence": " Giving each mark a `name=` is all it takes — a bare `[MASK]` simply opts into the default placement for the named series.",
+  "answer": "xy.legend()",
+  "closed_book_guess": "Legend()",
+  "category": "fact"
+ },
+ {
+  "id": 375,
+  "page": "Legends in Python",
+  "section": "How do I add a legend to a chart in Python?",
+  "sentence": "Add `[MASK]` only when you want to configure placement, columns, title, visibility, or styling.",
+  "answer": "xy.legend()",
+  "closed_book_guess": "legend_props",
+  "category": "fact"
+ },
+ {
+  "id": 379,
+  "page": "Legends in Python",
+  "section": "Basic Legend from Named Series",
+  "sentence": " Giving each mark a `[MASK]` is all it takes — a bare `xy.legend()` simply opts into the default placement for the named series.",
+  "answer": "name=",
+  "closed_book_guess": "label",
+  "category": "fact"
+ },
+ {
+  "id": 391,
+  "page": "Marks in Python",
+  "section": "Shared Mark Behavior",
+  "sentence": "Data-driven `color` and `[MASK]` channels are available where the mark supports them.",
+  "answer": "size",
+  "closed_book_guess": "opacity",
+  "category": "fact"
+ },
+ {
+  "id": 396,
+  "page": "Modebars & Controls in Python",
+  "section": "Configure Pan and Zoom",
+  "sentence": "The zoom policy applies consistently to wheel zoom, modebar zoom-in/out, and box zoom:  ~~~python chart = xy.line_chart( xy.line([0, 1, 2, 3], [1, 3, 2, 5]), xy.interaction_config(zoom_axes=(\"x\",)), ) ~~~  Use `[MASK]` for y-only zoom.",
+  "answer": "zoom_axes=(\"y\",)",
+  "closed_book_guess": "(\"y\",)",
+  "category": "equivalent"
+ },
+ {
+  "id": 399,
+  "page": "Modebars & Controls in Python",
+  "section": "Configure Pan and Zoom",
+  "sentence": "On a multi-axis chart, IDs are exact: `[MASK]` changes x and y2 while primary y remains fixed.",
+  "answer": "zoom_axes=(\"x\", \"y2\")",
+  "closed_book_guess": "x2y2",
+  "category": "fact"
+ },
+ {
+  "id": 400,
+  "page": "Modebars & Controls in Python",
+  "section": "Configure Pan and Zoom",
+  "sentence": "The complete navigation policy is:   Omitted `[MASK]` resolves to `(1.0, None)` on every zoom axis.",
+  "answer": "zoom_limits",
+  "closed_book_guess": "zoom_factor",
+  "category": "fact"
+ },
+ {
+  "id": 403,
+  "page": "Modebars & Controls in Python",
+  "section": "Constrained navigation in practice",
+  "sentence": "The `on_select` callback receives a canonical `[MASK]`; `on_brush` receives the box or polygon geometry.",
+  "answer": "Selection",
+  "closed_book_guess": "selection geometry",
+  "category": "fact"
+ },
+ {
+  "id": 404,
+  "page": "Tooltips in Python",
+  "section": "How do I customize which fields a tooltip shows and how numbers are formatted?",
+  "sentence": " Pass `[MASK]` and `format=` to `xy.tooltip()`, e.g.",
+  "answer": "fields=",
+  "closed_book_guess": "label",
+  "category": "fact"
+ },
+ {
+  "id": 406,
+  "page": "Tooltips in Python",
+  "section": "How do I customize which fields a tooltip shows and how numbers are formatted?",
+  "sentence": " Pass `fields=` and `format=` to `[MASK]`, e.g.",
+  "answer": "xy.tooltip()",
+  "closed_book_guess": "rx.tooltip_element",
+  "category": "fact"
+ },
+ {
+  "id": 428,
+  "page": "Axes and Scales",
+  "section": "Named and opposite-side axes",
+  "sentence": " Marks bind to axis identifiers through `[MASK]` and `y_axis=`.",
+  "answer": "x_axis=",
+  "closed_book_guess": "x_axis",
+  "category": "equivalent"
+ },
+ {
+  "id": 429,
+  "page": "Axes and Scales",
+  "section": "Tick controls",
+  "sentence": "`label_position`, `[MASK]`, and `label_angle` position the axis title.",
+  "answer": "label_offset",
+  "closed_book_guess": "title_offset",
+  "category": "fact"
+ },
+ {
+  "id": 438,
+  "page": "Axes and Scales",
+  "section": "Tick controls",
+  "sentence": "`[MASK]`, `label_offset`, and `label_angle` position the axis title.",
+  "answer": "label_position",
+  "closed_book_guess": "title_offset",
+  "category": "fact"
+ },
+ {
+  "id": 451,
+  "page": "Data and Columns",
+  "section": "Time handling",
+  "sentence": "Canonical time coordinates are float64 milliseconds since the Unix epoch; `[MASK]` becomes a missing value.",
+  "answer": "NaT",
+  "closed_book_guess": "NaN",
+  "category": "fact"
+ },
+ {
+  "id": 454,
+  "page": "Data and Columns",
+  "section": "Time handling",
+  "sentence": " Python dates, datetimes, NumPy `[MASK]`, and compatible pandas/Arrow time columns select time-axis behavior automatically.",
+  "answer": "datetime64",
+  "closed_book_guess": "datetime64 values",
+  "category": "equivalent"
+ },
+ {
+  "id": 479,
+  "page": "Interactions and Selections",
+  "section": "Polar interaction boundary",
+  "sentence": "An authored `[MASK]` is honored regardless of the zoom switch, and grants reset — controls and double-click alike — on its own; that is the right choice for a chart whose view moves through linked axes or application state rather than a gesture.",
+  "answer": "reset_axes",
+  "closed_book_guess": "domain",
+  "category": "fact"
+ },
+ {
+  "id": 506,
+  "page": "DataFrames and Real Data",
+  "section": "raw = pd.read_csv(\"daily_metrics.csv\", parse_dates=[\"day\"])",
+  "sentence": "In a notebook, leave `[MASK]` as the last expression in a cell instead of exporting it.",
+  "answer": "chart",
+  "closed_book_guess": "raw",
+  "category": "example_name"
+ },
+ {
+  "id": 511,
+  "page": "Deployment Recipes",
+  "section": "Build a pinned Docker image",
+  "sentence": "If `[MASK]` cannot find a compatible binary wheel, stop and check the [installation boundary](/docs/xy/overview/installation/) rather than silently changing the target platform.",
+  "answer": "pip",
+  "closed_book_guess": "pip install",
+  "category": "equivalent"
+ },
+ {
+  "id": 515,
+  "page": "Deployment Recipes",
+  "section": "Reflex live applications use the bundled integration",
+  "sentence": "Install the bundled integration with `[MASK]` or `python -m pip install \"xy[reflex]\"`.",
+  "answer": "uv add \"xy[reflex]\"",
+  "closed_book_guess": "pip install \"xy[reflex]\"",
+  "category": "fact"
+ },
+ {
+  "id": 516,
+  "page": "Deployment Recipes",
+  "section": "Reflex live applications use the bundled integration",
+  "sentence": "For production automation, commit the resolved uv lockfile or pin compatible `[MASK]` and Reflex versions in your requirements, test their documented compatibility, and follow the live deployment boundary in the integration guide.",
+  "answer": "xy[reflex]",
+  "closed_book_guess": "xy",
+  "category": "ambiguous"
+ },
+ {
+  "id": 523,
+  "page": "Display and Export",
+  "section": "Declarative Export Defaults",
+  "sentence": "`[MASK]` hides the download menu entirely.",
+  "answer": "formats=[]",
+  "closed_book_guess": "hide_download_menu",
+  "category": "fact"
+ },
+ {
+  "id": 530,
+  "page": "Display and Export",
+  "section": "Background policy",
+  "sentence": "`[MASK]` is the device-pixel-ratio for raster formats and is ignored by SVG/PDF, which are resolution-independent.",
+  "answer": "scale",
+  "closed_book_guess": "scale_factor",
+  "category": "fact"
+ },
+ {
+  "id": 548,
+  "page": "Serving, CSP, and Offline Use",
+  "section": "Reflex Deployment",
+  "sentence": "For fixed data that still needs kernel round-trips, create `token = reflex_xy.inline(chart)` at module scope and mount it with `[MASK]`.",
+  "answer": "reflex_xy.chart(token)",
+  "closed_book_guess": "reflex_xy.serve(token)",
+  "category": "fact"
+ },
+ {
+  "id": 553,
+  "page": "Serving, CSP, and Offline Use",
+  "section": "Standalone HTML Policy",
+  "sentence": "Density refinement can start a worker from the bundled source, so the policy allows `[MASK]`; it does not allow an external worker script.",
+  "answer": "worker-src blob:",
+  "closed_book_guess": "blob:",
+  "category": "equivalent"
+ },
+ {
+  "id": 558,
+  "page": "Troubleshooting",
+  "section": "Reflex",
+  "sentence": "For fixed data with backend events, create `token = reflex_xy.inline(chart)` at module scope and render it with `[MASK]`.",
+  "answer": "reflex_xy.chart(token)",
+  "closed_book_guess": "token.render()",
+  "category": "fact"
+ },
+ {
+  "id": 575,
+  "page": "Matplotlib (xy.pyplot)",
+  "section": "Polar Plots",
+  "sentence": "`set_rorigin()`/`[MASK]` expose the data-space radial origin.",
+  "answer": "get_rorigin()",
+  "closed_book_guess": "set_rmin()",
+  "category": "fact"
+ },
+ {
+  "id": 577,
+  "page": "Matplotlib (xy.pyplot)",
+  "section": "What Is Covered",
+  "sentence": " The shim includes every method in Matplotlib 3.11.0's 2-D `[MASK]` **Plotting inventory.",
+  "answer": "Axes",
+  "closed_book_guess": "pyplot API",
+  "category": "fact"
+ },
+ {
+  "id": 602,
+  "page": "Reflex",
+  "section": "Events and Streaming",
+  "sentence": " `[MASK]`, `on_point_click`, `on_select_end`, `on_view_change`, `on_animation_start`, and `on_animation_end` dispatch small semantic payloads through normal Reflex event handlers.",
+  "answer": "on_point_hover",
+  "closed_book_guess": "on_click",
+  "category": "fact"
+ },
+ {
+  "id": 603,
+  "page": "Reflex",
+  "section": "Events and Streaming",
+  "sentence": "Core `on_hover`, `on_click`, `on_brush`, `on_select`, and `[MASK]` callbacks are ordinary Python callables for the notebook widget.",
+  "answer": "on_view_change",
+  "closed_book_guess": "on_zoom",
+  "category": "fact"
+ },
+ {
+  "id": 605,
+  "page": "Reflex",
+  "section": "Experimental Boundary",
+  "sentence": "Pin `xy` when you need a stable integration contract, and build against `[MASK]`, `@rxy.data`, and `rxy.append` rather than private transport or registry modules.",
+  "answer": "rxy.chart",
+  "closed_book_guess": "rxy.create",
+  "category": "fact"
+ },
+ {
+  "id": 608,
+  "page": "Your First Chart",
+  "section": "Your First Chart",
+  "sentence": " You only need the core `[MASK]` package to create, display, and export a chart.",
+  "answer": "xy",
+  "closed_book_guess": "xy-core",
+  "category": "fact"
+ },
+ {
+  "id": 620,
+  "page": "Installation",
+  "section": "Supported platforms",
+  "sentence": "The current 0.0.1 PyPI upload does not include Windows wheels or a source distribution, so `[MASK]` and `python -m pip install xy` cannot install it directly on Windows yet.",
+  "answer": "uv add xy",
+  "closed_book_guess": "uv pip install xy",
+  "category": "fact"
+ },
+ {
+  "id": 621,
+  "page": "Installation",
+  "section": "What the package includes",
+  "sentence": " The regular `[MASK]` dependency already includes NumPy and anywidget support.",
+  "answer": "xy",
+  "closed_book_guess": "xy[all]",
+  "category": "fact"
+ },
+ {
+  "id": 637,
+  "page": "Animations and Data Transitions",
+  "section": "Initial render",
+  "sentence": "Set `enter` explicitly to `none`, `scale`, `[MASK]`, or `reveal` when a shared chart needs a different visual language.",
+  "answer": "grow",
+  "closed_book_guess": "fade",
+  "category": "fact"
+ },
+ {
+  "id": 642,
+  "page": "Animations and Data Transitions",
+  "section": "--- chart ---",
+  "sentence": "Use `enabled=False` to suppress motion or `[MASK]` only when the application intentionally overrides that preference.",
+  "answer": "enabled=True",
+  "closed_book_guess": "respect_reduced_motion=False",
+  "category": "fact"
+ },
+ {
+  "id": 644,
+  "page": "Capability Matrix",
+  "section": "Notes",
+  "sentence": "`background`, `[MASK]`, `borderRadius`, `--xy-legend-frame-alpha`, and `padding`/`rowGap` in `em` are honored; an explicit background paints opaque, as it does in the browser.",
+  "answer": "boxShadow",
+  "closed_book_guess": "borderWidth",
+  "category": "fact"
+ },
+ {
+  "id": 648,
+  "page": "Capability Matrix",
+  "section": "Notes",
+  "sentence": "`[MASK]`** — CSS px; a bare number is px, matching the chrome style convention.",
+  "answer": "stroke-width",
+  "closed_book_guess": "width",
+  "category": "fact"
+ },
+ {
+  "id": 654,
+  "page": "Capability Matrix",
+  "section": "Notes",
+  "sentence": "`legend_title`** (via `[MASK]`) — Vector (SVG, PDF) honors font-size, font-weight, font-style, font-family, letter-spacing, opacity and the text paint (`fill`, or `color`).",
+  "answer": "styles={'legend_title': ...}",
+  "closed_book_guess": "legend.titleStyle",
+  "category": "fact"
+ },
+ {
+  "id": 664,
+  "page": "Chrome Slots",
+  "section": "What survives which export",
+  "sentence": "The rest are live-only chrome (`[MASK]`, `modebar*`, `crosshair_*`, `selection`, `badge*`) with nothing in a file to paint.",
+  "answer": "tooltip*",
+  "closed_book_guess": "toolbar*",
+  "category": "fact"
+ },
+ {
+  "id": 667,
+  "page": "Component Variations",
+  "section": "Annotation variants",
+  "sentence": "Geometry `opacity` does not fade label text; set `[MASK]` in the annotation style when that label should also be translucent.",
+  "answer": "label_opacity",
+  "closed_book_guess": "text_opacity",
+  "category": "fact"
+ },
+ {
+  "id": 668,
+  "page": "Component Variations",
+  "section": "Crosshair and selection",
+  "sentence": "Granular `[MASK]` slots style the grip, groups, separators, icons, indicators, popovers, command labels, and history controls independently.",
+  "answer": "modebar_*",
+  "closed_book_guess": "parts",
+  "category": "fact"
+ },
+ {
+  "id": 674,
+  "page": "Component Variations",
+  "section": "Conditional badges and facet wrappers",
+  "sentence": "Its standalone HTML wrapper additionally emits `[MASK]`, `.xy-facet-panel`, and `.xy-facet-title`; target those through `custom_css` when styling the layout around panels.",
+  "answer": ".xy-facet-grid",
+  "closed_book_guess": ".xy-facet-wrapper",
+  "category": "fact"
+ },
+ {
+  "id": 690,
+  "page": "Customize Each Part",
+  "section": "Recolor categories with a chart palette",
+  "sentence": "Named colors, `rgb()`, and `[MASK]` are all fine — XY normalizes them to hex for you.",
+  "answer": "hsl()",
+  "closed_book_guess": "hex colors",
+  "category": "fact"
+ },
+ {
+  "id": 694,
+  "page": "Advanced Styling Gallery",
+  "section": "Scalar fields and density",
+  "sentence": "The second chart shows screen-bounded `[MASK]` geometry.",
+  "answer": "hexbin",
+  "closed_book_guess": "rasterized",
+  "category": "ambiguous"
+ },
+ {
+  "id": 696,
+  "page": "Advanced Styling Gallery",
+  "section": "Uncertainty and explicit geometry",
+  "sentence": " This pair shows advanced geometry from `error_band`, `errorbar`, `segments`, `[MASK]`, and `triangle_mesh`.",
+  "answer": "stem",
+  "closed_book_guess": "heatmap",
+  "category": "fact"
+ },
+ {
+  "id": 702,
+  "page": "Advanced Styling Gallery",
+  "section": "Uncertainty and explicit geometry",
+  "sentence": " This pair shows advanced geometry from `error_band`, `errorbar`, `[MASK]`, `stem`, and `triangle_mesh`.",
+  "answer": "segments",
+  "closed_book_guess": "ribbon",
+  "category": "fact"
+ },
+ {
+  "id": 739,
+  "page": "Themes and Export",
+  "section": "--- chart ---",
+  "sentence": "Declare the face in `custom_css` and select it with `[MASK]`.",
+  "answer": "xy.theme(font_family=...)",
+  "closed_book_guess": "font_family",
+  "category": "equivalent"
+ }
+]

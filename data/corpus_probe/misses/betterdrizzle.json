@@ -1,0 +1,1091 @@
+[
+ {
+  "id": 1,
+  "page": "Error handling",
+  "section": "Inspecting the details",
+  "sentence": " For logging or custom handling, `[MASK]` returns a normalized object regardless of driver:   There is also `isDatabaseError(error)` to guard before drilling in.",
+  "answer": "getDatabaseErrorInfo",
+  "closed_book_guess": "getDatabaseErrorDetails",
+  "category": "fact"
+ },
+ {
+  "id": 7,
+  "page": "Error handling",
+  "section": "Classifying database errors",
+  "sentence": " Writes fail in predictable ways - a unique email, a missing foreign key, a `[MASK]` violation.",
+  "answer": "NOT NULL",
+  "closed_book_guess": "not-null",
+  "category": "equivalent"
+ },
+ {
+  "id": 13,
+  "page": "Hooks",
+  "section": "CRUD and query hooks",
+  "sentence": "The operation result.' }, \t\trow: { type: 'object | null', description: 'After hooks only, for `create`, `upsert`, `update`, `delete`, `[MASK]`, `findOne`, and `findUnique`.",
+  "answer": "findFirst",
+  "closed_book_guess": "findMany",
+  "category": "fact"
+ },
+ {
+  "id": 17,
+  "page": "Hooks",
+  "section": "CRUD and query hooks",
+  "sentence": "The operation result.' }, \t\trow: { type: 'object | null', description: 'After hooks only, for `create`, `[MASK]`, `update`, `delete`, `findFirst`, `findOne`, and `findUnique`.",
+  "answer": "upsert",
+  "closed_book_guess": "findMany",
+  "category": "fact"
+ },
+ {
+  "id": 34,
+  "page": "Row locks",
+  "section": "Lock modes",
+  "sentence": "   `[MASK]` and `keyShare` are PostgreSQL-specific.",
+  "answer": "noKeyUpdate",
+  "closed_book_guess": "share and keyShare",
+  "category": "fact"
+ },
+ {
+  "id": 44,
+  "page": "Transactions",
+  "section": "Options",
+  "sentence": "     \t`isolationLevel` and `[MASK]` are no-ops on SQLite, and `comment` is \treported as unsupported on every dialect.",
+  "answer": "readOnly",
+  "closed_book_guess": "accessMode",
+  "category": "fact"
+ },
+ {
+  "id": 69,
+  "page": "better-drizzle vs Drizzle",
+  "section": "When raw Drizzle is the better tool",
+  "sentence": " Reports and analytics**: `groupBy`, `[MASK]`, `avg`, window functions, CTEs.",
+  "answer": "sum",
+  "closed_book_guess": "having",
+  "category": "fact"
+ },
+ {
+  "id": 74,
+  "page": "better-drizzle vs Drizzle",
+  "section": "When raw Drizzle is the better tool",
+  "sentence": " Reports and analytics**: `[MASK]`, `sum`, `avg`, window functions, CTEs.",
+  "answer": "groupBy",
+  "closed_book_guess": "count",
+  "category": "fact"
+ },
+ {
+  "id": 88,
+  "page": "better-drizzle vs Prisma",
+  "section": "better-drizzle vs Prisma",
+  "sentence": " If you know Prisma Client, most of better-drizzle will look familiar: `[MASK]`, `where`, `include`, `select`, `upsert`, `_count`.",
+  "answer": "findMany",
+  "closed_book_guess": "findFirst",
+  "category": "ambiguous"
+ },
+ {
+  "id": 94,
+  "page": "Getting started",
+  "section": "Install",
+  "sentence": "Pick your package manager:                \tbetter-drizzle declares `drizzle-orm` and `[MASK]` as peer dependencies.",
+  "answer": "typescript",
+  "closed_book_guess": "drizzle-kit",
+  "category": "fact"
+ },
+ {
+  "id": 95,
+  "page": "Getting started",
+  "section": "Define relations",
+  "sentence": "Declaring `[MASK]` / `posts.author` is what \tmakes `where: { author: { is: { ...",
+  "answer": "users.posts",
+  "closed_book_guess": "users.posts.author",
+  "category": "fact"
+ },
+ {
+  "id": 99,
+  "page": "Client extensions",
+  "section": "Typing",
+  "sentence": "`[MASK]` clones** keep the extension keys.",
+  "answer": "$withContext()",
+  "closed_book_guess": "Database client",
+  "category": "fact"
+ },
+ {
+  "id": 103,
+  "page": "Client extensions",
+  "section": "Typing",
+  "sentence": "The `[MASK]` parameter of `transaction()`** keeps the extension keys.",
+  "answer": "tx",
+  "closed_book_guess": "config",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "Client extensions",
+  "section": "Object form and callback form",
+  "sentence": "`[MASK]` modifies the client it is called on and returns that same instance.",
+  "answer": "extends()",
+  "closed_book_guess": "withExtensions",
+  "category": "fact"
+ },
+ {
+  "id": 110,
+  "page": "Dynamic repositories",
+  "section": "Example: generic admin list endpoint",
+  "sentence": " One handler serves every allowlisted resource with offset pagination:    `paginate()` takes `[MASK]` and `skip`, not a page number; it derives `page` and `pageCount` for the response.",
+  "answer": "limit",
+  "closed_book_guess": "take",
+  "category": "fact"
+ },
+ {
+  "id": 116,
+  "page": "Dynamic repositories",
+  "section": "Example: export job",
+  "sentence": "Pass `[MASK]` when you need another order, ending with a unique column.",
+  "answer": "orderBy",
+  "closed_book_guess": "orderByOverride",
+  "category": "fact"
+ },
+ {
+  "id": 119,
+  "page": "Dynamic repositories",
+  "section": "Example: export job",
+  "sentence": " A background job walks every allowlisted table in primary-key order with `cursor()`, so each batch is one indexed query regardless of table size:   `cursor()` without `[MASK]` pages by primary key ascending.",
+  "answer": "orderBy",
+  "closed_book_guess": "order",
+  "category": "fact"
+ },
+ {
+  "id": 122,
+  "page": "Framework integration",
+  "section": "Framework snippets",
+  "sentence": " Each snippet imports `client` from `lib/db.ts` and `[MASK]` from `lib/http-error.ts` above.",
+  "answer": "toHttpError",
+  "closed_book_guess": "HttpError",
+  "category": "example_name"
+ },
+ {
+  "id": 150,
+  "page": "Migrating from Prisma",
+  "section": "5. Move the queries",
+  "sentence": "Not-found writes**: Prisma's `update` and `delete` throw `[MASK]`; better-drizzle returns `null`.",
+  "answer": "P2025",
+  "closed_book_guess": "PrismaClientKnownRequestError",
+  "category": "ambiguous"
+ },
+ {
+  "id": 154,
+  "page": "Migrating from Prisma",
+  "section": "5. Move the queries",
+  "sentence": "Create the related row, then `connect` it, in one transaction:   Aggregates**: `[MASK]` and `groupBy` move to the Drizzle query builder on `db`.",
+  "answer": "aggregate",
+  "closed_book_guess": "count",
+  "category": "fact"
+ },
+ {
+  "id": 165,
+  "page": "Multi-tenancy & request context",
+  "section": "Enforcing tenant isolation",
+  "sentence": "Combine both: `[MASK]` scopes the data, and `$withContext()` (or `meta`) carries the request ids your hooks log.",
+  "answer": "$tenant()",
+  "closed_book_guess": "withTenant()",
+  "category": "fact"
+ },
+ {
+  "id": 167,
+  "page": "Multi-tenancy & request context",
+  "section": "Enforcing tenant isolation",
+  "sentence": "Combine both: `$tenant()` scopes the data, and `[MASK]` (or `meta`) carries the request ids your hooks log.",
+  "answer": "$withContext()",
+  "closed_book_guess": "$context()",
+  "category": "fact"
+ },
+ {
+  "id": 171,
+  "page": "Observability plugin",
+  "section": "Differences from client hooks",
+  "sentence": "Raw and transaction failures are covered by `[MASK]` and `onTransactionError`.",
+  "answer": "onRawError",
+  "closed_book_guess": "onQueryError",
+  "category": "fact"
+ },
+ {
+  "id": 182,
+  "page": "Tracing",
+  "section": "OpenTelemetry spans",
+  "sentence": "Match the version your backend expects, and set `[MASK]` to your database.",
+  "answer": "db.system.name",
+  "closed_book_guess": "dbSystem",
+  "category": "fact"
+ },
+ {
+  "id": 185,
+  "page": "Tracing",
+  "section": "Transaction lifecycle",
+  "sentence": "`[MASK]` starts at `1` and goes up with each [retry](/docs/advanced/transactions).",
+  "answer": "attempt",
+  "closed_book_guess": "attemptIndex",
+  "category": "fact"
+ },
+ {
+  "id": 192,
+  "page": "Logging",
+  "section": "Raw SQL logging",
+  "sentence": " `beforeRaw`, `afterRaw`, and `[MASK]` wrap `$raw`, `$executeRaw`, and `$rawUnsafe`.",
+  "answer": "onRawError",
+  "closed_book_guess": "beforeRawUnsafe",
+  "category": "fact"
+ },
+ {
+  "id": 195,
+  "page": "Logging",
+  "section": "Slow-query warnings",
+  "sentence": "`[MASK]` and `ctx.args.data` often hold emails, tokens, or other personal data.",
+  "answer": "ctx.args.where",
+  "closed_book_guess": "ctx.args.query",
+  "category": "fact"
+ },
+ {
+  "id": 214,
+  "page": "Service-layer patterns",
+  "section": "A good write",
+  "sentence": " Let `[MASK]` carry the not-found decision so the happy path stays linear:   ",
+  "answer": ".throw()",
+  "closed_book_guess": "getOrThrow",
+  "category": "fact"
+ },
+ {
+  "id": 232,
+  "page": "Testing on PostgreSQL",
+  "section": "Things to know",
+  "sentence": "`[MASK]` callbacks and the `afterTransactionRollback` hook do run.",
+  "answer": "afterRollback",
+  "closed_book_guess": "afterTransactionCommit",
+  "category": "fact"
+ },
+ {
+  "id": 241,
+  "page": "Testing",
+  "section": "Applying the schema",
+  "sentence": "`[MASK]`** against a database that lives longer than one test, such as a PostgreSQL test database.",
+  "answer": "drizzle-kit push",
+  "closed_book_guess": "Migrations",
+  "category": "fact"
+ },
+ {
+  "id": 250,
+  "page": "Testing",
+  "section": "Testing",
+  "sentence": "Under Vitest on Node, use better-sqlite3 instead of `[MASK]`.",
+  "answer": "bun:sqlite",
+  "closed_book_guess": "@libsql/client",
+  "category": "fact"
+ },
+ {
+  "id": 259,
+  "page": "Troubleshooting & FAQ",
+  "section": "`No tables found on the Drizzle instance`",
+  "sentence": "A Drizzle instance created without `[MASK]` exposes no tables.",
+  "answer": "relations",
+  "closed_book_guess": "schema",
+  "category": "fact"
+ },
+ {
+  "id": 264,
+  "page": "Typing results",
+  "section": "Reference",
+  "sentence": " All of these are type exports from `[MASK]`:  ",
+  "answer": "better-drizzle",
+  "closed_book_guess": "better-drizzle/types",
+  "category": "fact"
+ },
+ {
+  "id": 267,
+  "page": "Typing results",
+  "section": "From a function",
+  "sentence": " The simplest way to name a payload is to wrap the query in a function and read its return type:   `Awaited` also unwraps the helper types that `[MASK]` and friends return, so the result is the plain payload.",
+  "answer": "findMany",
+  "closed_book_guess": "$inferSelect",
+  "category": "fact"
+ },
+ {
+  "id": 273,
+  "page": "Typing results",
+  "section": "From the arguments: `PayloadForArgs`",
+  "sentence": "It is the counterpart of Prisma's `UserGetPayload`:   `Table` is the schema key (`[MASK]`), not the database table name.",
+  "answer": "'users'",
+  "closed_book_guess": "typeof schema.user",
+  "category": "example_name"
+ },
+ {
+  "id": 292,
+  "page": "Upgrade to 0.2 (unified package)",
+  "section": "Upgrade to 0.2 (unified package)",
+  "sentence": " Follow this guide when a project still imports `[MASK]` packages.",
+  "answer": "@better-drizzle/*",
+  "closed_book_guess": "better-drizzle/*",
+  "category": "fact"
+ },
+ {
+  "id": 297,
+  "page": "Changes in 0.3",
+  "section": "Behavior changes",
+  "sentence": "Library error codes are kept.** Operation, raw, and transaction wrappers keep the `code` of a `[MASK]` thrown inside them (for example from a hook or a nested call) instead of replacing it with `OPERATION_ERROR`.",
+  "answer": "BetterDrizzleError",
+  "closed_book_guess": "DrizzleError",
+  "category": "fact"
+ },
+ {
+  "id": 312,
+  "page": "Upgrade to 0.3 (Drizzle ORM 1.x)",
+  "section": "2. Move relations to defineRelations",
+  "sentence": " Keep tables in `schema.ts` and declare every relation in one `defineRelations` call:    Use `[MASK]` without a callback when the schema has no relations.",
+  "answer": "defineRelations(schema)",
+  "closed_book_guess": "defineRelations({})",
+  "category": "fact"
+ },
+ {
+  "id": 321,
+  "page": "Upgrading",
+  "section": "Upgrading",
+  "sentence": "The `[MASK]` line is the last one that works with `drizzle-orm` 0.x (peer \t`^0.30.0`).",
+  "answer": "0.2.x",
+  "closed_book_guess": "0.10.x",
+  "category": "fact"
+ },
+ {
+  "id": 351,
+  "page": "Benchmark parity",
+  "section": "Running the suites",
+  "sentence": "   When you change performance-sensitive code, run `bench`, `bench:verify`, `[MASK]`, and `bench:memory`, and read regressions against the parity groups first.",
+  "answer": "bench:full",
+  "closed_book_guess": "bench:compare",
+  "category": "fact"
+ },
+ {
+  "id": 356,
+  "page": "ata",
+  "section": "What the schemas say",
+  "sentence": "Both are written with `[MASK]` and local `$ref`, so a clause of any depth is still one compiled validator and one pass.",
+  "answer": "$defs",
+  "closed_book_guess": "allOf",
+  "category": "fact"
+ },
+ {
+  "id": 362,
+  "page": "ata",
+  "section": "ata",
+  "sentence": "The ata plugin is experimental in `[MASK]`.",
+  "answer": "0.3.x",
+  "closed_book_guess": "better-drizzle",
+  "category": "fact"
+ },
+ {
+  "id": 364,
+  "page": "ata",
+  "section": "Array columns",
+  "sentence": "Elements are never nullable, whatever the array's own nullability: Drizzle's own inferred type for `text('tags').array().notNull()` is `[MASK]`, and assigning `['x', null]` to it is a type error.",
+  "answer": "string[]",
+  "closed_book_guess": "string[] | null",
+  "category": "fact"
+ },
+ {
+  "id": 373,
+  "page": "Better Auth",
+  "section": "Better Auth",
+  "sentence": "Errors** arrive as [`[MASK]`](/docs/reference/errors) with the code, constraint, and table, not as raw driver errors.",
+  "answer": "BetterDrizzleError",
+  "closed_book_guess": "DrizzleError",
+  "category": "fact"
+ },
+ {
+  "id": 383,
+  "page": "Cache keys and invalidation",
+  "section": "Invalidating by hand",
+  "sentence": "Call \t`[MASK]` after them, or rely on the TTL.",
+  "answer": "$cache.invalidate()",
+  "closed_book_guess": "invalidateCache",
+  "category": "fact"
+ },
+ {
+  "id": 384,
+  "page": "Cache keys and invalidation",
+  "section": "How the key is built",
+  "sentence": "Some values cannot be hashed reliably: cyclic values, raw `sql` fragments, functions, and class instances other than `Date`, `[MASK]`, and `Uint8Array`.",
+  "answer": "Buffer",
+  "closed_book_guess": "URLSearchParams",
+  "category": "fact"
+ },
+ {
+  "id": 387,
+  "page": "Cache keys and invalidation",
+  "section": "Custom keys",
+  "sentence": "Its model and relation dependencies still come from the query, so a write to `[MASK]` still invalidates it.",
+  "answer": "users",
+  "closed_book_guess": "the related table",
+  "category": "example_name"
+ },
+ {
+  "id": 388,
+  "page": "Cache keys and invalidation",
+  "section": "How the key is built",
+  "sentence": "Types count: `[MASK]` and `where: { id: 1n }` are different keys.",
+  "answer": "where: { id: 1 }",
+  "closed_book_guess": "1 and 1n",
+  "category": "equivalent"
+ },
+ {
+  "id": 399,
+  "page": "Cache stores",
+  "section": "The Redis store",
+  "sentence": "`RedisStoreOptions` takes exactly one of:  `client`: a `RedisClientLike`, which is any object with Bun's `send(command, args)`, ioredis' `[MASK]`, or node-redis' `sendCommand(args)`.",
+  "answer": "call(command, ...args)",
+  "closed_book_guess": "call(command, args)",
+  "category": "fact"
+ },
+ {
+  "id": 405,
+  "page": "Cache",
+  "section": "Operate it in production",
+  "sentence": "Every failure reaches `onError` as a `BetterDrizzleError` with code `CACHE_STORE_ERROR`, `[MASK]`, or `CACHE_VALUE_TOO_LARGE`, and `details.stage` set to `read`, `write`, `invalidate`, `serialize`, or `deserialize`.",
+  "answer": "CACHE_SERIALIZATION_ERROR",
+  "closed_book_guess": "CACHE_INVALIDATION_ERROR",
+  "category": "fact"
+ },
+ {
+  "id": 417,
+  "page": "ESLint",
+  "section": "Sensitive fields and plugin bypass",
+  "sentence": "  The sensitive field list is fixed: `apiKey`, `apiKeys`, `password`, `passwordHash`, `secret`, `secrets`, `ssn`, `token`, `[MASK]`.",
+  "answer": "tokens",
+  "closed_book_guess": "accessToken",
+  "category": "fact"
+ },
+ {
+  "id": 421,
+  "page": "ESLint",
+  "section": "Sensitive fields and plugin bypass",
+  "sentence": "  The sensitive field list is fixed: `apiKey`, `apiKeys`, `password`, `[MASK]`, `secret`, `secrets`, `ssn`, `token`, `tokens`.",
+  "answer": "passwordHash",
+  "closed_book_guess": "privateKey",
+  "category": "fact"
+ },
+ {
+  "id": 424,
+  "page": "Plugins overview",
+  "section": "Official plugins",
+  "sentence": "A faster alternative to Zod: describe tables as JSON \t\tSchema, expose them on `[MASK]`, and validate operations with compiled ata \t\tvalidators.",
+  "answer": "$ata",
+  "closed_book_guess": "JSON Schema",
+  "category": "fact"
+ },
+ {
+  "id": 432,
+  "page": "Plugins overview",
+  "section": "Official plugins",
+  "sentence": "Turn `[MASK]` into a recoverable state change, filter deleted rows by \t\tdefault, and add `restore()` helpers.",
+  "answer": "delete()",
+  "closed_book_guess": "soft deletes",
+  "category": "fact"
+ },
+ {
+  "id": 439,
+  "page": "Plugin hooks",
+  "section": "Execution order",
+  "sentence": "Return new `[MASK]` from \t`beforeCreate` / `beforeUpdate`, or use a transform to rewrite `where`, \t`select`, and the other query fields.",
+  "answer": "data",
+  "closed_book_guess": "query builders",
+  "category": "fact"
+ },
+ {
+  "id": 444,
+  "page": "Plugin hooks",
+  "section": "Intercepts",
+  "sentence": "An intercept that derives anything from the args, such as a cache key, must also account for `[MASK]`.",
+  "answer": "ctx.params",
+  "closed_book_guess": "the query method",
+  "category": "fact"
+ },
+ {
+  "id": 446,
+  "page": "Plugin hooks",
+  "section": "Hook context",
+  "sentence": "Raw hooks receive `action` (`'raw' | 'executeRaw' | 'rawUnsafe'`), `query` (rendered SQL text), `sql`, `rawOptions`, `name`, `comment`, `timeoutMs`, `signal`, `map`, `meta`, `result` (in `afterRaw`), `error` (in `onRawError`), plus `[MASK]`, `schema`, `db`, `options`, `isInTransaction`, `transaction`, `transactionContext`, `afterCommit`, and `afterRollback`.",
+  "answer": "dialect",
+  "closed_book_guess": "params",
+  "category": "fact"
+ },
+ {
+  "id": 447,
+  "page": "Plugin hooks",
+  "section": "Hook context",
+  "sentence": "Raw hooks receive `action` (`'raw' | 'executeRaw' | 'rawUnsafe'`), `query` (rendered SQL text), `sql`, `rawOptions`, `name`, `comment`, `timeoutMs`, `signal`, `map`, `meta`, `result` (in `afterRaw`), `error` (in `onRawError`), plus `dialect`, `schema`, `db`, `[MASK]`, `isInTransaction`, `transaction`, `transactionContext`, `afterCommit`, and `afterRollback`.",
+  "answer": "options",
+  "closed_book_guess": "session",
+  "category": "fact"
+ },
+ {
+  "id": 453,
+  "page": "Scopes and generated columns",
+  "section": "Model scopes",
+  "sentence": "A `null` state switches the `columns` filter, stamping, and immutability off while a static `[MASK]` still applies; `undefined` clears the state.",
+  "answer": "where",
+  "closed_book_guess": "scope",
+  "category": "fact"
+ },
+ {
+  "id": 454,
+  "page": "Scopes and generated columns",
+  "section": "`definePlugin` generics",
+  "sentence": "better-drizzle fills in `this['schema']` (the relations config) and `this['name']` (the table key) for every delegate, and reads the result from `[MASK]`:  ",
+  "answer": "extension",
+  "closed_book_guess": "this['columns']",
+  "category": "fact"
+ },
+ {
+  "id": 458,
+  "page": "Rule reference",
+  "section": "Destructive writes",
+  "sentence": "  The `*WithoutWhere` rules only catch a missing `[MASK]`.",
+  "answer": "where",
+  "closed_book_guess": "where clause",
+  "category": "equivalent"
+ },
+ {
+  "id": 459,
+  "page": "Rule reference",
+  "section": "Raw SQL",
+  "sentence": "`[MASK]` reports a timeout above `defaultTimeoutMs` at the rule's own level.",
+  "answer": "requireRawTimeout",
+  "closed_book_guess": "RawSqlRule",
+  "category": "fact"
+ },
+ {
+  "id": 460,
+  "page": "Rule reference",
+  "section": "Raw SQL",
+  "sentence": "   The raw rules check `$raw`, `$rawUnsafe`, and `[MASK]`, except `noRawUnsafe`, which only fires on `$rawUnsafe`.",
+  "answer": "$executeRaw",
+  "closed_book_guess": "$rawTyped",
+  "category": "fact"
+ },
+ {
+  "id": 464,
+  "page": "Rule reference",
+  "section": "Destructive writes",
+  "sentence": "With no `[MASK]` set, `noEmptyWhere` checks every operation, and a missing `where` counts as empty.",
+  "answer": "operations",
+  "closed_book_guess": "ignoreTables",
+  "category": "fact"
+ },
+ {
+  "id": 470,
+  "page": "Rules",
+  "section": "Presets",
+  "sentence": "Both presets enable `[MASK]` at `'error'`.",
+  "answer": "requireTenantContext",
+  "closed_book_guess": "strictMode",
+  "category": "fact"
+ },
+ {
+  "id": 474,
+  "page": "Rules",
+  "section": "Violations and errors",
+  "sentence": "`[MASK]` receives errors, and then the plugin throws, unless `throwOnError: false`.",
+  "answer": "reporter.error",
+  "closed_book_guess": "drizzle-kit",
+  "category": "fact"
+ },
+ {
+  "id": 475,
+  "page": "Rules",
+  "section": "Presets",
+  "sentence": "Both presets enable `requireTenantContext` at `[MASK]`.",
+  "answer": "'error'",
+  "closed_book_guess": "true",
+  "category": "fact"
+ },
+ {
+  "id": 482,
+  "page": "Soft delete",
+  "section": "Behavior details",
+  "sentence": "`[MASK]` and `restoreById()` exist only on tables with `column`.",
+  "answer": "restore()",
+  "closed_book_guess": "softDeleteById",
+  "category": "fact"
+ },
+ {
+  "id": 484,
+  "page": "Soft delete",
+  "section": "Deleting and restoring",
+  "sentence": "  A soft `delete()` runs an `update` of the same `[MASK]` limited to live rows, then returns the updated row (or `null`), so it still has `.throw()`.",
+  "answer": "where",
+  "closed_book_guess": "query",
+  "category": "fact"
+ },
+ {
+  "id": 493,
+  "page": "Tenant",
+  "section": "Bypassing the tenant",
+  "sentence": "`[MASK]` is required and must be a non-empty string.",
+  "answer": "reason",
+  "closed_book_guess": "tenantId",
+  "category": "fact"
+ },
+ {
+  "id": 504,
+  "page": "Timestamps",
+  "section": "Per-model overrides",
+  "sentence": "A column named in `[MASK]` must exist on that model, or `better()` throws `PLUGIN_REQUIRED_COLUMN_MISSING`.",
+  "answer": "models",
+  "closed_book_guess": "timestamps",
+  "category": "fact"
+ },
+ {
+  "id": 506,
+  "page": "Timestamps",
+  "section": "Behavior details",
+  "sentence": "Soft deletes from `better-drizzle/soft-delete` run beneath the plugins, so they do not change `[MASK]`.",
+  "answer": "updatedAt",
+  "closed_book_guess": "timestamps",
+  "category": "fact"
+ },
+ {
+  "id": 514,
+  "page": "Timestamps",
+  "section": "Fixed clock in tests",
+  "sentence": "Text-backed columns receive `[MASK]`.",
+  "answer": "fixed.toISOString()",
+  "closed_book_guess": "the fixed clock value",
+  "category": "example_name"
+ },
+ {
+  "id": 528,
+  "page": "Writing a plugin",
+  "section": "Client and model extensions",
+  "sentence": "`extendModel(ctx)` returns an object merged onto each delegate - model-specific helpers (like `[MASK]` on soft-deletable tables).",
+  "answer": "restore()",
+  "closed_book_guess": "restoreDeleted",
+  "category": "fact"
+ },
+ {
+  "id": 529,
+  "page": "Writing a plugin",
+  "section": "Setup and fail-fast requirements",
+  "sentence": "With `[MASK]`, models without the column pass; use `model.hasColumn(...)` in hooks and transforms to skip them.",
+  "answer": "optional: true",
+  "closed_book_guess": "optionalColumns",
+  "category": "fact"
+ },
+ {
+  "id": 562,
+  "page": "Array updates",
+  "section": "Add values only once",
+  "sentence": " `[MASK]` adds only values that are not already present.",
+  "answer": "addUnique",
+  "closed_book_guess": "arrayAppendUnique",
+  "category": "fact"
+ },
+ {
+  "id": 569,
+  "page": "Array filters",
+  "section": "Filter individual elements",
+  "sentence": "For `some` equality/list predicates and `[MASK]` equality/list predicates, better-drizzle emits PostgreSQL array operators (`@>`, `&&`, `<@`) that a GIN index can use.",
+  "answer": "every",
+  "closed_book_guess": "none",
+  "category": "fact"
+ },
+ {
+  "id": 570,
+  "page": "Array filters",
+  "section": "Use in relations and other helpers",
+  "sentence": " Array filters work anywhere a `where` is accepted, including relation filters, `include` filters, `[MASK]`, `exists`, `paginate`, and bulk writes:   ",
+  "answer": "count",
+  "closed_book_guess": "updateMany",
+  "category": "fact"
+ },
+ {
+  "id": 572,
+  "page": "Array filters",
+  "section": "Edge cases",
+  "sentence": "An empty list is valid and follows PostgreSQL:    `length` and `isEmpty` use PostgreSQL `[MASK]`, which counts all elements across every dimension, so a 2x3 array has a length of 6.",
+  "answer": "cardinality()",
+  "closed_book_guess": "array_length(array, 1)",
+  "category": "fact"
+ },
+ {
+  "id": 583,
+  "page": "Explain",
+  "section": "Result shape",
+  "sentence": " `[MASK]` contains four standard fields and an optional `deferredProbes` field:   Each `deferredRelations` entry has `path`, `table`, `cardinality` (`'one' \\| 'many'`), `filtered`, `sorted`, `paginated`, and `through` (the junction table, for many-to-many).",
+  "answer": "ExplainResult",
+  "closed_book_guess": "deferredRelations",
+  "category": "fact"
+ },
+ {
+  "id": 588,
+  "page": "Explain",
+  "section": "Result shape",
+  "sentence": " `ExplainResult` contains four standard fields and an optional `deferredProbes` field:   Each `[MASK]` entry has `path`, `table`, `cardinality` (`'one' \\| 'many'`), `filtered`, `sorted`, `paginated`, and `through` (the junction table, for many-to-many).",
+  "answer": "deferredRelations",
+  "closed_book_guess": "probe",
+  "category": "fact"
+ },
+ {
+  "id": 591,
+  "page": "Filters",
+  "section": "Numeric and date filters",
+  "sentence": " Numbers, bigints, and dates accept range comparisons:     `[MASK]` and `startsWith` treat `%`, `_`, and the SQL escape character as literal search text.",
+  "answer": "contains",
+  "closed_book_guess": "between",
+  "category": "fact"
+ },
+ {
+  "id": 598,
+  "page": "Filters",
+  "section": "PostgreSQL arrays",
+  "sentence": "`[MASK]` uses PostgreSQL `cardinality`, including every dimension.",
+  "answer": "length",
+  "closed_book_guess": "arrayLength",
+  "category": "fact"
+ },
+ {
+  "id": 606,
+  "page": "Combining JSONB filters",
+  "section": "Index the paths you filter on",
+  "sentence": "Numeric paths index the cast, string and boolean paths index the text extraction:   Confirm the planner uses it with [`.explain()`](/docs/querying/explain):   A GIN index on the whole column (`using gin (settings)`) speeds up containment (`[MASK]`) but not these path comparisons.",
+  "answer": "@>",
+  "closed_book_guess": "settings @> '{\"theme\":{\"mode\":\"dark\"}}'::jsonb",
+  "category": "equivalent"
+ },
+ {
+  "id": 610,
+  "page": "Combining JSONB filters",
+  "section": "Filter through relations",
+  "sentence": "Given an `[MASK]` table with a typed `payload` column:    The same filter object works in `count`, `exists`, `paginate`, `cursor`, `updateMany`, and `deleteMany`:  ",
+  "answer": "orders",
+  "closed_book_guess": "events",
+  "category": "example_name"
+ },
+ {
+  "id": 611,
+  "page": "Combining JSONB filters",
+  "section": "Index the paths you filter on",
+  "sentence": "Numeric paths index the cast, string and boolean paths index the text extraction:   Confirm the planner uses it with [`[MASK]`](/docs/querying/explain):   A GIN index on the whole column (`using gin (settings)`) speeds up containment (`@>`) but not these path comparisons.",
+  "answer": ".explain()",
+  "closed_book_guess": "EXPLAIN ANALYZE",
+  "category": "fact"
+ },
+ {
+  "id": 613,
+  "page": "JSONB updates",
+  "section": "Use paths in every write",
+  "sentence": "`create` and `[MASK]` insert complete documents.",
+  "answer": "createMany",
+  "closed_book_guess": "replace",
+  "category": "fact"
+ },
+ {
+  "id": 615,
+  "page": "JSONB updates",
+  "section": "Use paths in every write",
+  "sentence": "  `[MASK]` with `update: 'all'` or `update: ['settings']` copies the proposed full document; use an object or a callback for a path update.",
+  "answer": "upsertMany",
+  "closed_book_guess": "jsonbSet",
+  "category": "fact"
+ },
+ {
+  "id": 625,
+  "page": "JSONB filters",
+  "section": "JSONB filters",
+  "sentence": "Dot paths.** `'plan.tier'` and `[MASK]` map to JSONB paths.",
+  "answer": "'notifications.email.enabled'",
+  "closed_book_guess": "'plan.features.enabled'",
+  "category": "example_name"
+ },
+ {
+  "id": 639,
+  "page": "null and undefined",
+  "section": "`undefined` and `null` in `data`",
+  "sentence": "If every field in an update is `undefined`, there is nothing to set and Drizzle throws `No values to set` (for `[MASK]`, only when some row matches).",
+  "answer": "updateMany",
+  "closed_book_guess": "updateOne",
+  "category": "fact"
+ },
+ {
+  "id": 644,
+  "page": "Pagination",
+  "section": "Navigating backwards",
+  "sentence": "Without `[MASK]`, pages are ordered by primary key ascending.",
+  "answer": "orderBy",
+  "closed_book_guess": "orderBy DESC",
+  "category": "fact"
+ },
+ {
+  "id": 645,
+  "page": "Pagination",
+  "section": "Pagination with projection",
+  "sentence": " Both helpers accept the same `[MASK]` / `include` as a normal read:   ",
+  "answer": "select",
+  "closed_book_guess": "columns",
+  "category": "fact"
+ },
+ {
+  "id": 646,
+  "page": "Pagination",
+  "section": "Navigating backwards",
+  "sentence": "Cursor tokens hold only the row's own column values, so `[MASK]` throws `INVALID_ARGS` when `orderBy` contains a [relation key](/docs/querying/reads#ordering-by-relations).",
+  "answer": "cursor()",
+  "closed_book_guess": "paginateBackward",
+  "category": "fact"
+ },
+ {
+  "id": 652,
+  "page": "Pagination",
+  "section": "Navigating backwards",
+  "sentence": "Pass the returned token unchanged and repeat the same `[MASK]` for each page.",
+  "answer": "orderBy",
+  "closed_book_guess": "query",
+  "category": "fact"
+ },
+ {
+  "id": 662,
+  "page": "Prepared Statements",
+  "section": "Hooks, plugins, and metadata",
+  "sentence": "[Rules](/docs/plugins/rules) and query validation (`better-drizzle/zod`, `[MASK]`) also run at prepare time and see `param()` markers instead of values:  Rules that check values cannot see a param.",
+  "answer": "better-drizzle/ata",
+  "closed_book_guess": "better-drizzle/valibot",
+  "category": "fact"
+ },
+ {
+  "id": 664,
+  "page": "Prepared Statements",
+  "section": "Prepared Statements",
+  "sentence": "Use `param()` to get typed values: `[MASK]` types its value as `any`.",
+  "answer": "sql.placeholder()",
+  "closed_book_guess": "sql<T>",
+  "category": "fact"
+ },
+ {
+  "id": 672,
+  "page": "Reads",
+  "section": "Ordering by relations",
+  "sentence": "For full offset pages with totals, use [`[MASK]`](/docs/querying/pagination).",
+  "answer": "paginate",
+  "closed_book_guess": "withCount",
+  "category": "fact"
+ },
+ {
+  "id": 687,
+  "page": "Relations",
+  "section": "Many-to-many relations",
+  "sentence": " Declare many-to-many relations natively with `.through()` on both ends, naming the junction columns:   The relation then behaves like any other to-many relation - `[MASK]`, `select`, `_count`, `some` / `every` / `none`, and `connect` / `disconnect` / `set` all work through it, and you never name the junction table in a query:   ",
+  "answer": "include",
+  "closed_book_guess": "with",
+  "category": "fact"
+ },
+ {
+  "id": 695,
+  "page": "Selecting fields",
+  "section": "Projecting relations",
+  "sentence": " Both `select` and `include` can shape a relation by giving it a nested query instead of `true`:    The nested object accepts the same `where`, `select`, `[MASK]`, and `take` you would use on a top-level query - so you can filter and order related rows too.",
+  "answer": "orderBy",
+  "closed_book_guess": "order",
+  "category": "fact"
+ },
+ {
+  "id": 706,
+  "page": "Client",
+  "section": "`raw` options",
+  "sentence": "With `[MASK]`, a call without `options.comment` throws `RAW_COMMENT_REQUIRED`.",
+  "answer": "raw.requireComment",
+  "closed_book_guess": "requireComment",
+  "category": "equivalent"
+ },
+ {
+  "id": 707,
+  "page": "Client",
+  "section": "`raw` options",
+  "sentence": "With `raw.requireComment`, a call without `options.comment` throws `[MASK]`.",
+  "answer": "RAW_COMMENT_REQUIRED",
+  "closed_book_guess": "an error",
+  "category": "fact"
+ },
+ {
+  "id": 727,
+  "page": "Model delegate",
+  "section": "Writes",
+  "sentence": "`[MASK]` is `{ count: number; data?: T[] }` - `data` is populated when the driver supports `RETURNING`.",
+  "answer": "BatchResult<T>",
+  "closed_book_guess": "WriteResult",
+  "category": "fact"
+ },
+ {
+  "id": 728,
+  "page": "Model delegate",
+  "section": "Reads",
+  "sentence": "`[MASK]` is an explainable `Promise<T | null>` with a `.throw()` method - see [throwing results](/docs/writing/throwing-results).",
+  "answer": "ThrowingResult<T>",
+  "closed_book_guess": "findFirst",
+  "category": "fact"
+ },
+ {
+  "id": 740,
+  "page": "Query options",
+  "section": "Projections",
+  "sentence": "  A relation value can be `true` or a nested read-args object (with its own `where`, `[MASK]`, `orderBy`, `take`).",
+  "answer": "select",
+  "closed_book_guess": "columns",
+  "category": "fact"
+ },
+ {
+  "id": 742,
+  "page": "Query options",
+  "section": "Read arguments",
+  "sentence": "`[MASK]` accepts the same query-argument shape as the other reads, but its `where` must pin one row: an equality on every primary key column, on a unique column, or on every column of a composite unique key.",
+  "answer": "findUnique",
+  "closed_book_guess": "update",
+  "category": "fact"
+ },
+ {
+  "id": 748,
+  "page": "Query options",
+  "section": "Pagination arguments",
+  "sentence": " `paginate` accepts everything above plus `page`, `perPage`, and `[MASK]`:  \ttype={{ \t\tpage: { \t\t\tdescription: '1-based page number.",
+  "answer": "limit",
+  "closed_book_guess": "totalCount",
+  "category": "fact"
+ },
+ {
+  "id": 750,
+  "page": "Stability & semver",
+  "section": "Experimental in `0.3.x`",
+  "sentence": "`[MASK]` (from `0.4.0`, experimental through `0.4.x`): option names, the `$tenant` / `$withoutTenant` API, and error details can change in a **patch** release.",
+  "answer": "better-drizzle/tenant",
+  "closed_book_guess": "Multi-tenancy",
+  "category": "fact"
+ },
+ {
+  "id": 751,
+  "page": "Stability & semver",
+  "section": "Experimental in `0.3.x`",
+  "sentence": " `better-drizzle/cache` and `better-drizzle/cache/redis`: option names, per-call `cache` arguments, `[MASK]` methods, the store interface, and the stored entry format can change in a **patch** release while the plugin matures.",
+  "answer": "$cache",
+  "closed_book_guess": "cache.invalidate",
+  "category": "fact"
+ },
+ {
+  "id": 754,
+  "page": "Stability & semver",
+  "section": "Experimental in `0.3.x`",
+  "sentence": "Option names, the `[MASK]` API, and the generated schemas can change in a **patch** release.",
+  "answer": "$ata",
+  "closed_book_guess": "query builder",
+  "category": "fact"
+ },
+ {
+  "id": 759,
+  "page": "Stability & semver",
+  "section": "Experimental in `0.3.x`",
+  "sentence": "`better-drizzle/tenant` (from `0.4.0`, experimental through `0.4.x`): option names, the `[MASK]` / `$withoutTenant` API, and error details can change in a **patch** release.",
+  "answer": "$tenant",
+  "closed_book_guess": "$withTenant",
+  "category": "fact"
+ },
+ {
+  "id": 763,
+  "page": "Support matrix",
+  "section": "String filters",
+  "sentence": "With `[MASK]`, both sides are lowered in SQL, so case folding follows the database.",
+  "answer": "mode: 'insensitive'",
+  "closed_book_guess": "ilike",
+  "category": "fact"
+ },
+ {
+  "id": 766,
+  "page": "Support matrix",
+  "section": "String filters",
+  "sentence": "SQLite's `[MASK]` only folds ASCII letters unless the ICU extension is loaded.",
+  "answer": "lower()",
+  "closed_book_guess": "LIKE",
+  "category": "fact"
+ },
+ {
+  "id": 769,
+  "page": "Support matrix",
+  "section": "String filters",
+  "sentence": "  Without `[MASK]`, case sensitivity follows the dialect: SQLite `LIKE` ignores ASCII case by default, `=` compares case-sensitively, and MySQL follows the column collation.",
+  "answer": "mode",
+  "closed_book_guess": "ilike",
+  "category": "fact"
+ },
+ {
+  "id": 780,
+  "page": "Why better-drizzle?",
+  "section": "Reads that answer the real question",
+  "sentence": "`[MASK]` and `cursor()` return `{ data, pagination }` with exact metadata, including correct `hasNext`/`hasPrevious` on cursor pages.",
+  "answer": "paginate()",
+  "closed_book_guess": "findMany",
+  "category": "fact"
+ },
+ {
+  "id": 790,
+  "page": "Atomic updates",
+  "section": "Operators",
+  "sentence": " Numeric columns accept `increment`, `decrement`, `multiply`, `divide`, and `[MASK]`.",
+  "answer": "set",
+  "closed_book_guess": "modulo",
+  "category": "fact"
+ },
+ {
+  "id": 797,
+  "page": "Create, update & delete",
+  "section": "Write relations",
+  "sentence": " `create`, `update`, and `upsert` accept `connect`, `disconnect`, and `set` inside `[MASK]`, so you attach related rows without resolving foreign keys yourself:   See [relation writes](/docs/writing/relation-writes) for every command, its rules, and the raw Drizzle equivalent.",
+  "answer": "data",
+  "closed_book_guess": "with",
+  "category": "fact"
+ },
+ {
+  "id": 812,
+  "page": "Relation writes",
+  "section": "Reference",
+  "sentence": "`[MASK]` replaces the entire relation, so it cannot be combined with `connect` \tor `disconnect` for that same relation.",
+  "answer": "set",
+  "closed_book_guess": "replace",
+  "category": "fact"
+ },
+ {
+  "id": 813,
+  "page": "Relation writes",
+  "section": "Relation writes",
+  "sentence": "No `[MASK]` in sight, no junction rows to insert by hand, and `post` comes back typed with both relations attached.",
+  "answer": "authorId",
+  "closed_book_guess": "join",
+  "category": "example_name"
+ },
+ {
+  "id": 826,
+  "page": "Throwing results",
+  "section": "Throwing results",
+  "sentence": "better-drizzle keeps that honest in the type - they return `[MASK]` - while letting you opt into throwing when not-found is genuinely exceptional.",
+  "answer": "T | null",
+  "closed_book_guess": "T | undefined",
+  "category": "fact"
+ },
+ {
+  "id": 832,
+  "page": "Update many rows with different values",
+  "section": "Edge cases",
+  "sentence": "`updateEach` is a scalar batch API: relation `[MASK]`, relation `select`, and relation commands are rejected.",
+  "answer": "include",
+  "closed_book_guess": "insert",
+  "category": "fact"
+ },
+ {
+  "id": 833,
+  "page": "Update many rows with different values",
+  "section": "Update many rows with different values",
+  "sentence": "It runs a single statement:   `[MASK]` is a Drizzle column instance (`users.id`), not a column key.",
+  "answer": "by",
+  "closed_book_guess": "users.id",
+  "category": "fact"
+ }
+]

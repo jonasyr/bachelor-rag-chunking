@@ -52,13 +52,15 @@ bachelor-rag-chunking/
 │   └── generate.py  evaluate_retrieval.py  evaluate_answers.py
 ├── scripts/
 │   ├── difficulty_probe.py                  (Pilotproben)
-│   └── remap_pilot.py                       (einmalig: Pilot-IDs auf neuen Korpus abbilden)
+│   ├── remap_pilot.py                       (einmalig: Pilot-IDs auf neuen Korpus abbilden)
+│   └── corpus_probe/                        (Korpusauswahl: Lückentext-Probe, ADR 0038)
 ├── tests/                                   (pytest; conftest.py, test_*.py)
 ├── data/
 │   ├── raw/vue_docs_snapshot/               (Snapshot: api/, guide/, style-guide/)
 │   ├── processed/                           (documents, sections, chunks_*, embeddings_*, embedding_runs)
 │   ├── evaluation/                          (questions, ground_truth, query_embeddings, retrieved_results*, generation_runs, …)
-│   └── pilot/                               (Pilot-Sets: ., hard/, hard_posthoc/)
+│   ├── pilot/                               (Pilot-Sets: ., hard/, hard_posthoc/)
+│   └── corpus_probe/                        (Korpusauswahl: Kandidaten, Ergebnisse, Wertung)
 ├── chroma_db/                               (Chroma-Index, entsteht beim ersten embed.py)
 ├── output/                                  (tables/*.tex, figures/*.pdf; entsteht mit der Auswertung)
 ├── notebooks/analysis.ipynb
@@ -113,6 +115,7 @@ Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. 
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht): `scaffold` schreibt aus `generated_answers.csv` Lesepaket, Bewertungsbogen und Schlüssel der blinden Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); nie über einen vorhandenen Bogen oder Schlüssel; nur, wenn Antworten und Chunk-Dateien die des letzten Generierungslaufs sind, [ADR 0033](../adr/0033-antwortmodell.md)); beide nur mit eingefrorenem Hauptkatalog ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) und nur, wenn jede Frage des Katalogs genau eine Zeile je Strategie C1–C3 hat; `summarise` prüft den Bogen gegen den Schlüssel und jede Bewertung (ganze Zahl 0–2), schreibt `scores.csv` mit `total_score` und gibt Mittel, Median und Standardabweichung je Strategie, Fragetyp und Konstruktionsklasse aus; `--set DIR` ein Pilot-Set (Dateien im Set-Ordner, Antworten aus `generate.py --set`), `--limit N` nur mit `--set`: die ersten N Fragen nach ID (in beiden Modi gleich angeben; der Hauptkatalog wird immer vollständig bewertet) |
 | `scripts/difficulty_probe.py` | `[SET_DIR]`: Pilot-Set, relativ zur Repo-Wurzel (Standard `config.PILOT_DIR` = `data/pilot`); läuft C1–C3 und K1, schreibt die Ergebnisdateien des Sets; Sets: [Datenformate](data-formats.md#pilot-sets) |
 | `scripts/remap_pilot.py` | einmalig: `OLD_DIR PILOT_DIR [PILOT_DIR …]` (Pfade relativ zum Arbeitsverzeichnis, also der Repo-Wurzel); bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab und überschreibt sie ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
+| `scripts/corpus_probe/` | `probe_corpus.sh NAME [--recorded]` (ein Kandidat aus `candidates.csv` auf seinem Commit; ruft die OpenAI-API; `--recorded` wiederholt die aufgezeichneten Proben), einzeln `to_docs.py NAME SOURCE`, `build_probes.py NAME [--recorded]`, `run_probes.py NAME PRODUCT`; `summarise.py` (Wertung aus den abgelegten Daten, ohne API); `question_probe.py sample|answer|blind BATCH|unblind|summary` (Closed-Book-Fragen, `answer` ruft die API); Verfahren: [Korpusauswahl](corpus-selection.md) |
 
 ## Qualitätswerkzeuge
 
