@@ -26,7 +26,12 @@ from config import (
     CORPUS_PROBE_SPAN_CHARS,
 )
 
-SPAN = re.compile(rf"`([^`\n]{{{CORPUS_PROBE_SPAN_CHARS[0]},{CORPUS_PROBE_SPAN_CHARS[1]}}})`")
+SPAN = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")  # one complete single-backtick code span
+# The recorded runs filtered by length inside the pattern, so adjacent one-character spans
+# (`+`/`×`) let a closing backtick open a bogus span; --recorded rebuilds them with this pattern.
+LEGACY_SPAN = re.compile(
+    rf"`([^`\n]{{{CORPUS_PROBE_SPAN_CHARS[0]},{CORPUS_PROBE_SPAN_CHARS[1]}}})`"
+)
 TRIVIAL = ("true", "false", "null", "undefined")
 
 
@@ -48,7 +53,7 @@ def sections(text: str, title: str) -> list[tuple[str, list[str]]]:
     return out
 
 
-def candidates(doc: dict) -> list[dict]:
+def candidates(doc: dict, legacy: bool = False) -> list[dict]:
     lo, hi = CORPUS_PROBE_SENTENCE_CHARS
     found = []
     for heading, lines in sections(doc["text"], doc["title"]):
@@ -62,7 +67,11 @@ def candidates(doc: dict) -> list[dict]:
                 continue
             prose.append(line.strip(" -*>"))
         for sentence in re.split(r"(?<=[.!?])\s+", " ".join(prose)):
-            spans = SPAN.findall(sentence)
+            if legacy:
+                spans = LEGACY_SPAN.findall(sentence)
+            else:
+                lo_span, hi_span = CORPUS_PROBE_SPAN_CHARS
+                spans = [t for t in SPAN.findall(sentence) if lo_span <= len(t) <= hi_span]
             if not (lo <= len(sentence) <= hi) or not spans:
                 continue
             for term in sorted(set(spans)):  # sorted: set order depends on the hash seed
@@ -113,7 +122,7 @@ def recorded(docs: list[dict], results: list[dict]) -> list[dict]:
     drops, which were never run)."""
     pool = {}
     for doc in docs:
-        for c in candidates(doc):
+        for c in candidates(doc, legacy=True):
             pool.setdefault((c["path"], c["section"], c["sentence"], c["answer"]), c)
     probes = []
     for r in results:

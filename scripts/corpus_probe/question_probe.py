@@ -5,7 +5,8 @@ sample NAME...  draws sections (H2/H3, outside examples, changelogs and blogs, a
                 into questions/<name>-sections.json for the question writer (an agent, prompt in
                 docs/reference/corpus-selection.md), who writes questions/<name>.json
 answer NAME...  answers every question closed-book and open-book (llm_client; calls the API)
-blind NAME...   shuffles all answers into questions/judge-input.json and judge-key.json
+blind BATCH NAME...  shuffles the answers with CORPUS_QUESTIONS_JUDGE_SEEDS[BATCH] into
+                questions/judge-input.json and judge-key.json (batch 1: five corpora, 2: Angular)
 unblind         merges the judge's questions/judge-output.json into questions/<name>.json
 summary         prints the share of retrieval-dependent questions per corpus
 
@@ -27,7 +28,7 @@ from dotenv import load_dotenv
 from config import (
     CORPUS_PROBE_SEED,
     CORPUS_PROBE_WORKERS,
-    CORPUS_QUESTIONS_JUDGE_SEED,
+    CORPUS_QUESTIONS_JUDGE_SEEDS,
     CORPUS_QUESTIONS_MIN_WORDS,
     CORPUS_QUESTIONS_PER_CORPUS,
     CORPUS_QUESTIONS_PER_PAGE,
@@ -82,7 +83,7 @@ def sample(name: str) -> list[dict]:
     return [s | {"id": f"{name}-{i + 1:02d}"} for i, s in enumerate(picked)]
 
 
-def ask(product: str, question: dict, section: dict, open_book: bool) -> str:
+def ask(product: str, question: dict, section: dict, open_book: bool) -> tuple[str, str]:
     from llm_client import complete
 
     user = f"Question about {product}: {question['question']}\n\n"
@@ -95,7 +96,7 @@ def ask(product: str, question: dict, section: dict, open_book: bool) -> str:
             {"role": "user", "content": user + TAIL},
         ]
     )
-    return reply.text.strip()
+    return reply.text.strip(), reply.model
 
 
 def answer(name: str) -> None:
@@ -105,19 +106,23 @@ def answer(name: str) -> None:
     jobs = [(q, ob) for q in questions for ob in (False, True)]
     with cf.ThreadPoolExecutor(CORPUS_PROBE_WORKERS) as pool:
         replies = list(pool.map(lambda j: ask(product, j[0], drawn[j[0]["id"]], j[1]), jobs))
-    for (q, open_book), text in zip(jobs, replies, strict=True):
+    models = sorted({model for _, model in replies})
+    if len(models) != 1:
+        raise SystemExit(f"the replies name several models {models}; run again")
+    for (q, open_book), (text, model) in zip(jobs, replies, strict=True):
         q["open" if open_book else "closed"] = text
+        q["model"] = model
     write_json(QUESTIONS_DIR / f"{name}.json", questions)
 
 
-def blind(names: list[str]) -> None:
+def blind(names: list[str], batch: int) -> None:
     items = [
         (q["id"], run, {"question": q["question"], "reference": q["reference"], "answer": q[run]})
         for name in names
         for q in read_json(QUESTIONS_DIR / f"{name}.json")
         for run in ("closed", "open")
     ]
-    random.Random(CORPUS_QUESTIONS_JUDGE_SEED).shuffle(items)
+    random.Random(CORPUS_QUESTIONS_JUDGE_SEEDS[batch]).shuffle(items)
     write_json(
         QUESTIONS_DIR / "judge-input.json",
         [{"item": f"J{i + 1:03d}", **x} for i, (_, _, x) in enumerate(items)],
@@ -179,7 +184,7 @@ def main() -> None:
         for name in names:
             answer(name)
     elif command == "blind":
-        blind(names)
+        blind(names[1:], int(names[0]))
     elif command == "unblind":
         unblind()
     elif command == "summary":

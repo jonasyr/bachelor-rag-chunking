@@ -321,4 +321,4 @@ CORPUS_QUESTIONS_PER_CORPUS = 20  # diagnostic questions per corpus, one per dra
 CORPUS_QUESTIONS_MIN_WORDS = 60  # prose words (3+ letters, outside code) a drawn section needs
 CORPUS_QUESTIONS_PER_PAGE = 2  # drawn sections per page at most
 CORPUS_QUESTIONS_SECTION_CHARS = 5000  # section text shown to the question writer and open-book run
-CORPUS_QUESTIONS_JUDGE_SEED = 7  # order of the blinded answers for the judge
+CORPUS_QUESTIONS_JUDGE_SEEDS = {1: 7, 2: 8}  # order of the blinded answers per judge batch

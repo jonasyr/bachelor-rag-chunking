@@ -26,4 +26,4 @@ else
 fi
 uv run python "$here/to_docs.py" "$name" "$source"
 uv run python "$here/build_probes.py" "$name" ${2:-}
-uv run python "$here/run_probes.py" "$name" "$product"
+uv run python "$here/run_probes.py" "$name" "$product" ${2:-}

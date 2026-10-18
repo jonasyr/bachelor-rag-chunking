@@ -6,7 +6,11 @@ masked section text, and scores exact match after normalisation. Writes results/
 (without the section text) and misses/<name>.json: the well-posed probes (open-book correct)
 missed closed-book, with an empty category for the classification. Calls the OpenAI API.
 
-Usage: uv run python scripts/corpus_probe/run_probes.py NAME "PRODUCT (short description)"
+The open-book context is a CORPUS_PROBE_CONTEXT_CHARS window around the probed sentence; the
+recorded runs used the start of the section (--recorded repeats that). Every result row keeps the
+model and system fingerprint the API reported; a run whose replies name more than one model stops.
+
+Usage: uv run python scripts/corpus_probe/run_probes.py NAME "PRODUCT (description)" [--recorded]
 """
 
 import concurrent.futures as cf
@@ -41,22 +45,41 @@ def norm(term: str) -> str:
     return re.sub(r"[`'\"\s]|\(\)$", "", first).rstrip(".").lower().removesuffix("()")
 
 
-def ask(probe: dict, product: str, open_book: bool) -> tuple[str, int, int]:
+def window(probe: dict, recorded: bool) -> str:
+    """The section text shown open-book: a window that contains the probed sentence."""
+    text, size = probe["section_text"], CORPUS_PROBE_CONTEXT_CHARS
+    if recorded or len(text) <= size:
+        return text[:size]
+    before = probe["sentence"].split("[MASK]")[0].replace("`", "").strip()[-30:]
+    pos = text.find(before) if before else -1
+    pos = pos if pos >= 0 else max(text.find("[MASK]"), 0)
+    start = max(0, min(pos - size // 2, len(text) - size))
+    return text[start : start + size]
+
+
+def ask(probe: dict, product: str, open_book: bool, recorded: bool) -> tuple:
     user = HEAD.format(product=product, **probe)
     if open_book:
-        user += CONTEXT.format(context=probe["section_text"][:CORPUS_PROBE_CONTEXT_CHARS])
+        user += CONTEXT.format(context=window(probe, recorded))
     reply = complete(
         [
             {"role": "system", "content": SYSTEM.format(product=product)},
             {"role": "user", "content": user + TAIL},
         ]
     )
-    return reply.text, reply.prompt_tokens, reply.completion_tokens
+    return (
+        reply.text,
+        reply.prompt_tokens,
+        reply.completion_tokens,
+        reply.model,
+        reply.system_fingerprint,
+    )
 
 
 def main() -> None:
     load_dotenv()
     name, product = sys.argv[1], sys.argv[2]
+    recorded = sys.argv[3:] == ["--recorded"]
     probes = [
         p
         for p in read_json(PROBES_DIR / f"{name}.json")
@@ -65,13 +88,19 @@ def main() -> None:
     jobs = [(i, open_book) for i in range(len(probes)) for open_book in (False, True)]
     tokens = [0, 0]
     with cf.ThreadPoolExecutor(CORPUS_PROBE_WORKERS) as pool:
-        replies = pool.map(lambda job: ask(probes[job[0]], product, job[1]), jobs)
-        for (i, open_book), (text, prompt_tokens, completion_tokens) in zip(
-            jobs, replies, strict=True
-        ):
-            probes[i]["open" if open_book else "closed"] = text
-            tokens[0] += prompt_tokens
-            tokens[1] += completion_tokens
+        replies = list(pool.map(lambda job: ask(probes[job[0]], product, job[1], recorded), jobs))
+    models = sorted({reply[3] for reply in replies})
+    if len(models) != 1:
+        raise SystemExit(f"the replies name several models {models}; run again")
+    for (i, open_book), (text, prompt_tokens, completion_tokens, model, fingerprint) in zip(
+        jobs, replies, strict=True
+    ):
+        run = "open" if open_book else "closed"
+        probes[i][run] = text
+        probes[i]["model"] = model
+        probes[i][run + "_fingerprint"] = fingerprint
+        tokens[0] += prompt_tokens
+        tokens[1] += completion_tokens
     results, misses = [], []
     for i, p in enumerate(probes):
         p.pop("section_text")

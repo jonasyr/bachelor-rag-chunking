@@ -39,7 +39,8 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
    jede Frage ohne Kontext und mit dem Abschnitt; ein weiterer Agent beurteilte alle Antworten blind (gemischt, ohne
    Angabe der Bedingung): `correct`, `partial`, `wrong`, `abstain`. Retrieval-abhängig = mit Abschnitt `correct`, ohne
    nicht `correct` (Wilson-Intervall). Die Fragen sind Diagnose, kein Teil des Fragenkatalogs. Urteilslauf 1: die fünf
-   Korpora gemeinsam (Seed 7); Lauf 2: Angular allein (Seed 8, auf Wunsch für die Mail an den Betreuer nachgereicht).
+   Korpora gemeinsam, Lauf 2: Angular allein (auf Wunsch für die Mail an den Betreuer nachgereicht); Seeds in
+   `config.CORPUS_QUESTIONS_JUDGE_SEEDS`, beide Reihenfolgen aus den abgelegten Antworten reproduzierbar.
 
 Prompt der Klassifikation (je Korpus; Eingabe `misses/<name>.json` ohne `category`):
 
@@ -229,6 +230,22 @@ Mitwirkende); Vorgabe war möglichst viel Inhalt in der Wissensbasis.
   `documents.jsonl` des Snapshots `40aa88a`. Die Antworten selbst sind nicht bitgenau wiederholbar (Modell nur als
   Alias, `seed` nur „best effort“, [ADR 0033](../adr/0033-antwortmodell.md)); belegt sind die Werte durch die
   abgelegten Ergebnisse.
+- Drei Abweichungen der aufgezeichneten Läufe, in der Codex-Prüfung von PR #21 gefunden; `build_probes.py`,
+  `run_probes.py` und `question_probe.py` sind seither korrigiert, `--recorded` wiederholt den alten Stand:
+  - Code-Ausdrücke: Das Muster filterte die Länge innerhalb des regulären Ausdrucks, sodass bei benachbarten
+    Ein-Zeichen-Ausdrücken (`` `+`/`×` ``) Prosa zwischen zwei Ausdrücken als Ausdruck galt (z. B. Vela,
+    `results/vela.jsonl` Zeile 80). Betroffen sind 0–46 Proben je Korpus, davon höchstens 5 eindeutig gestellt; ohne
+    sie ändert sich keine Wissenslücke um mehr als 0,4 Prozentpunkte (Vue, Angular, e2e, Enroute: unverändert).
+  - Open-Book-Kontext: Es wurden die ersten 6.000 Zeichen des Abschnitts gezeigt, auch wenn der Satz später stand;
+    solche Proben fallen aus dem Nenner. Betroffen sind 0–23 Proben je Korpus (Vue 0, Enroute 0, e2e 3). Neu: ein
+    Fenster um den Satz.
+  - Modellkennung: Die Läufe speicherten nicht, welche Modellversion die API meldete; `gpt-6-luna` ist ein Alias.
+    Alle Läufe fanden am 17./18.10.2026 statt. Neu: `model` und `system_fingerprint` je Ergebniszeile, ein Lauf mit
+    mehreren Modellen bricht ab.
+- Abweichung von der Vorregistrierung: Das Kriterium Struktur nennt dort auch die Streuung der Seitenlängen; die
+  Stufen in `summarise.py` nutzen nur Überschriftendichte und Ebenensprünge (`page_iqr` steht in `summary.json`, geht
+  aber nicht in die Wertung ein). Die Wertung wurde nachträglich nicht geändert. Die Entscheidung für e2e stützt sich
+  vor allem auf die Closed-Book-Fragen und den Umfang, nicht auf die Rangfolge der Wertung.
 - Blume wurde vor der Erweiterung des Changelog-Filters gelesen und enthält die Seite `advanced/changelog.mdx` (eine
   Anleitung zur Changelog-Funktion, kein Changelog); `skip_changelogs` = `no` hält das fest.
 
@@ -249,4 +266,4 @@ Skripte in `scripts/corpus_probe/`, Daten in `config.CORPUS_PROBE_DIR` = `data/c
 `scripts/corpus_probe/probe_corpus.sh <name>` (ruft die OpenAI-API; `--recorded` wiederholt die aufgezeichneten
 Proben statt eine neue Stichprobe zu ziehen), dann klassifizieren und
 `uv run python scripts/corpus_probe/summarise.py`. Closed-Book-Fragen: `question_probe.py sample NAME…`, Fragen
-schreiben lassen, `answer NAME…` (API), `blind NAME…`, urteilen lassen, `unblind`, `summary`.
+schreiben lassen, `answer NAME…` (API), `blind BATCH NAME…`, urteilen lassen, `unblind`, `summary`.

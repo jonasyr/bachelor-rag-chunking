@@ -180,5 +180,5 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 | `CORPUS_QUESTIONS_MIN_WORDS` | `60` | Prosawörter (ab 3 Buchstaben, außerhalb von Code), die ein gezogener Abschnitt braucht | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_PER_PAGE` | `2` | höchstens so viele gezogene Abschnitte je Seite | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_SECTION_CHARS` | `5000` | Abschnittstext für Fragenschreiber und Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
-| `CORPUS_QUESTIONS_JUDGE_SEED` | `7` | Reihenfolge der verblindeten Antworten für das Urteil | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_QUESTIONS_JUDGE_SEEDS` | `{1: 7, 2: 8}` | Reihenfolge der verblindeten Antworten je Urteilslauf (1: fünf Korpora, 2: Angular) | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_PROBE_AI_RATING`, `CORPUS_PROBE_FEW_STARS` | `low` 4 … `high` 1; `100` | Stufe „Passung“ nach KI-Textanteil, minus 1 unter 100 GitHub-Sternen | [ADR 0038](../adr/0038-korpus-e2e.md) |
