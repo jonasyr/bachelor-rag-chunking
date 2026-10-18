@@ -27,7 +27,7 @@ data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`
 - Corpus (ADR 0038): pages must equal the `docs.json` navigation; areas = navigation groups (`config.CORPUS_AREAS`,
   `area` in documents.jsonl). Anchors = site slugs (`mdx.slug`), H1 anchor = path slug. Doc IDs follow path order —
   a corpus change renumbers them; remap annotations by path + anchor (`scripts/remap_pilot.py`), never by hand.
-- Catalogue quotas (`AREA_MIN_QUESTIONS`, `CATALOGUE_AREA_SLOTS`, `CATALOGUE_RESERVE`) still use Vue keys until step 4.
+- Catalogue quotas: 15 e2e areas, slots = reserve = minimum by token share (ADR 0039); plan drawn 18.10.2026, Vue plan in `data/evaluation/archive_vue/`.
 - Raw and processed data are gitignored; their folders survive via `.gitkeep` negation rules in `.gitignore`.
 - Results for the thesis: `docs/how-to/deliver-results-to-thesis.md` (`output/figures/*.pdf` is versioned via a
   `.gitignore` exception to `*.pdf`).

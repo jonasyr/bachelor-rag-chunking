@@ -170,10 +170,10 @@ der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und 
 die Reserve in Ziehungsreihenfolge.
 ```
 area,draw,section_id,slot_id,class,status,skip_reason,question_id
-api,1,D009#onmounted,S01,single,used,,Q001
-api,2,D012#createrenderer,S02,multi-section,skipped,code-or-links,
-api,13,D020#script,S02,multi-section,open,,
-api,14,D003#v-bind,,,reserve,,
+Get started,1,D013#install-the-skill,S01,single,used,,Q001
+Get started,2,D037#use-a-subscription-or-api-key,S02,multi-section,skipped,code-or-links,
+Get started,3,D014#assertions,S02,multi-section,open,,
+Get started,4,D037#add-an-agent-step,,,reserve,,
 ```
 `status` ∈ `config.CATALOGUE_PLAN_STATUSES` (`open`, `used`, `skipped`, `reserve`); `skip_reason` ∈
 `config.CATALOGUE_SKIP_REASONS`. `check` vergleicht den Plan mit einer frischen Ziehung und meldet jede andere

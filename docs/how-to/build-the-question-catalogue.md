@@ -13,7 +13,8 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
 
 ## Schritte
 
-1. Den Stichprobenplan einmal ziehen und sofort committen:
+1. Der Stichprobenplan ist gezogen (18.10.2026, [Experiment-Protokoll](../reference/experiment-record.md#stichprobenplan-e2e));
+   nur nach einem neuen ADR wird er so neu gezogen und sofort committet:
 
    ```bash
    uv run python src/catalogue.py plan
@@ -21,8 +22,8 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    git commit -m "chore(data): Stichprobenplan des Fragenkatalogs gezogen"
    ```
 
-   Der Plan legt für 48 Slots je einen Ausgangsabschnitt und eine Konstruktionsklasse fest (12 API, 3 Style Guide,
-   33 Guide) und wird nie überschrieben.
+   Der Plan legt für 48 Slots je einen Ausgangsabschnitt und eine Konstruktionsklasse fest (je Bereich nach
+   Tokenanteil, [Korpus](../reference/corpus.md#bereiche)) und wird nie überschrieben.
 
 2. Den Editor starten (nur auf diesem Rechner erreichbar; die Option gilt unabhängig vom Arbeitsverzeichnis):
 
@@ -32,7 +33,7 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
 
    Der Abschnitt erscheint formatiert (Markdown); „Source text“ zeigt den genauen Text, auf den sich die Relevanzregel
    bezieht. Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über
-   „Find more sections“ suchen und hinzufügen, auch in der API-Referenz und im Style Guide. Der Ausgangsabschnitt gehört
+   „Find more sections“ suchen und hinzufügen, auch in anderen Bereichen. Der Ausgangsabschnitt gehört
    immer zur Annotation. Während des Schreibens markiert der Editor Wörter der Frage, die in den Überschriften
    vorkommen; bei `paraphrase` müssen sie umformuliert werden, bei `detail` zeigt die Prüfung die Länge der Antwort.
    „Save question“ schreibt `questions.csv` und `ground_truth.csv` und springt zum nächsten offenen Slot. Passt ein

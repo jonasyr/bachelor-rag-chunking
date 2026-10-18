@@ -26,25 +26,26 @@ Warum e2e: [Korpusauswahl](corpus-selection.md).
 Ein Bereich ist eine Gruppe der Navigation; Seiten, die direkt unter einem Tab stehen (Examples), bilden einen
 Bereich mit dem Namen des Tabs (`config.CORPUS_AREAS`, Feld `area` in `documents.jsonl`, Spalte `section` im Manifest).
 
-| Tab | Bereich | Seiten | Tokens |
-|---|---|---:|---:|
-| Documentation | Get started | 5 | 12.558 |
-| | Platforms | 3 | 10.908 |
-| | Features | 6 | 11.473 |
-| | Models and agents | 3 | 11.962 |
-| | Run in CI | 6 | 10.114 |
-| | Hosted browsers and devices | 7 | 10.940 |
-| | Extend | 3 | 6.703 |
-| | Deep dive | 5 | 15.059 |
-| | Migrate | 5 | 19.210 |
-| Reference | Test API | 5 | 37.134 |
-| | Project | 8 | 61.029 |
-| | Web | 1 | 11.033 |
-| | Mobile | 1 | 10.203 |
-| | Engine contract | 1 | 21.507 |
-| Examples | Examples | 1 | 547 |
+| Tab | Bereich | Seiten | Tokens | Slots |
+|---|---|---:|---:|---:|
+| Documentation | Get started | 5 | 12.558 | 2 |
+| | Platforms | 3 | 10.908 | 2 |
+| | Features | 6 | 11.473 | 2 |
+| | Models and agents | 3 | 11.962 | 2 |
+| | Run in CI | 6 | 10.114 | 2 |
+| | Hosted browsers and devices | 7 | 10.940 | 2 |
+| | Extend | 3 | 6.703 | 1 |
+| | Deep dive | 5 | 15.059 | 3 |
+| | Migrate | 5 | 19.210 | 4 |
+| Reference | Test API | 5 | 37.134 | 7 |
+| | Project | 8 | 61.029 | 12 |
+| | Web | 1 | 11.033 | 2 |
+| | Mobile | 1 | 10.203 | 2 |
+| | Engine contract | 1 | 21.507 | 4 |
+| Examples | Examples | 1 | 547 | 1 |
 
-Quoten je Bereich für den Fragenkatalog folgen in Schritt 4 ([Plan](../plan.md#stand)).
+Slots, Reserve und Mindestzahl je Bereich sind gleich (nach Tokenanteil, mindestens 1;
+[ADR 0039](../adr/0039-stichprobenplan-e2e.md)).
 
 ## Aufbereitung (MDX → Markdown)
 
