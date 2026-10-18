@@ -27,6 +27,18 @@ von [ADR 0019](0019-korpus-ausschnitt.md); Umsetzung in eigenen Pull Requests, S
   „Limits“-Abschnitte und Fehlercode-Katalog, dichte Querverweise; Aufwand durch Mintlify-MDX.
 - Vorgabe: möglichst viel Inhalt in der Wissensbasis. e2e hat rund 228.000 Tokens auf 61 Seiten (Enroute rund 81.000,
   der Vue-Korpus 166.000); mehr Ablenker machen das Retrieval realistischer.
+- Vergleich (vollständig mit allen 24 Kandidaten, Durchsicht und Entscheidungsweg:
+  [Korpusauswahl](../reference/corpus-selection.md#ergebnis)):
+
+  | | Vue.js | Angular | e2e | Enroute | TanStack Charts | xy |
+  |---|---|---|---|---|---|---|
+  | Wissenslücke (Lückentext) | 7,0 % | 12,8 % | 36,5 % | 50,4 % | 29,7 % | 31,7 % |
+  | Closed-Book ohne Doku richtig | 15/20 | 10/20 | 1/20 | 0/20 | 1/20 | 3/20 |
+  | Tokens (≈) | 177.951 | 508.000 | 228.266 | 81.395 | 219.823 | 159.453 |
+  | Sterne / Mitwirkende | bekannt | bekannt | 11.109 / 56 | 258 / 1 | 842 / 10 | 1.879 / 17 |
+  | Wertung (0–100) | – | – | 67,5 | 81,2 | 66,2 | 73,8 |
+  | Qualitativ (0–4 ×5) | – | – | 3/3/4/4/2 | 4/4/4/3/4 | 3/2/3/3/4 | 3/3/2/2/1 |
+
 - Zwei Korpora zu verbinden, um mehr Text zu haben, würde zwei Projekte mischen; Fragen und Retrieval wären nicht mehr
   über eine Dokumentation definiert.
 
