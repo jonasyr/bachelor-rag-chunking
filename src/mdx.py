@@ -329,9 +329,10 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
     stack: list[_Frame] = []
     fence: tuple[str, int] | None = None  # (marker, indent) of the open fence
     i = 0
+    origin = list(range(1, len(lines) + 1))  # source line of each entry (tag pairs get split)
 
     def fail(message: str) -> NoReturn:
-        raise ValueError(f"line {i}: {message}")
+        raise ValueError(f"line {origin[max(i, 1) - 1]}: {message}")
 
     def emit(line: str) -> None:
         if stack and stack[-1].body is not None:
@@ -446,6 +447,7 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
         pair = INLINE_PAIR_RE.match(line)
         if pair:
             lines[i:i] = [pair.group(4), pair.group(1) + pair.group(5)]
+            origin[i:i] = [origin[i - 1]] * 2
             line = pair.group(1) + pair.group(2)
         if TAG_START_RE.match(line):
             tag = line.strip()
@@ -473,6 +475,10 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
             else:
                 open_tag(name, attrs)
             continue
+        prose = INLINE_CODE_RE.sub("", line)
+        # a JSX expression may span lines: an unbalanced brace marks one as well
+        if MARKUP_RE.search(prose) or prose.count("{") != prose.count("}"):
+            fail(f"unhandled markup: {line!r}")
         h = HEADING_RE.match(line)
         if h:
             level, title = len(h.group(1)), h.group(2)
@@ -484,8 +490,6 @@ def to_markdown(text: str, page: str, snippet: ProviderSnippet | None = None) ->
                     fail(f"heading without slug: {line!r}")
                 emit(f"{h.group(1)} {title} {{#{anchor}}}")
                 continue
-        if MARKUP_RE.search(INLINE_CODE_RE.sub("", line)):
-            fail(f"unhandled markup: {line!r}")
         emit(line)
 
     if fence is not None:

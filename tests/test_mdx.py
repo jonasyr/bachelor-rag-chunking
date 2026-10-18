@@ -311,3 +311,26 @@ def test_unhandled_input_raises(body, message):
 def test_errors_name_the_line():
     with pytest.raises(ValueError, match="line 4"):
         md("Fine.\n\n<Frame>\n")
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "Intro.\n\n{/* hidden\ncomment */}\n",
+        "{items.map((x) => (\n  <li>{x}</li>\n))}\n",
+        "## Foo {bar}\n",
+    ],
+)
+def test_jsx_spanning_lines_or_in_headings_raises(body):
+    with pytest.raises(ValueError, match="unhandled markup"):
+        md(body)
+
+
+def test_error_line_counts_source_lines_after_inline_pairs():
+    with pytest.raises(ValueError, match="line 6:"):
+        md("<Note>a</Note>\n<Tip>b</Tip>\n\n\n<Foo />\n")
+
+
+def test_error_inside_a_split_pair_names_its_source_line():
+    with pytest.raises(ValueError, match="line 2:"):
+        md("<Note>Text with {x}.</Note>\n")

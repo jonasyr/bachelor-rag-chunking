@@ -149,7 +149,7 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
 |---|---|---|---|---:|
 | `D001#createapp` | api | api/application.md | Application API › createApp() | 164 |
 ```
-`area` ist das erste Pfadsegment (`api`, `guide`, `style-guide`).
+`area` ist der Bereich der Seite (Gruppe der Navigation, Feld `area` in `documents.jsonl`; [Korpus](corpus.md#bereiche)).
 
 **`catalogue_freeze.json`** (`data/evaluation/`, versioniert, geschrieben von `catalogue.py freeze`; [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)):
 ```
