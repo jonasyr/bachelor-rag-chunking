@@ -9,7 +9,8 @@ Status: [`docs/plan.md`](docs/plan.md#stand). Documentation index: [`docs/README
 
 ## Overview
 
-Controlled comparison of chunking strategies in a RAG pipeline on the Vue.js documentation. Only the chunking strategy
+Controlled comparison of chunking strategies in a RAG pipeline on the documentation of the e2e testing
+framework ([ADR 0038](docs/adr/0038-korpus-e2e.md)). Only the chunking strategy
 varies; every other component is held constant ([ADR 0006](docs/adr/0006-nur-chunking-variiert.md)).
 
 | Strategy | Description |
@@ -37,9 +38,9 @@ Run from the repository root; options of every script: [`docs/reference/tooling.
 Procedure and checks before an evaluation run: [`docs/how-to/run-the-experiment.md`](docs/how-to/run-the-experiment.md).
 
 ```bash
-uv run python src/snapshot.py      # 1. fetch the pinned Vue.js snapshot (docs/how-to/create-corpus-snapshot.md)
+uv run python src/snapshot.py      # 1. fetch the pinned e2e docs snapshot (docs/how-to/create-corpus-snapshot.md)
 uv run python src/ingest.py        # 2. ingest
-uv run python src/preprocess.py    # 3. clean, extract sections
+uv run python src/preprocess.py    # 3. convert MDX, extract sections
 uv run python src/chunking.py      # 4. chunk C1–C3 and the control K1
 uv run python src/embed.py         # 5. embed, build Chroma indices
 uv run python src/retrieve.py      # 6. retrieve (all strategies), then the control:
@@ -61,8 +62,13 @@ Repository layout: [`docs/reference/tooling.md`](docs/reference/tooling.md).
 - Code and documentation of this repository: [MIT](LICENSE), © 2026 Jonas Weirauch.
 - `.claude/agents/codex-reviewer.md` contains the review rubric of [openai/codex](https://github.com/openai/codex)
   under the Apache License 2.0 ([copy](LICENSES/Apache-2.0.txt)); the file states its changes.
-- Corpus: the [Vue.js documentation](https://github.com/vuejs/docs) © Yuxi (Evan) You and Vue documentation
-  contributors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It is downloaded at run time
-  (`src/snapshot.py`, commit in `src/config.py`) and not redistributed here; derived artefacts such as
-  `docs/corpus_manifest.csv` refer to it. It is modified before use; the cleaning steps are listed in
-  [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0020; scope: ADR 0025).
+- Corpus: the [e2e documentation](https://github.com/tester-army/e2e/tree/main/docs) © 2026 TesterArmy, Inc.,
+  licensed under the Apache License 2.0 ([copy](LICENSES/Apache-2.0.txt)). Its NOTICE reads: "This product includes
+  software developed at TesterArmy, Inc. (https://tester.army)." It is downloaded at run time (`src/snapshot.py`,
+  commit in `src/config.py`) and not redistributed here; derived artefacts such as `docs/corpus_manifest.csv` refer to
+  it, and `data/corpus_probe/` and the pilot data quote short excerpts under the same licence. It is modified before
+  use; the conversion rules are listed in [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019,
+  ADR 0038).
+- Until 18.10.2026 the corpus was the [Vue.js documentation](https://github.com/vuejs/docs) © Yuxi (Evan) You and Vue
+  documentation contributors, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); excerpts of it remain in
+  `data/corpus_probe/` and `data/pilot/`.

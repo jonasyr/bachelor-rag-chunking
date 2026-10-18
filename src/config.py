@@ -11,7 +11,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
 
-DATA_RAW = ROOT / "data" / "raw" / "vue_docs_snapshot"
+DATA_RAW = ROOT / "data" / "raw" / "e2e_docs_snapshot"
 DATA_PROCESSED = ROOT / "data" / "processed"
 DATA_EVAL = ROOT / "data" / "evaluation"
 PILOT_DIR = ROOT / "data" / "pilot"  # pilot probes, not the catalogue (scripts/difficulty_probe.py)
@@ -56,23 +56,33 @@ RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
 CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)
 
 # ---------------------------------------------------------------------------
-# Corpus (D19, D25)
+# Corpus (D19, D38)
 # ---------------------------------------------------------------------------
-VUE_DOCS_REPO_URL = "https://github.com/vuejs/docs.git"
-VUE_DOCS_COMMIT = "40aa88af0094f7bab4aaf786e55c748a6a251d88"  # 15.09.2026 (D25)
-VUE_DOCS_ROOT = "src"  # documentation root in the repository
-# Areas below VUE_DOCS_ROOT; the snapshot mirrors them below DATA_RAW (D25).
-VUE_DOCS_AREAS = ("api", "guide", "style-guide")
-# Paths below VUE_DOCS_ROOT left out of the corpus (D25): Options-API-only reference pages and the
-# generated API index. Each must exist at the commit, so the list cannot rot silently.
-VUE_DOCS_EXCLUDED = (
-    "api/component-instance.md",
-    "api/index.md",
-    "api/options-composition.md",
-    "api/options-lifecycle.md",
-    "api/options-misc.md",
-    "api/options-rendering.md",
-    "api/options-state.md",
+CORPUS_REPO_URL = "https://github.com/tester-army/e2e.git"
+CORPUS_COMMIT = "ef977f4856da009cac26d78d2e9bb14e5991ee41"  # 17.10.2026 (D38)
+CORPUS_ROOT = "docs"  # documentation root in the repository; the snapshot mirrors it in DATA_RAW
+CORPUS_PAGE_SUFFIX = ".mdx"  # page files below CORPUS_ROOT; they must equal the navigation's pages
+CORPUS_NAV_FILE = "docs.json"  # Mintlify navigation: tabs, groups, pages
+CORPUS_PROVIDER_SNIPPET = "snippets/model-provider.jsx"  # data of the <ModelProvider> component
+CORPUS_SUPPORT_FILES = (CORPUS_NAV_FILE, CORPUS_PROVIDER_SNIPPET)  # copied with the pages
+# Areas: the navigation groups in order; pages listed directly under a tab (Examples) form one area
+# named after the tab (D38). ingest.py stops if the navigation differs.
+CORPUS_AREAS = (
+    "Get started",
+    "Platforms",
+    "Features",
+    "Models and agents",
+    "Run in CI",
+    "Hosted browsers and devices",
+    "Extend",
+    "Deep dive",
+    "Migrate",
+    "Test API",
+    "Project",
+    "Web",
+    "Mobile",
+    "Engine contract",
+    "Examples",
 )
 TOKEN_ENCODING = "cl100k_base"  # tiktoken 0.13.0, pinned in pyproject.toml
 SECTION_MAX_LEVEL = 3  # H1-H3 headings become sections (sections.jsonl, C3 boundaries; D19, D21)
@@ -96,7 +106,7 @@ C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 # Size-matched control (D26): fixed windows of the rounded mean C3 chunk length, no overlap;
 # retrieval only. Not in STRATEGY_IDS: the experiment compares C1-C3 (D5). chunking.py aborts if
 # this value no longer equals the rule (round half up of the mean C3 chunk length).
-K1_CHUNK_SIZE = 231  # tokens; rounded mean of the C3 chunks at 40aa88a, measured 14.10.2026
+K1_CHUNK_SIZE = 375  # tokens; rounded mean of the C3 chunks at ef977f4, measured 18.10.2026
 K1_OVERLAP = 0
 CONTROL_STRATEGIES = {"K1": f"fixed_{K1_CHUNK_SIZE}_no_overlap"}
 
@@ -168,8 +178,8 @@ QUESTION_TYPES = {
     "limitation": 6,
 }
 QUESTION_CLASSES = {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}
-# Minimum number of questions with a relevant section in an area (keys of VUE_DOCS_AREAS); a
-# question counts for every area it touches (D29).
+# Minimum number of questions with a relevant section in an area; a question counts for every area
+# it touches (D29). Vue areas until step 4 sets the e2e quotas (plan.md).
 AREA_MIN_QUESTIONS = {"api": 12, "style-guide": 3}
 DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many words (D29)
 # Relevant sections per class (D29): `multi-section` at least this many independent sections
@@ -180,11 +190,12 @@ SINGLE_CLASS_SECTIONS = 1
 CATALOGUE_REPORT_MIN_PAGES = 2
 CATALOGUE_EXCERPT_CHARS = 60  # `catalogue.py find`: context characters on each side of a match
 CATALOGUE_HEADING_SEPARATOR = " › "  # heading path in section_index.md, find and show
-# Editor: site-relative doc links ("/api/...") in the formatted view point to the public docs
-VUE_DOCS_SITE_URL = "https://vuejs.org"
+# Editor: site-relative doc links ("/ci#mobile-jobs") in the formatted view point to the public docs
+CORPUS_SITE_URL = "https://e2e.tester.army/docs"
 # Random sampling plan (D31): one starting section per slot, drawn by text length from the
 # innermost H2/H3 sections of an area with SHA-256 of "{seed}:{area}:{k}" (version-independent).
 CATALOGUE_SEED = 20261014  # fixed on 14.10.2026, the date of the decision; never tuned
+# Vue areas until step 4 sets the e2e slots (plan.md)
 CATALOGUE_AREA_SLOTS = {"api": 12, "style-guide": 3, "guide": 33}  # sums to the catalogue size
 CATALOGUE_RESERVE = {"api": 12, "style-guide": 3, "guide": 33}  # replacement sections per area
 CATALOGUE_SKIP_REASONS = ("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")
@@ -238,11 +249,11 @@ LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date
 
 # Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
 # the documented text.
-SYSTEM_PROMPT = """You are a helpful assistant that answers questions about Vue.js based solely on
-the provided documentation excerpts.
+SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework
+based solely on the provided documentation excerpts.
 Do not use any knowledge outside the provided context.
 If the context does not contain sufficient information to answer the question,
-state that explicitly."""
+state that explicitly."""  # noqa: E501 (verbatim prompt text)
 USER_PROMPT_TEMPLATE = """Answer the following question based exclusively on the documentation excerpts below.
 
 Question: {question}

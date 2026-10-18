@@ -1,19 +1,32 @@
 # Experiment-Protokoll
 
-> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Messwerte aller Läufe (Chunking, Embedding, Pilotproben) mit Datum; wird mit jedem Lauf fortgeschrieben und ist die
 Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus: [Korpus](corpus.md)
 ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)); Parameter: [Konfiguration](configuration.md).
 
-## Snapshot
+## Snapshot (e2e)
+
+| Feld | Wert |
+|---|---|
+| Repository | `tester-army/e2e` (https://github.com/tester-army/e2e), Ordner `docs/` |
+| Commit | `ef977f4856da009cac26d78d2e9bb14e5991ee41` (Commit-Datum 17.10.2026; [ADR 0038](../adr/0038-korpus-e2e.md)) |
+| Datum des Snapshots | 18.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, SHA-256 je Datei) |
+| Dateien | 62: 60 Seiten (`*.mdx`, genau die Navigation) und `docs.json`, `snippets/model-provider.jsx` |
+| Dokumente, Tokens, Abschnitte | 60 Dokumente, 250.380 Tokens nach dem Preprocessing, 571 Abschnitte (60 H1, 347 H2, 164 H3); je Bereich: [Korpus](corpus.md#bereiche) |
+| K1-Fenster | 375 Tokens: 667 C3-Chunks, Mittel 375,38 → 375 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)); Chunk-Dateien und Vektoren folgen in Schritt 3 ([Plan](../plan.md#stand)) |
+
+Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpus bis 18.10.2026.
+
+## Snapshot (Vue.js, bis 18.10.2026)
 
 | Feld | Wert |
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `40aa88af0094f7bab4aaf786e55c748a6a251d88` (Commit-Datum 15.09.2026; [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
 | Datum des Snapshots | 14.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, Bereiche, Ausschlüsse, SHA-256 je Datei) |
-| Pfade, Dateien, Tokens, Abschnitte | [Korpus](corpus.md#quelle-und-ausschnitt); Dateiliste in `docs/corpus_manifest.csv` |
+| Pfade, Dateien, Tokens, Abschnitte | 79 Dateien (Guide 52, API 22, Style Guide 5), 165.723 Tokens, 813 Abschnitte; Details in der Git-Historie von `docs/reference/corpus.md` |
 
 ## Chunking
 

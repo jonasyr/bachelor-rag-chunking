@@ -15,9 +15,9 @@ env/
 # Contents ignored, but .gitkeep is tracked so the directory structure
 # survives a fresh clone (src/ingest.py writes into data/processed/).
 data/raw/*
-!data/raw/vue_docs_snapshot/
-data/raw/vue_docs_snapshot/*
-!data/raw/vue_docs_snapshot/.gitkeep
+!data/raw/e2e_docs_snapshot/
+data/raw/e2e_docs_snapshot/*
+!data/raw/e2e_docs_snapshot/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
 data/evaluation/retrieved_results.csv

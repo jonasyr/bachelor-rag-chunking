@@ -12,7 +12,7 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
 | `ROOT` | `Path`, Repo-Wurzel | Basis aller Pfade | – |
-| `DATA_RAW` | `data/raw/vue_docs_snapshot` | Rohdateien des Snapshots | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
+| `DATA_RAW` | `data/raw/e2e_docs_snapshot` | Rohdateien des Snapshots | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `DATA_PROCESSED` | `data/processed` | Zwischenstände (Dokumente, Abschnitte, Chunks, Vektoren) | – |
 | `DATA_EVAL` | `data/evaluation` | Fragen, Ground Truth, Ergebnisse | – |
 | `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | [ADR 0027](../adr/0027-blinde-annotation.md) |
@@ -50,11 +50,14 @@ Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
-| `VUE_DOCS_REPO_URL` | `"https://github.com/vuejs/docs.git"` | Quell-Repository | [ADR 0001](../adr/0001-korpus-vuejs.md) |
-| `VUE_DOCS_COMMIT` | `"40aa88af0094f7bab4aaf786e55c748a6a251d88"` | fester Commit (15.09.2026) | [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) |
-| `VUE_DOCS_ROOT` | `"src"` | Dokumentationswurzel im Repository | – |
-| `VUE_DOCS_AREAS` | `("api", "guide", "style-guide")` | Bereiche unter `VUE_DOCS_ROOT`; der Snapshot spiegelt sie unter `DATA_RAW` | [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) |
-| `VUE_DOCS_EXCLUDED` | Tupel aus 7 Pfaden: `api/component-instance.md`, `api/index.md`, `api/options-composition.md`, `api/options-lifecycle.md`, `api/options-misc.md`, `api/options-rendering.md`, `api/options-state.md` | ausgeschlossene Seiten (nur Options API, generierter API-Index); jede muss am Commit existieren | [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) |
+| `CORPUS_REPO_URL` | `"https://github.com/tester-army/e2e.git"` | Quell-Repository | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_COMMIT` | `"ef977f4856da009cac26d78d2e9bb14e5991ee41"` | fester Commit (17.10.2026) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_ROOT` | `"docs"` | Dokumentationswurzel im Repository; der Snapshot spiegelt sie unter `DATA_RAW` | – |
+| `CORPUS_PAGE_SUFFIX` | `".mdx"` | Seitendateien unter `CORPUS_ROOT`; ihre Menge muss den Seiten der Navigation entsprechen | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_NAV_FILE` | `"docs.json"` | Navigation (Tabs, Gruppen, Seiten); liefert die Bereiche | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROVIDER_SNIPPET` | `"snippets/model-provider.jsx"` | Daten der Komponente `<ModelProvider>` (Anbieterliste) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_SUPPORT_FILES` | `(CORPUS_NAV_FILE, CORPUS_PROVIDER_SNIPPET)` | mit den Seiten kopiert und im Snapshot-Datensatz geprüft | – |
+| `CORPUS_AREAS` | Tupel der 15 Navigationsgruppen in Reihenfolge (Get started … Engine contract, Examples) | Bereiche; `ingest.py` bricht ab, wenn die Navigation abweicht | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `TOKEN_ENCODING` | `"cl100k_base"` | Token-Kodierung (`tiktoken` 0.13.0, gepinnt in `pyproject.toml`) | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
 | `SECTION_MAX_LEVEL` | `3` | H1–H3 werden Abschnitte (`sections.jsonl`, C3-Grenzen) | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0021](../adr/0021-c3-grenzen.md) |
 
@@ -70,9 +73,9 @@ Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 | `C2_OVERLAP` | `100` | C2: Overlap in Tokens | [ADR 0005](../adr/0005-drei-chunking-strategien.md), [ADR 0010](../adr/0010-starke-baseline.md) |
 | `C3_MAX_TOKENS` | `800` | C3: harte Obergrenze je Chunk; zu lange Abschnitte werden an Absätzen geteilt | [ADR 0021](../adr/0021-c3-grenzen.md), [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `C3_MIN_TOKENS` | `50` | C3: Untergrenze; kürzere Segmente verschmelzen zuerst mit einem Nachbarn | [ADR 0021](../adr/0021-c3-grenzen.md) |
-| `K1_CHUNK_SIZE` | `231` | Kontrolle K1: Fenstergröße = kaufmännisch gerundetes Mittel der C3-Chunklängen (gemessen 14.10.2026 auf `40aa88a`); `chunking.py` bricht ab, wenn der Wert nicht mehr der Regel entspricht | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `K1_CHUNK_SIZE` | `375` | Kontrolle K1: Fenstergröße = kaufmännisch gerundetes Mittel der C3-Chunklängen (gemessen 18.10.2026 auf `ef977f4`); `chunking.py` bricht ab, wenn der Wert nicht mehr der Regel entspricht | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `K1_OVERLAP` | `0` | K1: ohne Overlap | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
-| `CONTROL_STRATEGIES` | `{"K1": "fixed_231_no_overlap"}` (aus `K1_CHUNK_SIZE` gebildet) | Schlüssel und `strategy`-Wert der Kontrolle; nur Retrieval, keine Generierung | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `CONTROL_STRATEGIES` | `{"K1": "fixed_375_no_overlap"}` (aus `K1_CHUNK_SIZE` gebildet) | Schlüssel und `strategy`-Wert der Kontrolle; nur Retrieval, keine Generierung | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `STRATEGY_IDS` | `{"C1": "fixed_500_no_overlap", "C2": "fixed_500_overlap_100", "C3": "structure_h2h3"}` | Schlüssel und `strategy`-Werte des Experiments (C1–C3); K1 gehört nicht hinein | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `CHUNK_FILES` | `{"C1": CHUNKS_C1_FILE, "C2": …, "C3": …}` | Chunk-Datei je Strategie | – |
 | `EMBEDDING_FILES` | `{"C1": data/processed/embeddings_c1.npz, …c2, …c3}` | gespeicherte Referenzvektoren je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
@@ -107,20 +110,20 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 |---|---|---|---|
 | `QUESTION_TYPES` | `{"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6}` | erlaubte Werte von `type` mit Quote | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `QUESTION_CLASSES` | `{"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}` | erlaubte Werte von `difficulty` (Konstruktionsklasse) mit Quote; Summe 48 | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `AREA_MIN_QUESTIONS` | `{"api": 12, "style-guide": 3}` | Mindestzahl Fragen mit einem relevanten Abschnitt im Bereich | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `AREA_MIN_QUESTIONS` | `{"api": 12, "style-guide": 3}` | Mindestzahl Fragen mit einem relevanten Abschnitt im Bereich; noch Vue-Bereiche, Schritt 4 setzt die e2e-Quoten ([Plan](../plan.md#stand)) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `DETAIL_MAX_ANSWER_WORDS` | `30` | `detail`: Referenzantwort höchstens so viele Wörter | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `MULTI_SECTION_MIN_SECTIONS` | `2` | `multi-section`: mindestens so viele unabhängige relevante Abschnitte (ein Abschnitt innerhalb eines anderen angegebenen zählt nicht) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `SINGLE_CLASS_SECTIONS` | `1` | `single`, `detail`, `paraphrase`: genau so viele relevante Abschnitte | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_REPORT_MIN_PAGES` | `2` | Bericht von `check`: Anzahl der `multi-section`-Fragen mit Abschnitten auf mindestens so vielen Seiten (nur Anzeige, keine Regel) | – |
 | `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext je Seite eines Treffers (nie über den Abschnitt hinaus) | – |
-| `VUE_DOCS_SITE_URL` | `"https://vuejs.org"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
+| `CORPUS_SITE_URL` | `"https://e2e.tester.army/docs"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
 | `CATALOGUE_HEADING_SEPARATOR` | `" › "` | Trenner im Überschriftenpfad (`section_index.md`, `find`, `show`) | – |
 | `CATALOGUE_WORD_PATTERN` | `r"[a-z0-9]+"` | Wörter für den Paraphrase-Vergleich (nach Kleinschreibung) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_SEED` | `20261014` | Seed des Stichprobenplans (Tag der Entscheidung; nie angepasst) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
-| `CATALOGUE_AREA_SLOTS` | `{"api": 12, "style-guide": 3, "guide": 33}` | Slots je Bereich (Summe 48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CATALOGUE_AREA_SLOTS` | `{"api": 12, "style-guide": 3, "guide": 33}` | Slots je Bereich (Summe 48); noch Vue-Bereiche bis Schritt 4 | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_RESERVE` | `{"api": 12, "style-guide": 3, "guide": 33}` | Reserveabschnitte je Bereich für Sprünge | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_REASONS` | `("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")` | erlaubte Gründe für einen Sprung | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_MIN_TOKENS` | `50` | `too-short` nur für Abschnitte unter so vielen Tokens | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |

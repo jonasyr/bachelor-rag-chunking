@@ -27,15 +27,15 @@ from catalogue import (
 from catalogue_review import ensure_review_file
 from config import (
     AREA_MIN_QUESTIONS,
+    CATALOGUE_AREA_SLOTS,
     QUESTION_CLASSES,
     QUESTION_TYPES,
-    VUE_DOCS_AREAS,
 )
 
 
 def test_config_quotas_are_consistent():
     assert sum(QUESTION_TYPES.values()) == sum(QUESTION_CLASSES.values()) == 48
-    assert set(AREA_MIN_QUESTIONS) <= set(VUE_DOCS_AREAS)
+    assert set(AREA_MIN_QUESTIONS) <= set(CATALOGUE_AREA_SLOTS)
 
 
 def test_corpus_text_is_the_exact_token_slice(corpus):

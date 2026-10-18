@@ -3,38 +3,40 @@
 > Seitentyp: Nachschlagen (reference). Stand: 17.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Dateinamen und Pfade kommen aus [`src/config.py`](../../src/config.py) ([Konfiguration](configuration.md)); welche
-Dateien versioniert sind: [Werkzeuge und Repository](tooling.md#versioniert-und-ignoriert). Beispiele sind echte
-Datensätze des Korpus auf `40aa88a` ([Korpus](corpus.md)), Texte gekürzt (`...`), Prüfsummen gekürzt (`…`).
+Dateien versioniert sind: [Werkzeuge und Repository](tooling.md#versioniert-und-ignoriert). Die Korpus-Beispiele sind echte
+Datensätze auf `ef977f4` ([Korpus](corpus.md)); Katalog- und Ergebnisbeispiele stammen noch aus dem Vue-Korpus und
+werden mit dem neuen Pilot ersetzt ([Plan](../plan.md#stand)). Texte gekürzt (`...`), Prüfsummen gekürzt (`…`).
 
 ## Korpus
 
 **`docs/corpus_snapshot.txt`** (versioniert, geschrieben von `snapshot.py`): Kopfzeilen `schlüssel: wert`, eine
-Leerzeile, dann je Datei `SHA-256  pfad` (zwei Leerzeichen; Pfad relativ zu `src/`, sortiert).
+Leerzeile, dann je Datei `SHA-256  pfad` (zwei Leerzeichen; Pfad relativ zu `docs/`, sortiert; Seiten und die
+beiden mitkopierten Dateien `docs.json` und `snippets/model-provider.jsx`).
 
 ```
-repository: https://github.com/vuejs/docs.git
-commit: 40aa88af0094f7bab4aaf786e55c748a6a251d88
-commit_date: 2026-09-15T14:47:19+02:00
-snapshot_date: 2026-10-14
-areas: api, guide, style-guide
-excluded: api/component-instance.md, api/index.md, …
-files: 79
+repository: https://github.com/tester-army/e2e.git
+commit: ef977f4856da009cac26d78d2e9bb14e5991ee41
+commit_date: 2026-10-17T16:12:13+02:00
+snapshot_date: 2026-10-18
+root: docs
+files: 62
 
-fd649a62…ea62234e8  api/application.md
+2b64177a…f8671c8  agent-steps.mdx
 ```
 
 **`docs/corpus_manifest.csv`** (versioniert, geschrieben von `preprocess.py`): Spalten und Beispielzeilen in
 [Korpus](corpus.md#korpusmanifest-corpus_manifestcsv).
 
-**`documents.jsonl`**
+**`documents.jsonl`** (`area` = Gruppe der Navigation, [Korpus](corpus.md#bereiche); `text` nach `ingest.py` das
+rohe MDX, nach `preprocess.py` das umgewandelte Markdown)
 ```json
-{"doc_id":"D049","path":"guide/essentials/reactivity-fundamentals.md","title":"Reactivity Fundamentals","text":"...","tokens":3063}
+{"doc_id":"D031","path":"migrate/detox.mdx","title":"From Detox","area":"Migrate","text":"# From Detox\n\nUse your existing app build and testIDs with s...","tokens":2409}
 ```
 
 **`sections.jsonl`** (ein Eintrag je H1–H3-Abschnitt; Spanne in Tokens des bereinigten `text`, Ende exklusiv; ein
 Abschnitt reicht bis zur nächsten Überschrift gleicher oder höherer Ebene; [ADR 0019](../adr/0019-korpus-ausschnitt.md))
 ```json
-{"section_id":"D049#declaring-reactive-state-1","doc_id":"D049","anchor":"declaring-reactive-state-1","title":"Declaring Reactive State","level":2,"start_token":60,"end_token":1567}
+{"section_id":"D013#let-the-agent-use-the-app","doc_id":"D013","anchor":"let-the-agent-use-the-app","title":"Let the agent use the app","level":2,"start_token":639,"end_token":710}
 ```
 
 ## Chunks
@@ -147,7 +149,7 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
 |---|---|---|---|---:|
 | `D001#createapp` | api | api/application.md | Application API › createApp() | 164 |
 ```
-`area` ist das erste Pfadsegment (`api`, `guide`, `style-guide`).
+`area` ist der Bereich der Seite (Gruppe der Navigation, Feld `area` in `documents.jsonl`; [Korpus](corpus.md#bereiche)).
 
 **`catalogue_freeze.json`** (`data/evaluation/`, versioniert, geschrieben von `catalogue.py freeze`; [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)):
 ```

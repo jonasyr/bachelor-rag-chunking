@@ -59,8 +59,9 @@ tragen irrelevante Information mit, und eine Zerlegung quer zur Dokumentstruktur
 
 Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
 
-1. **Anderer Korpus:** Vue.js statt der bereits informell untersuchten FastAPI/Supabase/Stripe-Dokumentation.
-2. **Andere Domäne:** entwicklerorientierte Frontend-Framework-Dokumentation; kontrollierte Chunking-Vergleiche gibt
+1. **Anderer Korpus:** e2e ([ADR 0038](../adr/0038-korpus-e2e.md); ursprünglich Vue.js) statt der bereits informell
+   untersuchten FastAPI/Supabase/Stripe-Dokumentation.
+2. **Andere Domäne:** entwicklerorientierte Dokumentation eines Testframeworks; kontrollierte Chunking-Vergleiche gibt
    es bislang vor allem fachfremd (Unternehmensdokumente, klinische Entscheidungsunterstützung).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot.
@@ -98,10 +99,11 @@ aber im Kapitel „Verwandte Arbeiten“ kurz als informeller Vorläufer eingeor
 
 ## Korpus: Begründung der Wahl
 
-Vue.js bietet entwicklerorientierte, didaktisch hochwertige Dokumentation mit konzeptueller und prozeduraler Tiefe,
-liegt im Quellrepository durchgängig als Markdown vor (VitePress) und ist öffentlich und stabil. Damit ist sie sauber
-snapshot- und parsebar und erlaubt viele Fragetypen ([ADR 0001](../adr/0001-korpus-vuejs.md)). Welche Bereiche und
-welcher Commit genutzt werden, legt [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) fest; Einzelheiten:
+Korpus ist die Dokumentation des Testframeworks e2e (`tester-army/e2e`, Commit `ef977f4`,
+[ADR 0038](../adr/0038-korpus-e2e.md)). Ursprünglich war Vue.js gewählt ([ADR 0001](../adr/0001-korpus-vuejs.md),
+[ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)); das Antwortmodell kannte Vue.js aber so gut, dass Retrieval
+kaum einen Unterschied machte. e2e ist neu, wird real genutzt, ist mit rund 250.000 Tokens groß genug und dem Modell
+weitgehend unbekannt (Messung: [Korpusauswahl](../reference/corpus-selection.md)). Einzelheiten:
 [Korpus](../reference/corpus.md).
 
 ## Chunking-Strategien
@@ -160,9 +162,9 @@ Metriken, Formeln und Rubrik im Einzelnen: [Evaluation](../reference/evaluation.
 ## RAG-Pipeline-Architektur
 
 ```
-Documentation Snapshot (Vue.js)
+Documentation Snapshot (e2e, MDX)
         ↓
-Preprocessing (Markdown Cleaning)
+Preprocessing (MDX → Markdown)
         ↓
 Chunking Strategy  → C1 / C2 / C3   (+ Kontrolle K1)
         ↓
@@ -185,7 +187,7 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 
 - **Interne Validität:** Misst die Arbeit wirklich den Chunking-Einfluss? Absicherung über Konstanthaltung aller
   anderen Parameter (gleicher Korpus, gleiche Fragen, Prompts und Modelle, Temperatur 0) und die Kontrolle K1.
-- **Externe Validität:** begrenzt; ein Korpus (Vue.js, nur Composition API, [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)).
+- **Externe Validität:** begrenzt; ein Korpus (e2e, [ADR 0038](../adr/0038-korpus-e2e.md)).
   Die Ergebnisse liefern Hinweise, keine universelle Aussage.
 - **Konstruktvalidität:** etablierte Metriken, transparente Rubrik, Bewertungsbeispiele; eine Zweitbewertung von
   10–20 % der Antworten wird empfohlen ([ADR 0007](../adr/0007-triangulation.md)).

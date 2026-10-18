@@ -1,47 +1,86 @@
-# Korpus (Vue.js)
+# Korpus (e2e)
 
-> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026, festgelegt in [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) (Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md)). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026, festgelegt in [ADR 0038](../adr/0038-korpus-e2e.md) (Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md)). Übersicht: [Dokumentation](../README.md).
+
+Bis 18.10.2026 war der Korpus die Vue.js-Dokumentation ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md),
+abgelöst durch [ADR 0038](../adr/0038-korpus-e2e.md)); ihre Zahlen stehen weiter im
+[Experiment-Protokoll](experiment-record.md), ihre Bereinigungsregeln in der Git-Historie von `src/preprocess.py`.
+Warum e2e: [Korpusauswahl](corpus-selection.md).
 
 ## Quelle und Ausschnitt
 
 | Feld | Wert |
 |---|---|
-| Repository | `vuejs/docs` (offizielle Vue-3-Dokumentation) |
-| Commit | `40aa88af0094f7bab4aaf786e55c748a6a251d88` (15.09.2026) |
-| Snapshot | 14.10.2026; Datensatz [`docs/corpus_snapshot.txt`](../corpus_snapshot.txt) (Format: [Datenformate](data-formats.md#korpus)) |
-| Pfade | `src/guide/`, `src/api/`, `src/style-guide/` (alle `*.md`, rekursiv) |
-| Ausgeschlossen (`config.VUE_DOCS_EXCLUDED`) | `api/index.md` (generiertes Inhaltsverzeichnis), `api/component-instance.md`, `api/options-{composition,lifecycle,misc,rendering,state}.md` (nur Options API) |
-| Dateien | 79 (Guide 52, API 22, Style Guide 5) |
-| API-Stil | nur Composition API; `<div class="options-api">`-Blöcke werden beim Preprocessing entfernt |
-| Playground-Links | kodierter Beispielzustand nach `#` entfernt, Link bleibt ([ADR 0020](../adr/0020-playground-urls-kuerzen.md)) |
+| Repository | `tester-army/e2e` (https://github.com/tester-army/e2e), Ordner `docs/` (Mintlify, MDX) |
+| Commit | `ef977f4856da009cac26d78d2e9bb14e5991ee41` (17.10.2026) |
+| Lizenz | Apache License 2.0, © TesterArmy, Inc. ([Lizenzhinweise im README](../../README.md#license)) |
+| Snapshot | 18.10.2026; Datensatz [`docs/corpus_snapshot.txt`](../corpus_snapshot.txt) (Format: [Datenformate](data-formats.md#korpus)) |
+| Seiten | alle 60 `*.mdx` unter `docs/`; die Menge muss genau den Seiten der Navigation (`docs.json`) entsprechen, sonst brechen Snapshot und Ingest ab |
+| Mitkopiert | `docs.json` (Navigation, liefert die Bereiche) und `snippets/model-provider.jsx` (Daten der Anbieterliste) |
+| Nicht im Korpus | Bilder, Videos, `examples/` (Beispielprojekte, nur Code), Styles und Skripte der Website |
 | Token-Kodierung | `config.TOKEN_ENCODING` = `cl100k_base` (`tiktoken` 0.13.0); alle Parameter: [Konfiguration](configuration.md#korpus) |
-| Umfang | 165.723 Tokens nach dem Preprocessing (Guide 117.694, API 42.488, Style Guide 5.541), 813 Abschnitte (H1–H3); gemessen beim Snapshot vom 14.10.2026, Chunking und Embedding im [Experiment-Protokoll](experiment-record.md) |
+| Umfang | 250.380 Tokens nach dem Preprocessing, 571 Abschnitte (60 H1, 347 H2, 164 H3); kleinste Seite 378, größte 21.507 Tokens (`reference/engine.mdx`); gemessen 18.10.2026 |
 
-Bereiche in `src/guide/` (Dateien): `essentials` (13), `components` (8), `extras` (8), `scaling-up` (6),
-`built-ins` (5), `best-practices` (4), `reusability` (3), `typescript` (3), Einstiegsseiten direkt in `guide/` (2).
-Im Manifest heißen die beiden anderen Bereiche „API Reference“ und „Style Guide“.
+## Bereiche
 
-Nicht aufgenommen: Tutorial (interaktive Schritte, wiederholt den Guide), Beispiele (nur Code) und Projektseiten
-(about, ecosystem, partners usw.); Begründung in [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md).
+Ein Bereich ist eine Gruppe der Navigation; Seiten, die direkt unter einem Tab stehen (Examples), bilden einen
+Bereich mit dem Namen des Tabs (`config.CORPUS_AREAS`, Feld `area` in `documents.jsonl`, Spalte `section` im Manifest).
 
-## Bereinigung (Auszug)
+| Tab | Bereich | Seiten | Tokens |
+|---|---|---:|---:|
+| Documentation | Get started | 5 | 12.558 |
+| | Platforms | 3 | 10.908 |
+| | Features | 6 | 11.473 |
+| | Models and agents | 3 | 11.962 |
+| | Run in CI | 6 | 10.114 |
+| | Hosted browsers and devices | 7 | 10.940 |
+| | Extend | 3 | 6.703 |
+| | Deep dive | 5 | 15.059 |
+| | Migrate | 5 | 19.210 |
+| Reference | Test API | 5 | 37.134 |
+| | Project | 8 | 61.029 |
+| | Web | 1 | 11.033 |
+| | Mobile | 1 | 10.203 |
+| | Engine contract | 1 | 21.507 |
+| Examples | Examples | 1 | 547 |
 
-Neben den Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md) und [ADR 0020](../adr/0020-playground-urls-kuerzen.md)
-gelten für die API-Seiten ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)):
+Quoten je Bereich für den Fragenkatalog folgen in Schritt 4 ([Plan](../plan.md#stand)).
 
-- Escapte spitze Klammern (`\<script setup>`, `PropType\<T>`) sind Text, kein HTML. Im bereinigten Text bleibt
-  das Escape wie in der Quelle stehen; der Abschnittstitel (`title` in `sections.jsonl`, Manifest) zeigt `<`.
-  Ein escapter Backslash vor einem echten Tag (`\\<b>`) bricht weiterhin ab.
-- `<br>` in einer Zeile wird ein Leerzeichen (`Composition API: Dependency Injection`).
-- `<span v-pre>` um Inline-Code wird entpackt, auch wenn der Code selbst Tags enthält.
-- ATX-Überschriften dürfen bis zu drei Leerzeichen eingerückt sein (CommonMark; die API rückt sie in
-  Listenpunkten ein); im bereinigten Text steht die Überschrift ohne Einrückung.
+## Aufbereitung (MDX → Markdown)
+
+`src/mdx.py` wandelt jede Seite in Markdown um, `src/preprocess.py` zeichnet danach die Abschnitte auf. Ziel: jeder
+Text, den eine Leserin oder ein Leser der Website sieht, bleibt erhalten ([ADR 0038](../adr/0038-korpus-e2e.md)).
+Code in Fences bleibt unverändert bis auf Info-String, Einrückung und Leerzeichen am Zeilenende.
+
+| Eingabe | Ausgabe |
+|---|---|
+| Frontmatter | `# {title}`, Leerzeile, `description` als erster Absatz; `sidebarTitle`, `icon` und Bild-Metadaten entfallen |
+| `import …` | entfällt |
+| `export const NAME = \`…\`` (Agent-Prompt) | Text des Prompts, angezeigt an der Stelle des `<Prompt>` |
+| `<SetupPrompt>` mit `<Prompt …/>` | Zeile `**Agent prompt**`, dann der Prompt als ```` ```text ````-Block |
+| `<Note>`, `<Warning>`, `<Tip>` | Zeile `**Note**` usw., dann der Inhalt |
+| `<Accordion title>`, `<Tab title>` | Zeile `**Titel**`, dann der Inhalt |
+| `<Steps>`/`<Step title>` | Zeile `**N. Titel**` (N zählt ab 1 je Block), dann der Inhalt |
+| `<AccordionGroup>`, `<Tabs>`, `<CodeGroup>`, `<CardGroup>`, `<ShowMore>`, `<Video>` | Hülle entfällt, Inhalt bleibt (bei `CodeGroup` alle Varianten) |
+| `<Card title href>Text</Card>` | Listenpunkt `- [Titel](href): Text` |
+| `<VideoCard title subtitle …/>` | Listenpunkt `- **Titel**: Untertitel` |
+| `<video …/>` (Bildunterschrift bleibt), `<a id/>`, `<span id/>` | entfällt |
+| `<ModelProvider show="select"/>` | Tabelle aller 51 Anbieter (Anbieter mit Link, Gruppe, Pakete, Variablen, Import, Modell, Hinweis) |
+| `<ModelProvider show="install\|env\|config\|model"/>` | was die Seite ohne Auswahl zeigt (erster Anbieter, npm): Zeile `**Install · Vercel AI Gateway**` usw. und der Codeblock |
+| Fence-Info `ts title="a.ts" expandable`, `bash npm` | Zeile `**a.ts**` bzw. `**npm**` vor dem Block, der Block behält nur die Sprache; eingerückte Fences werden ausgerückt |
+| unbekannte Komponente, JSX-Ausdruck, HTML-Tag außerhalb von Code | Abbruch mit Seite und Zeile |
+
+Eine Seite der Navigation, die keine dieser Regeln braucht, bleibt bis auf den Kopf unverändert. Die Aufbereitung
+ist rein regelbasiert und deterministisch; Tests je Regel in `tests/test_mdx.py`.
 
 ## Abschnitte und Relevanz
 
-- **`section_id`** = `{doc_id}#{anchor}`, wobei `anchor` der explizite VitePress-Anker `{#…}` einer H1-, H2- oder
-  H3-Überschrift ist (z. B. `D049#reactive`). Alle H1–H3-Überschriften im Ausschnitt tragen einen solchen Anker;
-  `sections.jsonl` enthält 79 H1-, 467 H2- und 267 H3-Abschnitte.
+- **`section_id`** = `{doc_id}#{anchor}`. H2/H3-Anker sind die Anker der Website: Linkziele und Backticks weg,
+  Kleinschreibung, jede Folge anderer Zeichen als `a-z0-9` wird `-`, `-` an den Rändern entfällt
+  (`` `.env` files `` → `env-files`, `agent.act` → `agent-act`). Geprüft am 18.10.2026 an allen 503 abrufbaren
+  H2/H3 der Live-Seite; nur `/docs/mcp` liefert dort Mintlifys MCP-Endpunkt statt der Seite.
+- **H1-Anker** = Slug des Seitenpfads ohne Endung (`reference/config` → `reference-config`): Die Website hat keinen
+  H1-Anker, und der Titel `E2EConfig` kollidiert mit einer H3 derselben Seite.
 - **H1-Abschnitte** umfassen jeweils die ganze Seite. Für `relevant_section_ids` gilt
   [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md): H2/H3-Abschnitte annotieren, einen
   H1-Abschnitt nur, wenn wirklich die ganze Seite die Antwort ist.
@@ -49,10 +88,10 @@ gelten für die API-Seiten ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.m
 
 ## Korpusmanifest (`corpus_manifest.csv`)
 
-Eine Zeile je Datei des Ausschnitts; `tokens` nach dem Preprocessing. Drei echte Zeilen:
+Eine Zeile je Seite; `section` = Bereich, `tokens` nach dem Preprocessing. Drei echte Zeilen:
 
 | file_id | path | title | section | tokens | included |
 |---------|------|-------|---------|-------:|----------|
-| D015 | api/reactivity-core.md | Reactivity API: Core | API Reference | 4181 | yes |
-| D035 | guide/components/props.md | Props | Components | 3754 | yes |
-| D049 | guide/essentials/reactivity-fundamentals.md | Reactivity Fundamentals | Essentials | 3063 | yes |
+| D036 | models.mdx | Models | Models and agents | 7383 | yes |
+| D037 | quickstart.mdx | Quickstart | Get started | 6914 | yes |
+| D045 | reference/expect.mdx | expect | Test API | 10332 | yes |

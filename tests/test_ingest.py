@@ -3,88 +3,76 @@ import json
 import pytest
 
 import tokens
-from ingest import ingest, title_of
+from ingest import ingest
+
+NAV = {
+    "navigation": {
+        "tabs": [
+            {"tab": "Docs", "groups": [{"group": "Start", "pages": ["index", "ci/a"]}]},
+            {"tab": "Examples", "pages": ["examples"]},
+        ]
+    }
+}
+PAGES = {
+    "index.mdx": "---\ntitle: Introduction\ndescription: Hi.\n---\n\nText.\n",
+    "ci/a.mdx": '﻿---\ntitle: "GitHub Actions"\n---\n\nRun it.\n',
+    "examples.mdx": "---\ntitle: Example projects\n---\n",
+}
 
 
-def make_snapshot(root, files):
-    for rel, text in files.items():
+def make_snapshot(root, pages=PAGES, nav=NAV):
+    for rel, text in pages.items():
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+    (root / "docs.json").write_text(json.dumps(nav), encoding="utf-8")
 
 
-def test_title_of_skips_frontmatter_bom_and_code():
-    text = "\ufeff---\noutline: deep\n---\n\n```sh\n# not a title\n```\n\n# Real Title {#real}\n"
-    assert title_of(text) == "Real Title"
+def run(snap, out, areas=("Start", "Examples")):
+    return ingest(snap, out, ".mdx", "docs.json", areas)
 
 
-def test_title_of_without_h1_raises():
-    with pytest.raises(ValueError, match="no H1"):
-        title_of("## Only H2 {#x}\n")
-
-
-def test_ingest_assigns_ids_by_path_and_writes_exact_keys(tmp_path):
-    snap = tmp_path / "snap"
-    make_snapshot(
-        snap,
-        {
-            "guide/introduction.md": "# Introduction {#introduction}\n",
-            "guide/components/props.md": "\ufeff# Props {#props}\n\nText\n",
-            "guide/essentials/a.md": "# A {#a}\n",
-        },
-    )
+def test_ingest_assigns_ids_by_path_with_title_and_area(tmp_path):
+    make_snapshot(tmp_path / "snap")
     out = tmp_path / "processed" / "documents.jsonl"
-    assert ingest(snap, out, areas=("guide",)) == 3
+    assert run(tmp_path / "snap", out) == 3
 
     docs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
-    assert [(d["doc_id"], d["path"], d["title"]) for d in docs] == [
-        ("D001", "guide/components/props.md", "Props"),
-        ("D002", "guide/essentials/a.md", "A"),
-        ("D003", "guide/introduction.md", "Introduction"),
+    assert [(d["doc_id"], d["path"], d["title"], d["area"]) for d in docs] == [
+        ("D001", "ci/a.mdx", "GitHub Actions", "Start"),
+        ("D002", "examples.mdx", "Example projects", "Examples"),
+        ("D003", "index.mdx", "Introduction", "Start"),
     ]
-    assert list(docs[0]) == ["doc_id", "path", "title", "text", "tokens"]
-    assert not docs[0]["text"].startswith("\ufeff")
+    assert list(docs[0]) == ["doc_id", "path", "title", "area", "text", "tokens"]
+    assert docs[0]["text"].startswith("---\n")  # raw text, BOM removed
     assert docs[0]["tokens"] == tokens.count(docs[0]["text"])
 
 
 def test_ingest_without_snapshot_points_to_snapshot_script(tmp_path):
     with pytest.raises(FileNotFoundError, match="run src/snapshot.py"):
-        ingest(tmp_path / "empty", tmp_path / "documents.jsonl")
+        run(tmp_path / "empty", tmp_path / "documents.jsonl")
 
 
-def test_title_of_tracks_fence_markers():
-    text = "~~~\n```\n# not a title\n~~~\n\n# Real {#real}\n"
-    assert title_of(text) == "Real"
+def test_ingest_rejects_areas_that_differ_from_the_config(tmp_path):
+    make_snapshot(tmp_path / "snap")
+    with pytest.raises(ValueError, match="CORPUS_AREAS"):
+        run(tmp_path / "snap", tmp_path / "d.jsonl", areas=("Start",))
 
 
-def test_title_of_normalises_api_heading_markup():
-    assert title_of("# \\<script setup> {#script-setup}\n") == "<script setup>"
-    assert title_of("# Composition API: <br>Dependency Injection {#di}\n") == (
-        "Composition API: Dependency Injection"
-    )
+def test_ingest_rejects_a_page_outside_the_navigation(tmp_path):
+    make_snapshot(tmp_path / "snap", {**PAGES, "draft.mdx": "---\ntitle: D\n---\n"})
+    with pytest.raises(ValueError, match="draft.mdx: not in the navigation"):
+        run(tmp_path / "snap", tmp_path / "d.jsonl")
 
 
-def test_ingest_orders_all_areas_by_path(tmp_path):
-    snap = tmp_path / "snap"
-    make_snapshot(
-        snap,
-        {
-            "style-guide/rules.md": "# Rules {#rules}\n",
-            "guide/intro.md": "# Intro {#intro}\n",
-            "api/core.md": "# Core {#core}\n",
-        },
-    )
-    out = tmp_path / "documents.jsonl"
-    assert ingest(snap, out, areas=("api", "guide", "style-guide")) == 3
-    docs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
-    assert [(d["doc_id"], d["path"]) for d in docs] == [
-        ("D001", "api/core.md"),
-        ("D002", "guide/intro.md"),
-        ("D003", "style-guide/rules.md"),
-    ]
+def test_ingest_rejects_a_navigation_page_without_file(tmp_path):
+    pages = {k: v for k, v in PAGES.items() if k != "examples.mdx"}
+    make_snapshot(tmp_path / "snap", pages)
+    with pytest.raises(ValueError, match="examples"):
+        run(tmp_path / "snap", tmp_path / "d.jsonl")
 
 
-def test_ingest_requires_every_area(tmp_path):
-    make_snapshot(tmp_path / "snap", {"guide/intro.md": "# Intro {#intro}\n"})
-    with pytest.raises(FileNotFoundError, match="api"):
-        ingest(tmp_path / "snap", tmp_path / "d.jsonl", areas=("api", "guide"))
+def test_ingest_requires_a_title(tmp_path):
+    make_snapshot(tmp_path / "snap", {**PAGES, "index.mdx": "---\ndescription: x\n---\n"})
+    with pytest.raises(ValueError, match="index.mdx: no title"):
+        run(tmp_path / "snap", tmp_path / "d.jsonl")

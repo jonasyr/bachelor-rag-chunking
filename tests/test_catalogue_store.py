@@ -286,7 +286,7 @@ def test_markdown_view_shows_tags_in_prose_as_text_and_fixes_doc_links():
     text = "Use <script setup> with [defineProps](/api/sfc-script-setup#defineprops)."
     out = store.markdown_with_highlights(text, ["props", "script"])
     assert "&lt;" in out and "<script" not in out
-    assert "(https://vuejs.org/api/sfc-script-setup#defineprops)" in out  # link target not marked
+    assert "(https://e2e.tester.army/docs/api/sfc-script-setup#defineprops)" in out  # not marked
     assert '[<mark class="hl">defineProps</mark>]' in out  # whole token, like the source view
 
 
