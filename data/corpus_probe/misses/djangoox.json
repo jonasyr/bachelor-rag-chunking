@@ -1,0 +1,398 @@
+[
+ {
+  "id": 2,
+  "page": "agents",
+  "section": "Facts to get right",
+  "sentence": "At the deadline `[MASK]` is raised inside a sync task on its own thread; an async task is cancelled.",
+  "answer": "TaskTimeout",
+  "closed_book_guess": "TimeoutError",
+  "category": "fact"
+ },
+ {
+  "id": 4,
+  "page": "agents",
+  "section": "Facts to get right",
+  "sentence": "Import `task` from `django.tasks` on Django 6.0+, or `django_tasks` on 5.2 LTS, decorate with `[MASK]`, and call `.enqueue(...)`.",
+  "answer": "@task",
+  "closed_book_guess": "@task_register",
+  "category": "fact"
+ },
+ {
+  "id": 16,
+  "page": "background-tasks",
+  "section": "Step 2: Write your first background task",
+  "sentence": "Try it from the shell before wiring up a view:    `[MASK]` wrote one row to the queue table and returned a result you can look up later by that id.",
+  "answer": "enqueue()",
+  "closed_book_guess": "task.delay()",
+  "category": "fact"
+ },
+ {
+  "id": 22,
+  "page": "background-tasks",
+  "section": "Production notes",
+  "sentence": "`[MASK]` reports what a cutoff would remove; on this demo database, whose rows are minutes old:    Failed tasks are kept until you pass `--include-failed`, so their tracebacks survive until someone has read them.",
+  "answer": "--dry-run",
+  "closed_book_guess": "`ox cleanup --dry-run`",
+  "category": "equivalent"
+ },
+ {
+  "id": 26,
+  "page": "benchmarks",
+  "section": "More tasks per second at matched connection settings",
+  "sentence": "Retain worker connections to speed up both backends: `CONN_MAX_AGE = 600`, or `OPTIONS[\"pool\"]` with `[MASK]`.",
+  "answer": "CONN_MAX_AGE = 0",
+  "closed_book_guess": "\"min_size\": 2, \"max_size\": 10",
+  "category": "fact"
+ },
+ {
+  "id": 36,
+  "page": "choosing",
+  "section": "Maintenance",
+  "sentence": "I don't think this will get added to the package\", but is \"open to creating a `[MASK]` subpackage that could include this\", checked 2026-10-11.",
+  "answer": "contrib",
+  "closed_book_guess": "maintenance",
+  "category": "ambiguous"
+ },
+ {
+  "id": 46,
+  "page": "configuration",
+  "section": "`oxpull` checks",
+  "sentence": "`[MASK]`**: WAITING workflow nodes exist, but no backend in `TASKS` declares `OPTIONS[\"WORKFLOWS\"]`.",
+  "answer": "oxpull.W007",
+  "closed_book_guess": "WORKFLOWS_UNCONFIGURED",
+  "category": "fact"
+ },
+ {
+  "id": 48,
+  "page": "configuration",
+  "section": "django_ox checks",
+  "sentence": "For `[MASK]`, compatibility conversions retain their existing behaviour.",
+  "answer": "MAX_ATTEMPTS",
+  "closed_book_guess": "django_ox.tasks.Task.delay",
+  "category": "ambiguous"
+ },
+ {
+  "id": 51,
+  "page": "configuration",
+  "section": "django_ox checks",
+  "sentence": "The app itself registers these checks with Django, so a project that also lacks any other import of `django.tasks` gets no `[MASK]` from `manage.py check`; the reliable symptom is `Unknown command: 'ox_worker'`, because the command ships with the app.",
+  "answer": "E001",
+  "closed_book_guess": "django_ox checks",
+  "category": "ambiguous"
+ },
+ {
+  "id": 54,
+  "page": "batches",
+  "section": "Behaviour",
+  "sentence": "With no attempts left the row is recorded as LOST, which says the attempt went unobserved and nothing about its outcome, so the batch counts that member as unattributed rather than failed: `[MASK]` fires, `on_success` is withheld, and `failed_count` is unchanged.",
+  "answer": "on_complete",
+  "closed_book_guess": "on_lost",
+  "category": "fact"
+ },
+ {
+  "id": 63,
+  "page": "batches",
+  "section": "Behaviour",
+  "sentence": "`[MASK]` still fires, so cleanup still runs.",
+  "answer": "on_complete",
+  "closed_book_guess": "on_commit",
+  "category": "fact"
+ },
+ {
+  "id": 68,
+  "page": "index",
+  "section": "Setup",
+  "sentence": "Set the relevant task alias's `BACKEND` to `[MASK]`.",
+  "answer": "\"oxpull.backend.OxpullBackend\"",
+  "closed_book_guess": "django_ox.backends.database.DatabaseBackend",
+  "category": "fact"
+ },
+ {
+  "id": 70,
+  "page": "index",
+  "section": "Setup",
+  "sentence": "A router that splits them is refused at backend construction with `[MASK]`.",
+  "answer": "ImproperlyConfigured",
+  "closed_book_guess": "NotImplementedError",
+  "category": "fact"
+ },
+ {
+  "id": 71,
+  "page": "index",
+  "section": "Setup",
+  "sentence": "Add `[MASK]` to `INSTALLED_APPS` and run migrations.",
+  "answer": "\"oxpull\"",
+  "closed_book_guess": "ox",
+  "category": "fact"
+ },
+ {
+  "id": 75,
+  "page": "index",
+  "section": "Database and task rows",
+  "sentence": "Use `[MASK]` for task rows and `oxpull_prune` for the optional app's records.",
+  "answer": "ox_prune",
+  "closed_book_guess": "ox_task_prune",
+  "category": "fact"
+ },
+ {
+  "id": 78,
+  "page": "rate-limiting",
+  "section": "Behaviour",
+  "sentence": "A limit that covers nothing, names a queue the backend does not accept, or lists a `[MASK]` path that is not a task is `oxpull.E005`.",
+  "answer": "tasks",
+  "closed_book_guess": "nonexistent task",
+  "category": "fact"
+ },
+ {
+  "id": 83,
+  "page": "rate-limiting",
+  "section": "The guarantee",
+  "sentence": "On one backend, `oxpull.W006` also covers names that differ only by accents, or by case and accents, such as `[MASK]` and `stripé`.",
+  "answer": "stripe",
+  "closed_book_guess": "stripÉ",
+  "category": "fact"
+ },
+ {
+  "id": 84,
+  "page": "rate-limiting",
+  "section": "Behaviour",
+  "sentence": "For aliases using `[MASK]`, `WORKER_CLASS` is required: it makes `ox_worker` run the worker that applies the limits.",
+  "answer": "OxpullBackend",
+  "closed_book_guess": "rate_limit",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "unique-tasks",
+  "section": "Behaviour",
+  "sentence": "Retrying a unique task that a later `[MASK]` has already superseded therefore runs that attempt beside the newer one, and the key carries two READY rows until both settle.",
+  "answer": "enqueue()",
+  "closed_book_guess": "task",
+  "category": "fact"
+ },
+ {
+  "id": 104,
+  "page": "workflows",
+  "section": "Failure, cancellation and completion",
+  "sentence": "`on_complete` and `[MASK]` are enqueued in the transaction that completes the workflow.",
+  "answer": "on_success",
+  "closed_book_guess": "on_failure",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "workflows",
+  "section": "Draining the waiting nodes",
+  "sentence": "A bare `[MASK]` reports nothing here, because a check that reads a database runs only against an alias you name.",
+  "answer": "manage.py check",
+  "closed_book_guess": "check",
+  "category": "equivalent"
+ },
+ {
+  "id": 107,
+  "page": "workflows",
+  "section": "Transactions",
+  "sentence": "`[MASK]` then runs its transaction again after a deadlock or a serialization failure.",
+  "answer": "add()",
+  "closed_book_guess": "WorkflowRetry",
+  "category": "fact"
+ },
+ {
+  "id": 113,
+  "page": "index",
+  "section": "Install",
+  "sentence": "**Your own imports differ with it**: on Django 6.0+ you write `from django.tasks import task`, and on Django 5.2 you write `[MASK]`.",
+  "answer": "from django_tasks import task",
+  "closed_book_guess": "from django.tasks import task",
+  "category": "fact"
+ },
+ {
+  "id": 115,
+  "page": "index",
+  "section": "Quickstart",
+  "sentence": " Tasks use the standard `[MASK]` decorator and enqueue API.",
+  "answer": "django.tasks",
+  "closed_book_guess": "@task",
+  "category": "ambiguous"
+ },
+ {
+  "id": 123,
+  "page": "migrating",
+  "section": "From another `django.tasks` backend",
+  "sentence": "Of `db_worker`'s worker-specific options, `--backend`, `--interval`, `--batch` and `[MASK]` carry over by name.",
+  "answer": "--max-tasks",
+  "closed_book_guess": "--queue",
+  "category": "fact"
+ },
+ {
+  "id": 125,
+  "page": "migrating",
+  "section": "From another `django.tasks` backend",
+  "sentence": "Do not use `[MASK]` to select all queues.",
+  "answer": "--queues '*'",
+  "closed_book_guess": "*",
+  "category": "equivalent"
+ },
+ {
+  "id": 127,
+  "page": "migrating",
+  "section": "From another `django.tasks` backend",
+  "sentence": "`[MASK]` runs every configured queue unless `--queues` selects queues.",
+  "answer": "ox_worker",
+  "closed_book_guess": "manage.py db_worker",
+  "category": "fact"
+ },
+ {
+  "id": 129,
+  "page": "migrating",
+  "section": "From another `django.tasks` backend",
+  "sentence": "Use `[MASK]` to preserve the old default.",
+  "answer": "--queues default",
+  "closed_book_guess": "default_backend",
+  "category": "fact"
+ },
+ {
+  "id": 132,
+  "page": "monitoring",
+  "section": "Schedule failure isolation",
+  "sentence": "On PostgreSQL, only `lock_timeout` (`[MASK]`) and deadlocks take this path.",
+  "answer": "55P03",
+  "closed_book_guess": "statement_timeout",
+  "category": "fact"
+ },
+ {
+  "id": 136,
+  "page": "monitoring",
+  "section": "Retrying and discarding",
+  "sentence": "`RUNNING` and `SUCCESSFUL` rows are never matched, and `retry` never matches a `[MASK]` row.",
+  "answer": "WAITING",
+  "closed_book_guess": "DISCARDED",
+  "category": "fact"
+ },
+ {
+  "id": 153,
+  "page": "patterns",
+  "section": "Retry a flaky third-party call",
+  "sentence": "`[MASK]` does not cap a valid callback delay.",
+  "answer": "BACKOFF_MAX",
+  "closed_book_guess": "max_retries",
+  "category": "fact"
+ },
+ {
+  "id": 155,
+  "page": "production",
+  "section": "Threads and processes",
+  "sentence": " `[MASK]` is a thread pool inside one process.",
+  "answer": "--concurrency N",
+  "closed_book_guess": "ThreadPoolExecutor",
+  "category": "fact"
+ },
+ {
+  "id": 157,
+  "page": "production",
+  "section": "Task timeouts",
+  "sentence": "There is no `[MASK]` event, and nothing else says a deadline passed.",
+  "answer": "task_timed_out",
+  "closed_book_guess": "timeout",
+  "category": "fact"
+ },
+ {
+  "id": 161,
+  "page": "production",
+  "section": "Task timeouts",
+  "sentence": "It asks on the task's own thread as it registers the attempt, and two things count:  a trace function on that thread (`[MASK]`), which is what `coverage run` installs before Python 3.14, and what `pdb` and most debuggers install; a registered `sys.monitoring` tool with events enabled, which is what `coverage run` uses from Python 3.14 on.",
+  "answer": "sys.settrace",
+  "closed_book_guess": "sys.gettrace()",
+  "category": "fact"
+ },
+ {
+  "id": 172,
+  "page": "recurring-tasks",
+  "section": "Schedule keys",
+  "sentence": "For `[MASK]`, PostgreSQL raises `DataError`, MySQL through PyMySQL raises `OperationalError` 3140, and SQLite raises `IntegrityError` through Django's `JSON_VALID` check.",
+  "answer": "float(\"inf\")",
+  "closed_book_guess": "invalid JSON",
+  "category": "fact"
+ },
+ {
+  "id": 183,
+  "page": "stability",
+  "section": "Public API",
+  "sentence": "The heartbeat-file protocol**: with `ox_worker`, one process writes `PATH`; above one process, the supervisor writes `[MASK]` and slot i writes `PATH.i`.",
+  "answer": "PATH.supervisor",
+  "closed_book_guess": "PATH.heartbeat",
+  "category": "fact"
+ },
+ {
+  "id": 185,
+  "page": "stability",
+  "section": "Versioning",
+  "sentence": "`get_result()` and `refresh()` raise `[MASK]` on it.",
+  "answer": "ValueError",
+  "closed_book_guess": "DoesNotExist",
+  "category": "fact"
+ },
+ {
+  "id": 190,
+  "page": "stored-schedules",
+  "section": "Writing schedules from code",
+  "sentence": "Each entry's `[MASK]` contains `index`, the zero-based position in `rows`; `name`, as supplied; `field`, or `\"\"` for a failure that belongs to no one field; and `message`.",
+  "answer": "params",
+  "closed_book_guess": "errors",
+  "category": "fact"
+ },
+ {
+  "id": 197,
+  "page": "stored-schedules",
+  "section": "Monitoring",
+  "sentence": "`django_celery_beat/models.py`: `[MASK]` is `models.CharField(max_length=200)` with no `choices` and no validators, and the model defines no `clean()`.",
+  "answer": "PeriodicTask.task",
+  "closed_book_guess": "crontab_string",
+  "category": "fact"
+ },
+ {
+  "id": 207,
+  "page": "use-cases",
+  "section": "Run recurring Django tasks without a scheduler process",
+  "sentence": " Run the nightly report and refresh exchange rates every five minutes without deploying a separate dispatcher such as `[MASK]`.",
+  "answer": "celery beat",
+  "closed_book_guess": "Celery",
+  "category": "ambiguous"
+ },
+ {
+  "id": 216,
+  "page": "wagtail",
+  "section": "Objects deleted before their tasks run",
+  "sentence": " Wagtail's search-index and reference-index task bodies raise `[MASK]` if the object is deleted before they run.",
+  "answer": "DoesNotExist",
+  "closed_book_guess": "ObjectDoesNotExist",
+  "category": "equivalent"
+ },
+ {
+  "id": 222,
+  "page": "wagtail",
+  "section": "Start the worker",
+  "sentence": "Without `[MASK]`, django-ox processes all queues configured for the backend.",
+  "answer": "--queues",
+  "closed_book_guess": "--queue",
+  "category": "equivalent"
+ },
+ {
+  "id": 223,
+  "page": "why-django-ox",
+  "section": "What does the optional app add?",
+  "sentence": "The `[MASK]` app is included in django-ox and requires Django 6.0+.",
+  "answer": "oxpull",
+  "closed_book_guess": "oxui",
+  "category": "fact"
+ },
+ {
+  "id": 225,
+  "page": "why-django-ox",
+  "section": "Which versions can I use?",
+  "sentence": "Django 5.2 uses the `[MASK]` backport.",
+  "answer": "django-tasks",
+  "closed_book_guess": "django.utils.functional.cached_property",
+  "category": "fact"
+ }
+]

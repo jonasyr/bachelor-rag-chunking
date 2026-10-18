@@ -1,0 +1,1010 @@
+[
+ {
+  "id": 9,
+  "page": "Quickstart",
+  "section": "Install and run",
+  "sentence": "`[MASK]` leaves existing files alone and skips the install, so install Blume yourself (`npm install blume`), then add `\"dev\": \"blume dev\"` and `\"build\": \"blume build\"` to its scripts, or run `npx blume dev` directly.",
+  "answer": "blume init",
+  "closed_book_guess": "npm create blume@latest",
+  "category": "fact"
+ },
+ {
+  "id": 15,
+  "page": "Deployment",
+  "section": "Pattern redirects",
+  "sentence": "The `node()` and `cloudflare()` servers match them themselves, and so do `blume dev` and `[MASK]`.",
+  "answer": "blume preview",
+  "closed_book_guess": "blume build",
+  "category": "fact"
+ },
+ {
+  "id": 29,
+  "page": "Upgrade to Blume 2",
+  "section": "Assistant",
+  "sentence": " Ask AI is now called the assistant, and its config moves with the name: `ai.ask` becomes `[MASK]`.",
+  "answer": "ai.assistant",
+  "closed_book_guess": "assistant.enabled",
+  "category": "fact"
+ },
+ {
+  "id": 33,
+  "page": "Upgrade to Blume 2",
+  "section": "Content sources",
+  "sentence": "Move them into the `[MASK]` entry.",
+  "answer": "filesystem()",
+  "closed_book_guess": "content.sources",
+  "category": "ambiguous"
+ },
+ {
+  "id": 36,
+  "page": "Migrate to Blume",
+  "section": "Other agents",
+  "sentence": " Without `--codex` or `--claude`, the command reports the source it detected, prints the path to the playbook — the `[MASK]` [skill](/docs/advanced/skills) bundled in the package — and exits without changing anything.",
+  "answer": "blume-migrate",
+  "closed_book_guess": "AGENTS.md",
+  "category": "fact"
+ },
+ {
+  "id": 49,
+  "page": "FAQ",
+  "section": "Why it happens",
+  "sentence": "When it wraps prose, it treats the `[MASK]` fence lines as ordinary text and joins them with the adjacent line, breaking the directive.",
+  "answer": ":::",
+  "closed_book_guess": ":::yaml",
+  "category": "fact"
+ },
+ {
+  "id": 57,
+  "page": "FAQ",
+  "section": "The fix",
+  "sentence": "`[MASK]`) or check whether the upstream fix has landed and the patch is no longer needed.",
+  "answer": "bun patch oxfmt",
+  "closed_book_guess": "patch",
+  "category": "ambiguous"
+ },
+ {
+  "id": 76,
+  "page": "Changelogs",
+  "section": "Write an entry",
+  "sentence": " A changelog entry is a regular `.md` or `.mdx` page with `[MASK]` in its frontmatter.",
+  "answer": "type: changelog",
+  "closed_book_guess": "changelog: true",
+  "category": "fact"
+ },
+ {
+  "id": 77,
+  "page": "Changelogs",
+  "section": "The index page",
+  "sentence": "The page appears only when nothing already occupies the `[MASK]` route.",
+  "answer": "/changelog",
+  "closed_book_guess": "/ route",
+  "category": "fact"
+ },
+ {
+  "id": 78,
+  "page": "Changelogs",
+  "section": "The RSS feed",
+  "sentence": "Tune it under [`[MASK]`](/docs/discoverability/rss):   Remove `\"changelog\"` from `rss.types` to skip the feed while keeping the timeline.",
+  "answer": "seo.rss",
+  "closed_book_guess": "site.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 93,
+  "page": "Custom pages",
+  "section": "404 page",
+  "sentence": "On Vercel the same goes for a `.md` or `[MASK]` URL no file backs.",
+  "answer": ".json",
+  "closed_book_guess": ".mdx",
+  "category": "ambiguous"
+ },
+ {
+  "id": 118,
+  "page": "Doctor",
+  "section": "What it checks",
+  "sentence": "[`<Component>`](/docs/content/components#component) examples that don't exist**: a `path` that names no file under `examples`, which the page would show as a \"No example found\" box: a warning (`BLUME_EXAMPLE_NOT_FOUND`) at its line, as `blume dev` and `[MASK]` print it.",
+  "answer": "blume build",
+  "closed_book_guess": "blume doctor",
+  "category": "fact"
+ },
+ {
+  "id": 120,
+  "page": "Doctor",
+  "section": "What it checks",
+  "sentence": " The Node version** against the range the installed `blume` package supports, read from its own `[MASK]` field.",
+  "answer": "engines",
+  "closed_book_guess": "engines.node",
+  "category": "equivalent"
+ },
+ {
+  "id": 130,
+  "page": "Evals",
+  "section": "Flags",
+  "sentence": "`[MASK]` — the evals file, relative to the project root or absolute.",
+  "answer": "--file <path>",
+  "closed_book_guess": "path",
+  "category": "fact"
+ },
+ {
+  "id": 132,
+  "page": "Evals",
+  "section": "Writing evals",
+  "sentence": " Questions live in `[MASK]` at the project root.",
+  "answer": "evals.yaml",
+  "closed_book_guess": "evals.jsonl",
+  "category": "fact"
+ },
+ {
+  "id": 142,
+  "page": "Overview",
+  "section": "Common flags",
+  "sentence": "By default `[MASK]` fails (exit 1) on any error diagnostic, because pages that fail frontmatter validation, and `.mdx` pages that don't [parse](/docs/content#markdown-and-mdx), are dropped from the output; with `--no-strict` the build succeeds and reports how many pages are missing.",
+  "answer": "blume build",
+  "closed_book_guess": "--strict",
+  "category": "fact"
+ },
+ {
+  "id": 149,
+  "page": "Overview",
+  "section": "Verifying while the dev server runs",
+  "sentence": "`blume build` and `[MASK]` regenerate the _same_ `.blume/`, so running either while the dev server is live would corrupt it — both refuse with an error and exit non-zero:   The `--isolated` flag is the escape hatch.",
+  "answer": "blume check",
+  "closed_book_guess": "blume dev",
+  "category": "fact"
+ },
+ {
+  "id": 150,
+  "page": "Overview",
+  "section": "Common flags",
+  "sentence": "`[MASK]` — write the files but skip the dependency install, for CI or custom dependency workflows.",
+  "answer": "blume init --no-install",
+  "closed_book_guess": "--no-install",
+  "category": "equivalent"
+ },
+ {
+  "id": 153,
+  "page": "Overview",
+  "section": "Common flags",
+  "sentence": "`blume init --eject` — scaffold, then eject to a standalone Astro project (with `--no-install`, falls back to guiding you through `[MASK]` once dependencies are installed).",
+  "answer": "blume eject",
+  "closed_book_guess": "pnpm dev",
+  "category": "fact"
+ },
+ {
+  "id": 160,
+  "page": "Translate",
+  "section": "Failing CI",
+  "sentence": "The JSON report carries the same `[MASK]` + `summary` shape as `blume validate --json`, `blume audit --json`, and `blume eval --json`, with the drift grouped per locale.",
+  "answer": "diagnostics",
+  "closed_book_guess": "report",
+  "category": "fact"
+ },
+ {
+  "id": 165,
+  "page": "Translate",
+  "section": "Translate",
+  "sentence": "`[MASK]` closes that loop: it computes exactly which pages are missing or stale in each locale, translates them headlessly with a local agent CLI, and records what it did in a committed ledger so the next run — and CI — knows what's current.",
+  "answer": "blume translate",
+  "closed_book_guess": "TranslateRunner",
+  "category": "fact"
+ },
+ {
+  "id": 176,
+  "page": "Validate",
+  "section": "JSON output",
+  "sentence": " With `--json`, `blume validate` (and [`blume doctor`](/docs/cli/doctor)) write one object to stdout: a `diagnostics` list, each entry carrying its `code`, `severity`, `message`, the `file` relative to the project root with `line` and `column` when the finding has a location, a `[MASK]`, and a `docsUrl` pointing at the page that explains the code, plus a `summary` of counts per severity.",
+  "answer": "suggestion",
+  "closed_book_guess": "ruleId",
+  "category": "fact"
+ },
+ {
+  "id": 181,
+  "page": "Version",
+  "section": "Version",
+  "sentence": "The first cut turns versioning on, adding a `[MASK]` block with the id archived and the live docs labeled \"Latest\".",
+  "answer": "versions",
+  "closed_book_guess": "versionSwitcher",
+  "category": "fact"
+ },
+ {
+  "id": 184,
+  "page": "Version",
+  "section": "Version",
+  "sentence": "That covers inline links and images, reference-style definitions (`[x]: /guides/x`), and HTML `href` and `src` attributes in either quote style, and a link that spells out your [`basePath`](/docs/deployment#mount-the-docs-under-a-path) keeps it (`/docs/guides/x` becomes `[MASK]`).",
+  "answer": "/docs/v1.0/guides/x",
+  "closed_book_guess": "/docs/v1/guides/x",
+  "category": "ambiguous"
+ },
+ {
+  "id": 187,
+  "page": "Version",
+  "section": "Version",
+  "sentence": "**Rewrites root-absolute links inside the copy** so they stay within the snapshot: `/guides/x` becomes `[MASK]`.",
+  "answer": "/v1.0/guides/x",
+  "closed_book_guess": "/guides/x",
+  "category": "ambiguous"
+ },
+ {
+  "id": 189,
+  "page": "Analytics",
+  "section": "PostHog",
+  "sentence": "With `[MASK]`, no pageviews are sent at all.",
+  "answer": "capture_pageview: false",
+  "closed_book_guess": "cookieless mode",
+  "category": "fact"
+ },
+ {
+  "id": 192,
+  "page": "Analytics",
+  "section": "Databuddy",
+  "sentence": "Databuddy ignores a camelCase name like `[MASK]`.",
+  "answer": "trackWebVitals",
+  "closed_book_guess": "pageView",
+  "category": "ambiguous"
+ },
+ {
+  "id": 195,
+  "page": "Analytics",
+  "section": "Google Analytics 4",
+  "sentence": "Blume renders the Google tag exactly as the stream's install instructions do: the async `gtag.js` loader plus the `dataLayer` bootstrap and `[MASK]` call.",
+  "answer": "config",
+  "closed_book_guess": "gtag('config', 'G-XXXXXXXXXX')",
+  "category": "equivalent"
+ },
+ {
+  "id": 199,
+  "page": "Assistant",
+  "section": "Adapters",
+  "sentence": "Each adapter owns its model, the env var its key is read from, how it maps [reasoning](#reasoning), and which provider SDK it needs — so there is no shared set of fields to reconcile across backends:    `openai()`, `anthropic()`, `[MASK]`, and `grok()` call the provider's own API with your key — nothing sits in between.",
+  "answer": "gemini()",
+  "closed_book_guess": "`google()`",
+  "category": "fact"
+ },
+ {
+  "id": 221,
+  "page": "Customization",
+  "section": "Layout slots",
+  "sentence": "`PageFooter` renders at the foot of every page Blume builds from your content, API operation pages included, with `[MASK]` and `Pagination` after it.",
+  "answer": "Feedback",
+  "closed_book_guess": "PageHeader",
+  "category": "fact"
+ },
+ {
+  "id": 233,
+  "page": "Configuration file",
+  "section": "Footer",
+  "sentence": "On a [multilingual](/docs/content/i18n#per-locale-navigation) site, `copyright` and a `[MASK]` can each be a map of locale code to text, and an internal link moves into the reader's locale whenever that locale serves the page.",
+  "answer": "label",
+  "closed_book_guess": "license",
+  "category": "fact"
+ },
+ {
+  "id": 235,
+  "page": "Configuration file",
+  "section": "Logo",
+  "sentence": "Set `[MASK]`** to show the mark alone — handy when the logo image already includes the wordmark.",
+  "answer": "text: \"\"",
+  "closed_book_guess": "logoOnly",
+  "category": "fact"
+ },
+ {
+  "id": 238,
+  "page": "Configuration file",
+  "section": "Date format",
+  "sentence": "It defaults to the long form (`[MASK]`, `2026年7月21日`):   `dateFormat` is a pass-through to [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat) options.",
+  "answer": "July 21, 2026",
+  "closed_book_guess": "long",
+  "category": "fact"
+ },
+ {
+  "id": 239,
+  "page": "Configuration file",
+  "section": "Logo",
+  "sentence": "The brand is a mark (`image`) plus a wordmark (`text`); the object form lets you set them independently:   `image` takes the same value as the shorthand — a single path, or `{ light, dark, alt }` for separate light/dark artwork (raster images must live in `[MASK]`).",
+  "answer": "public/",
+  "closed_book_guess": "public/brands",
+  "category": "fact"
+ },
+ {
+  "id": 241,
+  "page": "Configuration file",
+  "section": "Last modified",
+  "sentence": "It follows renames, as `git log --follow` does: renaming `page.md` to `[MASK]`, or moving a file to another folder under the same content root, keeps the page's date as long as the commit leaves its content unchanged.",
+  "answer": "page.mdx",
+  "closed_book_guess": "renamed-page.md",
+  "category": "example_name"
+ },
+ {
+  "id": 244,
+  "page": "Narration",
+  "section": "Generated voices",
+  "sentence": "Before it generates anything, the build logs how many new clips it needs and how many characters they cover, so the cost is visible up front:   `[MASK]` takes:  ",
+  "answer": "gateway()",
+  "closed_book_guess": "TTS generation",
+  "category": "ambiguous"
+ },
+ {
+  "id": 249,
+  "page": "Narration",
+  "section": "OpenAI and self-hosted voices",
+  "sentence": " `openai()` generates the clips with OpenAI's speech API instead: OpenAI's own models with your `[MASK]`, or, with a `baseUrl`, any server that serves the same `POST /audio/speech` endpoint, such as [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI), [Speaches](https://speaches.ai), or a [LiteLLM](https://docs.litellm.ai) proxy with a speech model.",
+  "answer": "OPENAI_API_KEY",
+  "closed_book_guess": "API key",
+  "category": "equivalent"
+ },
+ {
+  "id": 252,
+  "page": "Narration",
+  "section": "Fallbacks",
+  "sentence": "Run `blume build` and `[MASK]` to hear the generated voice locally.",
+  "answer": "blume preview",
+  "closed_book_guess": "blume dev",
+  "category": "fact"
+ },
+ {
+  "id": 253,
+  "page": "Narration",
+  "section": "OpenAI and self-hosted voices",
+  "sentence": "Without `apiKeyEnv`, a `[MASK]` server is called with no key, so your `OPENAI_API_KEY` never leaves for another server.",
+  "answer": "baseUrl",
+  "closed_book_guess": "self-hosted",
+  "category": "ambiguous"
+ },
+ {
+  "id": 255,
+  "page": "Rate limiting",
+  "section": "Behind a reverse proxy",
+  "sentence": "Leave `[MASK]` unset when readers reach the server directly.",
+  "answer": "allowedDomains",
+  "closed_book_guess": "trustProxy",
+  "category": "fact"
+ },
+ {
+  "id": 271,
+  "page": "Search",
+  "section": "Ranking",
+  "sentence": "`[MASK]` lists extra terms the page is found by, even when its text doesn't use them.",
+  "answer": "search.keywords",
+  "closed_book_guess": "keywords",
+  "category": "equivalent"
+ },
+ {
+  "id": 273,
+  "page": "Search",
+  "section": "Using search",
+  "sentence": "`Esc` closes it, and `[MASK]` (or `Ctrl J`) toggles the result preview pane.",
+  "answer": "⌘J",
+  "closed_book_guess": "Ctrl K",
+  "category": "fact"
+ },
+ {
+  "id": 292,
+  "page": "Components",
+  "section": "Type table",
+  "sentence": "Optional props (`[MASK]` unset) show a `?` after the name.",
+  "answer": "required",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 303,
+  "page": "Frontmatter",
+  "section": "AI",
+  "sentence": "  `[MASK]` keeps the page out of [`llms.txt` and `llms-full.txt`](/docs/discoverability/llms-txt#excluding-a-page) and out of the page map in your [site's skill](/docs/discoverability/agent-discovery#your-sites-skill).",
+  "answer": "ai.exclude",
+  "closed_book_guess": "excludeFromLlmsTxt",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "Frontmatter",
+  "section": "Search",
+  "sentence": "`[MASK]` multiplies the page's relevance: above 1 ranks it higher, below 1 lower.",
+  "answer": "boost",
+  "closed_book_guess": "searchBoost",
+  "category": "fact"
+ },
+ {
+  "id": 307,
+  "page": "Frontmatter",
+  "section": "Changelog",
+  "sentence": " Changelog entries (`type: changelog`) accept an optional `changelog` object for richer feed and display metadata:   `[MASK]` may live here or at the top level — both feed the [changelog RSS feed](/docs/content#feeds).",
+  "answer": "date",
+  "closed_book_guess": "title",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "Frontmatter",
+  "section": "Search",
+  "sentence": "  `[MASK]` keeps the page out of search, and `tags` labels its record for a hosted search adapter to filter on (see [Tags](/docs/configuration/search#tags)).",
+  "answer": "exclude",
+  "closed_book_guess": "searchable",
+  "category": "fact"
+ },
+ {
+  "id": 314,
+  "page": "Internationalization",
+  "section": "Search",
+  "sentence": "The default (Orama) and FlexSearch indexes filter in the browser, Pagefind keeps an index per language, and Algolia, Orama Cloud, and Typesense carry a `[MASK]` field on each record.",
+  "answer": "locale",
+  "closed_book_guess": "lang",
+  "category": "fact"
+ },
+ {
+  "id": 323,
+  "page": "Internationalization",
+  "section": "Translating with an agent",
+  "sentence": "In CI, `[MASK]` fails when a source page has drifted ahead of its translations.",
+  "answer": "blume translate --check",
+  "closed_book_guess": "blume i18n check",
+  "category": "fact"
+ },
+ {
+  "id": 326,
+  "page": "Includes",
+  "section": "Rules and diagnostics",
+  "sentence": "Other HTML there has to be valid JSX: an `<img …>` or `[MASK]` without a closing slash takes in everything after it in the partial, with no error.",
+  "answer": "<br>",
+  "closed_book_guess": "<input …>",
+  "category": "ambiguous"
+ },
+ {
+  "id": 341,
+  "page": "Pages",
+  "section": "Feeds",
+  "sentence": " Blume generates an RSS feed automatically for each content type listed in [`seo.rss.types`](/docs/discoverability/rss) — `blog` and `[MASK]` by default — as long as it has at least one page.",
+  "answer": "changelog",
+  "closed_book_guess": "news",
+  "category": "fact"
+ },
+ {
+  "id": 359,
+  "page": "Islands",
+  "section": "Hooks",
+  "sentence": "Instead, `blume/hooks` reads a small snapshot the layout serializes into the page — no props to drill:    `[MASK]` and `usePage()` return `null` until the island mounts (so server and client render the same first frame) — guard for it.",
+  "answer": "useBlume()",
+  "closed_book_guess": "useRoute()",
+  "category": "fact"
+ },
+ {
+  "id": 362,
+  "page": "Folder meta",
+  "section": "Defining meta",
+  "sentence": "Blume warns about that one as `BLUME_META_OUTSIDE_INCLUDE`: add an `[MASK]` glob that reaches the folder, such as `\"api/**/*.{md,mdx}\"`, so Blume reads it.",
+  "answer": "include",
+  "closed_book_guess": "includeFiles",
+  "category": "fact"
+ },
+ {
+  "id": 367,
+  "page": "Folder meta",
+  "section": "Fields",
+  "sentence": "  The `[MASK]` array lists children by slug — the folder or file name with its numeric prefix and any parentheses stripped (so `01-quickstart.mdx` is `\"quickstart\"`).",
+  "answer": "pages",
+  "closed_book_guess": "children",
+  "category": "fact"
+ },
+ {
+  "id": 372,
+  "page": "Navigation",
+  "section": "Repository link",
+  "sentence": "It's on by default; hide it with `[MASK]`:   The link only appears when `github` is configured, so projects without a repo are unaffected either way.",
+  "answer": "navigation.repo",
+  "closed_book_guess": "showRepositoryLink=false",
+  "category": "fact"
+ },
+ {
+  "id": 374,
+  "page": "Navigation",
+  "section": "Directory listings",
+  "sentence": "The setting carries down to nested folders, so one `directory` on the content root's `[MASK]` gives every section a listing, and a folder can set its own value (`none` included) to override what it inherits.",
+  "answer": "meta.ts",
+  "closed_book_guess": "frontmatter",
+  "category": "fact"
+ },
+ {
+  "id": 377,
+  "page": "Navigation",
+  "section": "Tabs",
+  "sentence": "On a route under no tab (or a tab whose `[MASK]` is `/`), the sidebar shows the pages that _don't_ belong to a tab — each tab's folder is hidden from it, since that section already has its own tab in the header.",
+  "answer": "path",
+  "closed_book_guess": "slug",
+  "category": "fact"
+ },
+ {
+  "id": 379,
+  "page": "Navigation",
+  "section": "Tabs",
+  "sentence": "A section whose `[MASK]` isn't a page of its own — a folder with no `index.mdx` — would link to a 404, so the tab falls back to the first page in the section instead.",
+  "answer": "path",
+  "closed_book_guess": "index.mdx",
+  "category": "fact"
+ },
+ {
+  "id": 380,
+  "page": "Navigation",
+  "section": "Tabs",
+  "sentence": "Its `path` still scopes the sidebar and marks the tab as current, and `[MASK]` doesn't apply.",
+  "answer": "href",
+  "closed_book_guess": "defaultTab",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "Navigation",
+  "section": "Featured links",
+  "sentence": "A path to a file in `public/` (`/spec.pdf`) or one Blume generates (`[MASK]`) matches too.",
+  "answer": "/llms.txt",
+  "closed_book_guess": "/index.html",
+  "category": "ambiguous"
+ },
+ {
+  "id": 391,
+  "page": "Contentful",
+  "section": "Contentful",
+  "sentence": "Under `--preview` the adapter reads drafts through the Preview API with `[MASK]`.",
+  "answer": "CONTENTFUL_PREVIEW_TOKEN",
+  "closed_book_guess": "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
+  "category": "fact"
+ },
+ {
+  "id": 397,
+  "page": "Custom sources",
+  "section": "Custom sources",
+  "sentence": "`custom()` takes a `[MASK]` instance rather than an options object, so there is nothing to pass the [shared options](/docs/content/sources#adapters) `prefix` or `pollInterval` to.",
+  "answer": "ContentSource",
+  "closed_book_guess": "SourceAdapter",
+  "category": "fact"
+ },
+ {
+  "id": 403,
+  "page": "Custom sources",
+  "section": "Custom sources",
+  "sentence": "`[MASK]` serves that snapshot after you edit the source's query, fields, or serializers, so run `blume sync` to fetch afresh.",
+  "answer": "blume dev",
+  "closed_book_guess": "The cache",
+  "category": "ambiguous"
+ },
+ {
+  "id": 408,
+  "page": "GitHub Releases",
+  "section": "GitHub Releases",
+  "sentence": "For a repository on GitHub Enterprise Server, set `baseUrl` to its REST API (`https://<host>/api/v3`); `[MASK]` is sent there, so it must be a token for that server.",
+  "answer": "GITHUB_TOKEN",
+  "closed_book_guess": "token",
+  "category": "equivalent"
+ },
+ {
+  "id": 420,
+  "page": "Content sources",
+  "section": "Adapters",
+  "sentence": "Beyond `[MASK]`, each built-in adapter has its own page, and [`custom()`](/docs/content/sources/custom) plugs in any other backend:   Every adapter that takes an options object accepts two shared options:  `prefix`** namespaces the source's routes under `/<prefix>/…`, which also becomes the source's name in diagnostics and its cache directory.",
+  "answer": "filesystem()",
+  "closed_book_guess": "`file()`",
+  "category": "fact"
+ },
+ {
+  "id": 421,
+  "page": "Content sources",
+  "section": "The default",
+  "sentence": "The top-level `[MASK]`, `content.include`, and `content.exclude` options are shorthand for that single source — nothing to import, nothing to change.",
+  "answer": "content.root",
+  "closed_book_guess": "content.directory",
+  "category": "fact"
+ },
+ {
+  "id": 423,
+  "page": "Content sources",
+  "section": "Preview and sync",
+  "sentence": " Two flags control how remote content is fetched and what's included:  `--preview`** on `blume dev` or `[MASK]` renders drafts and pulls unpublished CMS content — Sanity switches to its `previewDrafts` perspective, Contentful reads through the Preview API, and Payload and Strapi request drafts.",
+  "answer": "blume build",
+  "closed_book_guess": "--preview on blume build",
+  "category": "equivalent"
+ },
+ {
+  "id": 424,
+  "page": "Content sources",
+  "section": "Caching and offline builds",
+  "sentence": "Run `blume sync` to pull the latest content (a running dev server hot-reloads), or `[MASK]` to drop the snapshots first.",
+  "answer": "blume sync --force",
+  "closed_book_guess": "blume sync --clean",
+  "category": "fact"
+ },
+ {
+  "id": 425,
+  "page": "Content sources",
+  "section": "Adapters",
+  "sentence": "When `sources` is present it replaces the implicit default, so include a `[MASK]` entry for your local docs — and move `root`, `include`, or `exclude` into it.",
+  "answer": "filesystem()",
+  "closed_book_guess": "local",
+  "category": "fact"
+ },
+ {
+  "id": 427,
+  "page": "Content sources",
+  "section": "Caching and offline builds",
+  "sentence": "Preview and published content get separate snapshots, and so does each set of source options, so a build never falls back to drafts fetched under `--preview`, and editing a source's `[MASK]` or `fields` fetches afresh.",
+  "answer": "query",
+  "closed_book_guess": "filter",
+  "category": "fact"
+ },
+ {
+  "id": 435,
+  "page": "Notion",
+  "section": "Notion",
+  "sentence": "The `[MASK]` property is a publish gate by default.",
+  "answer": "Status",
+  "closed_book_guess": "Published",
+  "category": "fact"
+ },
+ {
+  "id": 441,
+  "page": "Obsidian",
+  "section": "Obsidian",
+  "sentence": "`[MASK]` is dropped rather than resolved — alias link targets are not supported yet.",
+  "answer": "aliases",
+  "closed_book_guess": "Obsidian alias links",
+  "category": "equivalent"
+ },
+ {
+  "id": 454,
+  "page": "Payload",
+  "section": "Payload",
+  "sentence": "The API key comes from the `[MASK]` environment variable and is sent as `users API-Key <key>`; set `authCollection` when the key belongs to another auth-enabled collection.",
+  "answer": "PAYLOAD_API_KEY",
+  "closed_book_guess": "PAYLOAD_SECRET",
+  "category": "fact"
+ },
+ {
+  "id": 463,
+  "page": "Remote MDX",
+  "section": "Remote MDX",
+  "sentence": "Enumerate files either from a GitHub repo subtree (`[MASK]`) or explicitly against a raw base URL (`url` + `files`):   To list the files yourself, point `url` at a raw base URL:   `include` (default `[\"**/*.{md,mdx}\"]`) filters the files by their path under `path`, the way a `filesystem()` source's `include` does: a pattern starting with `!` excludes what it matches (`[\"**/*.mdx\", \"!drafts/**\"]`).",
+  "answer": "github",
+  "closed_book_guess": "repo",
+  "category": "fact"
+ },
+ {
+  "id": 466,
+  "page": "Remote MDX",
+  "section": "Remote MDX",
+  "sentence": "GitHub caps the listing (100,000 entries or 7 MB for the whole repository, whatever `[MASK]` is), and past it the source warns with `BLUME_SOURCE_TRUNCATED`: list the files with `url` and `files` instead.",
+  "answer": "path",
+  "closed_book_guess": "comes first",
+  "category": "ambiguous"
+ },
+ {
+  "id": 469,
+  "page": "Remote MDX",
+  "section": "Remote MDX",
+  "sentence": " The built-in `[MASK]` adapter fetches raw `.md`/`.mdx` over HTTP.",
+  "answer": "mdxRemote()",
+  "closed_book_guess": "fetchRemoteMDX",
+  "category": "fact"
+ },
+ {
+  "id": 481,
+  "page": "Sanity",
+  "section": "Sanity",
+  "sentence": "The adapter declares `[MASK]` as its runtime dependency — an optional peer, so install it only if you use this source.",
+  "answer": "@sanity/client",
+  "closed_book_guess": "sanity.io",
+  "category": "fact"
+ },
+ {
+  "id": 484,
+  "page": "Strapi",
+  "section": "Strapi",
+  "sentence": "Entries are fetched with `populate=*` so images carry their URLs (set `populate` to narrow it), and a relative upload path (`/uploads/x.png`) in a Blocks field resolves against `[MASK]`.",
+  "answer": "url",
+  "closed_book_guess": "STRAPI_URL",
+  "category": "fact"
+ },
+ {
+  "id": 499,
+  "page": "Syntax",
+  "section": "Custom anchors",
+  "sentence": "A `<Badge>` in a heading is a label, not part of that text: `## Install <Badge>beta</Badge>` anchors as `[MASK]` and reads \"Install\" in the table of contents.",
+  "answer": "#install",
+  "closed_book_guess": "install",
+  "category": "equivalent"
+ },
+ {
+  "id": 506,
+  "page": "Variables",
+  "section": "Variables",
+  "sentence": "Spaces inside the braces are fine (`[MASK]`).",
+  "answer": "{{ version }}",
+  "closed_book_guess": "{ foo }",
+  "category": "example_name"
+ },
+ {
+  "id": 519,
+  "page": "Versioning",
+  "section": "Agents",
+  "sentence": "`[MASK]` stays current-only — the flat dump never interleaves frozen copies of the same page.",
+  "answer": "llms-full.txt",
+  "closed_book_guess": "llms.txt",
+  "category": "fact"
+ },
+ {
+  "id": 520,
+  "page": "Versioning",
+  "section": "SEO",
+  "sentence": "Per version you can pick a different treatment:   The sitemap follows suit: archived pages whose canonical points at a live equivalent are left out, `[MASK]` versions are left out wholesale, and version-only pages stay listed.",
+  "answer": "noindex",
+  "closed_book_guess": "unlisted",
+  "category": "fact"
+ },
+ {
+  "id": 526,
+  "page": "Versioning",
+  "section": "Enable it",
+  "sentence": " Add a `versions` block naming the current docs and any archived snapshots:   `current` labels the unprefixed tree in the switcher (with an optional `[MASK]`).",
+  "answer": "badge",
+  "closed_book_guess": "label",
+  "category": "fact"
+ },
+ {
+  "id": 538,
+  "page": "Agent discovery",
+  "section": "Discovery Link header",
+  "sentence": "The dev server's header lists only what it serves — the `service-desc` and `alternate` links — because `blume build` writes the catalogs, `agent-readability.json`, and `[MASK]` into the build output.",
+  "answer": "llms.txt",
+  "closed_book_guess": "agent-index.json",
+  "category": "fact"
+ },
+ {
+  "id": 540,
+  "page": "Agent discovery",
+  "section": "AI catalog",
+  "sentence": "The catalog and its `[MASK]` neighbors (the API catalog, the MCP discovery files) are served with `Access-Control-Allow-Origin: *` on every build surface, so a registry reading them from another origin isn't blocked.",
+  "answer": ".well-known",
+  "closed_book_guess": "well-known",
+  "category": "equivalent"
+ },
+ {
+  "id": 550,
+  "page": "SEO and GEO",
+  "section": "SEO and GEO",
+  "sentence": "The knobs live under two keys in `[MASK]`: `seo` for what search engines and social platforms see, and `agents` for what agents see.",
+  "answer": "blume.config.ts",
+  "closed_book_guess": "site.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 551,
+  "page": "SEO and GEO",
+  "section": "What the build emits",
+  "sentence": "  Every generated file yields to one you ship yourself: drop a `robots.txt`, `sitemap.xml`, `llms.txt`, `[MASK]`, or `agent-readability.json` in `public/` and Blume serves yours in its place.",
+  "answer": "openapi.json",
+  "closed_book_guess": "ai.txt",
+  "category": "ambiguous"
+ },
+ {
+  "id": 563,
+  "page": "JSON API",
+  "section": "Errors",
+  "sentence": " Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details (`application/problem+json`) with a stable `[MASK]`, a `detail`, and a `resolution` hint telling the agent where to go next — a missing page, a blank search query, or on server output any `/api/…` URL no endpoint answers:  ",
+  "answer": "code",
+  "closed_book_guess": "type",
+  "category": "fact"
+ },
+ {
+  "id": 565,
+  "page": "llms.txt",
+  "section": "llms.txt",
+  "sentence": "`[MASK]`** — the entire corpus: each page's full Markdown body, with its source URL, in one file.",
+  "answer": "/llms-full.txt",
+  "closed_book_guess": "llms-full.txt",
+  "category": "equivalent"
+ },
+ {
+  "id": 573,
+  "page": "llms.txt",
+  "section": "Excluding a page",
+  "sentence": " To keep an individual page out of both files, set `[MASK]` in its frontmatter:   The page still renders, stays in search, and keeps its place in the sitemap — only the `llms.txt` files and the page map in your [site's skill](/docs/discoverability/agent-discovery#your-sites-skill) skip it.",
+  "answer": "ai.exclude",
+  "closed_book_guess": "llms: false",
+  "category": "fact"
+ },
+ {
+  "id": 579,
+  "page": "Markdown for agents",
+  "section": "Raw Markdown",
+  "sentence": " Append `.md` or `[MASK]` to any page's URL to fetch its raw Markdown source — perfect for LLMs, coding agents, and \"copy as Markdown\" workflows.",
+  "answer": ".mdx",
+  "closed_book_guess": "?raw=1",
+  "category": "fact"
+ },
+ {
+  "id": 585,
+  "page": "Markdown for agents",
+  "section": "Content negotiation",
+  "sentence": "Send `[MASK]` without a q-value to get Markdown everywhere.",
+  "answer": "text/markdown",
+  "closed_book_guess": "Accept: text/markdown",
+  "category": "equivalent"
+ },
+ {
+  "id": 586,
+  "page": "MCP server",
+  "section": "Tools and resources",
+  "sentence": "`[MASK]` and `resources/read` still return a hidden page by its route: hidden isn't private, and the page is still served at its URL and as Markdown.",
+  "answer": "get_page",
+  "closed_book_guess": "pages/list",
+  "category": "fact"
+ },
+ {
+  "id": 597,
+  "page": "Metadata",
+  "section": "Your own tags",
+  "sentence": "It suits site-verification tokens from Google, Bing, or Facebook, a `[MASK]`, or an app banner:   Each key is the tag's name and each value its content.",
+  "answer": "theme-color",
+  "closed_book_guess": "meta tag",
+  "category": "ambiguous"
+ },
+ {
+  "id": 603,
+  "page": "Metadata",
+  "section": "Metadata",
+  "sentence": "`[MASK]` and `og:url` — the page's absolute URL (when [`deployment.site`](/docs/deployment) is set).",
+  "answer": "<link rel=\"canonical\">",
+  "closed_book_guess": "canonicalUrl",
+  "category": "fact"
+ },
+ {
+  "id": 607,
+  "page": "Metadata",
+  "section": "Your own tags",
+  "sentence": "Open Graph families (`og:`, `[MASK]`, `article:`, and the rest) render with `property`, as the protocol names them, and everything else with `name`.",
+  "answer": "fb:",
+  "closed_book_guess": "twitter:",
+  "category": "fact"
+ },
+ {
+  "id": 608,
+  "page": "Metadata",
+  "section": "Your own tags",
+  "sentence": " For anything Blume has no setting for, add tags under `[MASK]` and every page carries them, custom pages and API references included.",
+  "answer": "seo.metatags",
+  "closed_book_guess": "tags",
+  "category": "fact"
+ },
+ {
+  "id": 614,
+  "page": "Open Graph images",
+  "section": "Card fonts",
+  "sentence": "An explicit `og.fonts: []` opts out entirely: cards keep the built-in font even when `[MASK]` is set or a title needs a script fallback.",
+  "answer": "theme.fonts",
+  "closed_book_guess": "og.fonts.default",
+  "category": "fact"
+ },
+ {
+  "id": 624,
+  "page": "RSS feeds",
+  "section": "RSS feeds",
+  "sentence": " Blume builds an RSS feed for each content type in `[MASK]` — `blog` and `changelog` by default — that has pages, served at `/<type>/rss.xml`.",
+  "answer": "seo.rss.types",
+  "closed_book_guess": "content.collections",
+  "category": "fact"
+ },
+ {
+  "id": 628,
+  "page": "Sitemap and robots",
+  "section": "Locale alternates",
+  "sentence": "`[MASK]` and `sitemap: {}` keep alternates off; `sitemap: false` turns the sitemap off.",
+  "answer": "sitemap: true",
+  "closed_book_guess": "alternates: false",
+  "category": "fact"
+ },
+ {
+  "id": 642,
+  "page": "Structured data",
+  "section": "Shared entity identifiers",
+  "sentence": " When docs live inside another site (`example.com/docs`), point at the entities that site already defines instead of defining them again:   Every page names `[MASK]` as its `isPartOf`, and Blume stops emitting its own WebSite node, whose name and URL would describe the docs instead of the site.",
+  "answer": "websiteId",
+  "closed_book_guess": "siteEntityId",
+  "category": "fact"
+ },
+ {
+  "id": 644,
+  "page": "Structured data",
+  "section": "Custom pages",
+  "sentence": "A custom page has no content file to date, so pass `lastModified` to give it a `[MASK]`.",
+  "answer": "dateModified",
+  "closed_book_guess": "last modified date",
+  "category": "equivalent"
+ },
+ {
+  "id": 654,
+  "page": "Introduction",
+  "section": "Everything included",
+  "sentence": "Eject** — `[MASK]` produces a standalone Astro project that still uses the `blume` package.",
+  "answer": "blume eject",
+  "closed_book_guess": "Eject",
+  "category": "fact"
+ },
+ {
+  "id": 665,
+  "page": "Hand-written API pages",
+  "section": "Hand-written API pages",
+  "sentence": "Path parameters are written in braces, `{workspaceId}`, and filled from the matching `[MASK]` field.",
+  "answer": "path",
+  "closed_book_guess": "path parameter",
+  "category": "equivalent"
+ },
+ {
+  "id": 668,
+  "page": "Hand-written API pages",
+  "section": "Site defaults",
+  "sentence": "Without `[MASK]`, pages send no credentials.",
+  "answer": "auth",
+  "closed_book_guess": "credentials",
+  "category": "fact"
+ },
+ {
+  "id": 670,
+  "page": "Hand-written API pages",
+  "section": "Site defaults",
+  "sentence": "`auth` is how requests authenticate unless a page sets `authMethod`: `method` is `bearer`, `basic`, `key`, or `[MASK]`, and `name` is the header an API key goes in (`x-api-key` by default).",
+  "answer": "none",
+  "closed_book_guess": "query",
+  "category": "fact"
+ },
+ {
+  "id": 671,
+  "page": "Hand-written API pages",
+  "section": "Hand-written API pages",
+  "sentence": "Path parameters are written in braces, `[MASK]`, and filled from the matching `path` field.",
+  "answer": "{workspaceId}",
+  "closed_book_guess": "`{param}`",
+  "category": "example_name"
+ },
+ {
+  "id": 687,
+  "page": "GraphQL",
+  "section": "Multiple schemas",
+  "sentence": " Each entry in `[MASK]` renders one schema on its own route.",
+  "answer": "sources",
+  "closed_book_guess": "schemas",
+  "category": "fact"
+ },
+ {
+  "id": 693,
+  "page": "GraphQL",
+  "section": "GraphQL",
+  "sentence": "The `[MASK]` is the live GraphQL API URL.",
+  "answer": "endpoint",
+  "closed_book_guess": "graphqlEndpoint",
+  "category": "fact"
+ },
+ {
+  "id": 694,
+  "page": "GraphQL",
+  "section": "Try it playground",
+  "sentence": "That makes `[MASK]` required for a working proxy: without one, the proxy has no origin to allow for this reference and refuses every send (the build warns about this).",
+  "answer": "endpoint",
+  "closed_book_guess": "originUrl",
+  "category": "fact"
+ },
+ {
+  "id": 702,
+  "page": "OpenAPI",
+  "section": "Code samples and schemas",
+  "sentence": "`[MASK]` starts nested schema rows expanded rather than collapsed:   Every sample is plain, copy-pasteable code for the request, written with the language's standard or most common HTTP client:   Each value is quoted by its own language's rules, so a header like `If-Match: \"33a64df5\"` or a body with a `$` in it reaches the API as written.",
+  "answer": "expandSchemas",
+  "closed_book_guess": "`defaultExpanded`",
+  "category": "fact"
+ },
+ {
+  "id": 712,
+  "page": "Scalar",
+  "section": "Passing Scalar options",
+  "sentence": "The one key that can't be forwarded is Scalar's own multi-document `[MASK]`: that name is Blume's, and each Blume source becomes its own page.",
+  "answer": "sources",
+  "closed_book_guess": "slug",
+  "category": "fact"
+ }
+]

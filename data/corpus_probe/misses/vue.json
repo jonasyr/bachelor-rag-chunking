@@ -1,0 +1,911 @@
+[
+ {
+  "id": 4,
+  "page": "Application API",
+  "section": "app.config.compilerOptions.delimiters",
+  "sentence": "Type:** `[MASK]`  Default:** `{{ \"['\\u007b\\u007b', '\\u007d\\u007d']\" }}`  Details  This is typically used to avoid conflicting with server-side frameworks that also use mustache syntax.",
+  "answer": "[string, string]",
+  "closed_book_guess": "Array<string>",
+  "category": "fact"
+ },
+ {
+  "id": 7,
+  "page": "Application API",
+  "section": "app.config.compilerOptions.isCustomElement",
+  "sentence": "Type:** `[MASK]`  Details  Should return `true` if the tag should be treated as a native custom element.",
+  "answer": "(tag: string) => boolean",
+  "closed_book_guess": "isCustomElement",
+  "category": "fact"
+ },
+ {
+  "id": 8,
+  "page": "Application API",
+  "section": "app.config.compilerOptions",
+  "sentence": "If you are using the runtime-only build with a build setup, compiler options must be passed to `[MASK]` via build tool configurations instead.",
+  "answer": "@vue/compiler-dom",
+  "closed_book_guess": "@vue/compiler-sfc",
+  "category": "fact"
+ },
+ {
+  "id": 11,
+  "page": "Built-in Components",
+  "section": "`<KeepAlive>`",
+  "sentence": "Example  Basic usage:   When used with `v-if` / `[MASK]` branches, there must be only one component rendered at a time:   Used together with `<Transition>`:   Using `include` / `exclude`:   Usage with `max`:   See also** [Guide - KeepAlive](/guide/built-ins/keep-alive) ",
+  "answer": "v-else",
+  "closed_book_guess": "v-else-if",
+  "category": "ambiguous"
+ },
+ {
+  "id": 16,
+  "page": "Built-in Components",
+  "section": "`<Suspense>`",
+  "sentence": "By setting the Suspense as `[MASK]`, all the async dependency handling will be handled by the parent Suspense.",
+  "answer": "suspensible",
+  "closed_book_guess": "non-suspensible",
+  "category": "fact"
+ },
+ {
+  "id": 27,
+  "page": "Built-in Special Attributes",
+  "section": "ref",
+  "sentence": "Expects:** `[MASK]`  Details  `ref` is used to register a reference to an element or a child component.",
+  "answer": "string | Function",
+  "closed_book_guess": "string | Function | Ref",
+  "category": "fact"
+ },
+ {
+  "id": 33,
+  "page": "Built-in Special Attributes",
+  "section": "key",
+  "sentence": "The most common use case is combined with `[MASK]`:   It can also be used to force replacement of an element/component instead of reusing it.",
+  "answer": "v-for",
+  "closed_book_guess": "v-if",
+  "category": "fact"
+ },
+ {
+  "id": 34,
+  "page": "Built-in Special Attributes",
+  "section": "key",
+  "sentence": "This can be useful when you want to:  Properly trigger lifecycle hooks of a component Trigger transitions  For example:   When `text` changes, the `[MASK]` will always be replaced instead of patched, so a transition will be triggered.",
+  "answer": "<span>",
+  "closed_book_guess": "<input>",
+  "category": "example_name"
+ },
+ {
+  "id": 38,
+  "page": "Built-in Special Elements",
+  "section": "`<component>`",
+  "sentence": "As a result, using `[MASK]` with a dynamically created native element won't work:   In practice, this edge case isn't common as native form fields are typically wrapped in components in real applications.",
+  "answer": "v-model",
+  "closed_book_guess": "is=\"input\"",
+  "category": "fact"
+ },
+ {
+  "id": 39,
+  "page": "Built-in Special Elements",
+  "section": "`<component>`",
+  "sentence": "Example  Rendering components by registered name (Options API):   Rendering components by definition (Composition API with `[MASK]`):   Rendering HTML elements:   The [built-in components](./built-in-components) can all be passed to `is`, but you must register them if you want to pass them by name.",
+  "answer": "<script setup>",
+  "closed_book_guess": "resolveComponent",
+  "category": "fact"
+ },
+ {
+  "id": 70,
+  "page": "Composition API: setup()",
+  "section": "Accessing Props",
+  "sentence": "It is therefore recommended to always access props in the form of `[MASK]`.",
+  "answer": "props.xxx",
+  "closed_book_guess": "props.foo",
+  "category": "equivalent"
+ },
+ {
+  "id": 74,
+  "page": "Composition API: setup()",
+  "section": "Setup Context",
+  "sentence": "If you intend to apply side effects based on changes to `[MASK]` or `slots`, you should do so inside an `onBeforeUpdate` lifecycle hook.",
+  "answer": "attrs",
+  "closed_book_guess": "props",
+  "category": "fact"
+ },
+ {
+  "id": 78,
+  "page": "Custom Elements API",
+  "section": "defineCustomElement()",
+  "sentence": "`shadowRoot`** (3.5+): `[MASK]`, defaults to `true`.",
+  "answer": "boolean",
+  "closed_book_guess": "whether to use Shadow DOM for the custom element’s internal content",
+  "category": "fact"
+ },
+ {
+  "id": 82,
+  "page": "Custom Elements API",
+  "section": "defineCustomElement()",
+  "sentence": "`nonce`** (3.5+): `[MASK]`, if provided, will be set as the `nonce` attribute on style tags injected to the shadow root.",
+  "answer": "string",
+  "closed_book_guess": "nonce",
+  "category": "fact"
+ },
+ {
+  "id": 85,
+  "page": "Custom Renderer API",
+  "section": "createRenderer()",
+  "sentence": "For a simpler implementation, check out [`[MASK]`](https://github.com/vuejs/core/blob/main/packages/runtime-test/src/index.ts) which is a private package for Vue's own unit testing.",
+  "answer": "@vue/runtime-test",
+  "closed_book_guess": "runtime-test",
+  "category": "equivalent"
+ },
+ {
+  "id": 86,
+  "page": "Global API: General",
+  "section": "Note on webpack Treeshaking",
+  "sentence": "To tell webpack that this function call is safe to be tree-shaken, you can add a `/*#__PURE__*/` comment notation before the function call:   Note this is not necessary if you are using Vite, because Rollup (the underlying production bundler used by Vite) is smart enough to determine that `[MASK]` is in fact side-effect-free without the need for manual annotations.",
+  "answer": "defineComponent()",
+  "closed_book_guess": "Vue.createApp()",
+  "category": "fact"
+ },
+ {
+  "id": 89,
+  "page": "Global API: General",
+  "section": "Note on webpack Treeshaking",
+  "sentence": " Because `[MASK]` is a function call, it could look like it would produce side-effects to some build tools, e.g.",
+  "answer": "defineComponent()",
+  "closed_book_guess": "Vue.use",
+  "category": "fact"
+ },
+ {
+  "id": 103,
+  "page": "Reactivity API: Core",
+  "section": "watchEffect()",
+  "sentence": "This can be achieved using `[MASK]`.",
+  "answer": "flush: 'sync'",
+  "closed_book_guess": "watchPostEffect()",
+  "category": "fact"
+ },
+ {
+  "id": 105,
+  "page": "Reactivity API: Core",
+  "section": "watch()",
+  "sentence": "`[MASK]`**: debug the watcher's dependencies.",
+  "answer": "onTrack / onTrigger",
+  "closed_book_guess": "onTrack",
+  "category": "ambiguous"
+ },
+ {
+  "id": 123,
+  "page": "Render Function APIs",
+  "section": "withModifiers()",
+  "sentence": " For adding built-in [`[MASK]` modifiers](/guide/essentials/event-handling#event-modifiers) to an event handler function.",
+  "answer": "v-on",
+  "closed_book_guess": "event handler",
+  "category": "fact"
+ },
+ {
+  "id": 129,
+  "page": "Render Function APIs",
+  "section": "withDirectives()",
+  "sentence": "Each custom directive is also represented as an array in the form of `[MASK]`.",
+  "answer": "[Directive, value, argument, modifiers]",
+  "closed_book_guess": "[directive, value, arg, modifiers]",
+  "category": "equivalent"
+ },
+ {
+  "id": 133,
+  "page": "SFC CSS Features",
+  "section": "Usage with Composition API",
+  "sentence": "For `[MASK]` blocks with custom injection names, `useCssModule` accepts the matching `module` attribute value as the first argument:   Example  ",
+  "answer": "<style module>",
+  "closed_book_guess": "<style>",
+  "category": "fact"
+ },
+ {
+  "id": 138,
+  "page": "SFC CSS Features",
+  "section": "Deep Selectors",
+  "sentence": " If you want a selector in `[MASK]` styles to be \"deep\", i.e.",
+  "answer": "scoped",
+  "closed_book_guess": "scoped<style>",
+  "category": "equivalent"
+ },
+ {
+  "id": 141,
+  "page": "<script setup>",
+  "section": "Top-level `await`",
+  "sentence": "Note `async setup()` must be used in combination with [`[MASK]`](/guide/built-ins/suspense.html), which is currently still an experimental feature.",
+  "answer": "Suspense",
+  "closed_book_guess": "<Suspense>",
+  "category": "equivalent"
+ },
+ {
+  "id": 158,
+  "page": "Server-Side Rendering API",
+  "section": "pipeToWebWritable()",
+  "sentence": "Exported from `[MASK]`  Type   Example  This is typically used in combination with [`TransformStream`](https://developer.mozilla.org/en-US/docs/Web/API/TransformStream):  ",
+  "answer": "vue/server-renderer",
+  "closed_book_guess": "@vue/server-renderer",
+  "category": "equivalent"
+ },
+ {
+  "id": 176,
+  "page": "Accessibility",
+  "section": "Skip link",
+  "sentence": "This can be achieved by calling focus on the `backToTop` template ref (assuming usage of `[MASK]`):   [Read documentation on skip link to main content](https://www.w3.org/WAI/WCAG21/Techniques/general/G1.html) ",
+  "answer": "vue-router",
+  "closed_book_guess": "<script setup>",
+  "category": "fact"
+ },
+ {
+  "id": 182,
+  "page": "Accessibility",
+  "section": "Skip link",
+  "sentence": "This can be achieved by calling focus on the `[MASK]` template ref (assuming usage of `vue-router`):   [Read documentation on skip link to main content](https://www.w3.org/WAI/WCAG21/Techniques/general/G1.html) ",
+  "answer": "backToTop",
+  "closed_book_guess": "main-content ref",
+  "category": "example_name"
+ },
+ {
+  "id": 185,
+  "page": "Accessibility",
+  "section": "Headings",
+  "sentence": "When it comes to headings, there are a couple of recommended accessibility practices:  Nest headings in their ranking order: `[MASK]` - `<h6>` Don’t skip headings within a section Use actual heading tags instead of styling text to give the visual appearance of headings  [Read more about headings](https://www.w3.org/TR/UNDERSTANDING-WCAG20/navigation-mechanisms-descriptive.html)  ",
+  "answer": "<h1>",
+  "closed_book_guess": "<h1> - <h6>",
+  "category": "equivalent"
+ },
+ {
+  "id": 186,
+  "page": "Accessibility",
+  "section": "Semantic Forms",
+  "sentence": " When creating a form, you can use the following elements: `<form>`, `<label>`, `[MASK]`, `<textarea>`, and `<button>`  Labels are typically placed on top or to the left of the form fields:   Notice how you can include `autocomplete='on'` on the form element and it will apply to all inputs in your form.",
+  "answer": "<input>",
+  "closed_book_guess": "<input",
+  "category": "equivalent"
+ },
+ {
+  "id": 187,
+  "page": "Performance",
+  "section": "Computed Stability",
+  "sentence": "Even if the `[MASK]` property remains the same, Vue won't be able to know unless it performs a deep comparison of the old value and the new value.",
+  "answer": "isEven",
+  "closed_book_guess": "computed",
+  "category": "example_name"
+ },
+ {
+  "id": 190,
+  "page": "Performance",
+  "section": "Code Splitting",
+  "sentence": "Vue Router has explicit support for lazy loading, separate from `[MASK]`.",
+  "answer": "defineAsyncComponent",
+  "closed_book_guess": "dynamic imports",
+  "category": "fact"
+ },
+ {
+  "id": 206,
+  "page": "Security",
+  "section": "Style Injection",
+  "sentence": "With the `[MASK]`, malicious users could still provide CSS to \"click jack\", e.g.",
+  "answer": "userProvidedStyles",
+  "closed_book_guess": "v-html",
+  "category": "example_name"
+ },
+ {
+  "id": 218,
+  "page": "KeepAlive",
+  "section": "Include / Exclude",
+  "sentence": " By default, `[MASK]` will cache any component instance inside.",
+  "answer": "<KeepAlive>",
+  "closed_book_guess": "KeepAlive",
+  "category": "equivalent"
+ },
+ {
+  "id": 222,
+  "page": "KeepAlive",
+  "section": "Max Cached Instances",
+  "sentence": "When `max` is specified, `[MASK]` behaves like an [LRU cache](<https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)>): if the number of cached instances is about to exceed the specified max count, the least recently accessed cached instance will be destroyed to make room for the new one.",
+  "answer": "<KeepAlive>",
+  "closed_book_guess": "KeepAlive",
+  "category": "equivalent"
+ },
+ {
+  "id": 250,
+  "page": "TransitionGroup",
+  "section": "Enter / Leave Transitions",
+  "sentence": " Here is an example of applying enter / leave transitions to a `v-for` list using `[MASK]`:   ",
+  "answer": "<TransitionGroup>",
+  "closed_book_guess": "TransitionGroup",
+  "category": "equivalent"
+ },
+ {
+  "id": 254,
+  "page": "TransitionGroup",
+  "section": "Enter / Leave Transitions",
+  "sentence": " Here is an example of applying enter / leave transitions to a `[MASK]` list using `<TransitionGroup>`:   ",
+  "answer": "v-for",
+  "closed_book_guess": "v-for-rendered",
+  "category": "equivalent"
+ },
+ {
+  "id": 267,
+  "page": "Transition",
+  "section": "Reusable Transitions",
+  "sentence": "To create a reusable transition, we can create a component that wraps the `<Transition>` component and passes down the slot content:   Now `[MASK]` can be imported and used just like the built-in version:  ",
+  "answer": "MyTransition",
+  "closed_book_guess": "BaseTransition",
+  "category": "example_name"
+ },
+ {
+  "id": 270,
+  "page": "Async Components",
+  "section": "Basic Usage",
+  "sentence": "As with normal components, async components can be [registered globally](/guide/components/registration#global-registration) using `[MASK]`:   They can also be defined directly inside their parent component:  ",
+  "answer": "app.component()",
+  "closed_book_guess": "defineAsyncComponent",
+  "category": "fact"
+ },
+ {
+  "id": 277,
+  "page": "Fallthrough Attributes",
+  "section": "Disabling Attribute Inheritance",
+  "sentence": "We can achieve this with `inheritAttrs: false` and `[MASK]`:   Remember that [`v-bind` without an argument](/guide/essentials/template-syntax#dynamically-binding-multiple-attributes) binds all the properties of an object as attributes of the target element.",
+  "answer": "v-bind=\"$attrs\"",
+  "closed_book_guess": "$attrs",
+  "category": "equivalent"
+ },
+ {
+  "id": 292,
+  "page": "Component Events",
+  "section": "Events Validation",
+  "sentence": "To add validation, the event is assigned a function that receives the arguments passed to the `[MASK]` call and returns a boolean to indicate whether the event is valid or not.",
+  "answer": "emit",
+  "closed_book_guess": "$emit",
+  "category": "equivalent"
+ },
+ {
+  "id": 314,
+  "page": "Component Registration",
+  "section": "Local Registration",
+  "sentence": "In this case, `[MASK]` will be made available to the current component only, not any of its child or descendant components.",
+  "answer": "ComponentA",
+  "closed_book_guess": "components",
+  "category": "example_name"
+ },
+ {
+  "id": 318,
+  "page": "Slots",
+  "section": "Scoped Slots",
+  "sentence": "Notice how `[MASK]` matches the slot function signature.",
+  "answer": "v-slot=\"receivedProps\"",
+  "closed_book_guess": "slotProps",
+  "category": "example_name"
+ },
+ {
+  "id": 323,
+  "page": "Slots",
+  "section": "Scoped Slots",
+  "sentence": "The example above receives props using a single default slot, by using `[MASK]` directly on the `ChildComponent` tag.",
+  "answer": "v-slot",
+  "closed_book_guess": "v-slot:default",
+  "category": "equivalent"
+ },
+ {
+  "id": 325,
+  "page": "Slots",
+  "section": "Named Scoped Slots",
+  "sentence": "For example:    Using an explicit `<template>` tag for the default slot helps to make it clear that the `[MASK]` prop is not available inside the other slot:  ",
+  "answer": "message",
+  "closed_book_guess": "user",
+  "category": "example_name"
+ },
+ {
+  "id": 329,
+  "page": "Slots",
+  "section": "Fancy List Example",
+  "sentence": "So the desired usage may look like this:   Inside `<FancyList>`, we can render the same `<slot>` multiple times with different item data (notice we are using `[MASK]` to pass an object as slot props):   [Try it in the Playground](https://play.vuejs.org/) ",
+  "answer": "v-bind",
+  "closed_book_guess": "v-bind:=\"{ item }\"",
+  "category": "equivalent"
+ },
+ {
+  "id": 331,
+  "page": "Component v-model",
+  "section": "Under the Hood",
+  "sentence": "This is how you would implement the same child component shown above prior to 3.4:   Then, `[MASK]` in the parent component will be compiled to:   As you can see, it is quite a bit more verbose.",
+  "answer": "v-model=\"foo\"",
+  "closed_book_guess": "defineModel",
+  "category": "fact"
+ },
+ {
+  "id": 335,
+  "page": "Component v-model",
+  "section": "Under the Hood",
+  "sentence": "In the example below, the parent's `myRef` is undefined, but the child's `model` is 1:    Also, when using `withDefaults` with `defineProps`, default values for mutable reference types (like arrays or objects) should be wrapped in functions in `[MASK]` to avoid accidental modification and external side effects.",
+  "answer": "defineModel",
+  "closed_book_guess": "withDefaults",
+  "category": "ambiguous"
+ },
+ {
+  "id": 347,
+  "page": "Class and Style Bindings",
+  "section": "With Components",
+  "sentence": "For example, if we have a component named `[MASK]` with the following template:   Then add some classes when using it:   The rendered HTML will be:   The same is true for class bindings:   When `isActive` is truthy, the rendered HTML will be:   If your component has multiple root elements, you would need to define which element will receive this class.",
+  "answer": "MyComponent",
+  "closed_book_guess": "my-component",
+  "category": "example_name"
+ },
+ {
+  "id": 348,
+  "page": "Class and Style Bindings",
+  "section": "Binding to Objects",
+  "sentence": "For example, if `[MASK]` becomes `true`, the class list will become `\"static active text-danger\"`.",
+  "answer": "hasError",
+  "closed_book_guess": "isActive",
+  "category": "example_name"
+ },
+ {
+  "id": 352,
+  "page": "Class and Style Bindings",
+  "section": "Auto-prefixing",
+  "sentence": " When you use a CSS property that requires a [vendor prefix](https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix) in `[MASK]`, Vue will automatically add the appropriate prefix.",
+  "answer": ":style",
+  "closed_book_guess": "JavaScript",
+  "category": "fact"
+ },
+ {
+  "id": 356,
+  "page": "Class and Style Bindings",
+  "section": "Binding to Objects",
+  "sentence": "For example, if `hasError` becomes `true`, the class list will become `[MASK]`.",
+  "answer": "\"static active text-danger\"",
+  "closed_book_guess": "{ active: true, 'text-danger': true }",
+  "category": "example_name"
+ },
+ {
+  "id": 369,
+  "page": "Computed Properties",
+  "section": "Writable Computed",
+  "sentence": "In the rare cases where you need a \"writable\" computed property, you can create one by providing both a getter and a setter:   Now when you run `[MASK]`, the setter will be invoked and `firstName` and `lastName` will be updated accordingly.",
+  "answer": "fullName.value = 'John Doe'",
+  "closed_book_guess": "fullName = 'John Doe'",
+  "category": "example_name"
+ },
+ {
+  "id": 375,
+  "page": "Computed Properties",
+  "section": "Basic Example",
+  "sentence": "We have to look at it for a second before realizing that it performs a calculation depending on `[MASK]`.",
+  "answer": "author.books",
+  "closed_book_guess": "the value of `author.books`",
+  "category": "equivalent"
+ },
+ {
+  "id": 385,
+  "page": "Event Handling",
+  "section": "Method vs. Inline Detection",
+  "sentence": " The template compiler detects method handlers by checking whether the `[MASK]` value string is a valid JavaScript identifier or property access path.",
+  "answer": "v-on",
+  "closed_book_guess": "v-on argument",
+  "category": "equivalent"
+ },
+ {
+  "id": 415,
+  "page": "List Rendering",
+  "section": "Maintaining State with `key`",
+  "sentence": "To give Vue a hint so that it can track each node's identity, and thus reuse and reorder existing elements, you need to provide a unique `key` attribute for each item:   When using `<template v-for>`, the `key` should be placed on the `[MASK]` container:   Note `key` here is a special attribute being bound with `v-bind`.",
+  "answer": "<template>",
+  "closed_book_guess": "template element",
+  "category": "equivalent"
+ },
+ {
+  "id": 418,
+  "page": "Reactivity Fundamentals",
+  "section": "Caveat when Unwrapping in Templates",
+  "sentence": "a `{{ }}` tag), so the following will render `1`:   This is just a convenience feature of text interpolation and is equivalent to `[MASK]`.",
+  "answer": "{{ object.id.value }}",
+  "closed_book_guess": "String(count.value)",
+  "category": "example_name"
+ },
+ {
+  "id": 424,
+  "page": "Template Refs",
+  "section": "Accessing the Refs",
+  "sentence": " To obtain the reference with Composition API, we can use the [`useTemplateRef()`](/api/composition-api-helpers#usetemplateref) (3.5+) helper:   When using TypeScript, Vue's IDE support and `vue-tsc` will automatically infer the type of `[MASK]` based on what element or component the matching `ref` attribute is used on.",
+  "answer": "input.value",
+  "closed_book_guess": "the ref value",
+  "category": "example_name"
+ },
+ {
+  "id": 426,
+  "page": "Template Refs",
+  "section": "Function Refs",
+  "sentence": "The function receives the element reference as the first argument:   Note we are using a dynamic `[MASK]` binding so we can pass it a function instead of a ref name string.",
+  "answer": ":ref",
+  "closed_book_guess": "ref",
+  "category": "fact"
+ },
+ {
+  "id": 435,
+  "page": "Template Syntax",
+  "section": "Text Interpolation",
+  "sentence": " The most basic form of data binding is text interpolation using the \"Mustache\" syntax (double curly braces):   The mustache tag will be replaced with the value of the `[MASK]` property [from the corresponding component instance](/guide/essentials/reactivity-fundamentals#declaring-reactive-state).",
+  "answer": "msg",
+  "closed_book_guess": "message",
+  "category": "example_name"
+ },
+ {
+  "id": 447,
+  "page": "Watchers",
+  "section": "Once Watchers",
+  "sentence": "If you want the callback to trigger only once when the source changes, use the `[MASK]` option.",
+  "answer": "once: true",
+  "closed_book_guess": "once",
+  "category": "equivalent"
+ },
+ {
+  "id": 449,
+  "page": "Watchers",
+  "section": "`watchEffect()`",
+  "sentence": "Whenever `[MASK]` changes, the callback will be run again.",
+  "answer": "todoId.value",
+  "closed_book_guess": "a dependency",
+  "category": "example_name"
+ },
+ {
+  "id": 451,
+  "page": "Watchers",
+  "section": "Eager Watchers",
+  "sentence": "We can force a watcher's callback to be executed immediately by passing the `[MASK]` option:  ",
+  "answer": "immediate: true",
+  "closed_book_guess": "immediate",
+  "category": "equivalent"
+ },
+ {
+  "id": 454,
+  "page": "Composition API FAQ",
+  "section": "Does Composition API cover all use cases?",
+  "sentence": "Since 3.3 you can directly use `defineOptions` in `<script setup>` to set the component name or `[MASK]` property  If you intend to exclusively use Composition API (along with the options listed above), you can shave a few kbs off your production bundle via a [compile-time flag](/api/compile-time-flags) that drops Options API related code from Vue.",
+  "answer": "inheritAttrs",
+  "closed_book_guess": "other options",
+  "category": "fact"
+ },
+ {
+  "id": 464,
+  "page": "Composition API FAQ",
+  "section": "Does Composition API cover all use cases?",
+  "sentence": "When using Composition API, there are only a few options that may still be needed: `props`, `emits`, `[MASK]`, and `inheritAttrs`.",
+  "answer": "name",
+  "closed_book_guess": "slots",
+  "category": "fact"
+ },
+ {
+  "id": 467,
+  "page": "Reactivity in Depth",
+  "section": "What is Reactivity?",
+  "sentence": "First, in order to re-run the code that updates `[MASK]`, let's wrap it in a function:   Then, we need to define a few terms:  The `update()` function produces a **side effect**, or **effect** for short, because it modifies the state of the program.",
+  "answer": "A2",
+  "closed_book_guess": "document.title",
+  "category": "example_name"
+ },
+ {
+  "id": 468,
+  "page": "Reactivity in Depth",
+  "section": "How Reactivity Works in Vue",
+  "sentence": "But this time we invoke them instead:   Now let's circle back to the `[MASK]` function:   It wraps the raw `update` function in an effect that sets itself as the current active effect before running the actual update.",
+  "answer": "whenDepsChange()",
+  "closed_book_guess": "effect",
+  "category": "example_name"
+ },
+ {
+  "id": 469,
+  "page": "Reactivity in Depth",
+  "section": "How Reactivity Works in Vue",
+  "sentence": "In fact, you may have noticed that it works pretty similarly to the magical `[MASK]` in the example.",
+  "answer": "whenDepsChange()",
+  "closed_book_guess": "Proxy",
+  "category": "example_name"
+ },
+ {
+  "id": 472,
+  "page": "Reactivity in Depth",
+  "section": "How Reactivity Works in Vue",
+  "sentence": "Of course, Vue components use much more efficient ways to update the DOM than `[MASK]`.",
+  "answer": "innerHTML",
+  "closed_book_guess": "document.querySelector()",
+  "category": "example_name"
+ },
+ {
+  "id": 479,
+  "page": "Reactivity Transform",
+  "section": "Reactive Props Destructure",
+  "sentence": "We introduced the `[MASK]` API for this exact purpose, but it's still clunky to use.",
+  "answer": "withDefaults()",
+  "closed_book_guess": "toRefs",
+  "category": "fact"
+ },
+ {
+  "id": 482,
+  "page": "Reactivity Transform",
+  "section": "Refs vs. Reactive Variables",
+  "sentence": "Instead, the Vue compiler uses it as a hint to treat the resulting `[MASK]` variable as a **reactive variable.",
+  "answer": "count",
+  "closed_book_guess": "ref",
+  "category": "example_name"
+ },
+ {
+  "id": 490,
+  "page": "Render Functions & JSX",
+  "section": "Functional Components",
+  "sentence": "However, for functional components that don't explicitly specify their `props`, only the `class`, `style`, and `onXxx` event listeners will be inherited from the `[MASK]` by default.",
+  "answer": "attrs",
+  "closed_book_guess": "parent component",
+  "category": "fact"
+ },
+ {
+  "id": 510,
+  "page": "Vue and Web Components",
+  "section": "Non-Vue Web Components and TypeScript",
+  "sentence": "Using the type helper we can now select the JS properties that should be exposed for type checking in Vue templates:   Suppose that `[MASK]` builds its source TypeScript files into a `dist/` folder.",
+  "answer": "some-lib",
+  "closed_book_guess": "MyElement.ce.vue-tsc.json",
+  "category": "example_name"
+ },
+ {
+  "id": 524,
+  "page": "Introduction",
+  "section": "Options API",
+  "sentence": " With Options API, we define a component's logic using an object of options such as `data`, `methods`, and `[MASK]`.",
+  "answer": "mounted",
+  "closed_book_guess": "computed",
+  "category": "ambiguous"
+ },
+ {
+  "id": 532,
+  "page": "Quick Start",
+  "section": "Using the ES Module Build",
+  "sentence": "Most modern browsers now support ES modules natively, so we can use Vue from a CDN via native ES modules like this:   Notice that we are using `[MASK]`, and the imported CDN URL is pointing to the **ES modules build** of Vue instead.",
+  "answer": "<script type=\"module\">",
+  "closed_book_guess": "importmap",
+  "category": "fact"
+ },
+ {
+  "id": 533,
+  "page": "Quick Start",
+  "section": "Splitting Up the Modules",
+  "sentence": "Due to security reasons, ES modules can only work over the `[MASK]` protocol, which is what the browsers use when opening pages on the web.",
+  "answer": "http://",
+  "closed_book_guess": "http(s)",
+  "category": "equivalent"
+ },
+ {
+  "id": 541,
+  "page": "Quick Start",
+  "section": "Splitting Up the Modules",
+  "sentence": "In order for ES modules to work on our local machine, we need to serve the `index.html` over the `[MASK]` protocol, with a local HTTP server.",
+  "answer": "http://",
+  "closed_book_guess": "http:// or https://",
+  "category": "equivalent"
+ },
+ {
+  "id": 544,
+  "page": "Composables",
+  "section": "Accepting Reactive State",
+  "sentence": "The watch effect will run immediately, and will track any dependencies accessed during `[MASK]`.",
+  "answer": "toValue(url)",
+  "closed_book_guess": "getter function",
+  "category": "example_name"
+ },
+ {
+  "id": 546,
+  "page": "Composables",
+  "section": "Mouse Tracker Example",
+  "sentence": "The same `[MASK]` functionality can now be used in any component.",
+  "answer": "useMouse()",
+  "closed_book_guess": "mouse tracking",
+  "category": "example_name"
+ },
+ {
+  "id": 560,
+  "page": "Custom Directives",
+  "section": "Usage on Components",
+  "sentence": "Unlike attributes, directives can't be passed to a different element with `[MASK]`.",
+  "answer": "v-bind=\"$attrs\"",
+  "closed_book_guess": "v-bind",
+  "category": "equivalent"
+ },
+ {
+  "id": 565,
+  "page": "Custom Directives",
+  "section": "Introduction",
+  "sentence": "In the example above, `[MASK]` can be used in the template as `v-highlight`.",
+  "answer": "vHighlight",
+  "closed_book_guess": "highlightjs",
+  "category": "example_name"
+ },
+ {
+  "id": 566,
+  "page": "Custom Directives",
+  "section": "Hook Arguments",
+  "sentence": "Only available in the `[MASK]` and `updated` hooks.",
+  "answer": "beforeUpdate",
+  "closed_book_guess": "mounted",
+  "category": "fact"
+ },
+ {
+  "id": 570,
+  "page": "Plugins",
+  "section": "Writing a Plugin",
+  "sentence": "The object containing the translated keys should be passed to the plugin during installation via additional parameters to `app.use()`:   Now, our initial expression `$translate('greetings.hello')` will be replaced by `[MASK]` at runtime.",
+  "answer": "Bonjour!",
+  "closed_book_guess": "$translate('greetings.hello')",
+  "category": "example_name"
+ },
+ {
+  "id": 592,
+  "page": "Server-Side Rendering (SSR)",
+  "section": "Rendering an App",
+  "sentence": "We will be using [`express`](https://expressjs.com/) for the next steps:  Run `[MASK]` Create the following `server.js` file:   Finally, run `node server.js` and visit `http://localhost:3000`.",
+  "answer": "npm install express",
+  "closed_book_guess": "npm init -y",
+  "category": "fact"
+ },
+ {
+  "id": 596,
+  "page": "State Management",
+  "section": "Simple State Management with Reactivity API",
+  "sentence": "However, this also means any component importing `[MASK]` can mutate it however they want:   While this works in simple cases, global state that can be arbitrarily mutated by any component is not going to be very maintainable in the long run.",
+  "answer": "store",
+  "closed_book_guess": "state",
+  "category": "example_name"
+ },
+ {
+  "id": 602,
+  "page": "Testing",
+  "section": "Mounting Libraries",
+  "sentence": "It's also the lower-level library `[MASK]` is built on top of.",
+  "answer": "@testing-library/vue",
+  "closed_book_guess": "@vue/test-utils",
+  "category": "fact"
+ },
+ {
+  "id": 607,
+  "page": "Testing",
+  "section": "Mounting Libraries",
+  "sentence": "[`[MASK]`](https://github.com/vuejs/test-utils) is the official low-level component testing library that was written to provide users access to Vue specific APIs.",
+  "answer": "@vue/test-utils",
+  "closed_book_guess": "Vue Test Utils",
+  "category": "equivalent"
+ },
+ {
+  "id": 608,
+  "page": "Testing",
+  "section": "Component Testing",
+  "sentence": "We know nothing about the implementation of Stepper, only that the \"input\" is the `[MASK]` prop and the \"output\" is the state of the DOM as the user will see it.",
+  "answer": "max",
+  "closed_book_guess": "model",
+  "category": "example_name"
+ },
+ {
+  "id": 612,
+  "page": "Testing",
+  "section": "Unit Testing",
+  "sentence": "If any of these assertions fail, it's clear that the issue is contained within the `[MASK]` function.",
+  "answer": "increment",
+  "closed_book_guess": "incrementCounter",
+  "category": "example_name"
+ },
+ {
+  "id": 613,
+  "page": "Tooling",
+  "section": "Note on In-Browser Template Compilation",
+  "sentence": "Build files that do not include `[MASK]` are **full builds**: they include the compiler and support compiling templates directly in the browser.",
+  "answer": ".runtime",
+  "closed_book_guess": "runtime compiler",
+  "category": "fact"
+ },
+ {
+  "id": 624,
+  "page": "TypeScript with Composition API",
+  "section": "Using `<script setup>`",
+  "sentence": "We can also move the props types into a separate interface:   This also works if `[MASK]` is imported from another file such as a relative import, a path alias (e.g., `@/types`), or an external dependency (e.g., `node_modules`).",
+  "answer": "Props",
+  "closed_book_guess": "PropsType",
+  "category": "example_name"
+ },
+ {
+  "id": 625,
+  "page": "TypeScript with Composition API",
+  "section": "Typing Event Handlers",
+  "sentence": "This will also result in a TS error if `\"strict\": true` or `[MASK]` are used in `tsconfig.json`.",
+  "answer": "\"noImplicitAny\": true",
+  "closed_book_guess": "\"strictFunctionTypes\": true",
+  "category": "fact"
+ },
+ {
+  "id": 628,
+  "page": "TypeScript with Options API",
+  "section": "Caveats",
+  "sentence": " If your TypeScript version is less than `4.7`, you have to be careful when using function values for `[MASK]` and `default` prop options - make sure to use arrow functions:   This prevents TypeScript from having to infer the type of `this` inside these functions, which, unfortunately, can cause the type inference to fail.",
+  "answer": "validator",
+  "closed_book_guess": "factory",
+  "category": "fact"
+ },
+ {
+  "id": 642,
+  "page": "Using Vue with TypeScript",
+  "section": "Usage in Single-File Components",
+  "sentence": "When `[MASK]` is present, all template expressions also enjoy stricter type checking.",
+  "answer": "lang=\"ts\"",
+  "closed_book_guess": "strictTemplates",
+  "category": "fact"
+ },
+ {
+  "id": 649,
+  "page": "Using Vue with TypeScript",
+  "section": "Configuring `tsconfig.json`",
+  "sentence": "If you're using Options API, you need to set [`compilerOptions.strict`](https://www.typescriptlang.org/tsconfig#strict) to `true` (or at least enable [`[MASK]`](https://www.typescriptlang.org/tsconfig#noImplicitThis), which is a part of the `strict` flag) to leverage type checking of `this` in component options.",
+  "answer": "compilerOptions.noImplicitThis",
+  "closed_book_guess": "noImplicitThis",
+  "category": "equivalent"
+ },
+ {
+  "id": 655,
+  "page": "Priority A Rules: Essential",
+  "section": "Avoid `v-if` with `v-for`",
+  "sentence": "In these cases, replace `[MASK]` with a new computed property that returns your filtered list (e.g.",
+  "answer": "users",
+  "closed_book_guess": "v-for=\"user in users\"",
+  "category": "example_name"
+ },
+ {
+  "id": 661,
+  "page": "Priority C Rules: Recommended",
+  "section": "Component/instance options order",
+  "sentence": "**Interface** (the interface to the component)  `[MASK]` `props` `emits` `expose`  6.",
+  "answer": "inheritAttrs",
+  "closed_book_guess": "name",
+  "category": "fact"
+ },
+ {
+  "id": 663,
+  "page": "Priority C Rules: Recommended",
+  "section": "Element attribute order",
+  "sentence": "**Unique Attributes** (attributes that require unique values)  `[MASK]` `key`  7.",
+  "answer": "ref",
+  "closed_book_guess": "ref, is, class, style, id, title, lang, dir, content, name, href, src, alt, target, rel, type, value, for, placeholder, ",
+  "category": "ambiguous"
+ },
+ {
+  "id": 678,
+  "page": "Priority B Rules: Strongly Recommended",
+  "section": "Base component names",
+  "sentence": "`[MASK]` may be used in `ButtonSubmit`).",
+  "answer": "BaseButton",
+  "closed_book_guess": "Base components",
+  "category": "example_name"
+ },
+ {
+  "id": 680,
+  "page": "Priority D Rules: Use with Caution",
+  "section": "Element selectors with `scoped`",
+  "sentence": "`[MASK]`) will be considerably slower than class-attribute selectors (e.g.",
+  "answer": "button[data-v-f3f3eg9]",
+  "closed_book_guess": "`p` elements with `scoped`",
+  "category": "example_name"
+ },
+ {
+  "id": 682,
+  "page": "Priority D Rules: Use with Caution",
+  "section": "Implicit parent-child communication",
+  "sentence": "However, there are edge cases where prop mutation or `[MASK]` can simplify two components that are already deeply coupled.",
+  "answer": "this.$parent",
+  "closed_book_guess": "event bus",
+  "category": "fact"
+ },
+ {
+  "id": 683,
+  "page": "Priority D Rules: Use with Caution",
+  "section": "Implicit parent-child communication",
+  "sentence": " Props and events should be preferred for parent-child component communication, instead of `[MASK]` or mutating props.",
+  "answer": "this.$parent",
+  "closed_book_guess": "$parent",
+  "category": "equivalent"
+ }
+]

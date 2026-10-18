@@ -1,0 +1,650 @@
+[
+ {
+  "id": 11,
+  "page": "architecture",
+  "section": "SQL Facade Boundary",
+  "sentence": "Source keys, ACL/RLS checks, and final predicate rechecks stay in `[MASK]`; `context-hybrid` receives only framework-free candidate batches and deterministic branch order.",
+  "answer": "context-pg",
+  "closed_book_guess": "Postgres",
+  "category": "fact"
+ },
+ {
+  "id": 16,
+  "page": "architecture",
+  "section": "Custom Access Method",
+  "sentence": "`[MASK]` owns ANN algorithms and their configuration, but it does not choose the application execution path.",
+  "answer": "context-index",
+  "closed_book_guess": "pgvector",
+  "category": "fact"
+ },
+ {
+  "id": 25,
+  "page": "benchmark_methodology",
+  "section": "Recall Gates",
+  "sentence": "Scalar/SQ8-style quantized candidates with exact rerank: minimum recall `[MASK]`.",
+  "answer": "0.95",
+  "closed_book_guess": "≥ 0.99",
+  "category": "fact"
+ },
+ {
+  "id": 27,
+  "page": "benchmark_methodology",
+  "section": "Delta Thresholds",
+  "sentence": " Release benchmark jobs should compare each metric against the previous accepted baseline with `context-test`'s benchmark delta policy:  latency/search/build elapsed time: review required above `10%` regression; memory/index/vector/codebook bytes: review required above `[MASK]` regression; recall: review required above `0.01` absolute recall drop.",
+  "answer": "5%",
+  "closed_book_guess": "10%",
+  "category": "fact"
+ },
+ {
+  "id": 31,
+  "page": "benchmark_methodology",
+  "section": "Release Report Runner",
+  "sentence": "Release benchmark evidence is approved only when the report summary says `[MASK]`.",
+  "answer": "Approval: complete",
+  "closed_book_guess": "PASS",
+  "category": "fact"
+ },
+ {
+  "id": 33,
+  "page": "benchmark_methodology",
+  "section": "Delta Thresholds",
+  "sentence": " Release benchmark jobs should compare each metric against the previous accepted baseline with `context-test`'s benchmark delta policy:  latency/search/build elapsed time: review required above `[MASK]` regression; memory/index/vector/codebook bytes: review required above `5%` regression; recall: review required above `0.01` absolute recall drop.",
+  "answer": "10%",
+  "closed_book_guess": "2%",
+  "category": "fact"
+ },
+ {
+  "id": 34,
+  "page": "build_profile_2026-07",
+  "section": "HNSW Build Phase Profile",
+  "sentence": " This profile records where bulk-build time actually goes, measured with `pgcontext.hnsw_build_stats()` (phase timing recorded by the build callback) on Apple M4 Pro, PostgreSQL 17.9, release build, `m=16`, `ef_construction=64`, 384-dimensional uniform-random vectors, `[MASK]` sized above the estimate.",
+  "answer": "maintenance_work_mem",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "fuzzing",
+  "section": "Campaigns",
+  "sentence": "Release candidates should use the campaign runner so every target writes a log, Markdown report, and TSV summary under `target/fuzz-campaigns/`:   The release-gates workflow exposes the same runner as a manual `[MASK]` path.",
+  "answer": "workflow_dispatch",
+  "closed_book_guess": "workflow",
+  "category": "fact"
+ },
+ {
+  "id": 47,
+  "page": "fuzzing",
+  "section": "Campaigns",
+  "sentence": "`[MASK]` only changes scheduling; it does not lower duration, target, clean-tree, or artifact requirements.",
+  "answer": "--jobs",
+  "closed_book_guess": "Campaign mode",
+  "category": "fact"
+ },
+ {
+  "id": 60,
+  "page": "hnsw_callback_contract",
+  "section": "Inventory",
+  "sentence": "It returns an immutable static `[MASK]`, accepts no input, performs no allocation, and cannot invoke Rust code that may panic.",
+  "answer": "Pg_finfo_record",
+  "closed_book_guess": "value",
+  "category": "fact"
+ },
+ {
+  "id": 62,
+  "page": "hnsw_callback_contract",
+  "section": "Pointer And Ownership Rules",
+  "sentence": "Counted arrays use length-bearing `[MASK]` capabilities.",
+  "answer": "PgCallbackSlice<T>",
+  "closed_book_guess": "slice",
+  "category": "fact"
+ },
+ {
+  "id": 66,
+  "page": "hnsw_callback_contract",
+  "section": "Inventory",
+  "sentence": "`[MASK]` is the sole unguarded exported helper.",
+  "answer": "pg_finfo_pgcontext_hnsw_handler",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 74,
+  "page": "hnsw_storage_contract",
+  "section": "MVCC, Tombstones, And Source Recheck",
+  "sentence": "`tuples_removed` counts newly published tombstones cumulatively, `[MASK]` counts candidate-bearing nodes, and `estimated_count` mirrors `IndexVacuumInfo::estimated_count` once the live adapter is implemented.",
+  "answer": "num_index_tuples",
+  "closed_book_guess": "tuples_remaining",
+  "category": "fact"
+ },
+ {
+  "id": 86,
+  "page": "real_semantic_models",
+  "section": "Optional real semantic model tests",
+  "sentence": "`[MASK]` exercises P13 embeddings.",
+  "answer": "sentence-transformers/all-MiniLM-L6-v2",
+  "closed_book_guess": "real_semantic_model_test",
+  "category": "ambiguous"
+ },
+ {
+  "id": 93,
+  "page": "real_semantic_models",
+  "section": "Optional real semantic model tests",
+  "sentence": "The installer requires `[MASK]` and Python 3.12.",
+  "answer": "uv",
+  "closed_book_guess": "pgTAP",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "release_matrix",
+  "section": "Gate Tiers",
+  "sentence": "Use the local matrix runner to capture auditable fast, pgrx, and heavy gate evidence:   Use `--mode fast`, `[MASK]`, `--mode pgrx`, or `--mode heavy` to rerun one gate tier.",
+  "answer": "--mode schema",
+  "closed_book_guess": "--mode all",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "release_matrix",
+  "section": "Gate Tiers",
+  "sentence": "The release-gates workflow also runs the all-major report directly with `scripts/run-postgres-matrix-gates.sh --mode all --out-dir target/postgres-matrix/all-postgres`[MASK]`combined-postgres-matrix-report`.",
+  "answer": " and uploads it as ",
+  "closed_book_guess": "/--report-name=",
+  "category": "ambiguous"
+ },
+ {
+  "id": 110,
+  "page": "release_process",
+  "section": "Public Contracts",
+  "sentence": "Review new public enums and structs for `[MASK]` unless the type is intentionally closed.",
+  "answer": "#[non_exhaustive]",
+  "closed_book_guess": "exhaustiveness",
+  "category": "fact"
+ },
+ {
+  "id": 116,
+  "page": "release_process",
+  "section": "Required Gates",
+  "sentence": "`[MASK]` normalizes pgrx connected-object ordering before comparing the checked-in SQL artifact, because cargo-pgrx can emit equivalent object blocks in different orders.",
+  "answer": "scripts/check-extension-sql-artifact.sh",
+  "closed_book_guess": "cargo fmt",
+  "category": "fact"
+ },
+ {
+  "id": 118,
+  "page": "release_process",
+  "section": "Public Contracts",
+  "sentence": "Public Rust APIs should have rustdoc with `[MASK]` and `# Safety` sections where applicable.",
+  "answer": "# Errors",
+  "closed_book_guess": "# Examples",
+  "category": "ambiguous"
+ },
+ {
+  "id": 120,
+  "page": "repository_map",
+  "section": "Repository Map",
+  "sentence": "PostgreSQL-specific types, SPI, SQLSTATE mapping, and FFI stay in `context-pg`; validated storage unsafe work stays in `[MASK]`.",
+  "answer": "context-storage",
+  "closed_book_guess": "context-core",
+  "category": "fact"
+ },
+ {
+  "id": 121,
+  "page": "scripts",
+  "section": "Scripts and Generated Contracts",
+  "sentence": "`[MASK]` writes a deterministic checked-in or staged artifact.",
+  "answer": "scripts/generate-*",
+  "closed_book_guess": "pg_context_generate_contracts",
+  "category": "fact"
+ },
+ {
+  "id": 122,
+  "page": "scripts",
+  "section": "Scripts and Generated Contracts",
+  "sentence": " Scripts are grouped by responsibility:  `[MASK]` validates a bounded repository or public contract.",
+  "answer": "scripts/check-*",
+  "closed_book_guess": "contract-checker",
+  "category": "fact"
+ },
+ {
+  "id": 128,
+  "page": "security_review",
+  "section": "Security Review",
+  "sentence": "The report includes:  the full pgrx suite executed inside PostgreSQL, including hostile `[MASK]`, shadow-catalog, telemetry privacy, source-table ACL/RLS, point-mutation denial, and SQLSTATE contract tests; unsafe `SAFETY:` comment checks; heavy RLS/ACL boundary coverage; heavy-wrapper SQLSTATE contract coverage for the configured PostgreSQL major.",
+  "answer": "search_path",
+  "closed_book_guess": "extension tests",
+  "category": "fact"
+ },
+ {
+  "id": 156,
+  "page": "unsafe_review",
+  "section": "Current Review",
+  "sentence": "`[MASK]` writes the same eight rows and per-row logs without invoking Cargo, Miri, sanitizers, or PostgreSQL.",
+  "answer": "--dry-run",
+  "closed_book_guess": "I can’t determine the code term from the sentence alone.",
+  "category": "fact"
+ },
+ {
+  "id": 157,
+  "page": "vector_engine",
+  "section": "PostgreSQL-page graph",
+  "sentence": "Construction uses the standard hierarchical shape:  base layer degree is bounded by `[MASK]`; upper layers are bounded by `m`; `ef_construction` controls bounded candidate exploration; the diversity heuristic rejects a candidate when a previously selected neighbor is closer to it than the new node is; rewires are bidirectional and pruned with the same deterministic heuristic.",
+  "answer": "2 * m",
+  "closed_book_guess": "m0",
+  "category": "ambiguous"
+ },
+ {
+  "id": 186,
+  "page": "api_reference",
+  "section": "Experimental APIs",
+  "sentence": "`pgcontext.heartbeat_document_chunk_job`, `pgcontext.checkpoint_document_chunk_job`, `pgcontext.fail_document_chunk_job`, `[MASK]`, and `pgcontext.retry_document_chunk_job` manage bounded leased work.",
+  "answer": "pgcontext.cancel_document_chunk_job",
+  "closed_book_guess": "pgcontext.complete_document_chunk_job",
+  "category": "ambiguous"
+ },
+ {
+  "id": 193,
+  "page": "api_reference",
+  "section": "Experimental APIs",
+  "sentence": "If a previous `running` or `cancel_requested` row for the same target belongs to a backend that no longer appears in `pg_stat_activity`, it is first recorded as `[MASK]` so a replacement build can start without manual catalog repair.",
+  "answer": "abandoned",
+  "closed_book_guess": "failed",
+  "category": "fact"
+ },
+ {
+  "id": 225,
+  "page": "collections",
+  "section": "Mutate Registered Payload Fields",
+  "sentence": "For registered JSONB paths, `[MASK]` writes the value with `jsonb_set(..., create_missing := true)`.",
+  "answer": "set_payload",
+  "closed_book_guess": "set_payload_field",
+  "category": "fact"
+ },
+ {
+  "id": 231,
+  "page": "exact_first_readiness",
+  "section": "Lifecycle",
+  "sentence": "The controller protocol is `exact_first_advisor` → `apply_exact_first_plan(..., 'enqueue')` → `[MASK]` → top-level DDL → `publish_exact_first_build`.",
+  "answer": "claim_exact_first_build",
+  "closed_book_guess": "run_exact_first_build",
+  "category": "fact"
+ },
+ {
+  "id": 234,
+  "page": "exact_first_readiness",
+  "section": "Lifecycle",
+  "sentence": "`[MASK]`: relation, key, column, type, typmod, or collation identity drifted.",
+  "answer": "stale",
+  "closed_book_guess": "schema_identity",
+  "category": "fact"
+ },
+ {
+  "id": 237,
+  "page": "exact_first_readiness",
+  "section": "Lifecycle",
+  "sentence": "`apply_foreground` uses non-concurrent `[MASK]` in the calling transaction and therefore suits only explicitly reviewed maintenance windows.",
+  "answer": "CREATE INDEX",
+  "closed_book_guess": "REINDEX",
+  "category": "fact"
+ },
+ {
+  "id": 241,
+  "page": "exact_first_readiness",
+  "section": "Lifecycle",
+  "sentence": "`[MASK]`: exact search remains available while a fenced job is active.",
+  "answer": "building",
+  "closed_book_guess": "Fallback",
+  "category": "fact"
+ },
+ {
+  "id": 254,
+  "page": "filters",
+  "section": "Filters",
+  "sentence": "Boolean filters use `must`, `should`, and `must_not` arrays:   The parser currently accepts scalar `match` values, `match.value`, `match.any`, `[MASK]`, `range` bounds (`gt`, `gte`, `lt`, `lte`), `is_null`, and `is_empty`.",
+  "answer": "match.except",
+  "closed_book_guess": "match_all",
+  "category": "fact"
+ },
+ {
+  "id": 256,
+  "page": "hybrid_retrieval",
+  "section": "Explain a Hybrid Query",
+  "sentence": "The lexical stage reports the registered configuration and ranker, and its `strategy` is `lexical_exact`, `[MASK]`, or `lexical_gist`.",
+  "answer": "lexical_gin",
+  "closed_book_guess": "lexical_hybrid",
+  "category": "fact"
+ },
+ {
+  "id": 270,
+  "page": "indexes",
+  "section": "Index Status",
+  "sentence": "Use `pgcontext.index_diagnostics(index_name)` when an operator needs a typed serving decision plus repair advice:   The diagnostic `status` is `Ready`, `IndexNotReady`, `[MASK]`, or `UnsupportedAccessMethod`.",
+  "answer": "IndexCorrupt",
+  "closed_book_guess": "IndexInvalid",
+  "category": "fact"
+ },
+ {
+  "id": 278,
+  "page": "installation",
+  "section": "PGXN source installation",
+  "sentence": "Prerequisites:  Rust 1.96.0; `cargo-pgrx` 0.19.1; PostgreSQL 17 or 18 server development headers and `[MASK]`; a C linker and ordinary build tools; `pgxnclient` for the `pgxn install` command.",
+  "answer": "pg_config",
+  "closed_book_guess": "libclang-dev",
+  "category": "fact"
+ },
+ {
+  "id": 280,
+  "page": "installation",
+  "section": "PGXN source installation",
+  "sentence": "Replace `[MASK]` with `--pg18` when the selected `pg_config` belongs to PostgreSQL 18.",
+  "answer": "--pg17",
+  "closed_book_guess": "--pg18",
+  "category": "fact"
+ },
+ {
+  "id": 283,
+  "page": "installation",
+  "section": "Uninstall",
+  "sentence": " Remove the extension from each database before deleting installed files, and drop dependent objects only after review:   Then remove the installed files with the method you installed by: `[MASK]` for a source build, or removing the container and volume for Docker (`scripts/quickstart.sh clean`).",
+  "answer": "make uninstall PG_CONFIG=...",
+  "closed_book_guess": "make uninstall",
+  "category": "equivalent"
+ },
+ {
+  "id": 285,
+  "page": "installation",
+  "section": "Homebrew",
+  "sentence": " The [Evokoa Homebrew tap](https://github.com/Evokoa/homebrew-tap) builds pgContext 0.3.0 against Homebrew `[MASK]` and installs the PostgreSQL extension files:   The formula does not install a standalone `pgcontext` shell command.",
+  "answer": "postgresql@17",
+  "closed_book_guess": "libpq",
+  "category": "fact"
+ },
+ {
+  "id": 286,
+  "page": "installation",
+  "section": "Prebuilt Docker image",
+  "sentence": "Every major has immutable `[MASK]` and `pgMAJOR-0.3.0` aliases plus a rolling `pgMAJOR` alias.",
+  "answer": "pgMAJOR-v0.3.0",
+  "closed_book_guess": "pgMAJOR-0.3",
+  "category": "fact"
+ },
+ {
+  "id": 290,
+  "page": "lazy_hnsw_cursor",
+  "section": "Bounds and termination",
+  "sentence": "They are `exhausted`, `cancelled`, `comparison_budget`, `[MASK]`, `edge_budget`, `memory_budget`, or `adapter_error`.",
+  "answer": "expansion_budget",
+  "closed_book_guess": "result_limit",
+  "category": "fact"
+ },
+ {
+  "id": 293,
+  "page": "lazy_hnsw_cursor",
+  "section": "Bounds and termination",
+  "sentence": "They are `exhausted`, `cancelled`, `comparison_budget`, `expansion_budget`, `edge_budget`, `[MASK]`, or `adapter_error`.",
+  "answer": "memory_budget",
+  "closed_book_guess": "result_limit",
+  "category": "fact"
+ },
+ {
+  "id": 295,
+  "page": "lazy_hnsw_cursor",
+  "section": "Bounds and termination",
+  "sentence": "They are `exhausted`, `cancelled`, `[MASK]`, `expansion_budget`, `edge_budget`, `memory_budget`, or `adapter_error`.",
+  "answer": "comparison_budget",
+  "closed_book_guess": "completed",
+  "category": "fact"
+ },
+ {
+  "id": 296,
+  "page": "lazy_hnsw_cursor",
+  "section": "Bounds and termination",
+  "sentence": "They are `exhausted`, `[MASK]`, `comparison_budget`, `expansion_budget`, `edge_budget`, `memory_budget`, or `adapter_error`.",
+  "answer": "cancelled",
+  "closed_book_guess": "terminated",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "lexical_retrieval",
+  "section": "Inspecting registrations",
+  "sentence": "Registration, index attachment, and drops require collection ownership; every path additionally requires source-relation `[MASK]`.",
+  "answer": "SELECT",
+  "closed_book_guess": "ownership",
+  "category": "fact"
+ },
+ {
+  "id": 313,
+  "page": "limitations",
+  "section": "Retrieval maturity",
+  "sentence": "`[MASK]` is not an installation requirement.",
+  "answer": "pg_trgm",
+  "closed_book_guess": "pgvector",
+  "category": "ambiguous"
+ },
+ {
+  "id": 320,
+  "page": "limitations",
+  "section": "Semantic models and chunking",
+  "sentence": "The detached envelope and PostgreSQL finalization boundary are implemented and a revision-pinned MiniLM cross-encoder passes the optional local smoke, but a general transformer backend is not integrated into `[MASK]`.",
+  "answer": "pgcontext-worker",
+  "closed_book_guess": "pgContext",
+  "category": "fact"
+ },
+ {
+  "id": 324,
+  "page": "metric_semantics",
+  "section": "Definitions and Ordering",
+  "sentence": "Half-vector values are widened to `[MASK]` before calculation.",
+  "answer": "f32",
+  "closed_book_guess": "float32",
+  "category": "equivalent"
+ },
+ {
+  "id": 363,
+  "page": "parity_matrix",
+  "section": "pgvector and Qdrant Parity Matrix",
+  "sentence": "`[MASK]`: implemented for pgContext composition, with no public SQL promise.",
+  "answer": "internal",
+  "closed_book_guess": "Hybrid search",
+  "category": "fact"
+ },
+ {
+  "id": 377,
+  "page": "pgvector_migration",
+  "section": "Current Gaps",
+  "sentence": " Experimental SQL wrappers exist for `[MASK]`, `sparsevec`, and pgContext's `bitvec` bit-vector type.",
+  "answer": "halfvec",
+  "closed_book_guess": "vector",
+  "category": "fact"
+ },
+ {
+  "id": 378,
+  "page": "pgvector_migration",
+  "section": "Current Gaps",
+  "sentence": "`sparsevec` also supports `[MASK]` typmods, a structured constructor from aligned `integer[]` indexes and `real[]` values plus canonical index/value accessors, dense `real[]`/`vector` casts, and sum/average aggregates.",
+  "answer": "sparsevec(n)",
+  "closed_book_guess": "dimensioned",
+  "category": "ambiguous"
+ },
+ {
+  "id": 383,
+  "page": "pgvector_migration",
+  "section": "Migrating from pgvector",
+  "sentence": "The extensions can be installed in either order because pgvector owns `[MASK]` types while pgContext owns canonical `pgcontext.*` types.",
+  "answer": "public.*",
+  "closed_book_guess": "vector types",
+  "category": "fact"
+ },
+ {
+  "id": 385,
+  "page": "pgvector_migration",
+  "section": "Current Gaps",
+  "sentence": "Bitvec remains explicit—choose `[MASK]` or `pgcontext.bitvec_hnsw_jaccard_ops`; a default `pgcontext_hnsw` attempt still fails with SQLSTATE `42704` rather than guessing a bit metric.",
+  "answer": "pgcontext.bitvec_hnsw_hamming_ops",
+  "closed_book_guess": "pgcontext.bitvec_hnsw_ops",
+  "category": "fact"
+ },
+ {
+  "id": 391,
+  "page": "playground",
+  "section": "Playground",
+  "sentence": "Remove all disposable state with `[MASK]`.",
+  "answer": "scripts/quickstart.sh clean",
+  "closed_book_guess": "DROP SCHEMA CASCADE",
+  "category": "fact"
+ },
+ {
+  "id": 398,
+  "page": "quickstart",
+  "section": "Create a Collection",
+  "sentence": "Keep `[MASK]` for single-vector exact or ANN-style retrieval.",
+  "answer": "pgcontext.search",
+  "closed_book_guess": "vector(1536)",
+  "category": "fact"
+ },
+ {
+  "id": 407,
+  "page": "release_notes",
+  "section": "Semantic reranking without bundled weights",
+  "sentence": "`[MASK]` validates the untrusted response, rejects added or duplicate candidates, and rereads every result under current source hash, version, deletion, filter, ACL, and RLS state.",
+  "answer": "finalize_semantic_rerank",
+  "closed_book_guess": "Semantic reranking",
+  "category": "fact"
+ },
+ {
+  "id": 409,
+  "page": "release_notes",
+  "section": "pgvector companion removal",
+  "sentence": " The separate `[MASK]` companion extension is retired and is not packaged.",
+  "answer": "pgcontext_pgvector",
+  "closed_book_guess": "pgvector",
+  "category": "fact"
+ },
+ {
+  "id": 417,
+  "page": "retrieval_methods",
+  "section": "Lexical (Full-Text) Retrieval",
+  "sentence": "Fuzzy: `[MASK]` plus `pgcontext.query_fuzzy` over optional `pg_trgm`, in `similarity`, `word_similarity`, or `strict_word_similarity` mode.",
+  "answer": "pgcontext.register_fuzzy_source",
+  "closed_book_guess": "pg_trgm indexes",
+  "category": "fact"
+ },
+ {
+  "id": 419,
+  "page": "retrieval_methods",
+  "section": "Lexical (Full-Text) Retrieval",
+  "sentence": "**Experimental**; `[MASK]` is not an install requirement.",
+  "answer": "pg_trgm",
+  "closed_book_guess": "pg_textsearch",
+  "category": "ambiguous"
+ },
+ {
+  "id": 422,
+  "page": "retrieval_methods",
+  "section": "Lexical (Full-Text) Retrieval",
+  "sentence": "Typed branch: `[MASK]` with the `plain`, `structured`, `phrase`, `web_search`, `prefix`, `distance`, `boolean`, `weight_restricted`, and `registered_tsquery` forms.",
+  "answer": "pgcontext.query_lexical",
+  "closed_book_guess": "tsquery",
+  "category": "fact"
+ },
+ {
+  "id": 429,
+  "page": "roadmap",
+  "section": "pgContext crate and dependency boundary",
+  "sentence": "`[MASK]` does not depend on `context-query`; `context-build` constructs topology projections from authoritative edge rows, while `context-storage` provides generic versioned segment and mapping machinery.",
+  "answer": "context-topology",
+  "closed_book_guess": "pgContext",
+  "category": "fact"
+ },
+ {
+  "id": 433,
+  "page": "roadmap",
+  "section": "PostgreSQL-Native Lexical Retrieval",
+  "sentence": "Registered lexical sources bind ordered weighted text or JSON-path fields, or a stored/generated `tsvector` column, to a resolved text-search configuration, ranker, normalization, rank weights, and optional per-row `[MASK]`.",
+  "answer": "tsquery",
+  "closed_book_guess": "filter",
+  "category": "fact"
+ },
+ {
+  "id": 441,
+  "page": "security",
+  "section": "Security-Definer Review Notes",
+  "sentence": "They set a fixed `search_path` of `pg_catalog`, `pgcontext`, and `[MASK]`; resolve user relations through registered catalog metadata or validated qualified names; and still check the SQL session user before exposing source rows or mutating collection-owned metadata.",
+  "answer": "public",
+  "closed_book_guess": "pg_temp",
+  "category": "fact"
+ },
+ {
+  "id": 453,
+  "page": "semantic_reranking",
+  "section": "Register a source",
+  "sentence": "It needs a single-column primary key named `id`, one `[MASK]` column, and one positive `bigint` source version column.",
+  "answer": "text",
+  "closed_book_guess": "vector",
+  "category": "fact"
+ },
+ {
+  "id": 454,
+  "page": "semantic_reranking",
+  "section": "Failure policy",
+  "sentence": "`allow_fused_fallback` may return the stored fused order for the operational reasons `unavailable`, `timeout`, `crash`, `partial_output`, or `[MASK]`:   Fallback is visible as `status = \"degraded_reranker\"` and includes a bounded `degraded_reason`.",
+  "answer": "expired",
+  "closed_book_guess": "invalid_output",
+  "category": "fact"
+ },
+ {
+  "id": 463,
+  "page": "sql_object_inventory",
+  "section": "Aggregate Identities",
+  "sentence": " `pgcontext.avg(halfvec) (` `[MASK]` `pgcontext.avg(sparsevec) (` `pgcontext.avg(uint8vec) (` `pgcontext.avg(vector) (` `pgcontext.bit_and(bitvec) (` `pgcontext.bit_or(bitvec) (` `pgcontext.sum(halfvec) (` `pgcontext.sum(int8vec) (` `pgcontext.sum(sparsevec) (` `pgcontext.sum(uint8vec) (` `pgcontext.sum(vector) (` ",
+  "answer": "pgcontext.avg(int8vec) (",
+  "closed_book_guess": "pgcontext.avg(int8vec)",
+  "category": "equivalent"
+ },
+ {
+  "id": 479,
+  "page": "storage",
+  "section": "Rebuildable Storage Artifacts",
+  "sentence": "`pgcontext.publish_artifact_segment_file(build_job_id bigint, segment bytea)` performs the same validation, writes the bytes through the context-storage atomic writer under a generated PostgreSQL data-directory-relative `pgcontext_artifacts/...` path, reloads the file through the validator, and records the generated relative path with `[MASK]` lifecycle state.",
+  "answer": "file_materialized",
+  "closed_book_guess": "published",
+  "category": "fact"
+ },
+ {
+  "id": 481,
+  "page": "storage",
+  "section": "Rebuildable Storage Artifacts",
+  "sentence": "`pgcontext.artifact_segment_diagnostics(collection text)` reloads file-materialized manifests through the segment loader, rejects catalog paths that escape `pgcontext_artifacts/...`, and reports constrained text statuses: `ready`, `metadata_only`, `artifact_missing`, `checksum_mismatch`, `artifact_corrupt`, `metadata_mismatch`, or `[MASK]`.",
+  "answer": "path_rejected",
+  "closed_book_guess": "artifact_unavailable",
+  "category": "fact"
+ },
+ {
+  "id": 505,
+  "page": "vector_search",
+  "section": "Sparse Vector Core",
+  "sentence": "Build the metric-matched index and bind its schema-qualified identity to the sparse registration:   Use `sparsevec_hnsw_ip_ops`, `sparsevec_hnsw_cosine_ops`, or `[MASK]` for the corresponding registered metric.",
+  "answer": "sparsevec_hnsw_l1_ops",
+  "closed_book_guess": "sparsevec_hnsw_l2_ops",
+  "category": "fact"
+ },
+ {
+  "id": 506,
+  "page": "vector_search",
+  "section": "Exact Search Baseline",
+  "sentence": "Both branches are exact table scans and are fused with reciprocal-rank fusion:   Use `[MASK]` for exact recommendation search from positive and negative examples.",
+  "answer": "pgcontext.recommend",
+  "closed_book_guess": "recommendation_search_exact",
+  "category": "fact"
+ },
+ {
+  "id": 509,
+  "page": "vector_search",
+  "section": "Late-Interaction Rerank",
+  "sentence": "Query vectors must share one dimension and match the token column's declared `[MASK]` dimension; mismatches use SQLSTATE `22023`.",
+  "answer": "vector(n)",
+  "closed_book_guess": "vector dimension",
+  "category": "ambiguous"
+ }
+]

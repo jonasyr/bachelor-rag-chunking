@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D1 im Leitfaden; Quelle: Chat, ersetzt FastAPI aus der Baseline); Ausschnitt und Commit konkretisiert durch [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0025](0025-korpus-guide-api-styleguide.md), die Konsequenz „Ausschnitt noch offen“ ist damit erledigt
+Angenommen (D1 im Leitfaden; Quelle: Chat, ersetzt FastAPI aus der Baseline); Ausschnitt und Commit konkretisiert durch [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0025](0025-korpus-guide-api-styleguide.md), die Konsequenz „Ausschnitt noch offen“ ist damit erledigt; ersetzt durch [ADR 0038](0038-korpus-enroute.md) (18.10.2026: Korpus Enroute, weil das Antwortmodell Vue.js kennt)
 
 ## Kontext
 

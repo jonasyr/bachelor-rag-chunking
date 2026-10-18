@@ -1,0 +1,641 @@
+[
+ {
+  "id": 0,
+  "page": "Accessibility",
+  "section": "One interaction contract",
+  "sentence": "`[MASK]` identifies the unit, `value` is that unit's primary encoded number (`null` when the unit encodes nothing), and `formatted` is the exact string the chart's own readout chip would show.",
+  "answer": "index",
+  "closed_book_guess": "unit",
+  "category": "fact"
+ },
+ {
+  "id": 2,
+  "page": "Accessibility",
+  "section": "One interaction contract",
+  "sentence": "`[MASK]` fires as the active unit changes; `onSelect` fires on selection.",
+  "answer": "onActive",
+  "closed_book_guess": "onActiveChange",
+  "category": "fact"
+ },
+ {
+  "id": 6,
+  "page": "Accessibility",
+  "section": "Internationalization and RTL",
+  "sentence": "Spread `EN`, override the keys you're translating, and pass the result as `[MASK]` — static and `/interactive` entries both accept it, so a server-rendered chart localizes without shipping any client JavaScript.",
+  "answer": "strings",
+  "closed_book_guess": "labels",
+  "category": "fact"
+ },
+ {
+  "id": 7,
+  "page": "Accessibility",
+  "section": "Internationalization and RTL",
+  "sentence": "Or override the whole sentence with a `[MASK]` string.",
+  "answer": "summary",
+  "closed_book_guess": "ariaLabelTemplate",
+  "category": "fact"
+ },
+ {
+  "id": 21,
+  "page": "AI-native",
+  "section": "Machine-readable surfaces",
+  "sentence": "Appending `[MASK]` always works; the negotiation is a convenience on top.",
+  "answer": ".md",
+  "closed_book_guess": ".json",
+  "category": "fact"
+ },
+ {
+  "id": 24,
+  "page": "Annotations",
+  "section": "The vocabulary",
+  "sentence": "`[MASK]` is required; `y` is optional and defaults to the frame's mid-height.",
+  "answer": "label",
+  "closed_book_guess": "x",
+  "category": "fact"
+ },
+ {
+  "id": 35,
+  "page": "Annotations",
+  "section": "Rendering rules",
+  "sentence": "The `[MASK]` elbow is the exception, drawn a shade lighter at 0.75, because it's a leader line pointing at data rather than a reference the reader measures against.",
+  "answer": "Callout",
+  "closed_book_guess": "annotation",
+  "category": "fact"
+ },
+ {
+  "id": 37,
+  "page": "ActivityGrid",
+  "section": "Variants",
+  "sentence": "label=\"grid (default) vs strip\" code={`const commits = [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1];   data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]} cell={12} title=\"Grid\" / data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]} layout=\"strip\" cell={12} title=\"Strip\" /  `[MASK]` swaps the cell mark without changing the data or the levels.",
+  "answer": "shape",
+  "closed_book_guess": "variant",
+  "category": "fact"
+ },
+ {
+  "id": 38,
+  "page": "ActivityGrid",
+  "section": "Variants",
+  "sentence": "`\"round\"` softens the grid for product surfaces; `[MASK]` adds space between cells in dense strips.",
+  "answer": "\"dot\"",
+  "closed_book_guess": "\"gap\"",
+  "category": "fact"
+ },
+ {
+  "id": 43,
+  "page": "ActivityGrid",
+  "section": "Variants",
+  "sentence": "`[MASK]` softens the grid for product surfaces; `\"dot\"` adds space between cells in dense strips.",
+  "answer": "\"round\"",
+  "closed_book_guess": "\"soft\"",
+  "category": "fact"
+ },
+ {
+  "id": 62,
+  "page": "BreathingDot",
+  "section": "Edge cases",
+  "sentence": "     An unknown value (`null` or `[MASK]`) turns the dot gray, drops its ring, and **never pulses**, so an unknown system never renders as a calm one.",
+  "answer": "NaN",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 64,
+  "page": "BreathingDot",
+  "section": "Sizing",
+  "sentence": " One `size` prop, in viewBox units, sets the glyph box — it defaults to `[MASK]`, about the height of a line of body text.",
+  "answer": "16",
+  "closed_book_guess": "24",
+  "category": "fact"
+ },
+ {
+  "id": 74,
+  "page": "BurnChart",
+  "section": "Edge cases",
+  "sentence": "A single `[MASK]` point draws no projection at all: the fit needs at least two.",
+  "answer": "actual",
+  "closed_book_guess": "data",
+  "category": "fact"
+ },
+ {
+  "id": 75,
+  "page": "BurnChart",
+  "section": "Edge cases",
+  "sentence": "A stalled burn (`[MASK]` flat) never reaches zero, so `finishes` is `false` and the summary says so outright (\"not finishing at the current pace\") rather than extrapolating a landing date.",
+  "answer": "actual",
+  "closed_book_guess": "remaining",
+  "category": "fact"
+ },
+ {
+  "id": 79,
+  "page": "CalendarStrip",
+  "section": "Variants",
+  "sentence": "`cell`/`[MASK]` bump the edge length and spacing directly — grid-sibling parity with ActivityGrid and GardenGrid.",
+  "answer": "gap",
+  "closed_book_guess": "cells",
+  "category": "fact"
+ },
+ {
+  "id": 80,
+  "page": "CalibrationStrip",
+  "section": "Variants",
+  "sentence": "It localizes the announced numbers: with `[MASK]` the accessible name above reads \"3 bins; largest gap at 0,7 predicted (observed 0,52); 0 low-support bins.\" — the locale's own decimal mark, not \"0.7\".",
+  "answer": "locale=\"de-DE\"",
+  "closed_book_guess": "locale=\"de\"",
+  "category": "ambiguous"
+ },
+ {
+  "id": 99,
+  "page": "CometTrail",
+  "section": "Motion, and reduced motion",
+  "sentence": "Under `[MASK]` the head repositions instantly, since the static encoding is already complete.",
+  "answer": "prefers-reduced-motion",
+  "closed_book_guess": "reduced motion",
+  "category": "equivalent"
+ },
+ {
+  "id": 111,
+  "page": "Constellation",
+  "section": "When to use it",
+  "sentence": "For dense event streams reach for `Seismogram` or `[MASK]`; for a continuous trend, `Sparkline`.",
+  "answer": "EventTimeline",
+  "closed_book_guess": "Constellation",
+  "category": "fact"
+ },
+ {
+  "id": 129,
+  "page": "DataDiff",
+  "section": "Variants",
+  "sentence": "One symmetric scale spans every row, so a big change never shrinks to fit a small one; to compare across charts, pass them a shared `[MASK]`.",
+  "answer": "domain",
+  "closed_book_guess": "scale",
+  "category": "fact"
+ },
+ {
+  "id": 133,
+  "page": "Delta",
+  "section": "Variants",
+  "sentence": "`[MASK]` also takes `Intl.NumberFormatOptions` — with a `locale`, the magnitude follows that locale's own grouping and decimal marks (a German reader sees a comma decimal and a space before the `%`, not a period).",
+  "answer": "format",
+  "closed_book_guess": "Delta",
+  "category": "fact"
+ },
+ {
+  "id": 135,
+  "page": "Delta",
+  "section": "Variants",
+  "sentence": "Pass `[MASK]` for currency, counts, or any other unit.",
+  "answer": "format",
+  "closed_book_guess": "unit",
+  "category": "fact"
+ },
+ {
+  "id": 170,
+  "page": "EtaBar",
+  "section": "EtaBar",
+  "sentence": " EtaBar takes a job's `[MASK]`, `elapsed` time, and observed `rate` and shows how long is left at that pace.",
+  "answer": "progress",
+  "closed_book_guess": "total",
+  "category": "fact"
+ },
+ {
+  "id": 173,
+  "page": "EventRaster",
+  "section": "Edge cases",
+  "sentence": "`[MASK]` opts out and keeps one tick per event at any density.",
+  "answer": "overflow=\"clip\"",
+  "closed_book_guess": "preserveEvents",
+  "category": "fact"
+ },
+ {
+  "id": 174,
+  "page": "EventRaster",
+  "section": "Edge cases",
+  "sentence": "When a lane is dense enough that its ticks would alias into a solid smear, `[MASK]` (the default) switches that lane to per-bucket counts drawn as opacity, and the summary names the lanes that were binned.",
+  "answer": "overflow=\"bin\"",
+  "closed_book_guess": "autoBin",
+  "category": "fact"
+ },
+ {
+  "id": 176,
+  "page": "FatDigits",
+  "section": "FatDigits",
+  "sentence": "Always pass a `[MASK]`: without one a lone number has no tier to sit in and renders at the middle weight.",
+  "answer": "domain",
+  "closed_book_guess": "tier",
+  "category": "fact"
+ },
+ {
+  "id": 177,
+  "page": "FatDigits",
+  "section": "Variants",
+  "sentence": "`format` also takes `[MASK]`, and the numeral follows the locale's own grouping and decimal marks.",
+  "answer": "Intl.NumberFormatOptions",
+  "closed_book_guess": "a locale parameter",
+  "category": "fact"
+ },
+ {
+  "id": 180,
+  "page": "FatDigits",
+  "section": "FatDigits",
+  "sentence": " FatDigits renders the exact number and maps its magnitude to font _weight_: five ordinal tiers across your `[MASK]`, or three with `tiers={3}`.",
+  "answer": "domain",
+  "closed_book_guess": "data domain",
+  "category": "equivalent"
+ },
+ {
+  "id": 181,
+  "page": "FillWord",
+  "section": "Variants",
+  "sentence": "`[MASK]` empties the ink from the left as the value rises, which is the remaining-time read fill can't give you: TTLs, expiring sessions.",
+  "answer": "mode=\"drain\"",
+  "closed_book_guess": "FillWordCountdown",
+  "category": "fact"
+ },
+ {
+  "id": 199,
+  "page": "HeartbeatBlip",
+  "section": "HeartbeatBlip",
+  "sentence": "The static entry never calls `[MASK]`, because a server render and the client hydrate would disagree and mismatch.",
+  "answer": "Date.now()",
+  "closed_book_guess": "Math.random",
+  "category": "ambiguous"
+ },
+ {
+  "id": 202,
+  "page": "HeatStrip",
+  "section": "HeatStrip",
+  "sentence": "The steps stay discrete, the `[MASK]` is shared rather than autoscaled per row, and downsampling takes the max per bucket rather than the mean.",
+  "answer": "domain",
+  "closed_book_guess": "colorScale",
+  "category": "fact"
+ },
+ {
+  "id": 239,
+  "page": "MusicStaff",
+  "section": "Accessibility",
+  "sentence": " MusicStaff reuses `[MASK]`'s natural-language summary verbatim.",
+  "answer": "Sparkline",
+  "closed_book_guess": "BarChart",
+  "category": "fact"
+ },
+ {
+  "id": 248,
+  "page": "OrbitStatus",
+  "section": "OrbitStatus",
+  "sentence": "Pass `domain` and `[MASK]` when you know the range you care about, because a service that answers in 40–90 ms reads better on its own frame than on the second-wide default.",
+  "answer": "rateDomain",
+  "closed_book_guess": "range",
+  "category": "fact"
+ },
+ {
+  "id": 250,
+  "page": "OrbitStatus",
+  "section": "Sizing",
+  "sentence": "`[MASK]` follows `size` unless you set it.",
+  "answer": "fontSize",
+  "closed_book_guess": "radius",
+  "category": "fact"
+ },
+ {
+  "id": 255,
+  "page": "OrbitStatus",
+  "section": "Sizing",
+  "sentence": "`fontSize` follows `[MASK]` unless you set it.",
+  "answer": "size",
+  "closed_book_guess": "the surrounding text size",
+  "category": "fact"
+ },
+ {
+  "id": 262,
+  "page": "PercentileLadder",
+  "section": "Edge cases",
+  "sentence": "A single value at or below zero makes `[MASK]` fall back to linear, and no `log` tag renders, because the transform was not applied.",
+  "answer": "scale=\"log\"",
+  "closed_book_guess": "scale",
+  "category": "equivalent"
+ },
+ {
+  "id": 263,
+  "page": "PercentileTrace",
+  "section": "Variants",
+  "sentence": "By default a rising standing is good, so it turns positive; set `[MASK]` when slipping _down_ the pack is the win, as with a support ticket's backlog rank.",
+  "answer": "positive=\"down\"",
+  "closed_book_guess": "invertTrend",
+  "category": "fact"
+ },
+ {
+  "id": 266,
+  "page": "PercentileTrace",
+  "section": "Edge cases",
+  "sentence": "With a `locale`, the percentile label and every announced number follow that locale's own formatting: `[MASK]` renders `p81,5` with a comma.",
+  "answer": "de-DE",
+  "closed_book_guess": "p81.5",
+  "category": "fact"
+ },
+ {
+  "id": 268,
+  "page": "PercentileTrace",
+  "section": "Edge cases",
+  "sentence": "Ranks outside 0–100 are clamped to the axis (a value of `102` reads as `[MASK]`) and warn once in development.",
+  "answer": "p100",
+  "closed_book_guess": "100",
+  "category": "equivalent"
+ },
+ {
+  "id": 283,
+  "page": "Progress",
+  "section": "Edge cases",
+  "sentence": "`[MASK]` — not `total` — is the deliberate exception across the library.",
+  "answer": "max",
+  "closed_book_guess": "value",
+  "category": "fact"
+ },
+ {
+  "id": 300,
+  "page": "QuantileDots",
+  "section": "Accessibility",
+  "sentence": " The accessible name states the odds as a frequency: **\"8 in 15 chances above 15 min.\"** Without a `[MASK]` it reads \"Most likely …; range …\" instead.",
+  "answer": "threshold",
+  "closed_book_guess": "aria-label",
+  "category": "fact"
+ },
+ {
+  "id": 305,
+  "page": "RateVolume",
+  "section": "RateVolume",
+  "sentence": "Set `[MASK]` and any period below it renders its rate point hollow, a shape cue that survives forced-colors and print.",
+  "answer": "minVolume",
+  "closed_book_guess": "hollowBelow",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "RetentionCurve",
+  "section": "Edge cases",
+  "sentence": "`[MASK]` accepts either a 0–1 fraction or a 0–100 percent series, whichever the max value implies, so a raw percent export renders identically to its fraction form without a manual divide.",
+  "answer": "data",
+  "closed_book_guess": "retentionCurve",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "RubricStrip",
+  "section": "RubricStrip",
+  "sentence": "A `[MASK]` draws a single pass line across every row.",
+  "answer": "target",
+  "closed_book_guess": "RubricStrip",
+  "category": "fact"
+ },
+ {
+  "id": 319,
+  "page": "SparkBar",
+  "section": "Name the bars",
+  "sentence": "The hover readout then names the period it shows instead of only its value, and the live region announces the name ahead of the position:   The chip reads `[MASK]`, and the announcement reads \"Aug 2026.",
+  "answer": "Aug 2026 · 1.1K",
+  "closed_book_guess": "Aug 2026: $42.50",
+  "category": "example_name"
+ },
+ {
+  "id": 320,
+  "page": "SparkBar",
+  "section": "Name the bars",
+  "sentence": "The static entry ignores `[MASK]`: it has no readout to name, and the generated summary stays value-based.",
+  "answer": "labels",
+  "closed_book_guess": "nameKey",
+  "category": "fact"
+ },
+ {
+  "id": 328,
+  "page": "SparkBar",
+  "section": "Variants",
+  "sentence": "   label=\"winloss with ties\" code={`// a 0 is a tie — a neutral dash on the mid-line, never a win or a loss     The endpoint label and accessible summary both follow `[MASK]`/`locale`: 8600 reads \"8.600\" under `de-DE` rather than the English \"8,600\".",
+  "answer": "format",
+  "closed_book_guess": "format/locale",
+  "category": "equivalent"
+ },
+ {
+  "id": 338,
+  "page": "SpiralYear",
+  "section": "Variants",
+  "sentence": "480 : s; })} steps={3} size={56} summary={false} /  `[MASK]` changes no in-chart mark, since opacity steps carry the value and no number is printed.",
+  "answer": "locale",
+  "closed_book_guess": "opacity",
+  "category": "fact"
+ },
+ {
+  "id": 369,
+  "page": "TallyMarks",
+  "section": "Edge cases",
+  "sentence": "  label=\"negative clamps to 0 — the summary reads '0 counted.', never a negative count\" code={`[MASK]`}   label=\"a non-physical value saturates at the 200-mark ceiling\" code={`<TallyMarks value={5000} total={5000} />`}   A negative value clamps to 0 and a non-physical value saturates at the 200-mark ceiling.",
+  "answer": "<TallyMarks value={-5} />",
+  "closed_book_guess": "<TallyMarks value={-5} total={10} />",
+  "category": "ambiguous"
+ },
+ {
+  "id": 370,
+  "page": "TallyMarks",
+  "section": "Edge cases",
+  "sentence": "  label=\"negative clamps to 0 — the summary reads '0 counted.', never a negative count\" code={`<TallyMarks value={-5} />`}   label=\"a non-physical value saturates at the 200-mark ceiling\" code={`[MASK]`}   A negative value clamps to 0 and a non-physical value saturates at the 200-mark ceiling.",
+  "answer": "<TallyMarks value={5000} total={5000} />",
+  "closed_book_guess": "<TallyMarks value={Infinity} />",
+  "category": "ambiguous"
+ },
+ {
+  "id": 375,
+  "page": "Thermometer",
+  "section": "Variants",
+  "sentence": "`[MASK]` fits a table cell where a vertical tube cannot, and `bulb={false}` drops the reservoir where the instrument metaphor is too much for the context.",
+  "answer": "orientation=\"horizontal\"",
+  "closed_book_guess": "HorizontalThermometer",
+  "category": "fact"
+ },
+ {
+  "id": 391,
+  "page": "WinProbWorm",
+  "section": "Variants",
+  "sentence": "At a taller size the biggest single momentum swing also gets a hair connector and a signed delta; drop that with `[MASK]`, and drop the endpoint probability with `label=\"none\"`.",
+  "answer": "markSwing={false}",
+  "closed_book_guess": "showDelta=\"none\"",
+  "category": "fact"
+ },
+ {
+  "id": 397,
+  "page": "Composition",
+  "section": "In a sentence",
+  "sentence": "Wrap it in `[MASK]` (shipped in `styles.css`) and pass `dots=\"none\"` to drop its endpoint dots so it reads as one glyph.",
+  "answer": "mc-inline",
+  "closed_book_guess": "SparklineContainer",
+  "category": "fact"
+ },
+ {
+  "id": 405,
+  "page": "Composition",
+  "section": "Small multiples: one shared scale",
+  "sentence": "It's hook-free and RSC-safe, and a child's own explicit `[MASK]`/`width` still wins.",
+  "answer": "domain",
+  "closed_book_guess": "height",
+  "category": "ambiguous"
+ },
+ {
+  "id": 407,
+  "page": "Composition",
+  "section": "Small multiples: one shared scale",
+  "sentence": "Only children that carry a `[MASK]` prop get the scale and size injected; plain wrappers, labels, and captions pass through untouched, so you can interleave them without them picking up stray DOM attributes.",
+  "answer": "data",
+  "closed_book_guess": "dataKey",
+  "category": "fact"
+ },
+ {
+  "id": 414,
+  "page": "Design notes",
+  "section": "One package",
+  "sentence": " All the chart types ship from a single package, `[MASK]`, each behind its own subpath so you only bundle what you import.",
+  "answer": "@microcharts/react",
+  "closed_book_guess": "microcharts",
+  "category": "fact"
+ },
+ {
+  "id": 421,
+  "page": "Formatting & scale",
+  "section": "Your format merges with the chart's own defaults",
+  "sentence": "Passing an explicit `[MASK]` replaces the whole set, digit defaults included.",
+  "answer": "style",
+  "closed_book_guess": "format",
+  "category": "fact"
+ },
+ {
+  "id": 423,
+  "page": "Formatting & scale",
+  "section": "Scale: the `domain` decision",
+  "sentence": "To share one scale across several charts at once, use `SparkGroup`: it reads every child's `[MASK]`, computes one union domain, and injects it into any child that didn't set its own (`zero` anchors that shared domain at zero).",
+  "answer": "data",
+  "closed_book_guess": "domain",
+  "category": "fact"
+ },
+ {
+  "id": 451,
+  "page": "MCP server",
+  "section": "Two resources",
+  "sentence": "`[MASK]`** — the same paste-and-run setup prompt served at [`/agent-setup.md`](/agent-setup.md), for when the assistant should wire the library into a repo rather than render a one-off.",
+  "answer": "microcharts://agent-setup",
+  "closed_book_guess": "`/agent-setup.md`",
+  "category": "fact"
+ },
+ {
+  "id": 455,
+  "page": "MCP server",
+  "section": "`get_microchart`",
+  "sentence": "`[MASK]` is JSX, for a human to paste.",
+  "answer": "example.code",
+  "closed_book_guess": "The returned code is JSX, for a human to paste.",
+  "category": "fact"
+ },
+ {
+  "id": 457,
+  "page": "MCP server",
+  "section": "Props that do cross a tool call",
+  "sentence": " Anything JSON can express: `data`, `value`, `domain`, `title`, `summary`, `color`, categorical `[MASK]`, `label`, `dots`, `width`, `height`, `className`, `style`, `id`, and `positive`.",
+  "answer": "colors",
+  "closed_book_guess": "labels",
+  "category": "fact"
+ },
+ {
+  "id": 478,
+  "page": "Performance",
+  "section": "Why it's fast",
+  "sentence": "Zero runtime dependencies.** `[MASK]`, enforced by CI, forever.",
+  "answer": "dependencies: {}",
+  "closed_book_guess": "Zero runtime dependencies",
+  "category": "equivalent"
+ },
+ {
+  "id": 495,
+  "page": "Quickstart",
+  "section": "Animate on mount (optional)",
+  "sentence": "Wire the engine once, client-side, then opt in per chart:   `[MASK]` wins unconditionally: a reader who asked for less motion gets the finished chart with no entrance animation.",
+  "answer": "prefers-reduced-motion",
+  "closed_book_guess": "reducedMotion",
+  "category": "equivalent"
+ },
+ {
+  "id": 497,
+  "page": "React sparklines",
+  "section": "About `react-sparklines`",
+  "sentence": "It's a word-sized catalog of <CatalogTotal /> types under one grammar, and Sparkline is one chart in it: `data` alone renders, accessibility is on by default (`[MASK]` plus a summary from the data), the static entry is RSC-safe, and there are **zero runtime dependencies**.",
+  "answer": "role=\"img\"",
+  "closed_book_guess": "title",
+  "category": "fact"
+ },
+ {
+  "id": 506,
+  "page": "Sizing & scaling",
+  "section": "Inline in a sentence",
+  "sentence": "Leave `<Delta>` bare, with no `[MASK]` wrapper.",
+  "answer": "mc-inline",
+  "closed_book_guess": "<ResponsiveContainer>",
+  "category": "fact"
+ },
+ {
+  "id": 520,
+  "page": "Theming",
+  "section": "The MicroProvider component [#a-component-api-if-you-prefer]",
+  "sentence": "It renders a single `<div>` that sets `data-mc-theme` (the preset) plus any `[MASK]` as inline `--mc-*` custom properties, identical to writing them by hand.",
+  "answer": "tokens",
+  "closed_book_guess": "theme variables",
+  "category": "fact"
+ },
+ {
+  "id": 529,
+  "page": "Troubleshooting",
+  "section": "The chart won't stretch to fill its container",
+  "sentence": "A width alone is enough, and it is enough on a `[MASK]`.",
+  "answer": "className",
+  "closed_book_guess": "div",
+  "category": "fact"
+ },
+ {
+  "id": 540,
+  "page": "microcharts vs MUI X Sparkline — bundle size and RSC comparison",
+  "section": "If it is not on MUI",
+  "sentence": "Accessibility.** Every microchart defaults to `[MASK]` with a natural-language summary generated from the data, so labeling is not a task per chart.",
+  "answer": "role=\"img\"",
+  "closed_book_guess": "accessible",
+  "category": "fact"
+ },
+ {
+  "id": 543,
+  "page": "microcharts vs MUI X Sparkline — bundle size and RSC comparison",
+  "section": "If your app is already on MUI",
+  "sentence": "Two defaults are worth checking even there:  `[MASK]` is marked `'use client'`.",
+  "answer": "SparkLineChart",
+  "closed_book_guess": "SparkLine",
+  "category": "fact"
+ },
+ {
+  "id": 551,
+  "page": "microcharts vs react-sparklines — React sparkline comparison",
+  "section": "What changed since 2017",
+  "sentence": "Accessibility.** `react-sparklines` renders a bare `<svg>`: no `[MASK]`, no `<title>`, no accessible name, so a screen reader finds nothing.",
+  "answer": "role",
+  "closed_book_guess": "role=\"img\"",
+  "category": "equivalent"
+ },
+ {
+  "id": 571,
+  "page": "microcharts vs TanStack Charts — tiny charts comparison",
+  "section": "The numbers",
+  "sentence": "  That <TanstackChartGzip /> is one line chart: `defineChart` with a single `lineY` mark and two d3 scales, through `[MASK]`, with react external.",
+  "answer": "@tanstack/react-charts",
+  "closed_book_guess": "defineChartWithAxes",
+  "category": "fact"
+ },
+ {
+  "id": 577,
+  "page": "microcharts vs visx — tiny charts comparison",
+  "section": "Three things you own with visx",
+  "sentence": "Every microchart defaults to `[MASK]` with a natural-language summary generated from the data.",
+  "answer": "role=\"img\"",
+  "closed_book_guess": "accessible",
+  "category": "fact"
+ }
+]

@@ -1,0 +1,1064 @@
+[
+ {
+  "id": 2,
+  "page": "NG8011",
+  "section": "Debugging the error",
+  "sentence": "When the block has more than one root node, Angular can't use the element to choose a slot, so `<h2 card-title>` ends up in the default `<ng-content />` slot of `Card` instead of the `[MASK]` slot.",
+  "answer": "[card-title]",
+  "closed_book_guess": "`<ng-content select=\"[card-title]\" />`",
+  "category": "equivalent"
+ },
+ {
+  "id": 14,
+  "page": "lightweight-injection-tokens",
+  "section": "When tokens are retained",
+  "sentence": "If `[MASK]` 's code, template, and styles combine to become too large, including it unnecessarily can significantly increase the size of the client application.",
+  "answer": "LibHeader",
+  "closed_book_guess": "the component's",
+  "category": "example_name"
+ },
+ {
+  "id": 30,
+  "page": "common-to-standalone",
+  "section": "Convert CommonModule usage to standalone imports",
+  "sentence": " This migration helps projects remove imports of the `CommonModule` inside components by adding the minimal set of directive and pipe imports each template requires (for example, `NgIf`, `NgFor`, `[MASK]`, etc.).",
+  "answer": "AsyncPipe",
+  "closed_book_guess": "NgSwitch",
+  "category": "ambiguous"
+ },
+ {
+  "id": 35,
+  "page": "accordion",
+  "section": "Multiple expansion mode",
+  "sentence": "NOTE: The `[MASK]` input defaults to `true`.",
+  "answer": "multiExpandable",
+  "closed_book_guess": "multi",
+  "category": "fact"
+ },
+ {
+  "id": 36,
+  "page": "cross-field-logic",
+  "section": "Validating based on another field's state",
+  "sentence": "If the user hasn't touched the password yet, flagging a mismatch on the confirmation is premature:   The `[MASK]` call returns the other field's [field state](api/forms/signals/FieldState), giving you access to signals like `invalid()`, `touched()`, and `dirty()`.",
+  "answer": "stateOf()",
+  "closed_book_guess": "field()",
+  "category": "fact"
+ },
+ {
+  "id": 42,
+  "page": "enter-and-leave",
+  "section": "Event Bindings, Functions, and Third-party Libraries",
+  "sentence": "The `$event` object has the type `[MASK]`.",
+  "answer": "AnimationCallbackEvent",
+  "closed_book_guess": "AnimationEvent",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "form-logic",
+  "section": "Associate data with a field using `metadata()`",
+  "sentence": "Signal Forms provides pre-defined metadata keys that built-in validators populate automatically:   The `[formField]` directive automatically binds five of these (`REQUIRED`, `MIN`, `MAX`, `MIN_LENGTH`, and `[MASK]`) to the corresponding HTML attribute on a native form control.",
+  "answer": "MAX_LENGTH",
+  "closed_book_guess": "PATTERN",
+  "category": "fact"
+ },
+ {
+  "id": 50,
+  "page": "NG02802",
+  "section": "At the request level",
+  "sentence": " Add the `[MASK]` parameter to your HTTP request:  ",
+  "answer": "transferCache",
+  "closed_book_guess": "timeout",
+  "category": "ambiguous"
+ },
+ {
+  "id": 59,
+  "page": "accordion",
+  "section": "Lazy content rendering",
+  "sentence": " Use the `[MASK]` directive on an `ng-template` to defer rendering content until the panel expands.",
+  "answer": "ngAccordionContent",
+  "closed_book_guess": "matExpansionPanelContent",
+  "category": "fact"
+ },
+ {
+  "id": 60,
+  "page": "customizing-route-behavior",
+  "section": "Control parameter inheritance",
+  "sentence": "By default (`[MASK]`), child routes automatically inherit parameters, route data, and resolved values from parent routes.",
+  "answer": "'always'",
+  "closed_book_guess": "emptyOnly",
+  "category": "fact"
+ },
+ {
+  "id": 65,
+  "page": "tailwind",
+  "section": "4. Import Tailwind CSS",
+  "sentence": " Add an `@import` to `[MASK]` that imports Tailwind CSS.",
+  "answer": "./src/styles.css",
+  "closed_book_guess": "styles.css",
+  "category": "equivalent"
+ },
+ {
+  "id": 95,
+  "page": "NG0951",
+  "section": "Fixing the error",
+  "sentence": "`[MASK]` query results can be accessed in the `AfterViewChecked` lifecycle hook, or later.",
+  "answer": "viewChild",
+  "closed_book_guess": "Required query results",
+  "category": "ambiguous"
+ },
+ {
+  "id": 99,
+  "page": "error-boundaries",
+  "section": "Conditional error handling with `when`",
+  "sentence": "A final `[MASK]` block without a `when` clause acts as a catch-all fallback.",
+  "answer": "@error",
+  "closed_book_guess": "catchError",
+  "category": "fact"
+ },
+ {
+  "id": 109,
+  "page": "testing",
+  "section": "Setup for testing",
+  "sentence": "`HttpTestingController` can be injected from `[MASK]` once configured.",
+  "answer": "TestBed",
+  "closed_book_guess": "TestBed.inject(HttpTestingController)",
+  "category": "equivalent"
+ },
+ {
+  "id": 111,
+  "page": "testing",
+  "section": "Setup for testing",
+  "sentence": "`[MASK]` can be injected from `TestBed` once configured.",
+  "answer": "HttpTestingController",
+  "closed_book_guess": "TestBed.inject()",
+  "category": "ambiguous"
+ },
+ {
+  "id": 114,
+  "page": "overview",
+  "section": "Computed signals are both lazily evaluated and memoized",
+  "sentence": "The calculated value is then cached, and if you read `[MASK]` again, it will return the cached value without recalculating.",
+  "answer": "doubleCount",
+  "closed_book_guess": "the computed signal",
+  "category": "example_name"
+ },
+ {
+  "id": 117,
+  "page": "listbox",
+  "section": "Horizontal listbox",
+  "sentence": "With `[MASK]`, left and right arrow keys navigate between options instead of up and down.",
+  "answer": "orientation=\"horizontal\"",
+  "closed_book_guess": "horizontalOrientation",
+  "category": "fact"
+ },
+ {
+  "id": 119,
+  "page": "dependency-injection-context",
+  "section": "Injection context",
+  "sentence": "In the factory function specified for `useFactory` of a `[MASK]` or an `@Injectable`.",
+  "answer": "Provider",
+  "closed_book_guess": "InjectionToken",
+  "category": "fact"
+ },
+ {
+  "id": 121,
+  "page": "creating-component-harnesses",
+  "section": "Filtering harness instances with `HarnessPredicate`",
+  "sentence": "For example, consider the `[MASK]` method on the `MyMenuHarness` shown above.",
+  "answer": "getItems",
+  "closed_book_guess": "withItems",
+  "category": "example_name"
+ },
+ {
+  "id": 125,
+  "page": "field-state-management",
+  "section": "Reading validation errors",
+  "sentence": "Validators can provide custom error messages, but if not specified, you may need to map error `[MASK]` values to your own messages.",
+  "answer": "kind",
+  "closed_book_guess": "keys",
+  "category": "fact"
+ },
+ {
+  "id": 135,
+  "page": "attribute-directives",
+  "section": "Deactivating Angular processing with `NgNonBindable`",
+  "sentence": "In the following example, the `[MASK]` directive is still active but Angular does not evaluate the expression `{{ 1 + 1 }}`.",
+  "answer": "appHighlight",
+  "closed_book_guess": "ngNonBindable",
+  "category": "example_name"
+ },
+ {
+  "id": 138,
+  "page": "elements",
+  "section": "Typings for custom elements",
+  "sentence": "Assume you create a `[MASK]` custom element based on the following component:   The most straightforward way to get accurate typings is to cast the return value of the relevant DOM methods to the correct type.",
+  "answer": "my-dialog",
+  "closed_book_guess": "popup-message",
+  "category": "example_name"
+ },
+ {
+  "id": 139,
+  "page": "using-component-harnesses",
+  "section": "Interacting with child elements",
+  "sentence": "For all instances of the child element, use the `[MASK]` method.",
+  "answer": "getAllChildLoaders()",
+  "closed_book_guess": "getAllHarnesses",
+  "category": "fact"
+ },
+ {
+  "id": 144,
+  "page": "http-resource",
+  "section": "`Using httpResource`",
+  "sentence": "For more advanced requests, you can define a request object similar to the request taken by `[MASK]`.",
+  "answer": "HttpClient",
+  "closed_book_guess": "HttpClient.get",
+  "category": "equivalent"
+ },
+ {
+  "id": 148,
+  "page": "NG6100",
+  "section": "NgModule.id Set to module.id anti-pattern",
+  "sentence": "If you are not using `[MASK]`, you do not need to provide `id`s for your NgModules.",
+  "answer": "getNgModuleById",
+  "closed_book_guess": "SystemJS",
+  "category": "fact"
+ },
+ {
+  "id": 150,
+  "page": "custom-controls",
+  "section": "Value transformation",
+  "sentence": "Use `transformedValue()` (from `[MASK]`) to keep the raw value shown in the UI in sync with the model value.",
+  "answer": "@angular/forms/signals",
+  "closed_book_guess": "model()",
+  "category": "fact"
+ },
+ {
+  "id": 151,
+  "page": "overview",
+  "section": "`NgModule` providers",
+  "sentence": "`UserDataClient` can inject `OverlayManager` because its NgModule imports `[MASK]`.",
+  "answer": "CustomMenuModule",
+  "closed_book_guess": "OverlayModule",
+  "category": "example_name"
+ },
+ {
+  "id": 153,
+  "page": "linked-signal",
+  "section": "Accounting for previous state",
+  "sentence": "The first generic type corresponds with the type of `source` and the second generic type determines the output type of `[MASK]`.",
+  "answer": "computation",
+  "closed_book_guess": "linkedSignal",
+  "category": "fact"
+ },
+ {
+  "id": 164,
+  "page": "grid",
+  "section": "Selection and focus modes",
+  "sentence": "Selection modes:  `[MASK]`: Focused cell is automatically selected `explicit`: Users select cells with Space or click  Focus modes:  `roving`: Focus moves to cells using `tabindex` (better for simple grids) `activedescendant`: Focus stays on grid container, `aria-activedescendant` indicates active cell (better for virtual scrolling) ",
+  "answer": "follow",
+  "closed_book_guess": "automatic",
+  "category": "fact"
+ },
+ {
+  "id": 174,
+  "page": "file-structure",
+  "section": "Library project files",
+  "sentence": "Under the `projects/` folder, the `[MASK]` folder contains your library code.",
+  "answer": "my-lib",
+  "closed_book_guess": "my-lib/",
+  "category": "equivalent"
+ },
+ {
+  "id": 183,
+  "page": "deploy",
+  "section": "Configure a server",
+  "sentence": "IMPORTANT: If you are using [Server rendering](guide/ssr) with `outputMode` set to `server`, Angular automatically handles redirection dynamically based on the `[MASK]` HTTP header.",
+  "answer": "Accept-Language",
+  "closed_book_guess": "Accept-Encoding",
+  "category": "fact"
+ },
+ {
+  "id": 188,
+  "page": "components-scenarios",
+  "section": "Routed components",
+  "sentence": "Tests can explore how the `HeroDetail` responds to different `[MASK]` parameter values by navigating to different routes.",
+  "answer": "id",
+  "closed_book_guess": "route parameter",
+  "category": "example_name"
+ },
+ {
+  "id": 191,
+  "page": "testing",
+  "section": "Route guards",
+  "sentence": "The following example tests an `[MASK]` that allows navigation for authenticated users and redirects unauthenticated users to a login page.",
+  "answer": "authGuard",
+  "closed_book_guess": "CanActivate guard",
+  "category": "example_name"
+ },
+ {
+  "id": 194,
+  "page": "NG05201",
+  "section": "Debugging the error",
+  "sentence": " Look for a `[MASK]` call that uses `SecurityContext.RESOURCE_URL`.",
+  "answer": "sanitize()",
+  "closed_book_guess": "bypassSecurityTrustResourceUrl",
+  "category": "fact"
+ },
+ {
+  "id": 196,
+  "page": "hierarchical-dependency-injection",
+  "section": "Visibility of provided tokens",
+  "sentence": "This invocation is a property initializer in `<app-child>` as shown in `child.ts`:   With `[MASK]`, the `<app-child>` injector doesn't look to itself for the `FlowerService`.",
+  "answer": "skipSelf",
+  "closed_book_guess": "@SkipSelf()",
+  "category": "equivalent"
+ },
+ {
+  "id": 199,
+  "page": "NG0209",
+  "section": "Invalid multi provider",
+  "sentence": " The Angular runtime will throw this error when it injects a token intended to be used with `[MASK]` but a non-Array was found instead.",
+  "answer": "multi: true",
+  "closed_book_guess": "multi providers",
+  "category": "equivalent"
+ },
+ {
+  "id": 206,
+  "page": "pipes",
+  "section": "How pipes work",
+  "sentence": "`[MASK]` is added to the `imports` array 1.",
+  "answer": "CurrencyPipe",
+  "closed_book_guess": "DatePipe",
+  "category": "ambiguous"
+ },
+ {
+  "id": 230,
+  "page": "incremental-hydration",
+  "section": "How do you enable incremental hydration in Angular?",
+  "sentence": "To opt out of incremental hydration, use `[MASK]`:  ",
+  "answer": "withNoIncrementalHydration()",
+  "closed_book_guess": "ngSkipHydration",
+  "category": "fact"
+ },
+ {
+  "id": 236,
+  "page": "using-component-harnesses",
+  "section": "Using a harness loader",
+  "sentence": "In addition to `getHarness` and `getAllHarnesses`, `HarnessLoader` has several other useful methods for querying for harnesses:  `[MASK]`: Gets the harness for a component that matches the given criteria at a specific index.",
+  "answer": "getHarnessAtIndex(...)",
+  "closed_book_guess": "getHarnessAtIndex",
+  "category": "equivalent"
+ },
+ {
+  "id": 240,
+  "page": "lightweight-injection-tokens",
+  "section": "Use the lightweight injection token for API definition",
+  "sentence": "For example, the `[MASK]` now queries `LibHeaderToken` rather than `LibHeader`.",
+  "answer": "LibCard",
+  "closed_book_guess": "LibCardHeaderComponent",
+  "category": "example_name"
+ },
+ {
+  "id": 241,
+  "page": "debugging",
+  "section": "Debugging in Node.js",
+  "sentence": "Run the `ng test` command with the `[MASK]` flag: 2.",
+  "answer": "--debug",
+  "closed_book_guess": "--inspect-brk",
+  "category": "fact"
+ },
+ {
+  "id": 247,
+  "page": "overview",
+  "section": "Setup",
+  "sentence": "Import the necessary functions and directives from `[MASK]`:   The `FormField` directive must be imported into any component that binds form fields to HTML inputs:  ",
+  "answer": "@angular/forms/signals",
+  "closed_book_guess": "@angular/forms",
+  "category": "fact"
+ },
+ {
+  "id": 257,
+  "page": "NG05106",
+  "section": "Insertion reference node not found",
+  "sentence": "This can happen because of:  App code touching the DOM directly (`ElementRef.nativeElement`, `document.querySelector`, `[MASK]`, etc.) instead of going through Angular.",
+  "answer": "innerHTML",
+  "closed_book_guess": "Renderer2.selectRootElement",
+  "category": "ambiguous"
+ },
+ {
+  "id": 264,
+  "page": "cross-field-logic",
+  "section": "Conditional requirements",
+  "sentence": "When the user switches back to `[MASK]`, the condition re-evaluates and the requirement — along with its error — clears automatically.",
+  "answer": "'personal'",
+  "closed_book_guess": "email address",
+  "category": "example_name"
+ },
+ {
+  "id": 272,
+  "page": "NG8102",
+  "section": "Configuration requirements",
+  "sentence": " [`[MASK]`](tools/cli/template-typecheck#strict-mode) must be enabled for any extended diagnostic to emit.",
+  "answer": "strictTemplates",
+  "closed_book_guess": "strictNullChecks",
+  "category": "fact"
+ },
+ {
+  "id": 280,
+  "page": "field-state-management",
+  "section": "Form submission",
+  "sentence": " Signal Forms provides a `[MASK]` directive that simplifies form submission.",
+  "answer": "FormRoot",
+  "closed_book_guess": "submitForm",
+  "category": "fact"
+ },
+ {
+  "id": 288,
+  "page": "css",
+  "section": "Programmatic control of animations",
+  "sentence": "You can use the `Animation` API to do much more than you could with what the `[MASK]` from the animations package offered.",
+  "answer": "AnimationPlayer",
+  "closed_book_guess": "animateChild",
+  "category": "fact"
+ },
+ {
+  "id": 296,
+  "page": "import-global-variants",
+  "section": "Import global variants of the locale data",
+  "sentence": "The [Angular CLI][CliMain] automatically includes the locale data and sets the `LOCALE_ID` value when you use the `[MASK]` option with [`ng build`][CliBuild] command.",
+  "answer": "--localize",
+  "closed_book_guess": "i18n-duplicate-locale-data",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "testing",
+  "section": "Testing an Interceptor",
+  "sentence": "This behavior can be enforced with the use of an interceptor:   The `[MASK]` configuration for this interceptor should rely on the `withInterceptors` feature.",
+  "answer": "TestBed",
+  "closed_book_guess": "provideHttpClient",
+  "category": "ambiguous"
+ },
+ {
+  "id": 311,
+  "page": "manage-marked-text",
+  "section": "Use a custom ID with a description",
+  "sentence": "The following example defines the `[MASK]` custom ID for a variable.",
+  "answer": "introductionHeader",
+  "closed_book_guess": "descriptionId",
+  "category": "example_name"
+ },
+ {
+  "id": 313,
+  "page": "cross-field-logic",
+  "section": "Conditional requirements",
+  "sentence": "Using `required()` with `[MASK]` instead of a manual `validate()` check also adds proper required metadata to the field, which enables accessibility features like marking the field as required for screen readers.",
+  "answer": "when",
+  "closed_book_guess": "requiredWhen()",
+  "category": "fact"
+ },
+ {
+  "id": 315,
+  "page": "utility-apis",
+  "section": "`DebugElement`",
+  "sentence": "The following example finds all `[MASK]` with a reference to a template local variable named \"content\":   The Angular `By` class has three static methods for common predicates:   ",
+  "answer": "DebugElements",
+  "closed_book_guess": "DebugElement instances",
+  "category": "equivalent"
+ },
+ {
+  "id": 320,
+  "page": "validation",
+  "section": "Native HTML validation",
+  "sentence": "Even then, the error surfaces through the field's `[MASK]` signal like any other validation error.",
+  "answer": "errors()",
+  "closed_book_guess": "invalid",
+  "category": "fact"
+ },
+ {
+  "id": 324,
+  "page": "testing",
+  "section": "Route parameters",
+  "sentence": "The following example shows how to test a `[MASK]` component that displays a user ID from the route.",
+  "answer": "UserProfile",
+  "closed_book_guess": "routed",
+  "category": "example_name"
+ },
+ {
+  "id": 334,
+  "page": "tabs",
+  "section": "Disabled tabs",
+  "sentence": "When `[MASK]`, disabled tabs are skipped during keyboard navigation.",
+  "answer": "[softDisabled]=\"false\"",
+  "closed_book_guess": "disabled tabs are enabled",
+  "category": "fact"
+ },
+ {
+  "id": 343,
+  "page": "define-routes",
+  "section": "What are routes?",
+  "sentence": "Here is a basic example of a route:   For this route, when a user visits the `/admin` path, the app will display the `[MASK]` component.",
+  "answer": "AdminPage",
+  "closed_book_guess": "AdminComponent",
+  "category": "example_name"
+ },
+ {
+  "id": 350,
+  "page": "injectable-to-service",
+  "section": "Migration from `@Injectable` to `@Service`",
+  "sentence": "Run the schematic using the following command:   A class declared with `[MASK]` becomes a `@Service` with no options.",
+  "answer": "providedIn: 'root'",
+  "closed_book_guess": "@Injectable({ providedIn: 'root' })",
+  "category": "equivalent"
+ },
+ {
+  "id": 355,
+  "page": "field-state-management",
+  "section": "Disabled fields",
+  "sentence": "Two methods commonly used in validation rules are:  `valueOf(schemaPath.otherField)` - Read the value of another field in the form `[MASK]` - A signal containing the value of the field the rule is applied to  Disabled fields don't contribute to the parent form's validation state.",
+  "answer": "value()",
+  "closed_book_guess": "fieldValue",
+  "category": "fact"
+ },
+ {
+  "id": 359,
+  "page": "hydration",
+  "section": "Preserve Whitespaces Configuration",
+  "sentence": "If you choose to set this setting in your tsconfig, we recommend to set it only in `tsconfig.app.json` which by default the `[MASK]` will inherit it from.",
+  "answer": "tsconfig.server.json",
+  "closed_book_guess": "tsconfig.json",
+  "category": "fact"
+ },
+ {
+  "id": 362,
+  "page": "deploy",
+  "section": "Deploy multiple locales",
+  "sentence": "Specify the `[MASK]` for each locale in your [`angular.json`][GuideWorkspaceConfig] workspace build configuration file.",
+  "answer": "\"subPath\"",
+  "closed_book_guess": "baseHref",
+  "category": "fact"
+ },
+ {
+  "id": 363,
+  "page": "data-fetching-with-resources",
+  "section": "Transitional states during pending navigations",
+  "sentence": "You can read the resource signals and call `[MASK]`, but not `set()` or `update()`.",
+  "answer": "reload()",
+  "closed_book_guess": "value()",
+  "category": "fact"
+ },
+ {
+  "id": 366,
+  "page": "interceptors",
+  "section": "Modifying requests",
+  "sentence": "For example, to add a header to a request:   This immutability allows most interceptors to be idempotent if the same `[MASK]` is submitted to the interceptor chain multiple times.",
+  "answer": "HttpRequest",
+  "closed_book_guess": "request",
+  "category": "equivalent"
+ },
+ {
+  "id": 368,
+  "page": "show-routes-with-outlets",
+  "section": "Nesting routes with child routes",
+  "sentence": "One of the unique things you’ll notice about child routes is that the component often has its own `[MASK]` and `<router-outlet>`.",
+  "answer": "<nav>",
+  "closed_book_guess": "template",
+  "category": "ambiguous"
+ },
+ {
+  "id": 371,
+  "page": "selectors",
+  "section": "Selector prefixes",
+  "sentence": "By default, the Angular CLI uses `[MASK]`.",
+  "answer": "app-",
+  "closed_book_guess": "app",
+  "category": "equivalent"
+ },
+ {
+  "id": 379,
+  "page": "setup",
+  "section": "Providing `HttpClient` through dependency injection",
+  "sentence": " You can use the `provideHttpClient` helper function to configure the default HTTP feature set or add features in the application `[MASK]` in `app.config.ts`.",
+  "answer": "providers",
+  "closed_book_guess": "configuration",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "NG8021",
+  "section": "Configuration requirements",
+  "sentence": "`deferTriggerMisconfiguration` has no additional requirements beyond `[MASK]`.",
+  "answer": "strictTemplates",
+  "closed_book_guess": "deferBlockDependencies",
+  "category": "fact"
+ },
+ {
+  "id": 383,
+  "page": "NG0205",
+  "section": "Debugging the error",
+  "sentence": "Use `[MASK]` or `DestroyRef` for cleanup.",
+  "answer": "takeUntilDestroyed()",
+  "closed_book_guess": "ngOnDestroy",
+  "category": "ambiguous"
+ },
+ {
+  "id": 404,
+  "page": "NG01203",
+  "section": "Debugging the error",
+  "sentence": "if so, make sure you are **importing** the `[MASK]`.",
+  "answer": "NgModule",
+  "closed_book_guess": "ControlValueAccessor",
+  "category": "ambiguous"
+ },
+ {
+  "id": 408,
+  "page": "css",
+  "section": "Parallel Animations",
+  "sentence": "In this example, the `rotate` and `[MASK]` animations fire at the same time, but have different durations.",
+  "answer": "fade-in",
+  "closed_book_guess": "scale",
+  "category": "example_name"
+ },
+ {
+  "id": 419,
+  "page": "lightweight-injection-tokens",
+  "section": "Using lightweight injection tokens",
+  "sentence": "The following example shows how this works for the `LibHeader`:   In this example, the `[MASK]` implementation no longer refers to `LibHeader` in either the type position or the value position.",
+  "answer": "LibCard",
+  "closed_book_guess": "LibHeaderToken",
+  "category": "example_name"
+ },
+ {
+  "id": 422,
+  "page": "variables",
+  "section": "Accessing in a nested template",
+  "sentence": "However, accessing a template variable from a child scope in the parent template doesn't work:   Here, `ref2` is declared in the child scope created by `[MASK]`, and is not accessible from the parent template.",
+  "answer": "@if",
+  "closed_book_guess": "@for",
+  "category": "ambiguous"
+ },
+ {
+  "id": 426,
+  "page": "tailwind",
+  "section": "4. Import Tailwind CSS",
+  "sentence": "If you're using SCSS, add `@use` to `[MASK]`.",
+  "answer": "./src/styles.scss",
+  "closed_book_guess": "styles.scss",
+  "category": "equivalent"
+ },
+ {
+  "id": 431,
+  "page": "NG0956",
+  "section": "Tracking expression caused re-creation of the DOM structure.",
+  "sentence": "Here, a relatively inexpensive binding update to the `[MASK]` property would suffice.",
+  "answer": "done",
+  "closed_book_guess": "completed",
+  "category": "example_name"
+ },
+ {
+  "id": 440,
+  "page": "interceptors",
+  "section": "DI-based interceptors",
+  "sentence": " `[MASK]` also supports interceptors which are defined as injectable classes and configured through the DI system.",
+  "answer": "HttpClient",
+  "closed_book_guess": "HttpClientModule",
+  "category": "equivalent"
+ },
+ {
+  "id": 447,
+  "page": "event-listeners",
+  "section": "Using key modifiers",
+  "sentence": "This means that a combination like Alt + S reports a `key` value of `[MASK]`.",
+  "answer": "'ß'",
+  "closed_book_guess": "S",
+  "category": "fact"
+ },
+ {
+  "id": 448,
+  "page": "typed-forms",
+  "section": "Overview of Typed Forms",
+  "sentence": "For example: you could write the following invalid code:   With strictly typed reactive forms, the above code does not compile, because there is no `[MASK]` property on `email`.",
+  "answer": "domain",
+  "closed_book_guess": "address",
+  "category": "example_name"
+ },
+ {
+  "id": 451,
+  "page": "NG3003",
+  "section": "Import Cycle Detected",
+  "sentence": "The generated code for this template must therefore contain a reference to the `[MASK]` class.",
+  "answer": "Child",
+  "closed_book_guess": "ParentComponent",
+  "category": "example_name"
+ },
+ {
+  "id": 453,
+  "page": "code-coverage",
+  "section": "Advanced configuration",
+  "sentence": "`[MASK]`: Glob patterns of files to exclude in the coverage report.",
+  "answer": "coverageExclude",
+  "closed_book_guess": "excludeGlobs",
+  "category": "fact"
+ },
+ {
+  "id": 457,
+  "page": "enter-and-leave",
+  "section": "Element removal order",
+  "sentence": "If an element being removed contains child components, any `[MASK]` animations defined inside those child component templates will **not** run before the parent is removed.",
+  "answer": "animate.leave",
+  "closed_book_guess": "leave",
+  "category": "equivalent"
+ },
+ {
+  "id": 460,
+  "page": "NG8105",
+  "section": "What's wrong with that?",
+  "sentence": "It also means that `item` will not be properly pulled into scope and `[MASK]` will not resolve correctly.",
+  "answer": "{{ item }}",
+  "closed_book_guess": "item.title",
+  "category": "example_name"
+ },
+ {
+  "id": 467,
+  "page": "NG01354",
+  "section": "NgModel in child component cannot reach parent form",
+  "sentence": "The root cause is that `NgModel` injects `ControlContainer` with `[MASK]`, which stops the injector from crossing component boundaries.",
+  "answer": "@Host()",
+  "closed_book_guess": "@HostAncestorOnly",
+  "category": "fact"
+ },
+ {
+  "id": 472,
+  "page": "resource",
+  "section": "Resource loaders",
+  "sentence": "The `ResourceLoaderParams` object contains three properties: `params`, `[MASK]`, and `abortSignal`.",
+  "answer": "previous",
+  "closed_book_guess": "request",
+  "category": "fact"
+ },
+ {
+  "id": 480,
+  "page": "code-coverage",
+  "section": "Enforcing code coverage thresholds",
+  "sentence": "To enable this, add the `coverageThresholds` option to your `[MASK]` file:   Now, if your coverage drops below 80% when you run your tests, the command will fail.",
+  "answer": "angular.json",
+  "closed_book_guess": "karma.conf.js",
+  "category": "fact"
+ },
+ {
+  "id": 490,
+  "page": "NG02825",
+  "section": "Fixing the error",
+  "sentence": " Set `maxResponseBodySize` in the `[MASK]` options to increase the limit:   `maxResponseBodySize` configures the maximum number of response body bytes Angular buffers for each server-side `HttpClient` request that uses the fetch backend.",
+  "answer": "provideServerRendering",
+  "closed_book_guess": "withFetch()",
+  "category": "fact"
+ },
+ {
+  "id": 492,
+  "page": "error-boundaries",
+  "section": "Conditional error handling with `when`",
+  "sentence": "Order your `[MASK]` blocks from most specific to least specific, as Angular evaluates the `when` clauses in order and uses the first one that evaluates to true.",
+  "answer": "@error",
+  "closed_book_guess": "ErrorBoundary",
+  "category": "fact"
+ },
+ {
+  "id": 500,
+  "page": "styling",
+  "section": "Namespacing CSS custom properties",
+  "sentence": "Angular does not rewrite the name in:  Static style attributes, such as `[MASK]`, including the `style` entry of a component's `host` object.",
+  "answer": "style=\"--primary-color: red\"",
+  "closed_book_guess": "style=\"--my-var: 1\"",
+  "category": "example_name"
+ },
+ {
+  "id": 503,
+  "page": "making-requests",
+  "section": "Best practices",
+  "sentence": "For example, this `UserService` encapsulates the logic to request data for a user by their id:   Within a component, you can combine `@if` with the `[MASK]` pipe to render the UI for the data only after it's finished loading:  ",
+  "answer": "async",
+  "closed_book_guess": "async pipe",
+  "category": "equivalent"
+ },
+ {
+  "id": 512,
+  "page": "toolbar",
+  "section": "Widget groups",
+  "sentence": "In the examples above, the alignment buttons are wrapped in `ngToolbarWidgetGroup` with `[MASK]`.",
+  "answer": "role=\"radiogroup\"",
+  "closed_book_guess": "ngToolbarWidgetGroupLabel",
+  "category": "example_name"
+ },
+ {
+  "id": 516,
+  "page": "NG0913",
+  "section": "Lazy-loaded LCP element",
+  "sentence": "As a result, a warning is triggered when Angular detects that the LCP element has been given the `[MASK]` attribute.",
+  "answer": "loading=\"lazy\"",
+  "closed_book_guess": "loading",
+  "category": "equivalent"
+ },
+ {
+  "id": 520,
+  "page": "schemas",
+  "section": "Conditional schemas with `applyWhen()`",
+  "sentence": "A schema or schema function containing the conditional rules   The logic function receives a `FieldContext`, which provides access to `value`, `[MASK]`, `stateOf`, and other reactive helpers.",
+  "answer": "valueOf",
+  "closed_book_guess": "fieldTree",
+  "category": "fact"
+ },
+ {
+  "id": 521,
+  "page": "NG05101",
+  "section": "Debugging the error",
+  "sentence": "The most common cause is a typo in the event binding:   If the event name is intentional and belongs to a third-party plugin (for example, a Hammer.js gesture event), make sure the plugin is provided via the `[MASK]` token:  ",
+  "answer": "EVENT_MANAGER_PLUGINS",
+  "closed_book_guess": "HAMMER_GESTURE_CONFIG",
+  "category": "fact"
+ },
+ {
+  "id": 524,
+  "page": "css",
+  "section": "Animation Callbacks",
+  "sentence": "You can examine the `[MASK]` property or the properties being transitioned to verify you have the right nodes.",
+  "answer": "animationname",
+  "closed_book_guess": "targetState",
+  "category": "fact"
+ },
+ {
+  "id": 535,
+  "page": "listbox",
+  "section": "Selection modes",
+  "sentence": "The `[MASK]` mode requires Space or Enter to confirm selection, preventing accidental changes while navigating.",
+  "answer": "'explicit'",
+  "closed_book_guess": "multiple-activation",
+  "category": "fact"
+ },
+ {
+  "id": 536,
+  "page": "data-fetching-with-resources",
+  "section": "Fine-grained change tracking with signals",
+  "sentence": "Read the exact value you need so that the resource refetches only when that value changes:   A navigation that changes an unrelated query parameter, such as `?sort=desc` or `?page=2`, leaves `[MASK]` unchanged, so the resource does not refetch.",
+  "answer": "category",
+  "closed_book_guess": "searchTerm",
+  "category": "example_name"
+ },
+ {
+  "id": 541,
+  "page": "overview",
+  "section": "Reactive contexts",
+  "sentence": "Angular automatically enters a reactive context when:  Executing an `effect`, `[MASK]` callback.",
+  "answer": "afterRenderEffect",
+  "closed_book_guess": "computed function",
+  "category": "fact"
+ },
+ {
+  "id": 543,
+  "page": "customizing-route-behavior",
+  "section": "Handle canceled navigations",
+  "sentence": "This setting is most helpful when your app uses `[MASK]` or when guards frequently cancel popstate navigations initiated by the browser.",
+  "answer": "urlUpdateStrategy: 'eager'",
+  "closed_book_guess": "withComponentInputBinding",
+  "category": "fact"
+ },
+ {
+  "id": 547,
+  "page": "migrating-to-vitest",
+  "section": "2. Update `angular.json`",
+  "sentence": "If your test-specific build options differ from your existing `[MASK]` build configuration, you must move them to a dedicated build target configuration.",
+  "answer": "development",
+  "closed_book_guess": "test runner",
+  "category": "fact"
+ },
+ {
+  "id": 552,
+  "page": "deploy",
+  "section": "Deploy multiple locales",
+  "sentence": "To adjust the base `href` for each version of the application, the CLI adds the locale to the configured `[MASK]`.",
+  "answer": "\"subPath\"",
+  "closed_book_guess": "baseHref",
+  "category": "fact"
+ },
+ {
+  "id": 554,
+  "page": "overview",
+  "section": "Semantic Versioning",
+  "sentence": "However, setting `[MASK]` will promote such warnings to hard errors.",
+  "answer": "\"defaultCategory\": \"error\"",
+  "closed_book_guess": "strictTemplates",
+  "category": "fact"
+ },
+ {
+  "id": 561,
+  "page": "signal-inputs",
+  "section": "VSCode extension",
+  "sentence": "To make use of the migration via VSCode, install the latest version of the VSCode extension and either click:  on a `[MASK]` field.",
+  "answer": "@Input",
+  "closed_book_guess": "Migrate to signal inputs",
+  "category": "fact"
+ },
+ {
+  "id": 579,
+  "page": "karma",
+  "section": "Testing in continuous integration",
+  "sentence": "The `[MASK]` flag is also essential for running tests in a browser environment without a graphical interface.",
+  "answer": "--browsers=ChromeHeadless",
+  "closed_book_guess": "--no-sandbox",
+  "category": "fact"
+ },
+ {
+  "id": 582,
+  "page": "structural-directives",
+  "section": "Example use case",
+  "sentence": "The `[MASK]` prefix for this input is important for the [shorthand syntax](#structural-directive-shorthand).",
+  "answer": "select",
+  "closed_book_guess": "let",
+  "category": "example_name"
+ },
+ {
+  "id": 585,
+  "page": "NG05102",
+  "section": "Debugging the error",
+  "sentence": "A small mistake like `[MASK]` instead of `'window'` is enough to trigger this:   The same applies when calling `Renderer2.listen()` directly with a string that Angular doesn't know about:  ",
+  "answer": "'windw'",
+  "closed_book_guess": "window.navigator.userAgent",
+  "category": "example_name"
+ },
+ {
+  "id": 589,
+  "page": "overview",
+  "section": "Testing in continuous integration",
+  "sentence": "To test your Angular application in a CI server, run the standard test command:   Most CI servers set a `CI=true` environment variable, which `[MASK]` detects.",
+  "answer": "ng test",
+  "closed_book_guess": "Karma",
+  "category": "fact"
+ },
+ {
+  "id": 590,
+  "page": "setup",
+  "section": "`withXhr`",
+  "sentence": "The underlying `[MASK]` library does not safely handle redirects: it can forward `Authorization` headers on cross-origin redirects and is susceptible to denial-of-service (DoS) via redirect loops.",
+  "answer": "xhr2",
+  "closed_book_guess": "XMLHttpRequest",
+  "category": "fact"
+ },
+ {
+  "id": 597,
+  "page": "making-requests",
+  "section": "Credentials handling",
+  "sentence": "Available `credentials` values:  `'omit'`: Never send credentials `'same-origin'`: Send credentials only for same-origin requests (default) `'include'`: Always send credentials, even for cross-origin requests  TIP: Use `[MASK]` when you need to send authentication cookies or headers to a different domain that supports CORS.",
+  "answer": "credentials: 'include'",
+  "closed_book_guess": "include",
+  "category": "equivalent"
+ },
+ {
+  "id": 601,
+  "page": "attribute-directives",
+  "section": "Accepting input values",
+  "sentence": "Because `[MASK]` takes a static string rather than a dynamic expression, it doesn't need square brackets:  ",
+  "answer": "defaultColor",
+  "closed_book_guess": "selector",
+  "category": "example_name"
+ },
+ {
+  "id": 607,
+  "page": "cross-field-logic",
+  "section": "Conditional requirements",
+  "sentence": "For example, a registration form might require a company name only when the user selects a business account type:   The `when` option receives the same field context as any other rule function, so `[MASK]` works the same way.",
+  "answer": "valueOf",
+  "closed_book_guess": "value",
+  "category": "fact"
+ },
+ {
+  "id": 611,
+  "page": "styling",
+  "section": "`::ng-deep`",
+  "sentence": "In `p ::ng-deep a`, Angular requires the `<p>` element to come from the component's own template, but the `[MASK]` element may be anywhere in the application.",
+  "answer": "<a>",
+  "closed_book_guess": "a",
+  "category": "equivalent"
+ },
+ {
+  "id": 614,
+  "page": "dynamic-forms",
+  "section": "Define control classes",
+  "sentence": "The `type` attribute of the element is defined based on the `type` field specified in the `options` argument (for example `text`, `email`, `[MASK]`).",
+  "answer": "url",
+  "closed_book_guess": "date",
+  "category": "ambiguous"
+ },
+ {
+  "id": 621,
+  "page": "router-testing-module-migration",
+  "section": "RouterTestingModule migration",
+  "sentence": "When a test imports `SpyLocation` from `@angular/common/testing` and uses the `[MASK]` property, the schematic will also add `provideLocationMocks()` to preserve the original behavior.",
+  "answer": "urlChanges",
+  "closed_book_guess": "urlChangeListener",
+  "category": "fact"
+ },
+ {
+  "id": 628,
+  "page": "zone-js-testing-utilities",
+  "section": "Zone.js Testing Utilities",
+  "sentence": "For general Angular testing utilities, including `TestBed` and `[MASK]`, see the [Testing Utility APIs](guide/testing/utility-apis) guide.",
+  "answer": "ComponentFixture",
+  "closed_book_guess": "fakeAsync",
+  "category": "fact"
+ },
+ {
+  "id": 631,
+  "page": "resource",
+  "section": "Chaining resources",
+  "sentence": "`[MASK]` reads the value of `userResource` and automatically propagates its status to `companyResource`:  If `userResource` is **idle**, `companyResource` also becomes `idle`.",
+  "answer": "chain(userResource)",
+  "closed_book_guess": "linkedSignal",
+  "category": "fact"
+ },
+ {
+  "id": 649,
+  "page": "select",
+  "section": "Basic select",
+  "sentence": "Text input is prevented by applying the `ngCombobox` directive directly onto a non-interactive host element (such as a `div` or a `[MASK]`) instead of an `<input>`.",
+  "answer": "button",
+  "closed_book_guess": "span",
+  "category": "ambiguous"
+ },
+ {
+  "id": 660,
+  "page": "dynamic-forms-with-json",
+  "section": "Expressing conditional rules in config",
+  "sentence": "Users entering any other country can leave `[MASK]` blank without blocking submission.",
+  "answer": "stateCode",
+  "closed_book_guess": "state/province",
+  "category": "example_name"
+ },
+ {
+  "id": 663,
+  "page": "typed-forms",
+  "section": "Partial Values",
+  "sentence": "As a consequence, the type of `[MASK]` is `Partial<{email: string, password: string}>`.",
+  "answer": "login.value",
+  "closed_book_guess": "form.value",
+  "category": "example_name"
+ },
+ {
+  "id": 664,
+  "page": "anatomy-of-components",
+  "section": "anatomy-of-components",
+  "sentence": "This includes the `selector`, `[MASK]`, and other properties described throughout this guide.",
+  "answer": "template",
+  "closed_book_guess": "templateUrl",
+  "category": "ambiguous"
+ },
+ {
+  "id": 668,
+  "page": "NG8107",
+  "section": "Configuration requirements",
+  "sentence": "[`strictNullChecks`](tools/cli/template-typecheck#strict-null-checks) must also be enabled to emit `[MASK]` diagnostics.",
+  "answer": "optionalChainNotNullable",
+  "closed_book_guess": "optionalChain",
+  "category": "fact"
+ }
+]

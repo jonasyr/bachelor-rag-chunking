@@ -263,3 +263,15 @@ RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completenes
 RUBRIC_RULES_VERSION = "2026-10-18"  # version of the rules in src/scoring_rules.py (D35, D37)
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
+
+# ---------------------------------------------------------------------------
+# Corpus selection probe (D38): a diagnostic run once to choose the corpus, not part of the
+# experiment; scripts/corpus_probe/, method in docs/reference/corpus-selection.md
+# ---------------------------------------------------------------------------
+CORPUS_PROBE_DIR = ROOT / "data" / "corpus_probe"
+CORPUS_PROBE_SEED = 20261018  # order of the candidate sentences per page; fixed, never tuned
+CORPUS_PROBE_PER_PAGE = 12  # probes per page at most, so long pages do not dominate
+CORPUS_PROBE_SPAN_CHARS = (2, 40)  # length of a maskable inline code span
+CORPUS_PROBE_SENTENCE_CHARS = (40, 400)  # length of a usable prose sentence
+CORPUS_PROBE_CONTEXT_CHARS = 6000  # section text shown in the open-book run
+CORPUS_PROBE_WORKERS = 8  # parallel API requests

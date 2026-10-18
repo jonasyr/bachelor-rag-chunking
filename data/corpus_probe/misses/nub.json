@@ -1,0 +1,722 @@
+[
+ {
+  "id": 5,
+  "page": "Compiling executables",
+  "section": "Workers",
+  "sentence": "Name the constructor directly — the global, a property of `[MASK]`, or an import from `node:worker_threads` — and it compiles.",
+  "answer": "globalThis",
+  "closed_book_guess": "Worker_threads",
+  "category": "fact"
+ },
+ {
+  "id": 8,
+  "page": "Compiling executables",
+  "section": "Where the runtime is extracted",
+  "sentence": "The application's own files land beside it under `[MASK]`, keyed by the payload's content.",
+  "answer": "compile-app/<hash>",
+  "closed_book_guess": ".nub",
+  "category": "fact"
+ },
+ {
+  "id": 9,
+  "page": "Compiling executables",
+  "section": "`--drop`",
+  "sentence": "Repeatable, one category per use:   Two categories exist: `console` removes every `[MASK]` call, `debugger` every `debugger` statement.",
+  "answer": "console.*()",
+  "closed_book_guess": "console.log",
+  "category": "ambiguous"
+ },
+ {
+  "id": 14,
+  "page": "Config reference",
+  "section": "`jsx`",
+  "sentence": "The automatic runtime uses `[MASK]` as its package.",
+  "answer": "jsxImportSource",
+  "closed_book_guess": "react/jsx-runtime",
+  "category": "ambiguous"
+ },
+ {
+  "id": 15,
+  "page": "Config reference",
+  "section": "`loader`",
+  "sentence": "The supported loader names are:   An entry may also point an extension Nub already handles at something else — `[MASK]` imports TypeScript sources as strings, and `\".ts\": \"tsx\"` turns JSX on for them.",
+  "answer": "\".ts\": \"text\"",
+  "closed_book_guess": "\"text\"",
+  "category": "equivalent"
+ },
+ {
+  "id": 21,
+  "page": "Config reference",
+  "section": "`conditions`",
+  "sentence": "Node always keeps its built-in conditions (`node`, `import`, `require`, `default`); your names are extra, and on an `[MASK]` map they are matched before `default`.",
+  "answer": "exports",
+  "closed_book_guess": "ordered",
+  "category": "fact"
+ },
+ {
+  "id": 28,
+  "page": "AWS Lambda",
+  "section": "Build and push",
+  "sentence": "Build `[MASK]` on any host and disable provenance so ECR receives the image manifest Lambda expects:   Reuse `aws ecr describe-repositories` instead of `create-repository` when the repository already exists.",
+  "answer": "linux/amd64",
+  "closed_book_guess": "with `docker buildx`",
+  "category": "fact"
+ },
+ {
+  "id": 29,
+  "page": "AWS Lambda",
+  "section": "Build and push",
+  "sentence": "Build `linux/amd64` on any host and disable provenance so ECR receives the image manifest Lambda expects:   Reuse `aws ecr describe-repositories` instead of `[MASK]` when the repository already exists.",
+  "answer": "create-repository",
+  "closed_book_guess": "aws ecr create-repository",
+  "category": "equivalent"
+ },
+ {
+  "id": 30,
+  "page": "AWS Lambda",
+  "section": "Create the function",
+  "sentence": "When using the CLI, add both URL permissions that AWS requires for new Function URLs:   Update the AWS CLI if it does not recognize `[MASK]`.",
+  "answer": "--invoked-via-function-url",
+  "closed_book_guess": "--function-url-auth-type NONE",
+  "category": "fact"
+ },
+ {
+  "id": 35,
+  "page": "Cloudflare",
+  "section": "HTTP endpoint",
+  "sentence": "A minimal aliveness endpoint:   Point Wrangler at the handler:   If the project defines a `build` package script, set **Settings → Build → Build command** to `[MASK]`.",
+  "answer": "nub run build",
+  "closed_book_guess": "nub build",
+  "category": "fact"
+ },
+ {
+  "id": 41,
+  "page": "Cloudflare",
+  "section": "Letting Nub run the install",
+  "sentence": "The next `[MASK]` then refuses, unable to tell which one owns the project.",
+  "answer": "nub install",
+  "closed_book_guess": "install",
+  "category": "equivalent"
+ },
+ {
+  "id": 47,
+  "page": "Docker",
+  "section": "Adding Nub to your own image",
+  "sentence": " If you already build on a `[MASK]` base, install Nub with one line.",
+  "answer": "node",
+  "closed_book_guess": "debian",
+  "category": "ambiguous"
+ },
+ {
+  "id": 53,
+  "page": "Docker",
+  "section": "Adding Nub to your own image",
+  "sentence": "On Alpine, add `[MASK]` and `libstdc++` for the native addon:   To pin the floor Node version instead of the current line, use a `22` base (`node:22-slim` or `node:22-alpine`) — the lowest version Nub's fast tier supports.",
+  "answer": "libgcc",
+  "closed_book_guess": "gcompat",
+  "category": "fact"
+ },
+ {
+  "id": 70,
+  "page": "Google Cloud Run",
+  "section": "Architecture",
+  "sentence": " Cloud Run services require a `[MASK]` image.",
+  "answer": "linux/amd64",
+  "closed_book_guess": "container",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "Render",
+  "section": "Blueprint",
+  "sentence": " A repository can declare the same service in `[MASK]`:   The free plan is available for web services and has platform limits.",
+  "answer": "render.yaml",
+  "closed_book_guess": "Blueprints",
+  "category": "fact"
+ },
+ {
+  "id": 104,
+  "page": "Render",
+  "section": "Dashboard deployment",
+  "sentence": "The default web-service port is `[MASK]`, but reading `PORT` also covers a custom value.",
+  "answer": "10000",
+  "closed_book_guess": "3000",
+  "category": "fact"
+ },
+ {
+  "id": 105,
+  "page": "Render",
+  "section": "Dockerfile",
+  "sentence": "The HTTP server must listen on `0.0.0.0` and use `[MASK]`:  ",
+  "answer": "PORT",
+  "closed_book_guess": "process.env.PORT",
+  "category": "equivalent"
+ },
+ {
+  "id": 122,
+  "page": "FAQ",
+  "section": "What about `dotenv-cli`?",
+  "sentence": "Under the test mode (`APP_ENV=test`), `[MASK]` is skipped, following the Next.js convention.",
+  "answer": ".env.local",
+  "closed_book_guess": ".env.test.local",
+  "category": "fact"
+ },
+ {
+  "id": 124,
+  "page": "FAQ",
+  "section": "Does it work with `pnpm` / `npm` / `yarn` / `bun`?",
+  "sentence": "The runtime detects a `.pnp.cjs` and runs the project through it, and `[MASK]` resolves PnP bins through `pnpapi` (the way `yarn exec` does).",
+  "answer": "nubx",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 126,
+  "page": "FAQ",
+  "section": "Does it replace `npx`?",
+  "sentence": "Not installed** — `[MASK]` fetches the binary from the registry and runs it.",
+  "answer": "nubx",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 135,
+  "page": "Introduction",
+  "section": "Canary builds",
+  "sentence": " A nightly build of `main` publishes a canary for all platforms, versioned `<version>-canary.<date>.<n>`, as the rolling [canary release](https://github.com/nubjs/nub/releases/tag/canary) on GitHub:   An existing install switches with `[MASK]`.",
+  "answer": "nub upgrade --canary",
+  "closed_book_guess": "nub upgrade canary",
+  "category": "fact"
+ },
+ {
+  "id": 137,
+  "page": "Introduction",
+  "section": "Install",
+  "sentence": "See [Docker](/docs/deployment/docker):   In CI, swap `[MASK]` for the [setup-nub action](/docs/deployment/github-action):  ",
+  "answer": "actions/setup-node",
+  "closed_book_guess": "nub install",
+  "category": "fact"
+ },
+ {
+  "id": 140,
+  "page": "Introduction",
+  "section": "Introduction",
+  "sentence": "One binary runs your TypeScript files and scripts, installs your dependencies, and provisions Node itself — replacing `[MASK]`, `npm`/`pnpm`, `npx`, and `nvm` without adopting a new runtime.",
+  "answer": "node",
+  "closed_book_guess": "nodejs",
+  "category": "equivalent"
+ },
+ {
+  "id": 157,
+  "page": "Bun",
+  "section": "Gaps",
+  "sentence": " Install-only `[MASK]`.** The `[install]` keys (registry, scopes, TLS, release-age gate) are read; `linker`, runtime/test/serve fields, the security scanner, cache and global-dir behavior, and the wider `BUN_CONFIG_*` install-behavior family (retry, lockfile, and skip toggles) have no effect.",
+  "answer": "bunfig.toml",
+  "closed_book_guess": "configuration",
+  "category": "fact"
+ },
+ {
+  "id": 161,
+  "page": "Bun",
+  "section": "Gaps",
+  "sentence": "Custom CAs work through bunfig's `[install] cafile` and `ca` keys, and through the `[MASK]` `cafile` / `ca` keys, which work under every incumbent — see [Custom CAs](/docs/install/npm#custom-cas).",
+  "answer": ".npmrc",
+  "closed_book_guess": "`bunfig.toml`",
+  "category": "fact"
+ },
+ {
+  "id": 167,
+  "page": "Package manager",
+  "section": "`nub install`",
+  "sentence": "They also override `[MASK]` from `.npmrc`, `pnpm-workspace.yaml`, or the `pnpm` object in `package.json` — Nub reads that setting for pnpm compatibility, and a flag replaces only the axis it names.",
+  "answer": "supportedArchitectures",
+  "closed_book_guess": "overrides",
+  "category": "fact"
+ },
+ {
+  "id": 168,
+  "page": "Package manager",
+  "section": "`workspaces`",
+  "sentence": "Members resolve to each other through a `[MASK]` specifier instead of the registry.",
+  "answer": "workspace:",
+  "closed_book_guess": "workspace:specifier",
+  "category": "equivalent"
+ },
+ {
+  "id": 173,
+  "page": "Package manager",
+  "section": "`nub install`",
+  "sentence": "The `[MASK]` form drops the live progress display while keeping the dependency summary, and `--loglevel error` hides warnings without touching the rest.",
+  "answer": "--reporter=append-only",
+  "closed_book_guess": "--silent",
+  "category": "fact"
+ },
+ {
+  "id": 180,
+  "page": "npm",
+  "section": "`package-lock.json`",
+  "sentence": "A `lockfileVersion: 1` lock (npm 5/6) and a pre-2017 `[MASK]` — a nested `dependencies` tree with no `lockfileVersion` field at all — both resolve and install: Nub maps the legacy nested tree onto the same install-path scheme it uses for v2/v3.",
+  "answer": "npm-shrinkwrap.json",
+  "closed_book_guess": "shrinkwrap.json",
+  "category": "equivalent"
+ },
+ {
+  "id": 188,
+  "page": "pnpm",
+  "section": "Settings",
+  "sentence": "`[MASK]` — extra dependency/peer metadata merged onto resolved packages, hashed into the lockfile's `packageExtensionsChecksum`.",
+  "answer": "pnpm.packageExtensions",
+  "closed_book_guess": "packageExtensions",
+  "category": "equivalent"
+ },
+ {
+  "id": 189,
+  "page": "pnpm",
+  "section": "Settings",
+  "sentence": "Also readable from `.npmrc` and `[MASK]`, and overridable per axis for one run with [`--os` / `--cpu` / `--libc`](/docs/install#nub-install).",
+  "answer": "pnpm-workspace.yaml",
+  "closed_book_guess": ".nubrc",
+  "category": "fact"
+ },
+ {
+  "id": 194,
+  "page": "pnpm",
+  "section": "Settings",
+  "sentence": "Switching it to Nub's own identity with `nub pm use nub` migrates the pins to the top-level `overrides` and `[MASK]` fields in `package.json`.",
+  "answer": "patchedDependencies",
+  "closed_book_guess": "resolutions",
+  "category": "fact"
+ },
+ {
+  "id": 202,
+  "page": "The virtual store",
+  "section": "Project configuration",
+  "sentence": "Under `isolated` that option is `[MASK]`, which fills the hidden fallback tree at `node_modules/.store/node_modules/` — the directory your dependencies reach when they import something they never declared.",
+  "answer": "hoist",
+  "closed_book_guess": "hoistedFallbackDependencies",
+  "category": "fact"
+ },
+ {
+  "id": 204,
+  "page": "The virtual store",
+  "section": "GYP-based native builds",
+  "sentence": "The trigger is a `[MASK]` that names another package as a GYP build-file dependency:   Every node-gyp run generates with `--depth=.` and writes into `build/`, and GYP joins its output paths against that depth.",
+  "answer": "binding.gyp",
+  "closed_book_guess": "gypfile dependency",
+  "category": "fact"
+ },
+ {
+  "id": 208,
+  "page": "The virtual store",
+  "section": "Project configuration",
+  "sentence": "A related field, [`[MASK]`](/docs/config#installpublichoist), is outside `linker` because it applies under every strategy — it puts packages in the project's own top-level `node_modules` for tools that resolve from the project root, like TypeScript looking for `@types/*`.",
+  "answer": "publicHoist",
+  "closed_book_guess": "install.publicHoist",
+  "category": "equivalent"
+ },
+ {
+  "id": 215,
+  "page": "Yarn",
+  "section": "Gaps",
+  "sentence": "Install with Yarn and run with Nub, or select `[MASK]`.",
+  "answer": "nodeLinker: node-modules",
+  "closed_book_guess": "yarn dlx",
+  "category": "fact"
+ },
+ {
+  "id": 217,
+  "page": "Yarn",
+  "section": "Config files",
+  "sentence": "`httpProxy` / `httpsProxy` set the proxy, and `[MASK]` maps to strict-SSL.",
+  "answer": "enableStrictSsl",
+  "closed_book_guess": "strictSSL",
+  "category": "fact"
+ },
+ {
+  "id": 218,
+  "page": "Yarn",
+  "section": "Yarn",
+  "sentence": "Both formats are read:  Classic** — `[MASK]` with no `__metadata` block (Yarn 1.x).",
+  "answer": "yarn.lock",
+  "closed_book_guess": "v1 lockfile format",
+  "category": "fact"
+ },
+ {
+  "id": 220,
+  "page": "Yarn",
+  "section": "Config files",
+  "sentence": "Scope auth with no custom registry, with a shared registry, or with a registry that also has an `[MASK]` entry is skipped rather than widened into registry-wide credentials.",
+  "answer": "npmRegistries",
+  "closed_book_guess": "default registry",
+  "category": "fact"
+ },
+ {
+  "id": 229,
+  "page": "Node manager",
+  "section": "Pin sources",
+  "sentence": "Nub reads only the `node` entry's `version` under `devEngines.runtime`, and provisions that version regardless of `[MASK]`.",
+  "answer": "onFail",
+  "closed_book_guess": "engines.node.version",
+  "category": "fact"
+ },
+ {
+  "id": 249,
+  "page": "Plugins",
+  "section": "Built-in precedence",
+  "sentence": "Name a plugin for something that isn't a script (`nub-changeset`, `[MASK]`), or invoke a script-named one through `nub run` or by its bin directly.",
+  "answer": "nub-release",
+  "closed_book_guess": "nub-release-it",
+  "category": "example_name"
+ },
+ {
+  "id": 250,
+  "page": "Plugins",
+  "section": "Built-in precedence",
+  "sentence": "Native commands and package-manager verbs are matched before any plugin lookup, so `nub run`, `nub install`, `[MASK]`, and the rest always dispatch to Nub itself, even if a `nub-run` bin exists in `node_modules/.bin`.",
+  "answer": "nub add",
+  "closed_book_guess": "nub test",
+  "category": "ambiguous"
+ },
+ {
+  "id": 251,
+  "page": "Plugins",
+  "section": "Built-in precedence",
+  "sentence": "Name a plugin for something that isn't a script (`nub-changeset`, `nub-release`), or invoke a script-named one through `[MASK]` or by its bin directly.",
+  "answer": "nub run",
+  "closed_book_guess": "nub plugin",
+  "category": "fact"
+ },
+ {
+  "id": 254,
+  "page": "Plugins",
+  "section": "Built-in precedence",
+  "sentence": "Native commands and package-manager verbs are matched before any plugin lookup, so `nub run`, `nub install`, `nub add`, and the rest always dispatch to Nub itself, even if a `nub-run` bin exists in `[MASK]`.",
+  "answer": "node_modules/.bin",
+  "closed_book_guess": "node_modules",
+  "category": "equivalent"
+ },
+ {
+  "id": 261,
+  "page": "Package meta-manager",
+  "section": "`nub pm use`",
+  "sentence": "One command resolves the version (exact, range, or dist-tag; bare means `latest`), fetches and verifies it, writes `[MASK]`, and aligns the lockfile.",
+  "answer": "packageManager",
+  "closed_book_guess": "package.json",
+  "category": "ambiguous"
+ },
+ {
+  "id": 265,
+  "page": "Package meta-manager",
+  "section": "`nub pm pin`",
+  "sentence": "It writes the two pin fields — the exact `packageManager` and the `[MASK]` caret beside it — and nothing else: no lockfile conversion, no config migration.",
+  "answer": "devEngines.packageManager",
+  "closed_book_guess": "packageManagerVersion",
+  "category": "fact"
+ },
+ {
+  "id": 266,
+  "page": "Package meta-manager",
+  "section": "Package meta-manager",
+  "sentence": " Nub reads your project's package-manager pin, fetches that exact version from the npm registry — integrity-verified, cached under `[MASK]` — and runs it under the project's Node.",
+  "answer": "~/.cache/nub/pm",
+  "closed_book_guess": "~/.nub/cache",
+  "category": "fact"
+ },
+ {
+  "id": 274,
+  "page": "Corepack-style shims",
+  "section": "Running npm installs on Nub's engine",
+  "sentence": "Translated flags: `--ignore-scripts`, `--omit=dev` (also `--production` and `NODE_ENV=production`), `[MASK]`, and `--include`, which wins over `--omit` in either order as it does for npm; `--no-audit`, `--no-fund`, `--prefer-offline`, and the log-level and progress flags are accepted and ignored.",
+  "answer": "--omit=optional",
+  "closed_book_guess": "--include=dev",
+  "category": "fact"
+ },
+ {
+  "id": 283,
+  "page": "Script runner",
+  "section": "Lifecycle hooks",
+  "sentence": "Given these scripts:   A single `[MASK]` runs all three in order:   To skip the `pre` / `post` hooks (CI, or a security-conscious run), pass `--ignore-scripts`.",
+  "answer": "nub run build",
+  "closed_book_guess": "script run",
+  "category": "example_name"
+ },
+ {
+  "id": 294,
+  "page": "Debugging",
+  "section": "Running without augmentation",
+  "sentence": " To debug on plain Node — every augmentation off, the project's pinned version still used — add `--node` through `[MASK]`.",
+  "answer": "runtimeArgs",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 295,
+  "page": "Debugging",
+  "section": "Debugging",
+  "sentence": "VS Code resolves `[MASK]` against its own `PATH`.",
+  "answer": "runtimeExecutable",
+  "closed_book_guess": "node",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "Decorators",
+  "section": "Decorators",
+  "sentence": "Nub also reads `[MASK]` and `compilerOptions.emitDecoratorMetadata` from the selected or nearest `tsconfig.json`.",
+  "answer": "compilerOptions.experimentalDecorators",
+  "closed_book_guess": "experimentalDecorators",
+  "category": "equivalent"
+ },
+ {
+  "id": 311,
+  "page": "Decorators",
+  "section": "Decorators",
+  "sentence": " Set the decorator mode to `[MASK]` in `nub.jsonc` and decorated classes run with no build step.",
+  "answer": "legacy",
+  "closed_book_guess": "standard",
+  "category": "fact"
+ },
+ {
+  "id": 328,
+  "page": "Fetch handler",
+  "section": "Type checking",
+  "sentence": " Mark the export with `[MASK]` and TypeScript checks its shape.",
+  "answer": "satisfies ExportedHandler",
+  "closed_book_guess": "satisfies",
+  "category": "equivalent"
+ },
+ {
+  "id": 331,
+  "page": "Fetch handler",
+  "section": "What Nub serves",
+  "sentence": "A file passed to `[MASK]` runs as a test, a file passed to `--check` is only parsed, and a file after `-e` code is an argument to that code; none of them is served.",
+  "answer": "--test",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 336,
+  "page": "Runtime",
+  "section": "Augmentations",
+  "sentence": "[JSX](/docs/runtime/jsx)** — `.jsx` and `.tsx` files run with the modern automatic runtime by default, configured through `[MASK]` or a per-file `@jsxImportSource` pragma.",
+  "answer": "tsconfig.json",
+  "closed_book_guess": "jsxImportSource",
+  "category": "ambiguous"
+ },
+ {
+  "id": 348,
+  "page": "JSX",
+  "section": "`nub.jsonc`",
+  "sentence": "The classic runtime also accepts `jsxFactory` and `[MASK]`.",
+  "answer": "jsxFragmentFactory",
+  "closed_book_guess": "jsxFragment",
+  "category": "fact"
+ },
+ {
+  "id": 354,
+  "page": "JSX",
+  "section": "`tsconfig.json`",
+  "sentence": " Nub still reads the same settings from `[MASK]` when they are absent from `nub.jsonc`, so the runtime can share configuration with the rest of the toolchain.",
+  "answer": "compilerOptions",
+  "closed_book_guess": "tsconfig.json",
+  "category": "ambiguous"
+ },
+ {
+  "id": 367,
+  "page": "Loaders",
+  "section": "Extensions",
+  "sentence": " Loaders are keyed on file extension:  `.jsonc` — JSON with comments `.json5` — the JSON5 superset `[MASK]` `.yaml` / `.yml` `.txt` — loaded as a string, no parsing  The `.json` extension is not in this set: JSON modules are Node-native.",
+  "answer": ".toml",
+  "closed_book_guess": "`.toml` — TOML",
+  "category": "equivalent"
+ },
+ {
+  "id": 368,
+  "page": "Loaders",
+  "section": "Extensions",
+  "sentence": " Loaders are keyed on file extension:  `.jsonc` — JSON with comments `.json5` — the JSON5 superset `.toml` `[MASK]` / `.yml` `.txt` — loaded as a string, no parsing  The `.json` extension is not in this set: JSON modules are Node-native.",
+  "answer": ".yaml",
+  "closed_book_guess": "TOML files",
+  "category": "fact"
+ },
+ {
+  "id": 394,
+  "page": "Threadpool",
+  "section": "Child processes",
+  "sentence": "A `[MASK]` you set, in the shell or in an env file, is inherited as under Node.",
+  "answer": "UV_THREADPOOL_SIZE",
+  "closed_book_guess": "NODE_OPTIONS",
+  "category": "fact"
+ },
+ {
+  "id": 395,
+  "page": "Threadpool",
+  "section": "Opting out",
+  "sentence": " A `[MASK]` of your own wins.",
+  "answer": "UV_THREADPOOL_SIZE",
+  "closed_book_guess": "threadpool",
+  "category": "fact"
+ },
+ {
+  "id": 397,
+  "page": "Threadpool",
+  "section": "Threadpool",
+  "sentence": "The pool has four threads whatever the machine, and its size is read from `[MASK]` the first time it is used, so only the environment can change it.",
+  "answer": "UV_THREADPOOL_SIZE",
+  "closed_book_guess": "NUB_THREADPOOL_SIZE",
+  "category": "fact"
+ },
+ {
+  "id": 413,
+  "page": "Varlock",
+  "section": "Overriding the hand-over",
+  "sentence": "The exception is [dotenv-extended](https://www.npmjs.com/package/dotenv-extended), which has used the `[MASK]` name for its own incompatible format since 2016 — a project declaring it as a dependency keeps Nub's own environment loading and never sees Varlock mentioned.",
+  "answer": ".env.schema",
+  "closed_book_guess": ".env.override",
+  "category": "fact"
+ },
+ {
+  "id": 416,
+  "page": "Varlock",
+  "section": "Varlock",
+  "sentence": "When Nub detects `[MASK]`, it *disables its own [environment loading](/docs/runtime/env)* and hands the environment to Varlock for every file and script it runs.",
+  "answer": ".env.schema",
+  "closed_book_guess": "VARLOCK_CONFIG_PATH",
+  "category": "fact"
+ },
+ {
+  "id": 419,
+  "page": "Varlock",
+  "section": "Varlock",
+  "sentence": "Nub looks for `[MASK]` at the package you're running, then walks up to the workspace root.",
+  "answer": ".env.schema",
+  "closed_book_guess": ".env",
+  "category": "fact"
+ },
+ {
+  "id": 421,
+  "page": "Varlock",
+  "section": "Overriding the hand-over",
+  "sentence": " A `[MASK]` file is a signal Nub infers ownership from; an explicit [`envFile`](/docs/config#envfile) setting wins, and Varlock stays out of the chain.",
+  "answer": ".env.schema",
+  "closed_book_guess": ".env.varlock",
+  "category": "fact"
+ },
+ {
+  "id": 423,
+  "page": "Varlock",
+  "section": "Overriding the hand-over",
+  "sentence": "Setting `[MASK]` selects Varlock explicitly.",
+  "answer": "\"envFile\": \"varlock\"",
+  "closed_book_guess": "NUB_ENV_LOADER=varlock",
+  "category": "fact"
+ },
+ {
+  "id": 429,
+  "page": "Web Storage",
+  "section": "`localStorage`",
+  "sentence": "The `[MASK]` flag is also honored when set in `NODE_OPTIONS`.",
+  "answer": "--localstorage-file",
+  "closed_book_guess": "--disable-webstorage",
+  "category": "fact"
+ },
+ {
+  "id": 439,
+  "page": "Web Workers",
+  "section": "Messaging",
+  "sentence": "Inbound messages arrive as real `MessageEvent`s, so the payload is on `[MASK]`:   A thrown error in the worker surfaces on the main thread as an `ErrorEvent` carrying `message`, `error`, and the source location read from the worker's stack:   Payloads are cloned with Node's structured serializer.",
+  "answer": "ev.data",
+  "closed_book_guess": "event.data",
+  "category": "example_name"
+ },
+ {
+  "id": 451,
+  "page": "Unified runner",
+  "section": "Entry points",
+  "sentence": "  Module formats follow Node's own rules: a `[MASK]` file is CommonJS and a `.mts` file is an ES module.",
+  "answer": ".cts",
+  "closed_book_guess": ".cjs",
+  "category": "ambiguous"
+ },
+ {
+  "id": 455,
+  "page": "Watch mode",
+  "section": "`--watch`",
+  "sentence": " Flag and subcommand are aliases: `[MASK]` and `nub watch <file>` run the same code path.",
+  "answer": "nub --watch <file>",
+  "closed_book_guess": "--watch",
+  "category": "equivalent"
+ },
+ {
+  "id": 458,
+  "page": "Watch mode",
+  "section": "Watching a file",
+  "sentence": "TypeScript, JSX, `.env*` loading, `tsconfig.json` paths — everything `nub <file>` gives you is active here too, because `[MASK]` runs the same augmented Node underneath.",
+  "answer": "nub watch",
+  "closed_book_guess": "nub --watch <file>",
+  "category": "equivalent"
+ },
+ {
+  "id": 461,
+  "page": "Watch mode",
+  "section": "Watching a file",
+  "sentence": "Point `[MASK]` at an entry file — the one your `dev` script runs, for example.",
+  "answer": "nub watch",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 463,
+  "page": "Watch mode",
+  "section": "Plain Node `--watch`",
+  "sentence": "A `node` installed by [`[MASK]`](/docs/node#nub-node-shim) resolves the pinned version and adds nothing else, so `node --watch` stays vanilla there too.",
+  "answer": "nub node shim",
+  "closed_book_guess": "nub",
+  "category": "fact"
+ },
+ {
+  "id": 466,
+  "page": "Migrating from Bun to Nub",
+  "section": "Environment files",
+  "sentence": "Bun expands explicit files too, so a value that leaned on expansion in a `[MASK]` file needs the real value under Nub.",
+  "answer": "--env-file",
+  "closed_book_guess": ".env.local",
+  "category": "fact"
+ },
+ {
+  "id": 468,
+  "page": "Migrating from Bun to Nub",
+  "section": "Utilities, timing, and inspection",
+  "sentence": "  A practical migration tactic for the high-frequency APIs (`Bun.file`, `Bun.write`, `[MASK]`, `Bun.$`): write one small shim module that re-exports Node primitives under the call shapes your code already uses, import it everywhere those APIs were used, and the diff stays localized to that one file instead of spreading across every call site.",
+  "answer": "Bun.spawn",
+  "closed_book_guess": "Bun.sleep",
+  "category": "ambiguous"
+ },
+ {
+  "id": 482,
+  "page": "Running NestJS with Nub",
+  "section": "Nest CLI plugins",
+  "sentence": "If your project depends on either plugin, keep `[MASK]` for the build that produces your schema, or annotate the DTOs explicitly and drop the plugin.",
+  "answer": "nest build",
+  "closed_book_guess": "@nestjs/swagger",
+  "category": "fact"
+ },
+ {
+  "id": 494,
+  "page": "Using Nub with Turborepo",
+  "section": "How Turborepo runs a task, and why Nub reaches into it",
+  "sentence": "If you invoke the `turbo` binary directly from a plain shell, the tasks run on whatever Node is on your path with no augmentation, and a `[MASK]` entry will fail to parse.",
+  "answer": ".ts",
+  "closed_book_guess": ".nubrc",
+  "category": "fact"
+ },
+ {
+  "id": 497,
+  "page": "Using Nub with Turborepo",
+  "section": "What composes cleanly, and what to watch for",
+  "sentence": "Nub's augmentation rides in `[MASK]`, which Turborepo passes through to the task but does not fold into the cache hash unless you declare it, so adopting Nub does not by itself invalidate your cache.",
+  "answer": "NODE_OPTIONS",
+  "closed_book_guess": "NUB_OPTIONS",
+  "category": "fact"
+ }
+]

@@ -6,7 +6,7 @@
 
 Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
 RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
-Vue.js documentation in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
+documentation of Enroute (ADR 0038; the switch from Vue.js is in progress) in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
 Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
 ## Commands
@@ -67,6 +67,6 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/reference/configuration.md` — every key of `src/config.py` (meaning, ADR)
 - `docs/plan.md` — status (`#stand`), schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D37
+- `docs/adr/` — decisions D1–D38
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)

@@ -1,0 +1,623 @@
+[
+ {
+  "id": 18,
+  "page": "0002-boundary-test-on-a-synthetic-target",
+  "section": "Decision",
+  "sentence": "The verdict is `BOUNDARY_HOLDS` only when nothing adversarial reached the target under enforcement, routine work did, once each, and the evidence verifies; anything else is `[MASK]`, a defect in the runtime.",
+  "answer": "BOUNDARY_BROKEN",
+  "closed_book_guess": "BOUNDARY_FAILS",
+  "category": "fact"
+ },
+ {
+  "id": 26,
+  "page": "0002-boundary-test-on-a-synthetic-target",
+  "section": "Decision",
+  "sentence": "It is not bypassed there; the refusal is explained, and the image's documentation says to unset `[MASK]` for the one run.",
+  "answer": "NODE_ENV",
+  "closed_book_guess": "I can’t determine the masked term from the sentence alone.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 32,
+  "page": "0003-hosted-gate-in-every-run-path",
+  "section": "Options considered",
+  "sentence": "**A magic value in `[MASK]`.** Rejected: a key variable that is not a key is a trap for every other consumer of the same variable.",
+  "answer": "DECIONIS_API_KEY",
+  "closed_book_guess": "process.env.OPENAI_API_KEY",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "0004-transparent-interception",
+  "section": "Security impact",
+  "sentence": "`REDIRECT` maps a locally generated packet's destination to `[MASK]`, so nothing outside the namespace can use the interceptor as a relay; a destination that is one of its own listeners is refused as a loop.",
+  "answer": "127.0.0.1",
+  "closed_book_guess": "the namespace’s loopback address",
+  "category": "equivalent"
+ },
+ {
+  "id": 69,
+  "page": "0006-enforcement-boundary-identity",
+  "section": "Options considered",
+  "sentence": "**An instance identifier, from the runtime.** Read the container id from `[MASK]`, or the pod name from the downward API, and report that.",
+  "answer": "/proc/self/cgroup",
+  "closed_book_guess": "the cgroup namespace",
+  "category": "fact"
+ },
+ {
+  "id": 81,
+  "page": "0007-workload-provenance-signals",
+  "section": "Decision",
+  "sentence": "The shape.** `[MASK]` carries `runtime`, `artifact_type`, `image`, `digest`, `publisher` — every one optional — and a required `provenance: { source, trust_level }`.",
+  "answer": "WorkloadSignal",
+  "closed_book_guess": "workload_identity",
+  "category": "fact"
+ },
+ {
+  "id": 90,
+  "page": "distribution-discovery",
+  "section": "Decisions taken while packaging (Phase 2)",
+  "sentence": "`[MASK]` on npm** is published by the release workflow only once `NPM_PUBLISH_RUNTIME_ENABLED` is set, because a package's first publication cannot use trusted publishing until the publisher is configured on npm.",
+  "answer": "@decionis/agentsafe",
+  "closed_book_guess": "`@decionis/agent-safe-pipeline`",
+  "category": "fact"
+ },
+ {
+  "id": 109,
+  "page": "audit-events",
+  "section": "Sink configuration",
+  "sentence": "`SafeExecutor` emits this order when the applicable stages occur:   A grant held for a later claim (`SafeExecutor.hold`, which the card family uses so an issuer's authorization can claim it in milliseconds) records `[MASK]` in place of the claim, after the same admission checks and with nothing consumed.",
+  "answer": "GRANT_HELD",
+  "closed_book_guess": "hold",
+  "category": "fact"
+ },
+ {
+  "id": 125,
+  "page": "enforcement-boundary",
+  "section": "What a boundary is",
+  "sentence": "`[MASK]` prints this, with `--json` for a machine.",
+  "answer": "agentsafe identity",
+  "closed_book_guess": "I can’t verify the exact term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 172,
+  "page": "presence",
+  "section": "Managed",
+  "sentence": "`POST /_agentsafe/v1/escalations/{intent_id}/resume` is one bounded lookup: while the person is deciding it is `202` again with the escalation's state; a refusal is `[MASK]` (or `503` when the lookup failed closed); a fresh `ALLOW` with a grant runs the held request through the same claim, forward and finalize as any other, once.",
+  "answer": "403",
+  "closed_book_guess": "409",
+  "category": "fact"
+ },
+ {
+  "id": 178,
+  "page": "verifying-provider",
+  "section": "7. Effect receipt (VP-3)",
+  "sentence": "The organisation registers the public half with the authority (`POST /v1/execution/provider-keys`: `kid`, `issuer`, `algorithm` `[MASK]`, the OKP JWK), and the private half never leaves the provider.",
+  "answer": "EdDSA",
+  "closed_book_guess": "`use`",
+  "category": "fact"
+ },
+ {
+  "id": 180,
+  "page": "verifying-provider",
+  "section": "4. What the provider receives",
+  "sentence": "For a dispatch:   The eight components this profile knows, in the order the executor lists them: `@method`, `@path`, `content-digest`, `[MASK]`, `x-agent-safe-intent-hash`, `x-agent-safe-grant-id`, `x-agent-safe-decision-id`, `x-agent-safe-claim-attestation`.",
+  "answer": "idempotency-key",
+  "closed_book_guess": "x-agent-safe-profile-id",
+  "category": "fact"
+ },
+ {
+  "id": 186,
+  "page": "verifying-provider",
+  "section": "4. What the provider receives",
+  "sentence": "`[MASK]` is the request path without its query.",
+  "answer": "@path",
+  "closed_book_guess": "path",
+  "category": "equivalent"
+ },
+ {
+  "id": 193,
+  "page": "workload-provenance",
+  "section": "The trust source is the load-bearing field",
+  "sentence": "A provider reaching for `[MASK]` has decided it checked something, and if it did not, that is a defect to fix rather than a value to weaken in silence on its way to a policy.",
+  "answer": "verified",
+  "closed_book_guess": "I can’t verify the exact code term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 200,
+  "page": "beap-conformance",
+  "section": "BEAP: what the executor implements",
+  "sentence": "The profile mirror under `profiles/beap/v1.0` is the source this build was written against; the frozen 0.1 draft stays mirrored beside it under `[MASK]` and is never edited.",
+  "answer": "profiles/beap/v0.1",
+  "closed_book_guess": "profiles/beap/0.1",
+  "category": "equivalent"
+ },
+ {
+  "id": 211,
+  "page": "bypass-resistance",
+  "section": "The network is declared, not enforced, and now measured",
+  "sentence": "Read its verdicts asymmetrically:  `[MASK]` is **proof of a hole**.",
+  "answer": "REACHABLE",
+  "closed_book_guess": "ALLOW",
+  "category": "fact"
+ },
+ {
+  "id": 227,
+  "page": "compromised-principal-test",
+  "section": "Run it",
+  "sentence": "Then read the `[MASK]` line under the table: it is the same caller on every row, and it was never the reason anything was refused.",
+  "answer": "Caller",
+  "closed_book_guess": "principal",
+  "category": "fact"
+ },
+ {
+  "id": 235,
+  "page": "concepts",
+  "section": "Concepts",
+  "sentence": "`[MASK]` means Decionis issued an execution grant.",
+  "answer": "ALLOW",
+  "closed_book_guess": "I can’t determine the masked term from the sentence alone.",
+  "category": "fact"
+ },
+ {
+  "id": 245,
+  "page": "cryptographic-agility",
+  "section": "Current: SHA-256",
+  "sentence": " `CanonicalIntentHasher` uses Node.js `[MASK]` Hash format: `sha256:${hex}` — prefix identifies algorithm To rotate**: add new hash prefix (e.g., `sha3_256:${hex}`), update `AuthorizationVerifier` regex, maintain backward compatibility during transition The prefix-based format (`sha256:`) enables multi-algorithm support without breaking existing intents ",
+  "answer": "crypto.createHash(\"sha256\")",
+  "closed_book_guess": "crypto.createHash('sha256').digest('hex')",
+  "category": "equivalent"
+ },
+ {
+  "id": 274,
+  "page": "high-availability",
+  "section": "What the defaults give",
+  "sentence": " Two replicas**, preferring different nodes (`[MASK]` on the hostname), so one node's loss does not remove the boundary.",
+  "answer": "podAntiAffinity",
+  "closed_book_guess": "podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].topologyKey",
+  "category": "equivalent"
+ },
+ {
+  "id": 280,
+  "page": "high-availability",
+  "section": "What the defaults give",
+  "sentence": "Readiness on `[MASK]`**, which answers once the listener is bound; a pod that is not ready receives no traffic.",
+  "answer": "/_agentsafe/readyz",
+  "closed_book_guess": "/ready",
+  "category": "fact"
+ },
+ {
+  "id": 291,
+  "page": "production",
+  "section": "Production",
+  "sentence": "The `gateway.mode`, `gateway.routes` and `gateway.failurePolicy` names below are Helm values; runtime YAML uses `authority.mode`, `interception.routes` and `[MASK]` respectively.",
+  "answer": "authority.failurePolicy",
+  "closed_book_guess": "interception.failurePolicy",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "security",
+  "section": "What the chart establishes",
+  "sentence": " `runAsNonRoot`, `readOnlyRootFilesystem`, `[MASK]`, every capability dropped and `RuntimeDefault` seccomp.",
+  "answer": "allowPrivilegeEscalation: false",
+  "closed_book_guess": "allowPrivilegeEscalation",
+  "category": "equivalent"
+ },
+ {
+  "id": 308,
+  "page": "edge-evaluator",
+  "section": "Replicas and the shared replay store",
+  "sentence": "Where the store lives decides how far \"once\" reaches:  `[MASK]`** (the default) holds claims in the process.",
+  "answer": "memory",
+  "closed_book_guess": "in-memory store",
+  "category": "equivalent"
+ },
+ {
+  "id": 324,
+  "page": "execution-intent",
+  "section": "Execution intent",
+  "sentence": "The idempotency key stays part of the canonical binding by riding inside the trusted `context` under the reserved `[MASK]` entry; `IntentCapture` rejects a caller-supplied context key of that name.",
+  "answer": "idempotency_key",
+  "closed_book_guess": "intent_id",
+  "category": "fact"
+ },
+ {
+  "id": 329,
+  "page": "execution-outcomes",
+  "section": "Reading the authority's answer",
+  "sentence": "`[MASK]` is the one signal that separates a refused observation from one that was dropped or never supplied — without it the evidence-free retry would erase the fact that an observation existed at all.",
+  "answer": "effectEvidenceRefused",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 333,
+  "page": "execution-outcomes",
+  "section": "Execution outcomes and reconciliation",
+  "sentence": "`SafeExecutor.run` therefore returns one of five outcomes:   `[MASK]` is `true`, `false`, `false`, or `null` respectively so an unknown outcome cannot be mistaken for a definite failure, and a definite failure cannot be mistaken for an unknown one.",
+  "answer": "executed",
+  "closed_book_guess": "success",
+  "category": "fact"
+ },
+ {
+  "id": 334,
+  "page": "execution-outcomes",
+  "section": "A refusal before dispatch",
+  "sentence": "When the handler knows why, it throws `PreDispatchRefusal` with a code, and the code survives:   The result keeps `reason: \"HANDLER_FAILED_BEFORE_DISPATCH\"` as the category and adds `[MASK]`.",
+  "answer": "code: \"PAYLOAD_BINDING_MISMATCH\"",
+  "closed_book_guess": "I can’t verify the masked code term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 358,
+  "page": "configuration",
+  "section": "Many tenants in one process",
+  "sentence": "From the host's environment it inherits only how to reach the authority (`NODE_ENV`, `DECIONIS_API_URL`, `DECIONIS_TIMEOUT_MS`, `DECIONIS_ALLOW_INSECURE_LOOPBACK`, `AGENTSAFE_UPSTREAM_TIMEOUT_MS`, `AGENTSAFE_FAILURE_POLICY`), never a credential; a tenant's own `[MASK]` (1 to 120000) replaces the host's timeout for that tenant.",
+  "answer": "upstreamTimeoutMs",
+  "closed_book_guess": "AGENTSAFE_UPSTREAM_TIMEOUT_MS",
+  "category": "fact"
+ },
+ {
+  "id": 366,
+  "page": "deployment",
+  "section": "Run in the bank's Kubernetes cluster",
+  "sentence": "To promote the tested gateway, change `gateway.mode: enforcement` in the Helm values and run the same `[MASK]` command.",
+  "answer": "helm upgrade --install",
+  "closed_book_guess": "helm upgrade",
+  "category": "equivalent"
+ },
+ {
+  "id": 376,
+  "page": "deployment",
+  "section": "Set up the Decionis-managed cloud gateway",
+  "sentence": "For a command-line check, provision a private header file from the secret store, containing the `AgentSafe-Tenant-Key` and the API's own `[MASK]` header.",
+  "answer": "Authorization",
+  "closed_book_guess": "AgentSafe-API-Key",
+  "category": "fact"
+ },
+ {
+  "id": 390,
+  "page": "hosted-tcp-relay",
+  "section": "Enable the resource and save its credentials",
+  "sentence": "A public-address resource uses the same form, for example `[MASK]` (a documentation address to replace with your resource).",
+  "answer": "203.0.113.10:5432",
+  "closed_book_guess": "203.0.113.10",
+  "category": "example_name"
+ },
+ {
+  "id": 391,
+  "page": "hosted-tcp-relay",
+  "section": "Run the tunnel beside the application",
+  "sentence": " On the application machine:   Connect the application to `[MASK]`.",
+  "answer": "127.0.0.1:15432",
+  "closed_book_guess": "the local TCP port",
+  "category": "example_name"
+ },
+ {
+  "id": 393,
+  "page": "hosted-tcp-relay",
+  "section": "Run the tunnel beside the application",
+  "sentence": "Both commands use `[MASK]` by default.",
+  "answer": "https://api.decionis.com",
+  "closed_book_guess": "port 8080",
+  "category": "fact"
+ },
+ {
+  "id": 409,
+  "page": "http-interception",
+  "section": "Responses the gateway makes itself",
+  "sentence": "That answer is not a `code`: it is the gateway's own response (`version: agent-safe.gateway/1`), with state `ERROR`, `verdict` null, `reason_codes: [\"UPSTREAM_UNVERIFIED\"]`, `execution: NOT_FORWARDED` and `fallback`, the upstream to call directly in the meantime, and the headers `agentsafe-state: ERROR`, `[MASK]` and `Retry-After: 60`.",
+  "answer": "agentsafe-execution: NOT_FORWARDED",
+  "closed_book_guess": "agentsafe-reason-codes",
+  "category": "fact"
+ },
+ {
+  "id": 416,
+  "page": "routes",
+  "section": "Routes",
+  "sentence": "Without routes every `[MASK]`, `PUT`, `PATCH` and `DELETE` is still governed, under `http.<method>`; routes give the actions the names the policy uses.",
+  "answer": "POST",
+  "closed_book_guess": "GET",
+  "category": "fact"
+ },
+ {
+  "id": 427,
+  "page": "transparent-interception",
+  "section": "Govern",
+  "sentence": "In Docker, the same files as volumes and the same variables on the `[MASK]` service.",
+  "answer": "agentsafe-intercept",
+  "closed_book_guess": "app-container",
+  "category": "example_name"
+ },
+ {
+  "id": 433,
+  "page": "transparent-interception",
+  "section": "The process",
+  "sentence": "   With destinations to govern, the gateway's own settings apply as they do to `agentsafe proxy`, from the same places: `AGENTSAFE_MODE`, `[MASK]`, `DECIONIS_API_KEY_FILE`, `DECIONIS_TENANT_ID` and the rest of the [environment](../reference/environment.md), or a configuration file; the upstream is each governed host itself, and needs no setting.",
+  "answer": "AGENTSAFE_FAILURE_POLICY",
+  "closed_book_guess": "AGENTSAFE_CONFIG_FILE",
+  "category": "ambiguous"
+ },
+ {
+  "id": 447,
+  "page": "govern",
+  "section": "What the record shows",
+  "sentence": "The command itself receives `DECIONIS_DECISION_ID`, `[MASK]`, `DECIONIS_INTENT_HASH` and `DECIONIS_CLAIM_ATTESTATION`, the authority's own signed statement that this claim was made, which a system of record can verify before it acts ([Verifying Provider Profile](./authority/verifying-provider.md)).",
+  "answer": "DECIONIS_DOSSIER_ID",
+  "closed_book_guess": "DECIONIS_AUTHORITY_ID",
+  "category": "fact"
+ },
+ {
+  "id": 454,
+  "page": "human-approval",
+  "section": "Ceremony requirements and delivery",
+  "sentence": "A FIDO2 approval is `{ level: \"STANDARD\", methods: [\"WEBAUTHN\"] }`[MASK]`{ level: \"HIGH_CONFIDENCE\", methods: [\"WEBAUTHN\", \"ACTIVE_LIVENESS\"] }`.",
+  "answer": "; adding active liveness is ",
+  "closed_book_guess": "or",
+  "category": "ambiguous"
+ },
+ {
+  "id": 460,
+  "page": "human-approval",
+  "section": "Presence attestations",
+  "sentence": "Decionis also tells the organisation's webhook subscribers: `[MASK]` carries the same `selector` and `verification`, and `authority.escalation_resolved` carries what became of the hold once a proof was presented, the fresh decision's outcome or `REFUSED` with the code, with the proof's facts and never the proof.",
+  "answer": "authority.escalation_required",
+  "closed_book_guess": "authority.escalation_requested",
+  "category": "fact"
+ },
+ {
+  "id": 468,
+  "page": "incident-response",
+  "section": "The resume checklist",
+  "sentence": "`[MASK]` is refused with `HALT_CAUSE_PERSISTS` while the halt file is present or a posture drift still stands, which is the executor telling you it can see the cause.",
+  "answer": "POST /v1/control/resume",
+  "closed_book_guess": "Resume is refused",
+  "category": "fact"
+ },
+ {
+  "id": 475,
+  "page": "docker",
+  "section": "What Docker establishes, and what AgentSafe adds",
+  "sentence": "Declare the artifact on the container, and the gateway binds it into every intent it captures, with its trust source attached:   `[MASK]` reports what the container resolved:   Two things it will say, and both are the point.",
+  "answer": "agentsafe identity",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 484,
+  "page": "hosted",
+  "section": "What a tenant of the fleet sees",
+  "sentence": "The gateway removes the key, adds `[MASK]`, `X-Forwarded-Proto` and `X-Forwarded-Host`, and `x-agent-safe-intent-hash` on an evaluated request, and forwards the rest unchanged.",
+  "answer": "X-Forwarded-For",
+  "closed_book_guess": "Authorization",
+  "category": "fact"
+ },
+ {
+  "id": 512,
+  "page": "linux",
+  "section": "The service",
+  "sentence": "The Decionis key is a systemd credential: root writes it to `[MASK]`, systemd hands the service a private copy, and the gateway reads it from `DECIONIS_API_KEY_FILE`.",
+  "answer": "/etc/agentsafe/decionis-api-key",
+  "closed_book_guess": "/run/credentials/decioni.service/DECIONIS_API_KEY",
+  "category": "fact"
+ },
+ {
+  "id": 514,
+  "page": "linux",
+  "section": "The service",
+  "sentence": "The service refuses to start until `[MASK]` exists, and refuses the demo authority: a server runs in production and asks Decionis.",
+  "answer": "agentsafe.yaml",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 515,
+  "page": "linux",
+  "section": "The installer",
+  "sentence": "`[MASK]` pins a runtime version; `AGENTSAFE_INSTALL_PREFIX` chooses the prefix.",
+  "answer": "AGENTSAFE_VERSION",
+  "closed_book_guess": "AGENTSAFE_RUNTIME_VERSION",
+  "category": "fact"
+ },
+ {
+  "id": 516,
+  "page": "linux",
+  "section": "The installer",
+  "sentence": "The runtime is versioned on its own and its archives ride on the repository's releases, which are tagged by the library's version, so the installer reads which release carries the archive from the release listing; `[MASK]` names it for a mirror that has no listing.",
+  "answer": "AGENTSAFE_RELEASE_TAG",
+  "closed_book_guess": "latest_release_tag",
+  "category": "fact"
+ },
+ {
+  "id": 519,
+  "page": "linux",
+  "section": "The service",
+  "sentence": "`[MASK]` stays world-readable, because the service reads it as its dynamic user, and it holds no secret.",
+  "answer": "agentsafe.yaml",
+  "closed_book_guess": "Unknown",
+  "category": "ambiguous"
+ },
+ {
+  "id": 520,
+  "page": "macos",
+  "section": "By hand",
+  "sentence": " Download `[MASK]` (or `-darwin-x64`) and `SHA256SUMS` from the [release](https://github.com/decionis/agent-safe-pipeline/releases), verify, and extract:   Keep the directory together: on Intel the launcher runs the `node` and `agentsafe.cjs` beside it.",
+  "answer": "agentsafe-<version>-darwin-arm64.tar.gz",
+  "closed_book_guess": "agentsafe-darwin-arm64.tar.gz",
+  "category": "equivalent"
+ },
+ {
+  "id": 522,
+  "page": "macos",
+  "section": "Homebrew",
+  "sentence": "`[MASK]` runs the binary and the offline doctor.",
+  "answer": "brew test agentsafe",
+  "closed_book_guess": "brew test",
+  "category": "equivalent"
+ },
+ {
+  "id": 530,
+  "page": "macos",
+  "section": "Homebrew",
+  "sentence": "Homebrew 5 and later load a formula from a third-party tap only after you trust the tap once; `[MASK]` is the command, and an older Homebrew that does not have it does not need it.",
+  "answer": "brew trust",
+  "closed_book_guess": "brew tap-accept",
+  "category": "fact"
+ },
+ {
+  "id": 532,
+  "page": "local-testing",
+  "section": "Managed mode",
+  "sentence": "Its status lookups walk the managed lifecycle from `AWAITING_APPROVER` through verification and re-evaluation to `GRANT_READY`, or to `REJECTED`, `EXPIRED`, `CANCELLED`, or `[MASK]`.",
+  "answer": "FAILED",
+  "closed_book_guess": "REVOKED",
+  "category": "fact"
+ },
+ {
+  "id": 543,
+  "page": "local-testing",
+  "section": "Direct mode",
+  "sentence": "`[MASK]`, `presence.expire(requestId)`, and `presence.cancel(requestId)` produce the other terminal states.",
+  "answer": "presence.deny(requestId)",
+  "closed_book_guess": "presence.complete(requestId)",
+  "category": "fact"
+ },
+ {
+  "id": 552,
+  "page": "README",
+  "section": "Send your first governed action",
+  "sentence": "A `[MASK]` is not consequential and passes through untouched.",
+  "answer": "GET",
+  "closed_book_guess": "read",
+  "category": "equivalent"
+ },
+ {
+  "id": 553,
+  "page": "README",
+  "section": "Send your first governed action",
+  "sentence": "Try the other two:   The first is `[MASK]`: the exact bytes go to the upstream once, under a claimed single-use grant, and the upstream's own answer comes back with `agentsafe-decision`, `agentsafe-dossier-id` and `agentsafe-execution: FORWARDED` beside it.",
+  "answer": "ALLOW",
+  "closed_book_guess": "I can’t verify the exact code term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 571,
+  "page": "config",
+  "section": "The stored login",
+  "sentence": "Outside production it is the lowest layer for those three settings; a `[MASK]` in the environment wins.",
+  "answer": "DECIONIS_API_KEY",
+  "closed_book_guess": "value",
+  "category": "ambiguous"
+ },
+ {
+  "id": 575,
+  "page": "environment",
+  "section": "Environment reference",
+  "sentence": "The trusted executor (`[MASK]`) reads its own, larger set, listed in the [package README](../../packages/agentsafe/README.md#configuration).",
+  "answer": "agentsafe serve",
+  "closed_book_guess": "AGENTSAFE_ vars",
+  "category": "fact"
+ },
+ {
+  "id": 583,
+  "page": "telemetry",
+  "section": "Activation milestones",
+  "sentence": "The path, in order (`ACTIVATION_PATH`):   `[MASK]` is the number this repository measures itself by.",
+  "answer": "first_governed_action",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 585,
+  "page": "telemetry",
+  "section": "What leaves the process",
+  "sentence": "`agentsafe login --provision`, run by the person, sends the same `[MASK]` on its one call to mint a workspace, and nothing else.",
+  "answer": "User-Agent",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 586,
+  "page": "telemetry",
+  "section": "Activation milestones",
+  "sentence": "On a terminal each is one dim line (`✓ first governed action`); in JSON output it is `{\"event\":\"ACTIVATION\",\"milestone\":\"...\",\"at\":\"...\"}`; `/_agentsafe/status`[MASK]`activation`.",
+  "answer": " shows the gateway's own under ",
+  "closed_book_guess": "?",
+  "category": "ambiguous"
+ },
+ {
+  "id": 607,
+  "page": "dependency-review-2026-10-06",
+  "section": "Retained: development-only KaTeX advisory",
+  "sentence": "The upstream dependency declares KaTeX `[MASK]`; the fix is 0.18.2, outside that range, so this change does not force an unvalidated cross-minor override.",
+  "answer": "^0.16.0",
+  "closed_book_guess": "^0.18.0",
+  "category": "fact"
+ },
+ {
+  "id": 609,
+  "page": "dependency-review-2026-10-06",
+  "section": "Fixed: proxy address trust bypass",
+  "sentence": "An IPv6 trust range such as `::ffff:10.0.0.0/8` could incorrectly trust an arbitrary IPv4 peer and accept its forged `[MASK]` address.",
+  "answer": "X-Forwarded-For",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 610,
+  "page": "dependency-review-2026-10-06",
+  "section": "Fixed: proxy address trust bypass",
+  "sentence": " [GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h) rates the `[MASK]` IPv4-mapped IPv6 trust-subnet bypass critical.",
+  "answer": "proxy-addr",
+  "closed_book_guess": "proxy address",
+  "category": "equivalent"
+ },
+ {
+  "id": 612,
+  "page": "dependency-review-2026-10-06",
+  "section": "Fixed: proxy address trust bypass",
+  "sentence": "The workspace now overrides `[MASK]` to patched version 2.0.8.",
+  "answer": "proxy-addr",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "ambiguous"
+ },
+ {
+  "id": 632,
+  "page": "vulnerability-response",
+  "section": "Intake and ownership",
+  "sentence": "The security owner named in `[MASK]` assigns an uninvolved responder.",
+  "answer": "SECURITY.md",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 634,
+  "page": "zenodo-release-metadata",
+  "section": "Zenodo release metadata",
+  "sentence": "Zenodo gives `[MASK]` precedence when both files exist, which would create two mutable metadata sources.",
+  "answer": ".zenodo.json",
+  "closed_book_guess": "zenodo.json",
+  "category": "equivalent"
+ },
+ {
+  "id": 638,
+  "page": "zenodo-release-metadata",
+  "section": "Before a release",
+  "sentence": "It rejects version drift, creator-name inversion, missing or invalid ORCIDs, affiliation drift, repository mismatch, malformed release dates, and a competing `[MASK]` file.",
+  "answer": ".zenodo.json",
+  "closed_book_guess": "CITATION.cff",
+  "category": "fact"
+ },
+ {
+  "id": 642,
+  "page": "zenodo-release-metadata",
+  "section": "Before a release",
+  "sentence": "`CITATION.cff` `[MASK]` and `date-released`; and 3.",
+  "answer": "version",
+  "closed_book_guess": "authors",
+  "category": "ambiguous"
+ }
+]

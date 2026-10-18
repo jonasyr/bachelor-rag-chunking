@@ -157,3 +157,17 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `RUBRIC_RULES_VERSION` | `"2026-10-18"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+
+## Korpusauswahl
+
+Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus-selection.md).
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `CORPUS_PROBE_DIR` | `data/corpus_probe` | Kandidaten, Seitenstatistik, Ergebnisse, klassifizierte Fehltreffer, Wertung | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_SEED` | `20261018` | Reihenfolge der Kandidatensätze je Seite; fest, nie angepasst | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_PER_PAGE` | `12` | höchstens so viele Proben je Seite | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_SPAN_CHARS` | `(2, 40)` | Länge eines maskierbaren Inline-Code-Ausdrucks (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_SENTENCE_CHARS` | `(40, 400)` | Länge eines verwendbaren Prosasatzes (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_CONTEXT_CHARS` | `6000` | Abschnittstext im Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-enroute.md) |
+| `CORPUS_PROBE_WORKERS` | `8` | parallele API-Anfragen | [ADR 0038](../adr/0038-korpus-enroute.md) |

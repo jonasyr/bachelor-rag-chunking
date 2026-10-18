@@ -1,0 +1,1640 @@
+[
+ {
+  "id": 6,
+  "page": "Bulk actions",
+  "section": "Defining a bulk action",
+  "sentence": "`[MASK]` returns an [`ActionResult`](/actions/effects/) like any action.",
+  "answer": "handle()",
+  "closed_book_guess": "handleBulkAction",
+  "category": "fact"
+ },
+ {
+  "id": 8,
+  "page": "Confirmation & forms",
+  "section": "Collecting input with a form",
+  "sentence": "Declare `FormData $data` on `[MASK]` to receive the validated, cast values — the endpoint validates before calling you, so there's nothing to trigger yourself:  ",
+  "answer": "handle()",
+  "closed_book_guess": "#[Post]",
+  "category": "fact"
+ },
+ {
+  "id": 9,
+  "page": "Confirmation & forms",
+  "section": "Collecting input with a form",
+  "sentence": "The collected values are posted to the [action endpoint](/advanced/security/) and validated server-side, then `[MASK]` reads them.",
+  "answer": "handle()",
+  "closed_book_guess": "$request->input()",
+  "category": "fact"
+ },
+ {
+  "id": 13,
+  "page": "Confirmation & forms",
+  "section": "Collecting input with a form",
+  "sentence": "Declare `[MASK]` on `handle()` to receive the validated, cast values — the endpoint validates before calling you, so there's nothing to trigger yourself:  ",
+  "answer": "FormData $data",
+  "closed_book_guess": "array $data",
+  "category": "fact"
+ },
+ {
+  "id": 16,
+  "page": "Confirmation & forms",
+  "section": "Building the schema per request",
+  "sentence": "When the schema itself needs the request — to prefill from the record being acted on, or to vary fields by user — extend `FormActionDefinition` instead and build it in `[MASK]`:   Lattice marks these actions lazy automatically and fetches the schema from the trusted record context on open, so the prefilled values never ship in the page payload.",
+  "answer": "formSchema()",
+  "closed_book_guess": "buildFormSchema()",
+  "category": "fact"
+ },
+ {
+  "id": 18,
+  "page": "Confirmation & forms",
+  "section": "Collecting input with a form",
+  "sentence": " `[MASK]` renders a [form](/forms/overview/) in a modal before the action runs.",
+  "answer": "->form()",
+  "closed_book_guess": "form()",
+  "category": "equivalent"
+ },
+ {
+  "id": 30,
+  "page": "Effects & results",
+  "section": "How effects reach the client",
+  "sentence": "Each `[MASK]` is declared once on its PHP class via `#[AsEffect('…')]` and generated into the discriminated `Effect` union, so the PHP helpers and the client dispatcher stay in lockstep.",
+  "answer": "type",
+  "closed_book_guess": "effect type",
+  "category": "equivalent"
+ },
+ {
+  "id": 32,
+  "page": "Actions",
+  "section": "Defining an action",
+  "sentence": " Extend `[MASK]` and implement two methods: `definition()` describes the trigger (label, icon, variant, confirmation), and `handle()` runs the work and returns an `ActionResult`.",
+  "answer": "ActionDefinition",
+  "closed_book_guess": "Action",
+  "category": "fact"
+ },
+ {
+  "id": 38,
+  "page": "Actions",
+  "section": "Calling an action from a custom component",
+  "sentence": "A rejected action (non-2xx) still dispatches its effects — the error toast shows — and resolves `ok: false` with the response `[MASK]`.",
+  "answer": "data",
+  "closed_book_guess": "body",
+  "category": "fact"
+ },
+ {
+  "id": 40,
+  "page": "Actions",
+  "section": "Authorization",
+  "sentence": "An action's `[MASK]` also runs at render time — when it's hidden from the page rather than rejected outright, a strict accessor's 404 takes the whole page down with it.",
+  "answer": "authorize()",
+  "closed_book_guess": "authorization function",
+  "category": "equivalent"
+ },
+ {
+  "id": 41,
+  "page": "Actions",
+  "section": "Calling an action from a custom component",
+  "sentence": "Outside a hook context, use `callAction(action, payload, dispatch)` from `@lattice-php/action` with the dispatcher `[MASK]` returns.",
+  "answer": "useEffectDispatcher()",
+  "closed_book_guess": "useAction",
+  "category": "fact"
+ },
+ {
+  "id": 44,
+  "page": "Toasts",
+  "section": "Flashing from outside an action",
+  "sentence": " To show a toast after a controller redirect, from a listener, middleware, or anywhere an `ActionResult` is not available, use `[MASK]`:   The flashed toast is stored in the `latticeEffects` session bag, delivered with the next Inertia response, and shown once.",
+  "answer": "Effects::flash()",
+  "closed_book_guess": "Toast::flash()",
+  "category": "fact"
+ },
+ {
+  "id": 50,
+  "page": "Toasts",
+  "section": "Flashing from outside an action",
+  "sentence": "`[MASK]` accepts any number of effects — toast, callout, and more — see [Effects & results](/actions/effects/#flashing-effects-without-an-action) for details.",
+  "answer": "Effects::flash()",
+  "closed_book_guess": "flash()",
+  "category": "equivalent"
+ },
+ {
+  "id": 58,
+  "page": "Bundle size",
+  "section": "Code splitting",
+  "sentence": "Each lazy-loads its heavy dependency from inside the component (`[MASK]` + dynamic `import()`), so that dependency loads only when the component renders:  The **rich editor** loads TipTap + ProseMirror.",
+  "answer": "React.lazy",
+  "closed_book_guess": "onMounted()",
+  "category": "fact"
+ },
+ {
+  "id": 62,
+  "page": "Bundle size",
+  "section": "What is measured",
+  "sentence": "What remains is Lattice's marginal cost: its own code across `@lattice-php/core`, `[MASK]`, `form`, `table`, and `action`, plus the third-party dependencies it brings along.",
+  "answer": "ui",
+  "closed_book_guess": "layout",
+  "category": "fact"
+ },
+ {
+  "id": 67,
+  "page": "Enums reference",
+  "section": "Layout & spacing",
+  "sentence": " `Lattice\\Ui\\Enums` — the vocabulary for arranging components, used by `[MASK]` and the other layout primitives.",
+  "answer": "Stack",
+  "closed_book_guess": "Lattice\\Ui\\Components\\Flex",
+  "category": "ambiguous"
+ },
+ {
+  "id": 89,
+  "page": "Remote components",
+  "section": "Schema-driven federation",
+  "sentence": "Override `[MASK]` to point at a JSON manifest — an allow-listed URL or a local file — and return its nodes from `schema()`:   Render it by resolving the source on a page:   The manifest is a tree of `{ \"type\", \"id\", \"props\", \"schema\" }` nodes.",
+  "answer": "schemaEndpoint()",
+  "closed_book_guess": "manifestUrl",
+  "category": "fact"
+ },
+ {
+  "id": 91,
+  "page": "Security",
+  "section": "The signed reference",
+  "sentence": " When an interactive component (a `Form`, `Table`, `[MASK]`, `Fragment`, …) serializes, Lattice seals a reference into its props and ships it as the `X-Lattice-Ref` header on the component's requests.",
+  "answer": "Action",
+  "closed_book_guess": "Modal",
+  "category": "ambiguous"
+ },
+ {
+  "id": 92,
+  "page": "Security",
+  "section": "The signed reference",
+  "sentence": "A definition with no `can` declaration and no `[MASK]` override is therefore reachable for as long as its reference lives, even if the user's access was revoked in the meantime: revoke someone's admin role while they have the page open and their existing references keep working until they expire.",
+  "answer": "authorize()",
+  "closed_book_guess": "`canView`",
+  "category": "fact"
+ },
+ {
+  "id": 114,
+  "page": "Avatar",
+  "section": "Shape",
+  "sentence": "Reach for `[MASK]` where the avatar sits among other rounded surfaces — a user menu next to cards and buttons, say — so it does not read as the one round element in the row.",
+  "answer": "Rounded",
+  "closed_book_guess": "rounded-xl",
+  "category": "fact"
+ },
+ {
+  "id": 115,
+  "page": "Avatar",
+  "section": "Size",
+  "sentence": "It defaults to `[MASK]` and accepts any [`Size`](/advanced/enums/) from `Xs` through `Xl4`.",
+  "answer": "Size::Md",
+  "closed_book_guess": "Md",
+  "category": "equivalent"
+ },
+ {
+  "id": 120,
+  "page": "Avatar",
+  "section": "Source, name, and fallbacks",
+  "sentence": "`[MASK]` provides the accessible label and the initials fallback — the first letter of the first two words, uppercased (`Grace Hopper` → `GH`).",
+  "answer": "->name($name)",
+  "closed_book_guess": "name",
+  "category": "equivalent"
+ },
+ {
+  "id": 127,
+  "page": "Buttons & links",
+  "section": "Button",
+  "sentence": "`[MASK]` makes it a form's submit control — see [Forms](/forms/overview/#the-submit-button).",
+  "answer": "->submit()",
+  "closed_book_guess": "submit()",
+  "category": "equivalent"
+ },
+ {
+  "id": 140,
+  "page": "Charts",
+  "section": "Colors and theming",
+  "sentence": "Pass an explicit `color` to override — a colour name (`'success'`, `Color::success()`) resolves to the matching theme token, and any CSS colour (`'#2563eb'`, `[MASK]`) is used as-is.",
+  "answer": "Color::hex('#2563eb')",
+  "closed_book_guess": "'rgb(37, 99, 235)'",
+  "category": "ambiguous"
+ },
+ {
+  "id": 141,
+  "page": "Charts",
+  "section": "Formatting values and categories",
+  "sentence": "For dates, `DateFormat::date()`, `::time()`, and `::dateTime()` take a `DateTimeStyle` (Full/Long/Medium/Short), while `DateFormat::month()` and `::monthYear()` render just the month (`Jan`) or month and year (`[MASK]`) — pass `long: true` for the full month name.",
+  "answer": "Jan 2026",
+  "closed_book_guess": "Jan 2024",
+  "category": "ambiguous"
+ },
+ {
+  "id": 150,
+  "page": "Description list",
+  "section": "Description list",
+  "sentence": "    `[MASK]` lays out label/value pairs for a single subject — the read-only counterpart to a [form](/forms/overview/).",
+  "answer": "DescriptionList::make()",
+  "closed_book_guess": "Description list",
+  "category": "equivalent"
+ },
+ {
+  "id": 155,
+  "page": "Description list",
+  "section": "Dividers and bleed",
+  "sentence": "Inside a padded panel such as a [`[MASK]`](/components/layout/#card) the lines stop at the gutter — `->bleed()` runs them to the panel edge while the rows stay aligned with the rest of its content.",
+  "answer": "Card",
+  "closed_book_guess": "Card::make()",
+  "category": "equivalent"
+ },
+ {
+  "id": 157,
+  "page": "Description list",
+  "section": "Dividers and bleed",
+  "sentence": "Inside a padded panel such as a [`Card`](/components/layout/#card) the lines stop at the gutter — `[MASK]` runs them to the panel edge while the rows stay aligned with the rest of its content.",
+  "answer": "->bleed()",
+  "closed_book_guess": "bleed",
+  "category": "equivalent"
+ },
+ {
+  "id": 158,
+  "page": "Description list",
+  "section": "Entries",
+  "sentence": "  `[MASK]` is the escape hatch when a value is not a formatted scalar:  ",
+  "answer": "ComponentEntry",
+  "closed_book_guess": "HtmlString",
+  "category": "fact"
+ },
+ {
+  "id": 170,
+  "page": "Floating panel",
+  "section": "Floating panel",
+  "sentence": "   `[MASK]` fixes its children to a corner of the viewport, so they stay in place as the page scrolls.",
+  "answer": "FloatingPanel::make()",
+  "closed_book_guess": "FloatingPanel",
+  "category": "equivalent"
+ },
+ {
+  "id": 187,
+  "page": "Layout",
+  "section": "Grid",
+  "sentence": " `Grid::make()->columns(…)` lays children out in a responsive CSS grid:  `[MASK]` — three equal columns from the `md` breakpoint up, one column below.",
+  "answer": "->columns(3)",
+  "closed_book_guess": "grid-cols-1 md:grid-cols-3",
+  "category": "fact"
+ },
+ {
+  "id": 190,
+  "page": "Modals",
+  "section": "Effect-shipped",
+  "sentence": "For a modal that should be open on page load, flash the same effect from a controller or middleware instead of embedding it in the tree, with `Effects::flash()`:   `[MASK]` closes the hosted modal if it matches `$id`; `->closeModal()` with no argument closes every modal currently open, not just the topmost one.",
+  "answer": "->closeModal($id)",
+  "closed_book_guess": "Modal::close($id)",
+  "category": "fact"
+ },
+ {
+  "id": 191,
+  "page": "Modals",
+  "section": "Slide-out sheets",
+  "sentence": " `[MASK]` presents the dialog as a full-height sheet docked to a viewport edge instead of a centered window — the pattern for quick previews and edits alongside a table.",
+  "answer": "->slideOut()",
+  "closed_book_guess": "slideOver",
+  "category": "fact"
+ },
+ {
+  "id": 200,
+  "page": "Notifications",
+  "section": "Localized notifications",
+  "sentence": "Mixing is fine — `title` can be an `rt()` key while `[MASK]` stays a plain string.",
+  "answer": "body",
+  "closed_book_guess": "message",
+  "category": "fact"
+ },
+ {
+  "id": 206,
+  "page": "Notifications",
+  "section": "Realtime and polling",
+  "sentence": "If `[MASK]` isn't installed or `configureEcho()` hasn't run, the bell catches the failure, logs a console warning, and falls back to plain polling — it never crashes the page.",
+  "answer": "@laravel/echo-react",
+  "closed_book_guess": "Laravel Echo",
+  "category": "fact"
+ },
+ {
+  "id": 207,
+  "page": "Notifications",
+  "section": "Configuration",
+  "sentence": "`[MASK]`** — page size for the list and its \"load more\" pagination.",
+  "answer": "per_page",
+  "closed_book_guess": "perPage",
+  "category": "equivalent"
+ },
+ {
+  "id": 210,
+  "page": "Notifications",
+  "section": "Placing the bell",
+  "sentence": " Drop `[MASK]` into a [`Topbar`](/core/layouts/#the-header-bar) like any other component:   It defaults to a popover anchored under the bell.",
+  "answer": "Notifications::make()",
+  "closed_book_guess": "Notifications",
+  "category": "equivalent"
+ },
+ {
+  "id": 215,
+  "page": "Components",
+  "section": "Where components appear",
+  "sentence": "Containers nest freely, so a `Card` can hold a `Stack` of `[MASK]` and `Button`s, and a `Section` can hold a `Grid` of anything.",
+  "answer": "Text",
+  "closed_book_guess": "TextInput",
+  "category": "ambiguous"
+ },
+ {
+  "id": 228,
+  "page": "Popover",
+  "section": "Positioning",
+  "sentence": " `[MASK]` and `->align()` place the panel relative to the trigger, taking the `Placement` (`Top`, `Right`, `Bottom`, `Left`) and `ContentAlign` (`Start`, `Center`, `End`) enums.",
+  "answer": "->side()",
+  "closed_book_guess": "->position()",
+  "category": "fact"
+ },
+ {
+  "id": 232,
+  "page": "Progress",
+  "section": "Value and readout",
+  "sentence": " `->value($value)` and the constructor argument set the current value; `[MASK]` sets the scale.",
+  "answer": "->max($max)",
+  "closed_book_guess": "->max()",
+  "category": "equivalent"
+ },
+ {
+  "id": 234,
+  "page": "Progress",
+  "section": "Progress",
+  "sentence": "    `Progress::bar($value)` renders a linear progress bar and `[MASK]` a radial ring.",
+  "answer": "Progress::circle($value)",
+  "closed_book_guess": "Progress::ring($value)",
+  "category": "fact"
+ },
+ {
+  "id": 254,
+  "page": "Section & Collapsible",
+  "section": "Accordion",
+  "sentence": "`->gap()` spaces the items like a `[MASK]`.",
+  "answer": "Stack",
+  "closed_book_guess": "flex container",
+  "category": "ambiguous"
+ },
+ {
+  "id": 255,
+  "page": "Separator",
+  "section": "Separator",
+  "sentence": "   `[MASK]` renders a thin hairline rule that visually divides content.",
+  "answer": "Separator::make()",
+  "closed_book_guess": "Separator",
+  "category": "equivalent"
+ },
+ {
+  "id": 256,
+  "page": "Separator",
+  "section": "Bleed",
+  "sentence": "`[MASK]` extends it across the gutter so it meets both edges:  ",
+  "answer": "->bleed()",
+  "closed_book_guess": "Bleed",
+  "category": "equivalent"
+ },
+ {
+  "id": 268,
+  "page": "Tabs",
+  "section": "Orientation and alignment",
+  "sentence": "Vertical tabs only read `[MASK]` — it moves the strip to the right of the panels; every other value keeps it on the left.",
+  "answer": "End",
+  "closed_book_guess": "right",
+  "category": "fact"
+ },
+ {
+  "id": 270,
+  "page": "Tabs",
+  "section": "Orientation and alignment",
+  "sentence": " `[MASK]` moves the strip to the side of the panels.",
+  "answer": "->orientation(Orientation::Vertical)",
+  "closed_book_guess": "vertical",
+  "category": "equivalent"
+ },
+ {
+  "id": 275,
+  "page": "Text & badges",
+  "section": "Text",
+  "sentence": "`->color()` — a colour name (`Color::success()`, `'success'`) or any CSS colour; text renders in the `[MASK]` colour when unset.",
+  "answer": "muted",
+  "closed_book_guess": "default",
+  "category": "fact"
+ },
+ {
+  "id": 305,
+  "page": "Authorization",
+  "section": "Declaring `can`",
+  "sentence": "Putting `[MASK]` on a page gates who can _load_ the page; it does not gate the table on it.",
+  "answer": "can: 'admin.users.manage'",
+  "closed_book_guess": "canView",
+  "category": "example_name"
+ },
+ {
+  "id": 307,
+  "page": "Authorization",
+  "section": "Reading trusted context",
+  "sentence": "Inside `[MASK]` on a component that renders as part of a page, use the `OrNull` accessors (`contextModelOrNull()`, `contextStringOrNull()`, `contextIntOrNull()`) or `hasContext()` instead of their strict counterparts.",
+  "answer": "authorize()",
+  "closed_book_guess": "render()",
+  "category": "fact"
+ },
+ {
+  "id": 308,
+  "page": "Authorization",
+  "section": "Declaring `can`",
+  "sentence": "Every definition is reached through its own endpoint (`[MASK]`, `lattice/actions/{action}`, …), which runs the middleware in `config('lattice.<group>.middleware')` — `['web', 'auth']` by default — and then the definition's own gate.",
+  "answer": "lattice/tables/{table}",
+  "closed_book_guess": "lattice/resources/{resource}",
+  "category": "fact"
+ },
+ {
+  "id": 311,
+  "page": "Authorization",
+  "section": "Declaring `can`",
+  "sentence": "A page's `can` (or `[MASK]`) does **not** protect the definitions rendered on it.",
+  "answer": "middleware",
+  "closed_book_guess": "authorize",
+  "category": "fact"
+ },
+ {
+  "id": 317,
+  "page": "Closure evaluation",
+  "section": "Hook-specific utilities",
+  "sentence": " Some callbacks add more named utilities:    Inside row hooks, use the named `[MASK]` utility when you need values outside the row:   `Stringable` always evaluates truthy — even when it wraps an empty string — so `?:` never falls through to the second operand.",
+  "answer": "$form",
+  "closed_book_guess": "$record",
+  "category": "fact"
+ },
+ {
+  "id": 318,
+  "page": "Closure evaluation",
+  "section": "`handle()` parameter resolution",
+  "sentence": " Form, action, and bulk-action endpoints validate the submission once, then invoke `handle()` through the same evaluator, with a small, purpose-built context:    `$data`, `$request`, and `[MASK]` are reserved names — declare only the ones you need, in any order.",
+  "answer": "$records",
+  "closed_book_guess": "$record",
+  "category": "fact"
+ },
+ {
+  "id": 330,
+  "page": "Context",
+  "section": "Reading it",
+  "sentence": "`[MASK]`** — presence, distinct from \"not found\": a key that's set but whose resolver finds nothing still passes this check.",
+  "answer": "hasContext('key')",
+  "closed_book_guess": "hasContext",
+  "category": "equivalent"
+ },
+ {
+  "id": 336,
+  "page": "Fragments",
+  "section": "Defining a fragment",
+  "sentence": " Extend `FragmentDefinition` and build its `[MASK]`, the same way a page does.",
+  "answer": "schema()",
+  "closed_book_guess": "FragmentBuilder",
+  "category": "fact"
+ },
+ {
+  "id": 338,
+  "page": "Fragments",
+  "section": "Rendering a fragment",
+  "sentence": " Render it with `[MASK]`, passing the definition class.",
+  "answer": "Fragment::lazy()",
+  "closed_book_guess": "render_fragment",
+  "category": "fact"
+ },
+ {
+  "id": 357,
+  "page": "Icons",
+  "section": "Vendoring icons from a package",
+  "sentence": "`[MASK]`), or a path to a local directory.",
+  "answer": "lucide-static/icons",
+  "closed_book_guess": "Icon::fromPackage('heroicons')",
+  "category": "example_name"
+ },
+ {
+  "id": 359,
+  "page": "Icons",
+  "section": "Vendoring icons from a package",
+  "sentence": "Reference them by name like any other icon:   `from`** — a folder of SVGs: a package's icon directory resolved from `[MASK]` (e.g.",
+  "answer": "node_modules",
+  "closed_book_guess": "base_path()",
+  "category": "fact"
+ },
+ {
+  "id": 360,
+  "page": "Icons",
+  "section": "The sprite outside Vite",
+  "sentence": "`[MASK]` builds the sprite the plugin would serve — Lattice's icons, every installed component package's icons, and your `icons.dirs` — and returns an inline `SpriteValue` for `SpriteProvider`:   It takes the same options as `lattice()`, so the sprite stays identical to the one your app ships.",
+  "answer": "buildLatticeSprite()",
+  "closed_book_guess": "sprite()",
+  "category": "fact"
+ },
+ {
+  "id": 365,
+  "page": "Layouts",
+  "section": "Choosing a layout",
+  "sentence": "`[MASK]` opts out entirely: the page renders with no shell, which is what auth and error screens usually want.",
+  "answer": "PageLayout::None",
+  "closed_book_guess": "null",
+  "category": "fact"
+ },
+ {
+  "id": 368,
+  "page": "Layouts",
+  "section": "Defining a layout",
+  "sentence": "The `#[AsLayout]` attribute registers it under a key, and `Outlet::make()` marks where the page's content appears:   `schema()` receives the `[MASK]`, so the shell can adapt to the current user — highlighting the active section, showing an avatar, or hiding links a visitor can't reach.",
+  "answer": "Request",
+  "closed_book_guess": "$context",
+  "category": "fact"
+ },
+ {
+  "id": 379,
+  "page": "Navigation",
+  "section": "Client-side chrome",
+  "sentence": "`[MASK]` collapses the desktop rail to icons while `collapsed` is true (children read it through `useCollapsed()`), and renders the mobile drawer with a backdrop while `open` is true — closing it on backdrop click and Escape through `onOpenChange`.",
+  "answer": "Sidebar",
+  "closed_book_guess": "collapsed",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "Navigation",
+  "section": "Client-side chrome",
+  "sentence": " The React components behind `Sidebar`, `Topbar`, `Breadcrumbs`, `Menu`, `[MASK]`, and `Dropdown` are exported from `@lattice-php/ui` for custom pages and component packages.",
+  "answer": "MenuItem",
+  "closed_book_guess": "UserMenu",
+  "category": "ambiguous"
+ },
+ {
+  "id": 383,
+  "page": "Pages",
+  "section": "Shared base pages",
+  "sentence": " `layout`, `[MASK]`, `middleware`, and `endpoints` are inherited: a page that omits one of them takes the nearest value set by a parent class.",
+  "answer": "width",
+  "closed_book_guess": "title",
+  "category": "fact"
+ },
+ {
+  "id": 392,
+  "page": "Realtime",
+  "section": "Declaring listeners",
+  "sentence": "Each names a channel, the broadcast event(s) to react to, and the effects to dispatch:   When an `OrderShipped` event broadcasts on the `[MASK]` channel, every connected client viewing the page shows the toast.",
+  "answer": "orders",
+  "closed_book_guess": "orders.{{ $order->id }}",
+  "category": "example_name"
+ },
+ {
+  "id": 394,
+  "page": "Realtime",
+  "section": "Declaring listeners",
+  "sentence": "The leading dot (`[MASK]`) matches a broadcast name as-is; drop it to use Laravel's namespaced event class convention.",
+  "answer": ".OrderShipped",
+  "closed_book_guess": ".",
+  "category": "example_name"
+ },
+ {
+  "id": 395,
+  "page": "Component packages",
+  "section": "What a package ships",
+  "sentence": "A `[MASK]` declaring the Lattice entry points.** The generator writes `plugin` and `discover`; add `standalone` after configuring the separate precompile described below:   2.",
+  "answer": "composer.json",
+  "closed_book_guess": "manifest",
+  "category": "fact"
+ },
+ {
+  "id": 404,
+  "page": "Component packages",
+  "section": "Testing your package",
+  "sentence": "Both discovery sides account for this: PHP discovery also reads the package's own `composer.json` for `extra.lattice.discover`, and the Vite plugin also reads it for `[MASK]`.",
+  "answer": "extra.lattice.plugin",
+  "closed_book_guess": "extra.lattice.vite",
+  "category": "fact"
+ },
+ {
+  "id": 417,
+  "page": "Custom columns",
+  "section": "6. Wire the registry in app.tsx",
+  "sentence": "Without it, `[MASK]` falls back to the built-in registry, your custom type has no cell, and the column silently falls back to the built-in text cell — the value renders as plain text instead of through your component.",
+  "answer": "createLatticeApp",
+  "closed_book_guess": "ColumnRegistry",
+  "category": "fact"
+ },
+ {
+  "id": 427,
+  "page": "Custom fields",
+  "section": "6. Wire the registry in app.tsx",
+  "sentence": "Without it, `[MASK]` falls back to the built-in registry, your custom type has no renderer, and the node renders a muted missing-component placeholder instead of your field (Lattice also logs a `[lattice] No component registered…` warning in development to flag exactly this).",
+  "answer": "createLatticeApp",
+  "closed_book_guess": "fieldRegistry",
+  "category": "fact"
+ },
+ {
+  "id": 430,
+  "page": "Extending Lattice",
+  "section": "Where to go next",
+  "sentence": " [Custom fields](/extending/custom-fields/) — end-to-end walkthrough for a `[MASK]` form field.",
+  "answer": "ColorPicker",
+  "closed_book_guess": "custom",
+  "category": "example_name"
+ },
+ {
+  "id": 433,
+  "page": "Extending Lattice",
+  "section": "The mental model",
+  "sentence": " Every client extension in Lattice carries a `[MASK]` string.",
+  "answer": "type",
+  "closed_book_guess": "namespace",
+  "category": "fact"
+ },
+ {
+  "id": 439,
+  "page": "Extending Lattice",
+  "section": "Type generation",
+  "sentence": "Without running `lattice:typescript` the props fall back to a loose `[MASK]` — the renderer still works, types are just not narrowed.",
+  "answer": "Record<string, unknown>",
+  "closed_book_guess": "Record<string, any>",
+  "category": "fact"
+ },
+ {
+  "id": 443,
+  "page": "Registry and types",
+  "section": "The augmentable interfaces",
+  "sentence": "`[MASK]` — maps an effect type to its props shape.",
+  "answer": "EffectProps",
+  "closed_book_guess": "EffectPropsMap",
+  "category": "fact"
+ },
+ {
+  "id": 451,
+  "page": "Registry and types",
+  "section": "The augmentable interfaces",
+  "sentence": "`[MASK]` — maps a type string to its props shape for column cells.",
+  "answer": "ColumnProps",
+  "closed_book_guess": "CellTypeRegistry",
+  "category": "fact"
+ },
+ {
+  "id": 461,
+  "page": "Conditional fields",
+  "section": "Operators",
+  "sentence": "A bare `'empty'` or `[MASK]` string with no third argument is treated as a value to compare against, not an operator.",
+  "answer": "'filled'",
+  "closed_book_guess": "'not empty'",
+  "category": "fact"
+ },
+ {
+  "id": 471,
+  "page": "Builder",
+  "section": "Reordering",
+  "sentence": "Pass `[MASK]` to fix the order.",
+  "answer": "->reorderable(false)",
+  "closed_book_guess": "orderable",
+  "category": "fact"
+ },
+ {
+  "id": 476,
+  "page": "Checkbox group",
+  "section": "Sections",
+  "sentence": "`->collapsible()` turns each section into a collapsible panel — pass `[MASK]` to start them all closed, which keeps a long catalog scannable.",
+  "answer": "collapsed: true",
+  "closed_book_guess": "true",
+  "category": "fact"
+ },
+ {
+  "id": 494,
+  "page": "Color picker",
+  "section": "Color picker",
+  "sentence": "The value is a lowercase hex string like `[MASK]`.",
+  "answer": "#3b82f6",
+  "closed_book_guess": "#ff0000",
+  "category": "ambiguous"
+ },
+ {
+  "id": 497,
+  "page": "Date input",
+  "section": "Minimum and maximum",
+  "sentence": " `->min()` and `[MASK]` bound the selectable range.",
+  "answer": "->max()",
+  "closed_book_guess": "max",
+  "category": "equivalent"
+ },
+ {
+  "id": 513,
+  "page": "File upload",
+  "section": "Images",
+  "sentence": " `[MASK]` restricts the picker to images and renders an image-aware preview.",
+  "answer": "->image()",
+  "closed_book_guess": "ImageUpload",
+  "category": "fact"
+ },
+ {
+  "id": 514,
+  "page": "File upload",
+  "section": "Finalizing a signed upload",
+  "sentence": "It moves the object and returns the finalized `disk`, `path`, `name`, `mime_type`, and `size` for each file:   `[MASK]` throws if the destination stays inside the temporary prefix — return a path outside `lattice.files.temp_prefix`.",
+  "answer": "finalizeSignedUploads()",
+  "closed_book_guess": "finalizeSignedUpload",
+  "category": "equivalent"
+ },
+ {
+  "id": 519,
+  "page": "Number input",
+  "section": "Min, max, and step",
+  "sentence": " `->min()` and `->max()` bound the value; `[MASK]` sets the increment used by the spinner controls and accepts decimals for fractional values such as prices.",
+  "answer": "->step()",
+  "closed_book_guess": "step",
+  "category": "equivalent"
+ },
+ {
+  "id": 521,
+  "page": "Number input",
+  "section": "Slider",
+  "sentence": "Pair it with `->min()` and `[MASK]` so the track has defined bounds.",
+  "answer": "->max()",
+  "closed_book_guess": "max()",
+  "category": "equivalent"
+ },
+ {
+  "id": 522,
+  "page": "Number input",
+  "section": "Slider",
+  "sentence": " `[MASK]` renders the field as a range slider instead of a spinner.",
+  "answer": "->slider()",
+  "closed_book_guess": "slider()",
+  "category": "equivalent"
+ },
+ {
+  "id": 528,
+  "page": "Fields",
+  "section": "Disabled",
+  "sentence": " `[MASK]` renders the field non-interactive.",
+  "answer": "->disabled()",
+  "closed_book_guess": "disabled",
+  "category": "equivalent"
+ },
+ {
+  "id": 531,
+  "page": "Fields",
+  "section": "Hidden and visible",
+  "sentence": " `[MASK]` drops the field from the rendered form entirely — it is absent from the payload and its validation is skipped, exactly like every other Lattice component's shared render gate.",
+  "answer": "->hidden()",
+  "closed_book_guess": "hidden",
+  "category": "equivalent"
+ },
+ {
+  "id": 545,
+  "page": "Password input",
+  "section": "Confirmation",
+  "sentence": " `[MASK]` adds a second field the user must re-type to confirm.",
+  "answer": "->needsConfirmation()",
+  "closed_book_guess": "confirmationInput",
+  "category": "fact"
+ },
+ {
+  "id": 550,
+  "page": "Pattern input",
+  "section": "Pattern input",
+  "sentence": "Create one with `PatternInput::make()` and list the available tokens with `[MASK]`.",
+  "answer": "->tokens()",
+  "closed_book_guess": "PatternInput::tokens()",
+  "category": "equivalent"
+ },
+ {
+  "id": 554,
+  "page": "Pattern input",
+  "section": "Multiline",
+  "sentence": " `[MASK]` lets Enter start a new line — the pattern becomes a small block of text with chips, for content like an address footer built from variables.",
+  "answer": "->multiline()",
+  "closed_book_guess": "multiline pattern input",
+  "category": "equivalent"
+ },
+ {
+  "id": 557,
+  "page": "Repeater",
+  "section": "Row-scoped conditions",
+  "sentence": "So `visibleWhen`, `[MASK]`, `readOnlyWhen`, and `disabledWhen` on a row field compare against its siblings, and each row evaluates independently — the same client-side and on the server.",
+  "answer": "requiredWhen",
+  "closed_book_guess": "hiddenWhen",
+  "category": "ambiguous"
+ },
+ {
+  "id": 577,
+  "page": "Rich editor",
+  "section": "Server-side extensions",
+  "sentence": "`[MASK]`** — transforms a document once on its way out of the server (prefill and display), the place to batch-resolve stored references into human-readable attrs.",
+  "answer": "prepareDocument()",
+  "closed_book_guess": "Output transformer",
+  "category": "fact"
+ },
+ {
+  "id": 585,
+  "page": "Select",
+  "section": "Rich options",
+  "sentence": "The schema is declared once and ships once; each option only carries its `data`, passed as the third argument to `[MASK]`.",
+  "answer": "Select::option()",
+  "closed_book_guess": "SelectOption::make",
+  "category": "fact"
+ },
+ {
+  "id": 586,
+  "page": "Select",
+  "section": "Creatable / tags",
+  "sentence": "Pair it with `[MASK]` for a field that holds a set of tags.",
+  "answer": "->multiple()",
+  "closed_book_guess": "TagsInput",
+  "category": "fact"
+ },
+ {
+  "id": 587,
+  "page": "Select",
+  "section": "Multiple",
+  "sentence": " `[MASK]` lets the user choose more than one option.",
+  "answer": "->multiple()",
+  "closed_book_guess": "Multiple Select",
+  "category": "fact"
+ },
+ {
+  "id": 589,
+  "page": "Select",
+  "section": "Options from a model",
+  "sentence": "`[MASK]`) is a normal field value, so it is validated and returned in the submitted array like any other — your handler persists it.",
+  "answer": "author_id",
+  "closed_book_guess": "label",
+  "category": "example_name"
+ },
+ {
+  "id": 597,
+  "page": "Text input",
+  "section": "Affixes",
+  "sentence": "To use an icon that isn't an `[MASK]` case — for example a host app's own sprite name — reach for the explicit `Affix` value object:   Affixes are also available on [Number input](/forms/fields/number-input/) and [Password input](/forms/fields/password-input/).",
+  "answer": "Icon",
+  "closed_book_guess": "IconEnum",
+  "category": "fact"
+ },
+ {
+  "id": 598,
+  "page": "Text input",
+  "section": "Email",
+  "sentence": " Call `[MASK]` to set the HTML input type to `email` and apply email validation:  php={`TextInput::make('email', 'Email address') email() placeholder('you@example.com')`} fixture=\"text-input.email\" values={{ email: \"\" }} / ",
+  "answer": "->email()",
+  "closed_book_guess": "email",
+  "category": "equivalent"
+ },
+ {
+  "id": 603,
+  "page": "Text input",
+  "section": "Copyable",
+  "sentence": "It copies whatever the field currently holds — handy for generated values like API keys or invite links, usually combined with `[MASK]`:  php={`TextInput::make('api_key', 'API key') value('sk-live-4242') readOnly() copyable()`} fixture=\"text-input.copyable\" values={{ api_key: \"sk-live-4242\" }} / ",
+  "answer": "->readOnly()",
+  "closed_book_guess": "readOnly()",
+  "category": "equivalent"
+ },
+ {
+  "id": 604,
+  "page": "Text input",
+  "section": "Copyable",
+  "sentence": " `[MASK]` attaches a copy button to the end of the input.",
+  "answer": "->copyable()",
+  "closed_book_guess": "copyable",
+  "category": "equivalent"
+ },
+ {
+  "id": 605,
+  "page": "Textarea",
+  "section": "Autofocus",
+  "sentence": " `[MASK]` focuses the field when the form mounts.",
+  "answer": "->autoFocus()",
+  "closed_book_guess": "autofocus",
+  "category": "equivalent"
+ },
+ {
+  "id": 620,
+  "page": "Tree",
+  "section": "Hierarchy is data",
+  "sentence": "Row templates must not declare their own `[MASK]` or `rowId` fields — both keys are reserved.",
+  "answer": "children",
+  "closed_book_guess": "parentId",
+  "category": "fact"
+ },
+ {
+  "id": 624,
+  "page": "Forms",
+  "section": "The submit button",
+  "sentence": "Use `->submitJustify()`, `->submitVariant()`, and `[MASK]` to adjust its alignment and button style:   To replace the row's buttons entirely, call `->submitButtons()` with one or more `Button` components.",
+  "answer": "->submitEmphasis()",
+  "closed_book_guess": "->submitSize()",
+  "category": "fact"
+ },
+ {
+  "id": 625,
+  "page": "Forms",
+  "section": "The submit button",
+  "sentence": "Use `[MASK]`, `->submitVariant()`, and `->submitEmphasis()` to adjust its alignment and button style:   To replace the row's buttons entirely, call `->submitButtons()` with one or more `Button` components.",
+  "answer": "->submitJustify()",
+  "closed_book_guess": "->submitAlign()",
+  "category": "fact"
+ },
+ {
+  "id": 626,
+  "page": "Forms",
+  "section": "The submit lifecycle",
+  "sentence": "A **precognitive** request validates and returns `204`/`422` without running `[MASK]`.",
+  "answer": "handle()",
+  "closed_book_guess": "the action",
+  "category": "fact"
+ },
+ {
+  "id": 631,
+  "page": "Forms",
+  "section": "Defining a form",
+  "sentence": " Extend `FormDefinition` and implement two methods: `[MASK]` builds the field schema, and `handle()` processes a valid submission.",
+  "answer": "definition()",
+  "closed_book_guess": "defineFields",
+  "category": "fact"
+ },
+ {
+  "id": 633,
+  "page": "Forms",
+  "section": "Rendering a form",
+  "sentence": "A field's filled value wins over its `->value()` default, and fields can react to it (a `[MASK]` resolves stored ids to labels, for example).",
+  "answer": "Select",
+  "closed_book_guess": "SelectField",
+  "category": "fact"
+ },
+ {
+  "id": 634,
+  "page": "Forms",
+  "section": "Rendering a form",
+  "sentence": "`[MASK]` sets the HTTP verb the form submits with (`post` by default).",
+  "answer": "->method()",
+  "closed_book_guess": "method",
+  "category": "equivalent"
+ },
+ {
+  "id": 638,
+  "page": "Validation",
+  "section": "Dynamic rules",
+  "sentence": "The closure receives the `[MASK]` and the `Request`, and returns additional rules.",
+  "answer": "FormData",
+  "closed_book_guess": "Validator",
+  "category": "fact"
+ },
+ {
+  "id": 641,
+  "page": "Validation",
+  "section": "Dynamic rules",
+  "sentence": "The closure receives the `FormData` and the `[MASK]`, and returns additional rules.",
+  "answer": "Request",
+  "closed_book_guess": "component definition",
+  "category": "fact"
+ },
+ {
+  "id": 651,
+  "page": "Wizard",
+  "section": "Conditional fields and steps",
+  "sentence": " [`visibleWhen`, `requiredWhen`, `[MASK]`, and `disabledWhen`](/forms/conditional-fields/) work the same inside a wizard step as anywhere else — they react to other fields in the form.",
+  "answer": "readOnlyWhen",
+  "closed_book_guess": "hiddenWhen",
+  "category": "ambiguous"
+ },
+ {
+  "id": 652,
+  "page": "Wizard",
+  "section": "Steps",
+  "sentence": "Its label defaults to a headline-cased version of the name — `[MASK]` becomes \"Shipping Address\" — or pass a second argument to set one explicitly.",
+  "answer": "shipping-address",
+  "closed_book_guess": "shipping_address",
+  "category": "example_name"
+ },
+ {
+  "id": 658,
+  "page": "Configuration",
+  "section": "Registering definitions explicitly",
+  "sentence": " Instead of (or in addition to) discovery, register definition classes at runtime through the `[MASK]` facade — useful from a service provider:   The same method exists for `fragments`, `actions`, `bulkActions`, `layouts`, `pages`, and `remoteSources`.",
+  "answer": "Lattice",
+  "closed_book_guess": "Definition::register",
+  "category": "fact"
+ },
+ {
+  "id": 672,
+  "page": "Core Concepts",
+  "section": "Pages",
+  "sentence": " A page extends `Lattice\\Http\\Page`, returns a `title()`, and builds its UI in `[MASK]`.",
+  "answer": "render()",
+  "closed_book_guess": "layout()",
+  "category": "fact"
+ },
+ {
+  "id": 673,
+  "page": "Core Concepts",
+  "section": "Discovery and endpoints",
+  "sentence": "Lattice **discovers** them: annotate a class with an attribute like `#[AsForm]`, `[MASK]`, `#[AsAction]`, `#[AsBulkAction]`, or `#[AsFragment]`, and Lattice finds it under the path configured in `discover` (your `app/` directory by default).",
+  "answer": "#[AsTable]",
+  "closed_book_guess": "#[AsFilter]",
+  "category": "ambiguous"
+ },
+ {
+  "id": 674,
+  "page": "Core Concepts",
+  "section": "Discovery and endpoints",
+  "sentence": "Lattice **discovers** them: annotate a class with an attribute like `[MASK]`, `#[AsTable]`, `#[AsAction]`, `#[AsBulkAction]`, or `#[AsFragment]`, and Lattice finds it under the path configured in `discover` (your `app/` directory by default).",
+  "answer": "#[AsForm]",
+  "closed_book_guess": "#[AsPage]",
+  "category": "ambiguous"
+ },
+ {
+  "id": 693,
+  "page": "Development with AI",
+  "section": "Laravel Boost",
+  "sentence": "Install it in your application:   `boost:install` registers the MCP server — so the agent can inspect your database, models, routes, and search the Laravel ecosystem docs — and writes guideline files (`[MASK]`, `AGENTS.md`, …) and skills for the agents you select, scoped to the packages you actually have installed.",
+  "answer": "CLAUDE.md",
+  "closed_book_guess": "LATTICE.md",
+  "category": "fact"
+ },
+ {
+  "id": 694,
+  "page": "Development with AI",
+  "section": "What Lattice contributes",
+  "sentence": "`[MASK]` skill** — building [tables](/tables/overview/): columns, the Eloquent builder, sortable and filterable columns, custom data sources, and row & bulk actions.",
+  "answer": "lattice-tables",
+  "closed_book_guess": "Table-building",
+  "category": "fact"
+ },
+ {
+  "id": 695,
+  "page": "Development with AI",
+  "section": "What Lattice contributes",
+  "sentence": "`[MASK]` skill** — [actions](/actions/overview/) and bulk actions: `ActionResult` effects, confirmation and input-form modals, and authorization.",
+  "answer": "lattice-actions",
+  "closed_book_guess": "Action-builder",
+  "category": "fact"
+ },
+ {
+  "id": 697,
+  "page": "Development with AI",
+  "section": "Keeping them current",
+  "sentence": "After upgrading Lattice — or any ecosystem package — refresh the generated resources:   Add `[MASK]` to let Boost scan for newly installed packages and offer to publish their guidelines and skills:   If your app also has npm-managed frontend packages, run the refresh after `npm install` so Boost can discover package-specific skills such as React, Inertia, and Tailwind.",
+  "answer": "--discover",
+  "closed_book_guess": "php artisan boost:install",
+  "category": "fact"
+ },
+ {
+  "id": 698,
+  "page": "Development with AI",
+  "section": "What Lattice contributes",
+  "sentence": "`[MASK]` skill** — building [forms](/forms/overview/): fields, `Select`/`Choice` options, validation and live Precognition, conditional and computed fields, and the submit lifecycle.",
+  "answer": "lattice-forms",
+  "closed_book_guess": "Form-building",
+  "category": "fact"
+ },
+ {
+  "id": 702,
+  "page": "Development with AI",
+  "section": "Laravel Boost",
+  "sentence": "Install it in your application:   `[MASK]` registers the MCP server — so the agent can inspect your database, models, routes, and search the Laravel ecosystem docs — and writes guideline files (`CLAUDE.md`, `AGENTS.md`, …) and skills for the agents you select, scoped to the packages you actually have installed.",
+  "answer": "boost:install",
+  "closed_book_guess": "php artisan boost:install",
+  "category": "equivalent"
+ },
+ {
+  "id": 703,
+  "page": "Getting Started",
+  "section": "Define a page",
+  "sentence": "It returns a `title()` and builds its UI in `render()` by populating the `[MASK]` with components.",
+  "answer": "PageSchema",
+  "closed_book_guess": "layout",
+  "category": "fact"
+ },
+ {
+  "id": 705,
+  "page": "Getting Started",
+  "section": "Route the page",
+  "sentence": "Visit `[MASK]` and the page renders through Inertia — no route file entry, no controller, and no Inertia page component to write by hand.",
+  "answer": "/dashboard",
+  "closed_book_guess": "/admin/dashboard",
+  "category": "example_name"
+ },
+ {
+  "id": 708,
+  "page": "Getting Started",
+  "section": "Sharing layout and middleware across pages",
+  "sentence": " Rather than repeating `layout:` and `[MASK]` on every page, declare a shared base page and inherit from it:   Pages need the `web` middleware group for sessions, CSRF, and route-model binding.",
+  "answer": "middleware:",
+  "closed_book_guess": "middleware",
+  "category": "equivalent"
+ },
+ {
+  "id": 710,
+  "page": "Getting Started",
+  "section": "Define a page",
+  "sentence": "It returns a `title()` and builds its UI in `[MASK]` by populating the `PageSchema` with components.",
+  "answer": "render()",
+  "closed_book_guess": "schema()",
+  "category": "fact"
+ },
+ {
+  "id": 713,
+  "page": "Getting Started",
+  "section": "Define a page",
+  "sentence": "It returns a `[MASK]` and builds its UI in `render()` by populating the `PageSchema` with components.",
+  "answer": "title()",
+  "closed_book_guess": "PageSchema",
+  "category": "fact"
+ },
+ {
+  "id": 716,
+  "page": "Installation",
+  "section": "Version compatibility",
+  "sentence": "`[MASK]` with `@lattice-php/lattice@^0.7`.",
+  "answer": "lattice-php/lattice:^0.7",
+  "closed_book_guess": "Install Lattice using npm",
+  "category": "fact"
+ },
+ {
+  "id": 729,
+  "page": "No-Build Installation",
+  "section": "Wire it into your layout",
+  "sentence": " Add `@latticeHead` before `@inertiaHead`, and `@latticeScripts` after `@inertia`:   `@latticeHead` renders the stylesheet link, the [theme](/theming/) registered via `[MASK]` (if any), an import map for the shared React and Lattice runtimes, and a small JSON config script the bundle reads on boot.",
+  "answer": "Lattice::theme()",
+  "closed_book_guess": "@latticeTheme",
+  "category": "fact"
+ },
+ {
+  "id": 736,
+  "page": "No-Build Installation",
+  "section": "Install",
+  "sentence": "You can also run `[MASK]` directly.",
+  "answer": "php artisan lattice:assets",
+  "closed_book_guess": "php artisan lattice:install",
+  "category": "fact"
+ },
+ {
+  "id": 737,
+  "page": "No-Build Installation",
+  "section": "Install",
+  "sentence": "Run `[MASK]` first to preview the changes.",
+  "answer": "php artisan lattice:update --dry-run",
+  "closed_book_guess": "php artisan lattice:install --dry-run",
+  "category": "fact"
+ },
+ {
+  "id": 752,
+  "page": "Blocks",
+  "section": "As HTML",
+  "sentence": " For output outside a Lattice page — a public marketing route, an email — implement `html()` on each block and render the document through `[MASK]`.",
+  "answer": "BlockHtmlRenderer",
+  "closed_book_guess": "HtmlRenderer",
+  "category": "fact"
+ },
+ {
+  "id": 759,
+  "page": "Blocks",
+  "section": "Installation",
+  "sentence": "[No-build apps](/introduction/no-build/) use the precompiled module: run `[MASK]` after installation.",
+  "answer": "php artisan lattice:assets",
+  "closed_book_guess": "php artisan lattice:install",
+  "category": "fact"
+ },
+ {
+  "id": 762,
+  "page": "Board",
+  "section": "Installation",
+  "sentence": "`lattice-php/board` depends on `[MASK]` for its filter classes and wire format.",
+  "answer": "lattice-php/table",
+  "closed_book_guess": "lattice-php/query-builder",
+  "category": "fact"
+ },
+ {
+  "id": 771,
+  "page": "Board",
+  "section": "Moving cards",
+  "sentence": " `moveAction()` wires a registered Lattice [action](/actions/overview/) to receive `[MASK]` on every drop:   The client drags cards within and across columns, applies the move optimistically, and rolls back if the action rejects it.",
+  "answer": "{ cardId, columnKey, position }",
+  "closed_book_guess": "the card’s new position",
+  "category": "fact"
+ },
+ {
+  "id": 783,
+  "page": "Chat",
+  "section": "Usage",
+  "sentence": "  `[MASK]` is required for sending messages.",
+  "answer": "streamEndpoint()",
+  "closed_book_guess": "conversation_id",
+  "category": "fact"
+ },
+ {
+  "id": 785,
+  "page": "Chat",
+  "section": "Remote chat",
+  "sentence": " `ChatBox` supports Lattice's browser-token flow when the endpoints belong to another service:   `[MASK]` and `audience()` are required together.",
+  "answer": "source()",
+  "closed_book_guess": "tokenEndpoint()",
+  "category": "fact"
+ },
+ {
+  "id": 796,
+  "page": "Map",
+  "section": "Adding a Provider",
+  "sentence": "The `isMarkerFeature` and `[MASK]` guards exported from `@lattice-php/map` narrow the wire features to the type a renderer is drawing.",
+  "answer": "isRouteFeature",
+  "closed_book_guess": "isClusterFeature",
+  "category": "fact"
+ },
+ {
+  "id": 798,
+  "page": "Map",
+  "section": "Routes",
+  "sentence": "`[MASK]` accepts the same named Lattice colors and CSS colors as markers; without one the route uses the primary color.",
+  "answer": "->color()",
+  "closed_book_guess": "Routes",
+  "category": "fact"
+ },
+ {
+  "id": 809,
+  "page": "Media",
+  "section": "Conversions",
+  "sentence": "Override `[MASK]` alongside `defaultConversions()` if the subclass drops `thumb`, or the library grid silently falls back to full-size originals:   A collection can ask for more on top of the defaults.",
+  "answer": "previewConversion()",
+  "closed_book_guess": "registerMediaConversionsUsingModelInstance",
+  "category": "fact"
+ },
+ {
+  "id": 811,
+  "page": "Media",
+  "section": "Upload with an inline preview",
+  "sentence": "The field submits the media id like a single `MediaPicker`, so the same rules apply:   `[MASK]` sizes the face (an int is pixels, a string any CSS length); the preview fills it.",
+  "answer": "height()",
+  "closed_book_guess": "avatarSize",
+  "category": "fact"
+ },
+ {
+  "id": 815,
+  "page": "Media",
+  "section": "Installation",
+  "sentence": "  That is the whole integration: the classes, migrations, config (`config/media.php`), and the default `Media` policy are picked up automatically, and the package ships its React renderer as source, which the `[MASK]` Vite plugin compiles into your app's bundle via `virtual:lattice/plugins` (see [Component packages](/extending/component-packages/)).",
+  "answer": "lattice()",
+  "closed_book_guess": "@lattice/vite-plugin",
+  "category": "fact"
+ },
+ {
+  "id": 818,
+  "page": "PDF",
+  "section": "The worker asset",
+  "sentence": "The package ships the matching worker script and serves it itself; the service provider registers a `[MASK]` route (named `lattice.pdf.worker`) that streams the artifact with immutable cache headers, and the component puts that URL on the wire.",
+  "answer": "GET",
+  "closed_book_guess": "pdf.worker.js",
+  "category": "fact"
+ },
+ {
+  "id": 821,
+  "page": "PDF",
+  "section": "Usage",
+  "sentence": "  `[MASK]` accepts a string or a [closure](/core/closure-evaluation/) resolved at serialization time — the natural place to produce a signed or temporary URL on every render instead of storing one.",
+  "answer": "->url()",
+  "closed_book_guess": "url",
+  "category": "equivalent"
+ },
+ {
+  "id": 823,
+  "page": "PDF",
+  "section": "Exotic documents",
+  "sentence": "The versions must match the pinned `[MASK]` release in the package.",
+  "answer": "pdfjs-dist",
+  "closed_book_guess": "wkhtmltopdf",
+  "category": "fact"
+ },
+ {
+  "id": 831,
+  "page": "Search",
+  "section": "Authorizing a provider",
+  "sentence": " A provider is gated exactly like a definition: declare the ability on its attribute, and use `[MASK]` only for what `can` cannot express.",
+  "answer": "authorize()",
+  "closed_book_guess": "Gatekeeper",
+  "category": "fact"
+ },
+ {
+  "id": 839,
+  "page": "Search",
+  "section": "An Eloquent category",
+  "sentence": "`query()` is where scopes, ordering and the eager loads `[MASK]` reads belong — it is called per request, never memoized.",
+  "answer": "result()",
+  "closed_book_guess": "the table",
+  "category": "fact"
+ },
+ {
+  "id": 841,
+  "page": "Search",
+  "section": "The search dialog",
+  "sentence": "Pass your own `->schema([...])` of `SearchInput`, `SearchResults`, `SearchCategories`, `SearchRecent`, and `[MASK]` components to replace the default composition entirely.",
+  "answer": "SearchPreview",
+  "closed_book_guess": "SearchEmptyState",
+  "category": "fact"
+ },
+ {
+  "id": 849,
+  "page": "Tree",
+  "section": "Usage",
+  "sentence": "`[MASK]` adds classes to the node's `<li>` element — the wrapper around both the row and its children group — so styling a parent together with its subtree (a frame around a section and its lines, say) needs no `:has()` selectors against the tree's internal markup.",
+  "answer": "->class()",
+  "closed_book_guess": "nodeClass",
+  "category": "fact"
+ },
+ {
+  "id": 855,
+  "page": "Actions",
+  "section": "Row actions",
+  "sentence": "`[MASK]` references an action class and runs it through the [action endpoint](/advanced/security/).",
+  "answer": "Action::use()",
+  "closed_book_guess": "Action::make()",
+  "category": "fact"
+ },
+ {
+  "id": 857,
+  "page": "Actions",
+  "section": "Row actions",
+  "sentence": "It receives the row data, so you can build links and actions scoped to that record:   `[MASK]` navigates, like any other link.",
+  "answer": "Link",
+  "closed_book_guess": "LinkAction",
+  "category": "fact"
+ },
+ {
+  "id": 865,
+  "page": "Badge column",
+  "section": "Badge column",
+  "sentence": "`[MASK]`, `Color::green()`, `Color::hex('#16a34a')`, and `Color::hex('#2563eb')->dark('#60a5fa')` are all accepted.",
+  "answer": "'green'",
+  "closed_book_guess": "Color::red()",
+  "category": "ambiguous"
+ },
+ {
+  "id": 882,
+  "page": "Image column",
+  "section": "Image column",
+  "sentence": "Give the column an empty `[MASK]` to drop its header, which reads better for a leading avatar.",
+  "answer": "->label('')",
+  "closed_book_guess": "label",
+  "category": "equivalent"
+ },
+ {
+  "id": 886,
+  "page": "Money column",
+  "section": "Money column",
+  "sentence": "`[MASK]` adds a click-to-copy affordance.",
+  "answer": "->copyable()",
+  "closed_book_guess": "CopyableColumn",
+  "category": "fact"
+ },
+ {
+  "id": 888,
+  "page": "Number column",
+  "section": "Number column",
+  "sentence": "The value is rendered as-is with the unit appended — no scaling — so store `12.8` to render `[MASK]`.",
+  "answer": "12.8%",
+  "closed_book_guess": "12.8 KB",
+  "category": "ambiguous"
+ },
+ {
+  "id": 890,
+  "page": "Number column",
+  "section": "Number column",
+  "sentence": "`[MASK]` renders large numbers compactly (`1.2K`, `3.4M`).",
+  "answer": "->compact()",
+  "closed_book_guess": "compact()",
+  "category": "equivalent"
+ },
+ {
+  "id": 897,
+  "page": "Number column",
+  "section": "Number column",
+  "sentence": "php={`TextColumn::make('label')->label('Metric'); NumberColumn::make('views')->label('Views')->compact()->sortable(); NumberColumn::make('conversion')->label('Conversion') unit(NumberFormatUnit::Percent) decimals(1);`} fixture=\"table.number\" /  `->decimals($min, $max?)` fixes the fraction digits — `->decimals(2)`[MASK]`->decimals(0, 2)` for a min–max range.",
+  "answer": " for exactly two, or ",
+  "closed_book_guess": "or",
+  "category": "ambiguous"
+ },
+ {
+  "id": 898,
+  "page": "Number column",
+  "section": "Number column",
+  "sentence": "`->unit(NumberFormatUnit::…)` adds a locale-correct unit suffix — `[MASK]`, `Kilogram`, `Byte`, and the rest of the [`NumberFormatUnit`](/advanced/enums/) cases.",
+  "answer": "Percent",
+  "closed_book_guess": "Meter",
+  "category": "ambiguous"
+ },
+ {
+  "id": 900,
+  "page": "Columns",
+  "section": "Toggleable",
+  "sentence": " `[MASK]` lets viewers show or hide the column from a **Columns** menu in the table toolbar.",
+  "answer": "->toggleable()",
+  "closed_book_guess": "toggleable",
+  "category": "equivalent"
+ },
+ {
+  "id": 902,
+  "page": "Columns",
+  "section": "Pinned",
+  "sentence": " `[MASK]` keeps a column fixed at the left edge of the table while the rest of the columns scroll underneath it — useful for an identifying column like a SKU or name in a wide table.",
+  "answer": "->pinned()",
+  "closed_book_guess": "pinned()",
+  "category": "equivalent"
+ },
+ {
+  "id": 918,
+  "page": "Text column",
+  "section": "Dates and times",
+  "sentence": "Pass a [`[MASK]`](/advanced/enums/#tables) case — `Short`, `Medium` (the default), `Long`, or `Full` — to control the style.",
+  "answer": "DateTimeStyle",
+  "closed_book_guess": "DateStyle",
+  "category": "fact"
+ },
+ {
+  "id": 921,
+  "page": "Text column",
+  "section": "Popover",
+  "sentence": "The closure runs on the server per row — receiving `$row` and `[MASK]` like a link closure — and returns the popover's content component, or `null` for no popover on that row.",
+  "answer": "$value",
+  "closed_book_guess": "$column",
+  "category": "fact"
+ },
+ {
+  "id": 925,
+  "page": "Text column",
+  "section": "Popover",
+  "sentence": "The closure runs on the server per row — receiving `[MASK]` and `$value` like a link closure — and returns the popover's content component, or `null` for no popover on that row.",
+  "answer": "$row",
+  "closed_book_guess": "$record",
+  "category": "fact"
+ },
+ {
+  "id": 929,
+  "page": "Data sources",
+  "section": "Backing a table with your own source",
+  "sentence": " For a one-off source, `[MASK]` takes the three methods as closures — you only pass the first unless the table has bulk actions:   The closure receives the `TableQuery`, so it can page, sort, and filter however the backing store allows — slice an in-memory collection, forward the parameters to an HTTP API, or query a search index.",
+  "answer": "CallbackTableSource",
+  "closed_book_guess": "Table::source",
+  "category": "fact"
+ },
+ {
+  "id": 930,
+  "page": "Data sources",
+  "section": "Backing a table with your own source",
+  "sentence": "When the backend returns its own paginator (or you build one), hand it to `[MASK]` so the table renders a full pager:   For anything more involved, implement `TableSource` on a class of its own and return it from `source()`.",
+  "answer": "TableResult::fromPaginator()",
+  "closed_book_guess": "setPaginator",
+  "category": "fact"
+ },
+ {
+  "id": 931,
+  "page": "Data sources",
+  "section": "The contract",
+  "sentence": "`resolveMatching()`** and **`[MASK]`** resolve rows for [bulk actions](/tables/actions/#bulk-actions) — everything matching the current filters, and an explicit set of selected keys.",
+  "answer": "resolveSelection()",
+  "closed_book_guess": "resolveSelected()",
+  "category": "fact"
+ },
+ {
+  "id": 934,
+  "page": "Data sources",
+  "section": "The query and the result",
+  "sentence": "It is an immutable value with the request's state as public properties:   `[MASK]` wraps the rows and their pagination metadata.",
+  "answer": "TableResult",
+  "closed_book_guess": "Result",
+  "category": "fact"
+ },
+ {
+  "id": 937,
+  "page": "Data sources",
+  "section": "The contract",
+  "sentence": "  `[MASK]`** fetches one page of rows for the current request.",
+  "answer": "query()",
+  "closed_book_guess": "A data source",
+  "category": "fact"
+ },
+ {
+  "id": 938,
+  "page": "Data sources",
+  "section": "The query and the result",
+  "sentence": "`[MASK]`** — a `LengthAwarePaginator`, carrying the total count for a full pager.",
+  "answer": "TableResult::fromPaginator($paginator)",
+  "closed_book_guess": "paginate()",
+  "category": "fact"
+ },
+ {
+  "id": 944,
+  "page": "Eloquent tables",
+  "section": "Eloquent tables",
+  "sentence": "Extend `EloquentTableDefinition` and implement `[MASK]` instead of `source()` — Lattice wires up an `EloquentTableSource` from your builder, columns, dedicated filters, and pagination mode.",
+  "answer": "builder()",
+  "closed_book_guess": "query()",
+  "category": "fact"
+ },
+ {
+  "id": 947,
+  "page": "Eloquent tables",
+  "section": "Relation columns",
+  "sentence": "`[MASK]` resolves the `author` relation and shows its `name`; Lattice eager-loads the relation, so there is no N+1.",
+  "answer": "TextColumn::make('author.name')",
+  "closed_book_guess": "author.name",
+  "category": "equivalent"
+ },
+ {
+  "id": 955,
+  "page": "Filtering",
+  "section": "Filter types and operators",
+  "sentence": "Each `FilterType` offers a sensible default set and a default operator (text defaults to `[MASK]`, the rest to `=`).",
+  "answer": "contains",
+  "closed_book_guess": "LIKE",
+  "category": "fact"
+ },
+ {
+  "id": 967,
+  "page": "Tables",
+  "section": "Defining a table",
+  "sentence": " Extend `TableDefinition` and implement its two abstract methods — `columns()` and `[MASK]`.",
+  "answer": "source()",
+  "closed_book_guess": "filters()",
+  "category": "fact"
+ },
+ {
+  "id": 968,
+  "page": "Tables",
+  "section": "Defining a table",
+  "sentence": "`TableDefinition` exposes these hooks beyond `columns()` and `[MASK]`:   Each hook is a method you override.",
+  "answer": "source()",
+  "closed_book_guess": "filters()",
+  "category": "fact"
+ },
+ {
+  "id": 970,
+  "page": "Tables",
+  "section": "Defining a table",
+  "sentence": "Backing a table with an Eloquent model is common enough that [`[MASK]`](/tables/eloquent-tables/) implements `source()` for you — you write a `builder()` instead.",
+  "answer": "EloquentTableDefinition",
+  "closed_book_guess": "EloquentTable",
+  "category": "fact"
+ },
+ {
+  "id": 977,
+  "page": "Searching",
+  "section": "Declaring searchable columns",
+  "sentence": " `[MASK]` opts a column into the global search.",
+  "answer": "->searchable()",
+  "closed_book_guess": "searchable",
+  "category": "equivalent"
+ },
+ {
+  "id": 986,
+  "page": "Sorting & pagination",
+  "section": "Pagination",
+  "sentence": "The mode is a `PaginationType`:    A [custom data source](/tables/data-sources/) chooses its own `TableResult` builder to match the mode — `[MASK]` for a full pager, `fromSimplePaginator()` for infinite scroll-to-load, or `fromSimplePaginator($paginator, PaginationType::Simple)` for previous/next.",
+  "answer": "fromPaginator()",
+  "closed_book_guess": "fromLengthAwarePaginator()",
+  "category": "fact"
+ },
+ {
+  "id": 993,
+  "page": "Sorting & pagination",
+  "section": "Sorting",
+  "sentence": "Clicking it cycles ascending, descending, and off, and the source applies an `[MASK]` on the column key.",
+  "answer": "orderBy",
+  "closed_book_guess": "orderByRaw",
+  "category": "fact"
+ },
+ {
+  "id": 995,
+  "page": "Sorting & pagination",
+  "section": "Page size options",
+  "sentence": "Numeric entries offer fixed page sizes; `[MASK]` lets the user switch the table to infinite pagination on the fly — and back to numbered pages.",
+  "answer": "PaginationType::Infinite",
+  "closed_book_guess": "'infinite'",
+  "category": "equivalent"
+ },
+ {
+  "id": 1006,
+  "page": "Testing",
+  "section": "Forms and fields",
+  "sentence": "  Field assertions: `[MASK]` / `assertHiddenWhen($state)`, `assertRequired` / `assertOptional`, `assertDisabled` / `assertEnabled`, `assertReadOnly`, `assertInitialValue($value)`, and `assertHasCondition($type, $field, $operator, $value)`.",
+  "answer": "assertVisibleWhen($state)",
+  "closed_book_guess": "assertVisible",
+  "category": "fact"
+ },
+ {
+  "id": 1007,
+  "page": "Testing",
+  "section": "Test selectors",
+  "sentence": "An action defined as `#[AsAction('workbench.products.archive')]` and rendered without a `key()`[MASK]`data-test=\"action-workbench.products.archive\"`, not `action-archive`; give it an explicit `key()` for a shorter, stable selector.",
+  "answer": " produces ",
+  "closed_book_guess": "gets the selector",
+  "category": "ambiguous"
+ },
+ {
+  "id": 1014,
+  "page": "Theming",
+  "section": "Dark mode",
+  "sentence": "Lattice manages the class for you through its appearance helpers, exported from the package:  `[MASK]`** — call once before your app mounts (e.g.",
+  "answer": "initializeAppearance()",
+  "closed_book_guess": "useAppearance()",
+  "category": "fact"
+ }
+]

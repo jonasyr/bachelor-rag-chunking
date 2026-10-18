@@ -1,0 +1,488 @@
+[
+ {
+  "id": 32,
+  "page": "Icon",
+  "section": "Iconify sets",
+  "sentence": " Install any `[MASK]` package and reference icons with its prefix.",
+  "answer": "@iconify-json/*",
+  "closed_book_guess": "Iconify JSON collection",
+  "category": "equivalent"
+ },
+ {
+  "id": 57,
+  "page": "Docs for agents",
+  "section": "Agent discovery",
+  "sentence": "Your own `[MASK]` wins: a header a site rule already sets for a path, with an exact path or a wildcard such as `/*`, is left out of the generated rule for it, since hosts join repeated values and `Access-Control-Allow-Origin: *, *` is refused by browsers.",
+  "answer": "_headers",
+  "closed_book_guess": "Access-Control-Allow-Origin",
+  "category": "fact"
+ },
+ {
+  "id": 58,
+  "page": "Docs for agents",
+  "section": "What ships",
+  "sentence": "Version labels** — on versioned sites, every alternate Markdown version's frontmatter carries a `version:` key (resolved from your `[MASK]` manifest) so agents can pin a version.",
+  "answer": "versions",
+  "closed_book_guess": "versions manifest",
+  "category": "equivalent"
+ },
+ {
+  "id": 80,
+  "page": "Override a default",
+  "section": "Replace the shared route",
+  "sentence": "Keep the shared route's `[MASK]`: it lists every collection's pages, skips pages that more specific routes own, and passes each page's `reference` as a prop.",
+  "answer": "getStaticPaths",
+  "closed_book_guess": "loader",
+  "category": "fact"
+ },
+ {
+  "id": 83,
+  "page": "Override a default",
+  "section": "What an override changes",
+  "sentence": "The shared routes and routes that use `[MASK]` or `markdownSourceRoute()` must keep `export const prerender = true`.",
+  "answer": "markdownRoute()",
+  "closed_book_guess": "getStaticPaths",
+  "category": "fact"
+ },
+ {
+  "id": 84,
+  "page": "Override a default",
+  "section": "What an override changes",
+  "sentence": "Like Astro's own `[MASK]` detection, Nimbus finds it by reading the route file, so a factory re-exported from another module is not checked when the build starts.",
+  "answer": "prerender",
+  "closed_book_guess": "getStaticPaths",
+  "category": "fact"
+ },
+ {
+  "id": 87,
+  "page": "Override a default",
+  "section": "Wrap the shared route",
+  "sentence": " Call the shared route's `[MASK]`, then change its response.",
+  "answer": "GET",
+  "closed_book_guess": "loader",
+  "category": "fact"
+ },
+ {
+  "id": 90,
+  "page": "Override a default",
+  "section": "Override an `llms.txt` index",
+  "sentence": "This example adds a support link to `/llms.txt`:   For section indexes, keep `[MASK]`'s `getStaticPaths`, which lists every section, and wrap its `GET`.",
+  "answer": "llmsSectionRoute()",
+  "closed_book_guess": "index.tsx",
+  "category": "fact"
+ },
+ {
+  "id": 91,
+  "page": "Markdown and llms.txt endpoints",
+  "section": "Verify",
+  "sentence": "If a section index is absent, confirm that the section has discoverable pages and appears in `[MASK]`.",
+  "answer": "/llms.txt",
+  "closed_book_guess": "llms.txt",
+  "category": "equivalent"
+ },
+ {
+  "id": 103,
+  "page": "Remote MCP server",
+  "section": "Which pages",
+  "sentence": "By default `list_pages` matches site search: pages with `noindex: true` are left out unless they set `[MASK]`, and deprecated versions are left out unless you ask for one by `version`.",
+  "answer": "searchable: true",
+  "closed_book_guess": "include_in_search",
+  "category": "fact"
+ },
+ {
+  "id": 105,
+  "page": "Remote MCP server",
+  "section": "Which pages",
+  "sentence": "`[MASK]` also reads `noindex` pages by URL, and resolves an API URL with `?version=` to the default version, which is the one with a Markdown version.",
+  "answer": "get_page",
+  "closed_book_guess": "Nimbus",
+  "category": "fact"
+ },
+ {
+  "id": 106,
+  "page": "Remote MCP server",
+  "section": "The tools",
+  "sentence": " `[MASK]`** returns pages with their `title`, `url`, `markdownUrl` and `section`, plus `description` and `version` when the page has them, 200 at a time.",
+  "answer": "list_pages",
+  "closed_book_guess": "search_docs",
+  "category": "fact"
+ },
+ {
+  "id": 110,
+  "page": "Remote MCP server",
+  "section": "The tools",
+  "sentence": "Pass the `url` that `[MASK]` returned, or a site-relative path such as `/guide/`; only the path of an absolute URL is used.",
+  "answer": "list_pages",
+  "closed_book_guess": "createMcpHandler",
+  "category": "fact"
+ },
+ {
+  "id": 120,
+  "page": "API reference",
+  "section": "Coordinates and routes",
+  "sentence": "The earlier `[MASK]` derives the same operation routes but keeps a tag's own casing, `/api/tags/Locations` and `/api/tags/User-Management`.",
+  "answer": "resource-action-v1",
+  "closed_book_guess": "tag-based strategy",
+  "category": "fact"
+ },
+ {
+  "id": 121,
+  "page": "API reference",
+  "section": "Versions in the query",
+  "sentence": "Version-prefixed paths such as `[MASK]` do not exist in this mode.",
+  "answer": "/api/v1/pets/",
+  "closed_book_guess": "/v1/endpoint",
+  "category": "example_name"
+ },
+ {
+  "id": 122,
+  "page": "API reference",
+  "section": "Code samples",
+  "sentence": "A `[MASK]` property indexes every array (`expand[0]=customer`).",
+  "answer": "deepObject",
+  "closed_book_guess": "bracket notation",
+  "category": "fact"
+ },
+ {
+  "id": 131,
+  "page": "CLI",
+  "section": "Server adapters",
+  "sentence": " Add the adapter for the host you deploy to: `adapter-cloudflare`, `[MASK]`, `adapter-node` or `adapter-vercel`.",
+  "answer": "adapter-netlify",
+  "closed_book_guess": "adapter-static",
+  "category": "fact"
+ },
+ {
+  "id": 136,
+  "page": "Configuration",
+  "section": "Links and trailing slashes",
+  "sentence": "On Cloudflare, a static site with `trailingSlash: \"always\"` and `[MASK]` writes `guides.html` but links `/guides/`, and Cloudflare redirects `/guides/` to `/guides` by default.",
+  "answer": "build.format: \"file\"",
+  "closed_book_guess": "cleanUrls: true",
+  "category": "fact"
+ },
+ {
+  "id": 138,
+  "page": "Configuration",
+  "section": "Links and trailing slashes",
+  "sentence": "With the defaults (`trailingSlash: \"ignore\"` and `build.format: \"directory\"`), page URLs end in a slash, such as `[MASK]`.",
+  "answer": "/guides/",
+  "closed_book_guess": "`/about/`",
+  "category": "ambiguous"
+ },
+ {
+  "id": 139,
+  "page": "Configuration",
+  "section": "Links and trailing slashes",
+  "sentence": "With `trailingSlash: \"always\"` or `[MASK]`, `astro dev` returns 404 for the other shape, and many hosts redirect it or return 404 too.",
+  "answer": "\"never\"",
+  "closed_book_guess": "trailingSlash: \"never\"",
+  "category": "equivalent"
+ },
+ {
+  "id": 142,
+  "page": "Configuration",
+  "section": "Integration options",
+  "sentence": " The second argument to `[MASK]` controls build behavior:   ",
+  "answer": "nimbus()",
+  "closed_book_guess": "defineConfig",
+  "category": "fact"
+ },
+ {
+  "id": 153,
+  "page": "Installation",
+  "section": "What lands in your repo",
+  "sentence": "Everything visible — components under `src/components/`, MDX content under `src/content/docs/`, routes under `src/pages/`, design tokens in `[MASK]`, and the MDX globals registry at `src/components.ts` — copies into your repo and is yours to edit.",
+  "answer": "src/styles/globals.css",
+  "closed_book_guess": "src/styles/tokens.css",
+  "category": "fact"
+ },
+ {
+  "id": 182,
+  "page": "Sidebar",
+  "section": "Nested collections",
+  "sentence": "To place it yourself, name it in `[MASK]` with `{ autogenerate: { collection: \"dbt\" } }`, link to its URL with `{ label: \"dbt\", link: \"/integrations/connectors/dbt/\" }`, or make it a hand-made group's `landing`; it then appears only there.",
+  "answer": "sidebar.items",
+  "closed_book_guess": "sidebar.config.ts",
+  "category": "fact"
+ },
+ {
+  "id": 183,
+  "page": "Sidebar",
+  "section": "Markup and styling hooks",
+  "sentence": "These come from the registry, not the starter, so reinstall them with `[MASK]` and `nimbus-docs add api-layout --overwrite`.",
+  "answer": "nimbus-docs add api-sidebar --overwrite",
+  "closed_book_guess": "nimbus-docs add sidebar --overwrite",
+  "category": "fact"
+ },
+ {
+  "id": 184,
+  "page": "Sidebar",
+  "section": "Scope large sidebars",
+  "sentence": "The active group still opens, and a group's explicit `[MASK]` value wins.",
+  "answer": "collapsed",
+  "closed_book_guess": "defaultOpen",
+  "category": "fact"
+ },
+ {
+  "id": 193,
+  "page": "Build one locale or one part",
+  "section": "Under a base",
+  "sentence": " With `[MASK]` in `astro.config`, a slice writes the same files, and every URL it serves and advertises is under the base.",
+  "answer": "base: \"/docs\"",
+  "closed_book_guess": "basePath",
+  "category": "fact"
+ },
+ {
+  "id": 194,
+  "page": "Build one locale or one part",
+  "section": "Deploy each slice",
+  "sentence": "Files in `[MASK]` (the favicon, fonts, root-path images) keep their root paths and come from the root slice, so a change there deploys the root slice.",
+  "answer": "public/",
+  "closed_book_guess": "public",
+  "category": "equivalent"
+ },
+ {
+  "id": 196,
+  "page": "Build one locale or one part",
+  "section": "Under a base",
+  "sentence": "Cloudflare:** add `@astrojs/cloudflare` (`~14.3.0`, with `wrangler` `^4.127.1`) and keep `[MASK]`.",
+  "answer": "output: \"static\"",
+  "closed_book_guess": "output: \"server\"",
+  "category": "fact"
+ },
+ {
+  "id": 201,
+  "page": "Philosophy",
+  "section": "Authoring quality is first-class",
+  "sentence": "Run `nimbus-docs lint` for human output, `[MASK]` for diagnostics an agent can read, `--fix` to apply auto-fixes.",
+  "answer": "--format json",
+  "closed_book_guess": "--json",
+  "category": "fact"
+ },
+ {
+  "id": 205,
+  "page": "Philosophy",
+  "section": "Versions are just collections",
+  "sentence": "src/content/ docs/ docs-v2/ docs-v3/  The same primitive handles internationalisation (a `[MASK]` collection is a French site) and per-product splits (a `docs-api/` collection sits next to `docs-cli/`).",
+  "answer": "docs-fr/",
+  "closed_book_guess": "locale",
+  "category": "example_name"
+ },
+ {
+  "id": 215,
+  "page": "Project structure",
+  "section": "What lands in your repo",
+  "sentence": "`[MASK]`** — routes, including the docs catch-all, alternate Markdown/MDX versions, and `llms.txt` indexes.",
+  "answer": "src/pages/",
+  "closed_book_guess": "src/pages",
+  "category": "equivalent"
+ },
+ {
+  "id": 218,
+  "page": "Project structure",
+  "section": "What lands in your repo",
+  "sentence": "`src/layouts/`** — page shells (`[MASK]`, `DocsLayout`).",
+  "answer": "BaseLayout",
+  "closed_book_guess": "RootLayout",
+  "category": "fact"
+ },
+ {
+  "id": 220,
+  "page": "Project structure",
+  "section": "What lands in your repo",
+  "sentence": "`[MASK]`** — page shells (`BaseLayout`, `DocsLayout`).",
+  "answer": "src/layouts/",
+  "closed_book_guess": "Layouts",
+  "category": "equivalent"
+ },
+ {
+  "id": 228,
+  "page": "Registry",
+  "section": "Content recipes",
+  "sentence": "`[MASK]` — symptoms, causes, and fixes, titled by search terms.",
+  "answer": "content-troubleshooting",
+  "closed_book_guess": "Troubleshooting guides",
+  "category": "fact"
+ },
+ {
+  "id": 232,
+  "page": "Registry",
+  "section": "Content recipes",
+  "sentence": "`[MASK]` — a complete, neutral, templated lookup page.",
+  "answer": "content-reference",
+  "closed_book_guess": "Registry lookup page",
+  "category": "fact"
+ },
+ {
+  "id": 233,
+  "page": "Registry",
+  "section": "Content recipes",
+  "sentence": "`[MASK]` — dated, categorized records that flag breakage.",
+  "answer": "content-changelog",
+  "closed_book_guess": "Changelog entries",
+  "category": "fact"
+ },
+ {
+  "id": 234,
+  "page": "Registry",
+  "section": "Four types",
+  "sentence": "`[MASK]`** — Content sources, added with `nimbus-docs add source <name>`.",
+  "answer": "registry:source",
+  "closed_book_guess": "Sources",
+  "category": "fact"
+ },
+ {
+  "id": 245,
+  "page": "Layouts",
+  "section": "The shells",
+  "sentence": "Because they're your files, the way to remove a piece of chrome is to delete it from the layout — drop `<Pagination />` from `[MASK]` and it's gone site-wide.",
+  "answer": "DocsLayout",
+  "closed_book_guess": "`<Shell />`",
+  "category": "fact"
+ },
+ {
+  "id": 247,
+  "page": "Layouts",
+  "section": "The shells",
+  "sentence": "`[MASK]`** — the docs page shape: sidebar rail, content column, table of contents, breadcrumbs, prev/next.",
+  "answer": "DocsLayout",
+  "closed_book_guess": "Shells",
+  "category": "fact"
+ },
+ {
+  "id": 270,
+  "page": "Content from Notion",
+  "section": "Properties",
+  "sentence": "Every other row is a draft, exactly like a local draft: shown in `[MASK]` with the Draft badge, absent from `astro build`.",
+  "answer": "astro dev",
+  "closed_book_guess": "preview",
+  "category": "fact"
+ },
+ {
+  "id": 272,
+  "page": "Content from Notion",
+  "section": "Properties",
+  "sentence": "With one, a row publishes only when its value is `[MASK]`, or when its checkbox is checked.",
+  "answer": "Published",
+  "closed_book_guess": "true",
+  "category": "fact"
+ },
+ {
+  "id": 281,
+  "page": "Content from other sources",
+  "section": "What happens at build time",
+  "sentence": " Each source resolves to a **snapshot**: a sparse, history-free checkout of `path` at one commit, under `[MASK]`, with its `.git` folder removed.",
+  "answer": ".nimbus/sources/",
+  "closed_book_guess": "content/sources",
+  "category": "fact"
+ },
+ {
+  "id": 290,
+  "page": "Content from other sources",
+  "section": "Timeouts",
+  "sentence": "`[MASK]` and `NIMBUS_SOURCES_FETCH_TIMEOUT` (seconds) change them.",
+  "answer": "NIMBUS_SOURCES_RESOLVE_TIMEOUT",
+  "closed_book_guess": "NIMBUS_SOURCES_TIMEOUT",
+  "category": "fact"
+ },
+ {
+  "id": 308,
+  "page": "Interactive content",
+  "section": "The boundary",
+  "sentence": "Embed the result in MDX with a `[MASK]` directive so it hydrates when scrolled into view.",
+  "answer": "client:visible",
+  "closed_book_guess": "<ClientOnly>",
+  "category": "fact"
+ },
+ {
+  "id": 316,
+  "page": "Linting",
+  "section": "Run it",
+  "sentence": "It also reads page collections that load from another folder, including [content sources](/writing/content-sources): a problem in a source's snapshot is reported as `sdk: docs/guides/intro.mdx:12`, its path in the source repository, and `[MASK]` leaves the snapshot untouched.",
+  "answer": "--fix",
+  "closed_book_guess": "linting",
+  "category": "fact"
+ },
+ {
+  "id": 317,
+  "page": "Linting",
+  "section": "Check links",
+  "sentence": "Writing `[Guide](/docs/guide)` renders as `[MASK]`, and lint reports it with the path to use instead.",
+  "answer": "/docs/docs/guide",
+  "closed_book_guess": "`[Guide](/docs/guide)`",
+  "category": "fact"
+ },
+ {
+  "id": 335,
+  "page": "Markdown and MDX",
+  "section": "Syntax and behavior",
+  "sentence": " Built-in types: `note`, `info`, `tip`, `caution`, `warning`, `[MASK]`, `danger`.",
+  "answer": "important",
+  "closed_book_guess": "success",
+  "category": "fact"
+ },
+ {
+  "id": 336,
+  "page": "Pages and routing",
+  "section": "Page URLs",
+  "sentence": " `getDocsPage()` and `getCollectionPage()` return each page's URLs next to `[MASK]`, `Content`, and `headings`, so page routes don't build them by hand.",
+  "answer": "entry",
+  "closed_book_guess": "slug",
+  "category": "fact"
+ },
+ {
+  "id": 339,
+  "page": "Pages and routing",
+  "section": "Page URLs",
+  "sentence": " `[MASK]` and `getCollectionPage()` return each page's URLs next to `entry`, `Content`, and `headings`, so page routes don't build them by hand.",
+  "answer": "getDocsPage()",
+  "closed_book_guess": "getPages()",
+  "category": "fact"
+ },
+ {
+  "id": 344,
+  "page": "Pages and routing",
+  "section": "Other collections",
+  "sentence": "`[MASK]` is the purpose-built exception for API references because Nimbus supplies its renderer.",
+  "answer": "apiCollection()",
+  "closed_book_guess": "apiReference",
+  "category": "fact"
+ },
+ {
+  "id": 345,
+  "page": "Pages and routing",
+  "section": "Custom route helpers",
+  "sentence": "`[MASK]` adds the configured base when producing a browser URL.",
+  "answer": "withBase()",
+  "closed_book_guess": "useBaseUrl",
+  "category": "fact"
+ },
+ {
+  "id": 355,
+  "page": "Example",
+  "section": "Agent notes",
+  "sentence": "The How-it-works bullets are retrieval gold: they pair the non-obvious line with its reason in one chunk, which is exactly what stops an agent from \"simplifying\" the load-bearing part (`req.text()` → `[MASK]`).",
+  "answer": "req.json()",
+  "closed_book_guess": "await req.text()",
+  "category": "example_name"
+ },
+ {
+  "id": 369,
+  "page": "Quickstart",
+  "section": "Links & freshness",
+  "sentence": "This page rots fastest of all types (install commands, CLI output, signup flow): re-run it end-to-end on every release that touches its path, and stamp `[MASK]` in frontmatter when you do.",
+  "answer": "lastVerified",
+  "closed_book_guess": "last_verified",
+  "category": "fact"
+ },
+ {
+  "id": 373,
+  "page": "Reference",
+  "section": "Links & freshness",
+  "sentence": "Hand-maintained fact pages with no machine source (limits, quotas) carry a visible last-verified date (`[MASK]` in frontmatter); generated pages inherit their source's freshness.",
+  "answer": "lastVerified",
+  "closed_book_guess": "last_verified",
+  "category": "fact"
+ }
+]

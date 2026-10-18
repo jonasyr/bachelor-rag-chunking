@@ -1,0 +1,452 @@
+[
+ {
+  "id": 4,
+  "page": "conventions",
+  "section": "Why `--all-features`, and not \"default plus `--no-default-features`\"",
+  "sentence": " A plain `cargo test` reports success while skipping the tests that matter.** `strands-box` declares `test-support`, and `box_shell` and `[MASK]` each carry `required-features = [\"test-support\"]`.",
+  "answer": "box_credentials",
+  "closed_book_guess": "box_runtime",
+  "category": "fact"
+ },
+ {
+  "id": 7,
+  "page": "conventions",
+  "section": "SHOULD — common (most crates; diverge only with a recorded reason)",
+  "sentence": "[ ] **Tests live beside or under the crate.** Unit tests inline in `[MASK]`; integration/e2e tests in `tests/`.",
+  "answer": "#[cfg(test)] mod tests",
+  "closed_book_guess": "src/test.rs",
+  "category": "fact"
+ },
+ {
+  "id": 16,
+  "page": "architecture",
+  "section": "The MCP broker",
+  "sentence": "A permit on `[MASK]` covers every tool on that server, and a rule on a tool's own action can narrow it ([an MCP tool call passes two gates](decisions.md#mcp-authorization-is-two-gates)).",
+  "answer": "mcp:call",
+  "closed_book_guess": "server_id",
+  "category": "fact"
+ },
+ {
+  "id": 23,
+  "page": "architecture",
+  "section": "The MCP broker",
+  "sentence": "A remote MCP server takes the gateway's route instead, and the gateway raises the same `[MASK]`.",
+  "answer": "mcp:call",
+  "closed_book_guess": "Strands Box is a sandbox for AI agents.",
+  "category": "fact"
+ },
+ {
+  "id": 59,
+  "page": "decisions",
+  "section": "A host binary resolves against the operator's real `PATH`, and the longest command prefix selects the tool",
+  "sentence": " The Shell resolves a host binary against the operator's real host `PATH`, with `[MASK]` as the fallback, so Box finds a tool under Homebrew, nvm, or mise.",
+  "answer": "/usr/bin:/bin",
+  "closed_book_guess": "/usr/bin:/bin:/usr/sbin:/sbin",
+  "category": "fact"
+ },
+ {
+  "id": 77,
+  "page": "macos-enforcement",
+  "section": "Reading a profile rule",
+  "sentence": "This illustrative excerpt permits reads of one named file:   `[MASK]` matches that exact path.",
+  "answer": "literal",
+  "closed_book_guess": "literal(\"/path/to/file\")",
+  "category": "equivalent"
+ },
+ {
+  "id": 88,
+  "page": "macos-enforcement",
+  "section": "Reading a profile rule",
+  "sentence": "A directory-tree rule uses `[MASK]` to match a path and its descendants.",
+  "answer": "subpath",
+  "closed_book_guess": "/**/",
+  "category": "fact"
+ },
+ {
+  "id": 99,
+  "page": "mcp-discovery",
+  "section": "How a server is discovered",
+  "sentence": "Box captures a list that starts with no cursor and follows its own `[MASK]` chain, and builds the server's tool list from it ([pages, limits, and failures](#pages-limits-and-failures)).",
+  "answer": "nextCursor",
+  "closed_book_guess": "pagination",
+  "category": "fact"
+ },
+ {
+  "id": 103,
+  "page": "mcp",
+  "section": "Per-tool actions and their arguments",
+  "sentence": "Take the rule from the tool arguments row:   To load, this rule needs an action named `github::Action::\"search_repositories\"` and a typed `perPage` under that action's `[MASK]`.",
+  "answer": "context.input",
+  "closed_book_guess": "arguments",
+  "category": "fact"
+ },
+ {
+  "id": 105,
+  "page": "mcp",
+  "section": "Staged policy commits",
+  "sentence": "While `[MASK]`,** every request is decided by the committed rules, so the agent, the model, the shell, and every server's `tools/list` work from the start.",
+  "answer": "Discovering",
+  "closed_book_guess": "staging a policy commit",
+  "category": "fact"
+ },
+ {
+  "id": 108,
+  "page": "mcp",
+  "section": "How a server starts",
+  "sentence": " Box builds a server's per-tool actions while the server starts, from the server's own `[MASK]`.",
+  "answer": "tools/list",
+  "closed_book_guess": "tools",
+  "category": "fact"
+ },
+ {
+  "id": 116,
+  "page": "monty",
+  "section": "Example: the write, and two refusals",
+  "sentence": "The workspace is `~/src/project`, and it holds `notes.txt` and an empty `[MASK]` directory.",
+  "answer": "out",
+  "closed_book_guess": "output",
+  "category": "example_name"
+ },
+ {
+  "id": 117,
+  "page": "monty",
+  "section": "Example: the write, and two refusals",
+  "sentence": "`policy.dw` permits `[MASK]` under the workspace and `fs:write` under `out`.",
+  "answer": "fs:read",
+  "closed_book_guess": "fs:write",
+  "category": "fact"
+ },
+ {
+  "id": 121,
+  "page": "monty",
+  "section": "What Monty performs, and what it refuses",
+  "sentence": "`[MASK]` and `os.environ`** raise a `RuntimeError`.",
+  "answer": "os.getenv()",
+  "closed_book_guess": "`open`",
+  "category": "fact"
+ },
+ {
+  "id": 122,
+  "page": "monty",
+  "section": "How Box decides a file operation",
+  "sentence": "A rename is two paths.** `[MASK]` reads the source, moves it, and replaces whatever the destination names.",
+  "answer": "Path.rename()",
+  "closed_book_guess": "`rename`",
+  "category": "fact"
+ },
+ {
+  "id": 123,
+  "page": "monty",
+  "section": "Time and randomness",
+  "sentence": "`[MASK]`, the monotonic clock, `os.urandom()`, and `time.sleep()` take no policy decision, because none of them touches a resource a rule could name.",
+  "answer": "time.time()",
+  "closed_book_guess": "time.monotonic()",
+  "category": "fact"
+ },
+ {
+  "id": 136,
+  "page": "shell",
+  "section": "Commands the Shell implements",
+  "sentence": "The Shell's own command wins over a program of the same name.** `echo` is the Shell's `echo`, even though `[MASK]` is on the `PATH`, so a rule on `shell:exec` always means the Shell's own commands.",
+  "answer": "/bin/echo",
+  "closed_book_guess": "/usr/bin/echo",
+  "category": "ambiguous"
+ },
+ {
+  "id": 142,
+  "page": "shell",
+  "section": "File operations",
+  "sentence": "Reading, listing, `cd`, and checking whether a file can run are `[MASK]`.",
+  "answer": "fs:read",
+  "closed_book_guess": "read-only",
+  "category": "fact"
+ },
+ {
+  "id": 147,
+  "page": "shell",
+  "section": "How the Shell decides a command",
+  "sentence": "These actions decide what a command does:  `[MASK]`, for a command the Shell implements ([commands the Shell implements](#commands-the-shell-implements)).",
+  "answer": "shell:exec",
+  "closed_book_guess": "built-in commands",
+  "category": "fact"
+ },
+ {
+  "id": 176,
+  "page": "config",
+  "section": "Which trace variables the box reads",
+  "sentence": "An MCP frame carries `params._meta.threadId` or `sessionId`, and an HTTP egress request carries a `[MASK]` or `session-id` header.",
+  "answer": "thread-id",
+  "closed_book_guess": "x-thread-id",
+  "category": "fact"
+ },
+ {
+  "id": 177,
+  "page": "config",
+  "section": "`[mcp.<name>]`",
+  "sentence": "A `[MASK]` server is a local program that the box starts in its own separate sandbox.",
+  "answer": "stdio",
+  "closed_book_guess": "MCP",
+  "category": "fact"
+ },
+ {
+  "id": 180,
+  "page": "egress",
+  "section": "Example",
+  "sentence": " A bearer token for GitHub, and an AWS profile for Bedrock:   `box run` reads `[MASK]` from its own environment.",
+  "answer": "GITHUB_TOKEN",
+  "closed_book_guess": "AWS_PROFILE",
+  "category": "fact"
+ },
+ {
+  "id": 187,
+  "page": "egress",
+  "section": "Credential sources",
+  "sentence": "  An `[MASK]` route takes no placement, `header`, `prefix`, `param`, `inject`, or `phantom_prefix`.",
+  "answer": "aws://",
+  "closed_book_guess": "anonymous",
+  "category": "fact"
+ },
+ {
+  "id": 195,
+  "page": "getting-started",
+  "section": "Step 2. Install the Strands CLI",
+  "sentence": " Install the CLI with Homebrew's `[MASK]`, so it lands where `box.toml` expects it, and make a small project for it to work on:  ",
+  "answer": "npm",
+  "closed_book_guess": "strands-box formula",
+  "category": "fact"
+ },
+ {
+  "id": 200,
+  "page": "mcp-policy",
+  "section": "Step 5. Cap how often the agent calls a server",
+  "sentence": " A `[MASK]` with a `when temporal` clause caps calls.",
+  "answer": "forbid",
+  "closed_book_guess": "rate_limit policy",
+  "category": "fact"
+ },
+ {
+  "id": 206,
+  "page": "mcp-policy",
+  "section": "Step 4. Narrow the server",
+  "sentence": "Narrow a tool with a per-tool `[MASK]`, or with the tool list in the `mcp:call` permit.",
+  "answer": "forbid",
+  "closed_book_guess": "policy",
+  "category": "fact"
+ },
+ {
+  "id": 209,
+  "page": "mcp-policy",
+  "section": "Step 5. Cap how often the agent calls a server",
+  "sentence": "This rule refuses a third `tools/call` to `github` within five minutes:   `[MASK]` counts every attempt, including a refused one.",
+  "answer": "::request",
+  "closed_book_guess": "max_calls",
+  "category": "fact"
+ },
+ {
+  "id": 215,
+  "page": "mcp",
+  "section": "Example",
+  "sentence": " A stdio server and an http server:   The table's name, `fetch` or `[MASK]`, is the server name.",
+  "answer": "github",
+  "closed_book_guess": "http",
+  "category": "example_name"
+ },
+ {
+  "id": 226,
+  "page": "monty",
+  "section": "Policy",
+  "sentence": "A `forbid` refuses a path whatever another rule permits:   To run `python` and `[MASK]` in Strands Shell, permit `shell:exec` for them:   The egress gateway decides each `fetch()` with `net:connect` and `http:request`, as for the agent's own requests.",
+  "answer": "python3",
+  "closed_book_guess": "curl",
+  "category": "ambiguous"
+ },
+ {
+  "id": 238,
+  "page": "native-filesystem-policy",
+  "section": "Select workloads",
+  "sentence": "Add `native-filesystem-policy` to an existing `[agent]`, `[MASK]`, or local `[mcp.<name>]` table to override that default.",
+  "answer": "[tool.<name>]",
+  "closed_book_guess": "[tool]",
+  "category": "fact"
+ },
+ {
+  "id": 244,
+  "page": "actions",
+  "section": "MCP",
+  "sentence": "Server `[MASK]` and tool `lookup` give `demo_mcp::Action::\"lookup\"`.",
+  "answer": "demo-mcp",
+  "closed_book_guess": "demo_mcp",
+  "category": "example_name"
+ },
+ {
+  "id": 252,
+  "page": "actions",
+  "section": "The ten actions",
+  "sentence": "`[MASK]`: reading content or metadata, listing a directory, reading a symlink target, changing directory, and testing a file for execution.",
+  "answer": "fs:read",
+  "closed_book_guess": "filesystem",
+  "category": "fact"
+ },
+ {
+  "id": 255,
+  "page": "actions",
+  "section": "The ten actions",
+  "sentence": "`[MASK]`: a command line that runs a program the shell implements, such as `cat` or `grep`.",
+  "answer": "shell:exec",
+  "closed_book_guess": "shell command",
+  "category": "fact"
+ },
+ {
+  "id": 258,
+  "page": "policy",
+  "section": "Bind a credential to one host and one method",
+  "sentence": "Replace rather than add: a second rule with the same `@id` refuses to load, and a renamed copy leaves the broad `[MASK]` permit in force.",
+  "answer": "model_request",
+  "closed_book_guess": "allow_hosts",
+  "category": "example_name"
+ },
+ {
+  "id": 260,
+  "page": "policy",
+  "section": "A budget over time",
+  "sentence": "The `[MASK]` clause limits the `forbid` to content writes.",
+  "answer": "when",
+  "closed_book_guess": "on_write",
+  "category": "fact"
+ },
+ {
+  "id": 283,
+  "page": "shell-policy",
+  "section": "Step 6. Cap a command with a history rule",
+  "sentence": "`[MASK]` counts only commands that ran, and carries the exit status as `output.status`.",
+  "answer": "::response",
+  "closed_book_guess": "history.regex",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "telemetry",
+  "section": "A decision",
+  "sentence": "`[MASK]` holds one of six values: `permitted`, `forbidden`, `no_match`, `policy_pending`, `internal_fault`, and `enforcement`.",
+  "answer": "strands.box.policy.cause",
+  "closed_book_guess": "decision",
+  "category": "fact"
+ },
+ {
+  "id": 325,
+  "page": "codex-cli",
+  "section": "What you have",
+  "sentence": "To give Codex more, add a rule to `policy.dw`: [common rules](../policy.md#common-rules) has six to start from, and [write policy for shell commands](../shell-policy.md) shows how to admit a program such as `[MASK]`.",
+  "answer": "git",
+  "closed_book_guess": "git status",
+  "category": "ambiguous"
+ },
+ {
+  "id": 330,
+  "page": "codex-cli",
+  "section": "Step 1. Copy the example",
+  "sentence": " Clone the repository, unless `box-src` is already there from getting started, and copy the example directory to `~/box-tutorial/codex`:   The directory holds `box.toml`, `policy.dw`, `config.toml`, `[MASK]`, and a `README.md`.",
+  "answer": "AGENTS.md",
+  "closed_book_guess": "codex.toml",
+  "category": "example_name"
+ },
+ {
+  "id": 337,
+  "page": "first-policy",
+  "section": "Step 1. Write the policy",
+  "sentence": "It keeps the rules from getting started, widens `[MASK]` to the project directory itself, and denies one file.",
+  "answer": "project_write",
+  "closed_book_guess": "read access",
+  "category": "example_name"
+ },
+ {
+  "id": 341,
+  "page": "first-policy",
+  "section": "Step 1. Write the policy",
+  "sentence": "A directory takes two clauses: `[MASK]` matches the directory itself, and `like \".../*\"` matches everything below it.",
+  "answer": "==",
+  "closed_book_guess": "like \"...\"",
+  "category": "fact"
+ },
+ {
+  "id": 351,
+  "page": "pi",
+  "section": "Step 2. Read pi's settings",
+  "sentence": "The box prints that directory at startup as the first entry of the agent's `[MASK]`.",
+  "answer": "PATH",
+  "closed_book_guess": "settings",
+  "category": "fact"
+ },
+ {
+  "id": 355,
+  "page": "pi",
+  "section": "Step 6. Read the decision log",
+  "sentence": "That is one `[MASK]` under `shell_commands` and one `fs:read` per entry under `project_read`, the metadata of `.env` included.",
+  "answer": "shell:exec",
+  "closed_book_guess": "allowlist item",
+  "category": "fact"
+ },
+ {
+  "id": 359,
+  "page": "strands-cli-telemetry",
+  "section": "Step 4. Read both sources together",
+  "sentence": "`[MASK]` answers the same question without a viewer.",
+  "answer": "jq",
+  "closed_book_guess": "CloudWatch Logs",
+  "category": "ambiguous"
+ },
+ {
+  "id": 361,
+  "page": "strands-cli-telemetry",
+  "section": "Step 4. Read both sources together",
+  "sentence": "`[MASK]` is one that runs in the terminal:   Search for `box-tutorial`, the service name you chose.",
+  "answer": "otel-tui",
+  "closed_book_guess": "box logs",
+  "category": "fact"
+ },
+ {
+  "id": 362,
+  "page": "strands-cli-telemetry",
+  "section": "Step 3. Run it and read what the agent wrote",
+  "sentence": "The ninth, `[MASK]`, arrives once a tool call fails.",
+  "answer": "gen_ai.agent.tool.error.count",
+  "closed_book_guess": "tool_error",
+  "category": "fact"
+ },
+ {
+  "id": 364,
+  "page": "strands-cli-telemetry",
+  "section": "Step 3. Run it and read what the agent wrote",
+  "sentence": "  Ask the agent to read `README.md` again, then leave with `[MASK]`.",
+  "answer": "/exit",
+  "closed_book_guess": "goodbye",
+  "category": "fact"
+ },
+ {
+  "id": 376,
+  "page": "strands-sdk-agent",
+  "section": "Step 7. Read the decision log",
+  "sentence": "`rm` checks the file before it deletes it, which is the `[MASK]` above the `fs:delete`:   Each model call is an `http:request` under `model_request`, on a connection that `model_connect` permitted.",
+  "answer": "fs:read",
+  "closed_book_guess": "decision log entry",
+  "category": "fact"
+ },
+ {
+  "id": 379,
+  "page": "strands-sdk-agent",
+  "section": "Step 5. Read the policy",
+  "sentence": "The tasks below exercise two of them, `no_env` and `no_deletes`, and each carries an `[MASK]` and a `@description` that the denial text quotes:   The file ends with two more `forbid` rules, `metadata_hosts` and `metadata_addresses`, which refuse the cloud metadata services by name and by address.",
+  "answer": "@id",
+  "closed_book_guess": "@message",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "strands-sdk-agent",
+  "section": "Step 5. Read the policy",
+  "sentence": "The tasks below exercise two of them, `no_env` and `no_deletes`, and each carries an `@id` and a `@description` that the denial text quotes:   The file ends with two more `[MASK]` rules, `metadata_hosts` and `metadata_addresses`, which refuse the cloud metadata services by name and by address.",
+  "answer": "forbid",
+  "closed_book_guess": "deny",
+  "category": "fact"
+ }
+]

@@ -1,0 +1,227 @@
+[
+ {
+  "id": 39,
+  "page": "ci",
+  "section": "Change classification",
+  "sentence": "The detector uses `git diff --name-only --no-renames -z` and the classifier's `[MASK]` option so both sides of a rename and unquoted filenames, including embedded newlines, participate in the decision:  `run-workloads` is false only when every changed file is documentation, under `doc/` or ending in `.md`.",
+  "answer": "--null",
+  "closed_book_guess": "--name-only",
+  "category": "fact"
+ },
+ {
+  "id": 45,
+  "page": "ci",
+  "section": "Continuous integration",
+  "sentence": "Every restored guest must run the warp probe, report a passing restore line through `[MASK]` before the harness stages its check, report `/sys/kernel/rcu_stall_count` as 0 two seconds later, and show an uptime of at least 30 s, which proves that monotonic time advanced by the downtime.",
+  "answer": "nvx-time status",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 52,
+  "page": "contribute",
+  "section": "Access",
+  "sentence": "`[MASK]` records its URL and tracked `main` branch, and each NVX commit pins one exact revision.",
+  "answer": ".gitmodules",
+  "closed_book_guess": "GitHub",
+  "category": "fact"
+ },
+ {
+  "id": 55,
+  "page": "contribute",
+  "section": "Workflow",
+  "sentence": "Branch rules on `dev` require one approving review, every review thread resolved, and a passing `[MASK]`, the CI job that confirms that every job the change schedules succeeded.",
+  "answer": "Required status check",
+  "closed_book_guess": "test suite",
+  "category": "fact"
+ },
+ {
+  "id": 68,
+  "page": "2.5-device-topology-transport-and-discovery",
+  "section": "2.5 Device Topology, Transport, and Discovery",
+  "sentence": "All six slots are reserved, and the windows `0xd0004000..0xd0005fff` and `[MASK]`, IRQs 9, 12, and 13, and the status words at `0x30010`, `0x30014`, and `0x30020` are unused.",
+  "answer": "0xd0008000..0xd0008fff",
+  "closed_book_guess": "0xd0006000..0xd0007fff",
+  "category": "fact"
+ },
+ {
+  "id": 69,
+  "page": "2.5-device-topology-transport-and-discovery",
+  "section": "2.5 Device Topology, Transport, and Discovery",
+  "sentence": "All six slots are reserved, and the windows `[MASK]` and `0xd0008000..0xd0008fff`, IRQs 9, 12, and 13, and the status words at `0x30010`, `0x30014`, and `0x30020` are unused.",
+  "answer": "0xd0004000..0xd0005fff",
+  "closed_book_guess": "0xd0000000..0xd0000fff",
+  "category": "fact"
+ },
+ {
+  "id": 79,
+  "page": "3.2-clock-and-time",
+  "section": "3.2.2 MSRs",
+  "sentence": "The MSRs that hold an offset added to the processor's TSC (`[MASK]`, `0x3b`) and the TSC value at which the LAPIC timer fires in TSC-deadline mode (`IA32_TSC_DEADLINE`, `0x6e0`) raise #GP on every backend, as do the cache-control registers of Intel's P6 processor generation (the legacy P6 L2-cache MSRs).",
+  "answer": "IA32_TSC_ADJUST",
+  "closed_book_guess": "IA32_TSC_OFFSET",
+  "category": "fact"
+ },
+ {
+  "id": 81,
+  "page": "3.2-clock-and-time",
+  "section": "3.2.1 Hypervisor Identity",
+  "sentence": "Leaf `[MASK]` recommends nothing and never requests spinlock notification.",
+  "answer": "0x40000004",
+  "closed_book_guess": "0x40000000",
+  "category": "fact"
+ },
+ {
+  "id": 93,
+  "page": "3.5-network",
+  "section": "3.5.4 Host-Local Access and Ingress",
+  "sentence": "It is bound into the policy digest, admitted before the policy mode is evaluated, and translated to the same port on host `[MASK]`, where the launcher supplies the proxy service.",
+  "answer": "127.0.0.1",
+  "closed_book_guess": "loopback",
+  "category": "equivalent"
+ },
+ {
+  "id": 97,
+  "page": "3.5-network",
+  "section": "3.5.4 Host-Local Access and Ingress",
+  "sentence": "An explicit host-loopback allow makes host-loopback access bidirectional: besides the gateway mapping, it publishes the guest's listeners on host loopback and admits explicit TCP or UDP forwards from host `[MASK]` ports to guest ports, at most 64 of them.",
+  "answer": "127.0.0.1",
+  "closed_book_guess": "ephemeral",
+  "category": "ambiguous"
+ },
+ {
+  "id": 98,
+  "page": "3.5-network",
+  "section": "3.5.4 Host-Local Access and Ingress",
+  "sentence": "The endpoint presents other host peers, such as the host clients of published listeners, at synthetic addresses inside the guest's subnet of each family, allocated downward from its last usable address, such as `[MASK]` and `fd00::a00:ff` for the identity in Table 3.12.",
+  "answer": "10.0.0.254",
+  "closed_book_guess": "172.30.0.254",
+  "category": "fact"
+ },
+ {
+  "id": 102,
+  "page": "3.6-host-filesystem",
+  "section": "3.6.4 Nodes, Handles, and Listings",
+  "sentence": "`[MASK]` looks each listed name up again and fails if it no longer reaches the listed object.",
+  "answer": "READDIRPLUS",
+  "closed_book_guess": "readdir",
+  "category": "fact"
+ },
+ {
+  "id": 104,
+  "page": "3.6-host-filesystem",
+  "section": "3.6.4 Nodes, Handles, and Listings",
+  "sentence": "Every reply that returns an entry adds one lookup, `[MASK]` subtracts the count that the guest reports, and the node disappears at zero.",
+  "answer": "FORGET",
+  "closed_book_guess": "forget_reply",
+  "category": "fact"
+ },
+ {
+  "id": 111,
+  "page": "3.6-host-filesystem",
+  "section": "3.6.4 Nodes, Handles, and Listings",
+  "sentence": "Every request on a node first walks each recorded name from the export root again without following links, fails with `ELOOP` if a name now crosses a symbolic link and with `[MASK]` if the policy hides it, and then operates on the final component without following it.",
+  "answer": "EACCES",
+  "closed_book_guess": "ENOENT",
+  "category": "ambiguous"
+ },
+ {
+  "id": 140,
+  "page": "5.1-boot-protocol",
+  "section": "5.1.2 Effective Command Line",
+  "sentence": "Callers may not supply `earlycon=`, `console=`, `virtio_mmio.device=`, `nr_cpus=`, any network or host filesystem bootstrap token, `nvx_snapshot_tier=`, `nvx_workload_uid=`, `[MASK]`, or `nvx_lifecycle=`.",
+  "answer": "nvx_workload_gid=",
+  "closed_book_guess": "nvx_boot_id=",
+  "category": "fact"
+ },
+ {
+  "id": 152,
+  "page": "5.5-restore-protocol",
+  "section": "5.5.3 Processor Activation",
+  "sentence": "Restore requires exactly one processor state entry for every index in `[MASK]` and rejects missing, duplicate, or out-of-range entries, including errors in the dormant suffix.",
+  "answer": "0..C-1",
+  "closed_book_guess": "0..max_vcpus-1",
+  "category": "ambiguous"
+ },
+ {
+  "id": 163,
+  "page": "distribution",
+  "section": "Source-inclusive packages",
+  "sentence": "This produces a patched Linux corresponding-source archive under `build/sources/linux`, exact Alpine recipes/upstream sources under `build/sources/alpine`, and exact Ubuntu `[MASK]` plus referenced source members under `build/sources/ubuntu`.",
+  "answer": ".dsc",
+  "closed_book_guess": ".dsc files",
+  "category": "equivalent"
+ },
+ {
+  "id": 196,
+  "page": "ubuntu-guest",
+  "section": "Root filesystem builder",
+  "sentence": "checks that `[MASK]` names the pinned release; 3.",
+  "answer": "/etc/os-release",
+  "closed_book_guess": "releasever",
+  "category": "fact"
+ },
+ {
+  "id": 216,
+  "page": "project-structure",
+  "section": "`guest/`, `ubuntu/`, and `azurelinux/`",
+  "sentence": "`[MASK]` pins the SHA-256 of every RPM that the Azure Linux initramfs adds to its digest-pinned base image; the Docker build downloads exactly those RPMs, verifies their checksums and signatures, and installs them without resolving packages from a repository.",
+  "answer": "azurelinux/packages.lock.json",
+  "closed_book_guess": "azurelinux-packages.txt",
+  "category": "fact"
+ },
+ {
+  "id": 220,
+  "page": "run",
+  "section": "Live host shares",
+  "sentence": "A relative `--mount-deny`, `--mount-allow`, or `[MASK]` path is resolved inside its share's host directory.",
+  "answer": "--mount-write",
+  "closed_book_guess": "--mount-ro",
+  "category": "fact"
+ },
+ {
+  "id": 229,
+  "page": "run",
+  "section": "Experimental single-workload sandbox",
+  "sentence": "It requires a write to a `file-ro` file to fail with `EROFS`, so the host must let every identity write the file, and it writes `[MASK]` to a `file-rw` file.",
+  "answer": "guest-to-host",
+  "closed_book_guess": "EROFS",
+  "category": "fact"
+ },
+ {
+  "id": 243,
+  "page": "setup",
+  "section": "Linux / KVM",
+  "sentence": "Add the current user to the `kvm` group:   Log out and back in after changing groups, then check access with `[MASK]`.",
+  "answer": "test -r /dev/kvm && test -w /dev/kvm",
+  "closed_book_guess": "groups",
+  "category": "ambiguous"
+ },
+ {
+  "id": 246,
+  "page": "usage",
+  "section": "`build-openvmm`",
+  "sentence": "On Linux, `--backend kvm` selects GNU and `[MASK]` selects musl; Windows accepts `--backend whp`.",
+  "answer": "--backend mshv",
+  "closed_book_guess": "--backend kvm-musl",
+  "category": "fact"
+ },
+ {
+  "id": 247,
+  "page": "usage",
+  "section": "`performance validate-openvmm`",
+  "sentence": "`[MASK]` appends the input's path, SHA-256 digest, outcome (`valid`, `unstable`, or `invalid`), exit status, and error to a JSON attempt log, creating it on the first attempt.",
+  "answer": "--attempt-log",
+  "closed_book_guess": "performance validate-openvmm",
+  "category": "fact"
+ },
+ {
+  "id": 253,
+  "page": "usage",
+  "section": "Command-line usage",
+  "sentence": " `[MASK]` is the supported command-line entry point for building, running, benchmarking, and packaging NVX.",
+  "answer": "scripts/nvx.py",
+  "closed_book_guess": "nvx",
+  "category": "equivalent"
+ }
+]

@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (14.10.2026; ersetzt Ausschnitt und Commit von [ADR 0019](0019-korpus-ausschnitt.md), dessen übrige Regeln gelten weiter)
+Angenommen (14.10.2026; ersetzt Ausschnitt und Commit von [ADR 0019](0019-korpus-ausschnitt.md), dessen übrige Regeln gelten weiter); ersetzt durch [ADR 0038](0038-korpus-enroute.md) (18.10.2026)
 
 ## Kontext
 

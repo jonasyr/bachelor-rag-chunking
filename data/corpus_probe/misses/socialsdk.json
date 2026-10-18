@@ -1,0 +1,1181 @@
+[
+ {
+  "id": 0,
+  "page": "Integrate the Social SDK",
+  "section": "Build in this order",
+  "sentence": "Add `[MASK]` from `@opencoredev/social-sdk/server`.",
+  "answer": "ConnectionManager",
+  "closed_book_guess": "SocialProvider",
+  "category": "fact"
+ },
+ {
+  "id": 16,
+  "page": "Integration checklist",
+  "section": "Integration checklist",
+  "sentence": "It publishes Markdown pages and `[MASK]`, but it does not advertise a live MCP endpoint.",
+  "answer": "llms.txt",
+  "closed_book_guess": "OpenAPI specs",
+  "category": "ambiguous"
+ },
+ {
+  "id": 31,
+  "page": "Buffer",
+  "section": "Connect other Buffer accounts with OAuth",
+  "sentence": "Default scopes are `posts:read`, `posts:write`, `account:read`, and `[MASK]`.",
+  "answer": "offline_access",
+  "closed_book_guess": "channels:read",
+  "category": "fact"
+ },
+ {
+  "id": 47,
+  "page": "Post for Me",
+  "section": "Schedule and check a delivery",
+  "sentence": " Set `[MASK]` and store the outcome's `delivery` reference.",
+  "answer": "schedule.at",
+  "closed_book_guess": "scheduled_publish_time",
+  "category": "fact"
+ },
+ {
+  "id": 54,
+  "page": "Post for Me",
+  "section": "Receive webhooks",
+  "sentence": "Only the verify call sits inside the `[MASK]`, so a decoding or inbox failure is not reported as an authentication error.",
+  "answer": "try",
+  "closed_book_guess": "try/catch",
+  "category": "equivalent"
+ },
+ {
+  "id": 55,
+  "page": "Post for Me",
+  "section": "Receive webhooks",
+  "sentence": "Store the returned `WebhookDto.secret` in your server secret store as `[MASK]`; it is distinct from the API key.",
+  "answer": "POST_FOR_ME_WEBHOOK_SECRET",
+  "closed_book_guess": "webhook secret",
+  "category": "fact"
+ },
+ {
+  "id": 63,
+  "page": "PostFast",
+  "section": "Media",
+  "sentence": "PostFast's schema has no alt text field, so attachments with `[MASK]` are rejected.",
+  "answer": "altText",
+  "closed_book_guess": "alt_text",
+  "category": "equivalent"
+ },
+ {
+  "id": 68,
+  "page": "PostFast",
+  "section": "Every post is scheduled",
+  "sentence": "The adapter checks relative to its configured clock in preparation and publication; preparation reports `[MASK]`, `schedule.past` or `schedule.horizon` otherwise:   A successful submission returns a `scheduled` outcome whose job ID is the PostFast post ID.",
+  "answer": "schedule.required",
+  "closed_book_guess": "schedule.ready",
+  "category": "fact"
+ },
+ {
+  "id": 71,
+  "page": "Postiz",
+  "section": "Supported operations",
+  "sentence": "Past the limit Postiz answers with HTTP 429, which the adapter reports as `[MASK]`.",
+  "answer": "rate_limited",
+  "closed_book_guess": "rateLimitError",
+  "category": "fact"
+ },
+ {
+  "id": 78,
+  "page": "Postiz",
+  "section": "Poll for status",
+  "sentence": "TikTok can finish a post before it returns the post ID; Postiz then reports the post as published without one, and the adapter returns `[MASK]` until you resolve it in Postiz.",
+  "answer": "unknown",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 82,
+  "page": "Zernio",
+  "section": "Receive webhooks",
+  "sentence": "`[MASK]` is your durable event store and `resolveTenants` maps Zernio account IDs to your tenants.",
+  "answer": "inbox",
+  "closed_book_guess": "webhookEvents",
+  "category": "fact"
+ },
+ {
+  "id": 83,
+  "page": "Zernio",
+  "section": "Receive webhooks",
+  "sentence": "`inbox` is your durable event store and `[MASK]` maps Zernio account IDs to your tenants.",
+  "answer": "resolveTenants",
+  "closed_book_guess": "accountMap",
+  "category": "fact"
+ },
+ {
+  "id": 87,
+  "page": "Zernio",
+  "section": "Publish a video",
+  "sentence": " Pass the file as a `[MASK]` with its MIME type and filename; the adapter uploads it to Zernio before it creates the post.",
+  "answer": "Blob",
+  "closed_book_guess": "FileUpload",
+  "category": "fact"
+ },
+ {
+  "id": 90,
+  "page": "Zernio",
+  "section": "Schedule and check a delivery",
+  "sentence": " Set `[MASK]`, with an optional IANA `timeZone`, and store the outcome's `delivery` reference.",
+  "answer": "schedule.at",
+  "closed_book_guess": "scheduledFor",
+  "category": "fact"
+ },
+ {
+  "id": 95,
+  "page": "Handle comments and messages",
+  "section": "Platform support",
+  "sentence": "Delete one with native `[MASK]` and its `uri` and `cid`.",
+  "answer": "deletePost",
+  "closed_book_guess": "post",
+  "category": "fact"
+ },
+ {
+  "id": 97,
+  "page": "Handle comments and messages",
+  "section": "Platform support",
+  "sentence": "`setModerationStatus` must be called by the owner of the channel or video and requires a `moderationStatus` of `[MASK]`, `heldForReview`, or `rejected`; omitting it raises `invalid_input`.",
+  "answer": "published",
+  "closed_book_guess": "approved",
+  "category": "fact"
+ },
+ {
+  "id": 100,
+  "page": "Handle comments and messages",
+  "section": "Platform support",
+  "sentence": "Native `deleteComment` calls `[MASK]`, which YouTube allows only for the comment's original author.",
+  "answer": "comments.delete",
+  "closed_book_guess": "`deleteComment` calls",
+  "category": "fact"
+ },
+ {
+  "id": 112,
+  "page": "Accounts",
+  "section": "The account reference",
+  "sentence": "`createSocial({ backend: x(...) })` registers the adapter as `\"default\"`; `createSocial({ backends: { brand: x(...) } })`[MASK]`\"brand\"`.",
+  "answer": " registers it as ",
+  "closed_book_guess": "registers the adapter as",
+  "category": "equivalent"
+ },
+ {
+  "id": 113,
+  "page": "Architecture",
+  "section": "Per-target publication lifecycle",
+  "sentence": "`scheduled`, `accepted`, and `[MASK]` are pending and need later reconciliation.",
+  "answer": "processing",
+  "closed_book_guess": "publishing",
+  "category": "fact"
+ },
+ {
+  "id": 116,
+  "page": "Architecture",
+  "section": "Per-target publication lifecycle",
+  "sentence": "`[MASK]` always carries a `PlatformPostRef` in `post`; the provider-native identifiers inside it are optional.",
+  "answer": "published",
+  "closed_book_guess": "TargetPostResult",
+  "category": "fact"
+ },
+ {
+  "id": 117,
+  "page": "Architecture",
+  "section": "Per-target publication lifecycle",
+  "sentence": "The publication `[MASK]` summarizes the targets.",
+  "answer": "status",
+  "closed_book_guess": "result",
+  "category": "fact"
+ },
+ {
+  "id": 126,
+  "page": "Capabilities",
+  "section": "Availability states",
+  "sentence": "`[MASK]` means the code exists, not that your app or account may use it.",
+  "answer": "available",
+  "closed_book_guess": "Implemented",
+  "category": "fact"
+ },
+ {
+  "id": 146,
+  "page": "Idempotency",
+  "section": "Unknown is not failure",
+  "sentence": "`never` means do not retry, `[MASK]` gives a wait in milliseconds, `after-reconnect` needs new credentials, and `reconcile-first` means the write state is still uncertain.",
+  "answer": "after-delay",
+  "closed_book_guess": "number",
+  "category": "fact"
+ },
+ {
+  "id": 152,
+  "page": "Media",
+  "section": "Four media sources",
+  "sentence": "Optional fields `mimeType`, `filename`, `byteSize`, `width`, `height`, `durationSeconds`, `altText`, `[MASK]`, and `thumbnail` travel with the attachment where platforms accept them.",
+  "answer": "caption",
+  "closed_book_guess": "blurhash",
+  "category": "fact"
+ },
+ {
+  "id": 164,
+  "page": "Native access",
+  "section": "Two native surfaces",
+  "sentence": "This example uses the Threads adapter, whose native `[MASK]` takes the acting account and an operation context:   Method names and inputs differ by platform.",
+  "answer": "getProfile",
+  "closed_book_guess": "client",
+  "category": "fact"
+ },
+ {
+  "id": 169,
+  "page": "Native access",
+  "section": "Two native surfaces",
+  "sentence": "The X native module, for example, has no `[MASK]`; it uses `getMe`, `getUserById`, and `getUserByUsername`.",
+  "answer": "getProfile",
+  "closed_book_guess": "getUserByIdAndUsername",
+  "category": "fact"
+ },
+ {
+  "id": 170,
+  "page": "Native access",
+  "section": "Two native surfaces",
+  "sentence": "Some adapters expose them natively: `[MASK]` on X, Threads, and Bluesky, comment moderation on YouTube and Instagram, and `createModerationReport` on Bluesky.",
+  "answer": "hideReply",
+  "closed_book_guess": "createPostReply",
+  "category": "fact"
+ },
+ {
+  "id": 175,
+  "page": "Outcomes",
+  "section": "Resource boundaries",
+  "sentence": " A connected account (`[MASK]`) identifies an authorized social identity through one backend instance: `backend`, `platform`, and `accountId`.",
+  "answer": "ConnectedAccountRef",
+  "closed_book_guess": "connectedAccount",
+  "category": "fact"
+ },
+ {
+  "id": 177,
+  "page": "Outcomes",
+  "section": "Resource boundaries",
+  "sentence": " A connected account (`ConnectedAccountRef`) identifies an authorized social identity through one backend instance: `backend`, `[MASK]`, and `accountId`.",
+  "answer": "platform",
+  "closed_book_guess": "provider",
+  "category": "fact"
+ },
+ {
+  "id": 179,
+  "page": "Outcomes",
+  "section": "Outcomes",
+  "sentence": "The client checks the `kind` and `[MASK]` on some calls and routes on `backend`; it does not prove the caller owns the reference.",
+  "answer": "version",
+  "closed_book_guess": "outcomeId",
+  "category": "fact"
+ },
+ {
+  "id": 183,
+  "page": "Outcomes",
+  "section": "Outcomes",
+  "sentence": "The client checks the `[MASK]` and `version` on some calls and routes on `backend`; it does not prove the caller owns the reference.",
+  "answer": "kind",
+  "closed_book_guess": "outcomeId",
+  "category": "fact"
+ },
+ {
+  "id": 186,
+  "page": "Authorization",
+  "section": "Authorization is opt in",
+  "sentence": " The client checks account access only when you configure an `[MASK]` in `createSocial`.",
+  "answer": "AuthorizationPolicy",
+  "closed_book_guess": "accountId",
+  "category": "fact"
+ },
+ {
+  "id": 190,
+  "page": "Authorization",
+  "section": "Authorization is opt in",
+  "sentence": "It carries the authenticated caller's `[MASK]` and `principalId` to your policy and scopes idempotency claims.",
+  "answer": "tenantId",
+  "closed_book_guess": "accountId",
+  "category": "fact"
+ },
+ {
+  "id": 198,
+  "page": "Process webhooks",
+  "section": "Verify direct platform webhooks",
+  "sentence": "The event keeps all of them in `data`, and `type` is specific only when every update maps to the same type; otherwise it is `[MASK]` and `originalType` lists the source types.",
+  "answer": "unknown",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 204,
+  "page": "Process webhooks",
+  "section": "Process webhooks",
+  "sentence": "Duplicate acceptance returns `[MASK]`, while processing remains a separate recoverable worker step.",
+  "answer": "duplicate",
+  "closed_book_guess": "200 OK",
+  "category": "fact"
+ },
+ {
+  "id": 208,
+  "page": "Mount in your framework",
+  "section": "Separate webhook intake",
+  "sentence": "Set the backend's `[MASK]` and `ZERNIO_WEBHOOK_SECRET` to the same server-side secret.",
+  "answer": "webhookSecret",
+  "closed_book_guess": "ZERNIO_API_KEY",
+  "category": "fact"
+ },
+ {
+  "id": 209,
+  "page": "Mount in your framework",
+  "section": "Separate webhook intake",
+  "sentence": "Supply `[MASK]` as a durable application-owned implementation of the SDK's `EventInbox` contract.",
+  "answer": "quarantineInbox",
+  "closed_book_guess": "an EventInbox implementation",
+  "category": "fact"
+ },
+ {
+  "id": 211,
+  "page": "Mount in your framework",
+  "section": "Separate webhook intake",
+  "sentence": "The example intake re-verifies the signature, matches `backendRecordId` against its saved delivery index, and writes its own inbox payload with `[MASK]` and `publicationKey`.",
+  "answer": "tenantId",
+  "closed_book_guess": "deliveryId",
+  "category": "example_name"
+ },
+ {
+  "id": 215,
+  "page": "Mount in your framework",
+  "section": "Configure the handler",
+  "sentence": " `[MASK]` checks the request `Host` and `Origin` against allowlists.",
+  "answer": "createExampleHandler",
+  "closed_book_guess": "The handler",
+  "category": "example_name"
+ },
+ {
+  "id": 217,
+  "page": "Mount in your framework",
+  "section": "Separate webhook intake",
+  "sentence": "Invoke the authenticated example worker at `[MASK]` through the mounted user route (for Next.js, `/api/social/events/process`; for Hono, `/social/events/process`).",
+  "answer": "/api/events/process",
+  "closed_book_guess": "/social/events/process",
+  "category": "example_name"
+ },
+ {
+  "id": 219,
+  "page": "Installation",
+  "section": "Installation",
+  "sentence": "The package is ESM-only: import it with `import`, from an ES module (`\"type\": \"module\"` or `[MASK]`).",
+  "answer": ".mts",
+  "closed_book_guess": ".mjs",
+  "category": "ambiguous"
+ },
+ {
+  "id": 220,
+  "page": "Quickstart",
+  "section": "Failure exercise",
+  "sentence": "Publish to both mock accounts:   Keep the successful delivery and display the failed target's `[MASK]`, `message`, and `retryDisposition`.",
+  "answer": "code",
+  "closed_book_guess": "platformId",
+  "category": "fact"
+ },
+ {
+  "id": 226,
+  "page": "Quickstart",
+  "section": "Failure exercise",
+  "sentence": "Calling `[MASK]` again with the same key returns these saved outcomes without dispatching.",
+  "answer": "publish",
+  "closed_book_guess": "idempotency key",
+  "category": "fact"
+ },
+ {
+  "id": 232,
+  "page": "Convex",
+  "section": "Create the client in one module",
+  "sentence": "Actions can run more than once, so an `idempotencyKey` must be backed by a durable `[MASK]`.",
+  "answer": "idempotencyStore",
+  "closed_book_guess": "storage",
+  "category": "fact"
+ },
+ {
+  "id": 234,
+  "page": "Convex",
+  "section": "Reconcile processing outcomes",
+  "sentence": "Build `[MASK]` for that backend, store the outcome's `delivery` reference as above, and reconcile from a later action instead of polling in the background:   `internal.accounts.authorizedForDelivery` is an application-owned query.",
+  "answer": "createSocialClient",
+  "closed_book_guess": "a mutation",
+  "category": "example_name"
+ },
+ {
+  "id": 236,
+  "page": "Convex",
+  "section": "Select Node 22 or 24",
+  "sentence": "Set `[MASK]` in `convex.json` to `\"22\"` or `\"24\"`.",
+  "answer": "node.nodeVersion",
+  "closed_book_guess": "nodeVersion",
+  "category": "fact"
+ },
+ {
+  "id": 237,
+  "page": "Convex",
+  "section": "Publish from a Node action",
+  "sentence": "If that result is `[MASK]`, the first attempt may have posted.",
+  "answer": "unknown",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 238,
+  "page": "Convex",
+  "section": "Create the client in one module",
+  "sentence": "This client holds one X account's token, so it can only publish as `[MASK]`.",
+  "answer": "X_USER_ID",
+  "closed_book_guess": "that account",
+  "category": "example_name"
+ },
+ {
+  "id": 242,
+  "page": "Elysia",
+  "section": "Publish from a route",
+  "sentence": "If a retry returns `[MASK]`, the first attempt may have posted, so check the account before you publish again, even under a new draft ID.",
+  "answer": "unknown",
+  "closed_book_guess": "uncertain",
+  "category": "fact"
+ },
+ {
+  "id": 247,
+  "page": "Elysia",
+  "section": "Mount the example handler",
+  "sentence": "The database module finds them at `[MASK]` relative to `src/db/client.ts`, so copy both directories and keep them side by side.",
+  "answer": "../../drizzle",
+  "closed_book_guess": "../../prisma/schema.prisma",
+  "category": "example_name"
+ },
+ {
+  "id": 248,
+  "page": "Elysia",
+  "section": "Webhooks from the raw request",
+  "sentence": "The route below is a separate one for the [Zernio](/backends/zernio) managed backend, which signs each delivery with `[MASK]`.",
+  "answer": "X-Zernio-Signature",
+  "closed_book_guess": "HMAC-SHA256",
+  "category": "ambiguous"
+ },
+ {
+  "id": 250,
+  "page": "Elysia",
+  "section": "Webhooks from the raw request",
+  "sentence": "Pass `request.headers` as is, because verifiers read signatures with `[MASK]`.",
+  "answer": "headers.get()",
+  "closed_book_guess": "request.headers.get()",
+  "category": "equivalent"
+ },
+ {
+  "id": 254,
+  "page": "Express",
+  "section": "Create the client once",
+  "sentence": "This client holds one Threads account's token, so it can only publish as `[MASK]`.",
+  "answer": "THREADS_USER_ID",
+  "closed_book_guess": "that account",
+  "category": "example_name"
+ },
+ {
+  "id": 259,
+  "page": "Express",
+  "section": "Webhooks need the raw body",
+  "sentence": "The verifier expects a web `Headers` object, so copy Node's header record into one, keeping repeated headers:   Register `eventsRouter` before any app-wide `[MASK]` middleware.",
+  "answer": "express.json()",
+  "closed_book_guess": "body-parser",
+  "category": "ambiguous"
+ },
+ {
+  "id": 263,
+  "page": "Express",
+  "section": "Create the client once",
+  "sentence": "The Threads adapter also needs a durable `[MASK]`, because it keeps each post's progress there between calls.",
+  "answer": "workflowStore",
+  "closed_book_guess": "storage",
+  "category": "fact"
+ },
+ {
+  "id": 268,
+  "page": "Hono",
+  "section": "Mount the example handler",
+  "sentence": "With the server below on port 3030, `GET /social/accounts` lists two mock accounts and `[MASK]` publishes to them.",
+  "answer": "POST /social/publish",
+  "closed_book_guess": "POST /social/accounts/:accountId/publish",
+  "category": "example_name"
+ },
+ {
+  "id": 271,
+  "page": "Hono",
+  "section": "Mount the example handler",
+  "sentence": "Install the copy's dependencies, which come from `[MASK]`:   Then mount it:   If you compile with `tsc` instead of running TypeScript directly, copy `drizzle/` next to the compiled `social-example/src` as well, so the relative path still resolves.",
+  "answer": "apps/example/package.json",
+  "closed_book_guess": "social-example/package.json",
+  "category": "example_name"
+ },
+ {
+  "id": 273,
+  "page": "Hono",
+  "section": "Mount the example handler",
+  "sentence": "The database module finds them at `[MASK]` relative to `src/db/client.ts`, so copy both directories and keep them side by side.",
+  "answer": "../../drizzle",
+  "closed_book_guess": "../../drizzle/migrations",
+  "category": "example_name"
+ },
+ {
+  "id": 274,
+  "page": "Hono",
+  "section": "Publish from a route",
+  "sentence": "If a retry returns `[MASK]`, the first attempt may have posted.",
+  "answer": "unknown",
+  "closed_book_guess": "already_published",
+  "category": "fact"
+ },
+ {
+  "id": 276,
+  "page": "Hono",
+  "section": "Mount the example handler",
+  "sentence": "From your project root, with a checkout of the repository at `[MASK]`:   That gives this layout.",
+  "answer": "../social-sdk",
+  "closed_book_guess": "examples/hono",
+  "category": "example_name"
+ },
+ {
+  "id": 279,
+  "page": "Inngest",
+  "section": "Create the client and stores",
+  "sentence": "An `[MASK]` has the same five methods (`create`, `get`, `update`, `claim`, `release`), so the same table design works with `InstagramWorkflow` records.",
+  "answer": "InstagramWorkflowStore",
+  "closed_book_guess": "InngestStore",
+  "category": "fact"
+ },
+ {
+  "id": 281,
+  "page": "Inngest",
+  "section": "Publish as a durable function",
+  "sentence": "Instagram image publishing accepts JPEG only, so the media item sets `[MASK]`.",
+  "answer": "mimeType: \"image/jpeg\"",
+  "closed_book_guess": "mimeType",
+  "category": "ambiguous"
+ },
+ {
+  "id": 282,
+  "page": "Inngest",
+  "section": "Publish as a durable function",
+  "sentence": "`hasActiveAccountGrant` is your server-owned lookup of an active grant matching the tenant and the reference's exact `backend`, `[MASK]`, and `accountId`.",
+  "answer": "platform",
+  "closed_book_guess": "providerAccountId",
+  "category": "fact"
+ },
+ {
+  "id": 286,
+  "page": "Inngest",
+  "section": "Create the client and stores",
+  "sentence": " The samples use the Inngest TypeScript SDK v4, where `createFunction` takes a configuration object with `[MASK]` and a handler.",
+  "answer": "triggers",
+  "closed_book_guess": "id, trigger, retries",
+  "category": "fact"
+ },
+ {
+  "id": 287,
+  "page": "Inngest",
+  "section": "Create the client and stores",
+  "sentence": "The Instagram adapter's `[MASK]` holds each post's container progress between the publish step and later status reads.",
+  "answer": "workflowStore",
+  "closed_book_guess": "store",
+  "category": "fact"
+ },
+ {
+  "id": 293,
+  "page": "Neon",
+  "section": "Reconcile on a schedule",
+  "sentence": "To test the route locally, run `[MASK]` and replay the trigger call:  ",
+  "answer": "neon dev",
+  "closed_book_guess": "npm run dev",
+  "category": "ambiguous"
+ },
+ {
+  "id": 296,
+  "page": "Neon",
+  "section": "Schema",
+  "sentence": "  `[MASK]` is the table your application already uses for tenant identity, keyed by the same ID your authentication resolves.",
+  "answer": "tenants",
+  "closed_book_guess": "Tenant table",
+  "category": "example_name"
+ },
+ {
+  "id": 302,
+  "page": "NestJS",
+  "section": "Webhooks with a raw body",
+  "sentence": "The verifier expects a web `Headers` object, so copy Node's header record into one, keeping repeated headers:   Register the controller in a module that imports `[MASK]`.",
+  "answer": "ConfigModule",
+  "closed_book_guess": "SocialModule",
+  "category": "fact"
+ },
+ {
+  "id": 305,
+  "page": "NestJS",
+  "section": "Webhooks with a raw body",
+  "sentence": "`[MASK]` exists on the Express platform's `NestExpressApplication` type:   Read `req.rawBody` in the events controller.",
+  "answer": "useBodyParser",
+  "closed_book_guess": "rawBody",
+  "category": "fact"
+ },
+ {
+  "id": 308,
+  "page": "NestJS",
+  "section": "Webhooks with a raw body",
+  "sentence": "The direct X client above sends its own webhooks: verify those with `[MASK]` and answer the CRC check with `answerXWebhookChallenge`, as the [events guide](/events#verify-direct-platform-webhooks) shows.",
+  "answer": "verifyXWebhook",
+  "closed_book_guess": "verifyXWebhookSignature",
+  "category": "fact"
+ },
+ {
+  "id": 313,
+  "page": "Next.js",
+  "section": "Mount the example handler",
+  "sentence": "From your project root, with a checkout of the repository at `[MASK]`:   That gives this layout:   Install the copy's dependencies, which come from `apps/example/package.json`:   Next.js bundles route handlers, and the copy is written for Node's own module loader, so it needs three changes before it builds and runs.",
+  "answer": "../social-sdk",
+  "closed_book_guess": "apps/example",
+  "category": "example_name"
+ },
+ {
+  "id": 315,
+  "page": "Next.js",
+  "section": "Mount the example handler",
+  "sentence": "In it, authenticate the session, take the tenant and principal from the session, and pass the full callback URL and returned `[MASK]` to `ConnectionManager.discover`, then `select` the accounts the user picks.",
+  "answer": "state",
+  "closed_book_guess": "connection request ID",
+  "category": "fact"
+ },
+ {
+  "id": 320,
+  "page": "Next.js",
+  "section": "Mount the example handler",
+  "sentence": "The example's `POST /api/connect/callback` takes a JSON body with `attemptId`, `[MASK]`, and `returnedState`.",
+  "answer": "callbackUrl",
+  "closed_book_guess": "authorizationCode",
+  "category": "example_name"
+ },
+ {
+  "id": 324,
+  "page": "Restate",
+  "section": "Retries",
+  "sentence": "Sending `[MASK]` again for the same draft runs the step again, and the idempotency store answers it as described below.",
+  "answer": "publish",
+  "closed_book_guess": "the same idempotency key",
+  "category": "fact"
+ },
+ {
+  "id": 327,
+  "page": "Restate",
+  "section": "Retries",
+  "sentence": "The draft stores the `[MASK]` outcome as final and stops.",
+  "answer": "unknown",
+  "closed_book_guess": "failed",
+  "category": "fact"
+ },
+ {
+  "id": 329,
+  "page": "Restate",
+  "section": "How the handlers behave",
+  "sentence": "The Threads workflow reports `[MASK]` when a write may or may not have reached Threads, and `resumePublication` won't replay it.",
+  "answer": "unknown",
+  "closed_book_guess": "uncertain_delivery",
+  "category": "fact"
+ },
+ {
+  "id": 331,
+  "page": "Restate",
+  "section": "How the handlers behave",
+  "sentence": "For `[MASK]`, `publish` calls `resume` right away, which runs the adapter's native `resumePublication`, so most posts go out during the first invocation.",
+  "answer": "processing",
+  "closed_book_guess": "publish",
+  "category": "fact"
+ },
+ {
+  "id": 332,
+  "page": "Restate",
+  "section": "Define the draft object",
+  "sentence": "Passing `tenantId` alone does not enforce a grant, and native calls bypass any SDK `[MASK]`.",
+  "answer": "AuthorizationPolicy",
+  "closed_book_guess": "authorization",
+  "category": "fact"
+ },
+ {
+  "id": 334,
+  "page": "Restate",
+  "section": "Retries",
+  "sentence": "A retried `resume` step hits the workflow store, which knows how far the post got and reports `[MASK]` rather than replay a write it can't confirm.",
+  "answer": "unknown",
+  "closed_book_guess": "uncertain",
+  "category": "fact"
+ },
+ {
+  "id": 335,
+  "page": "Restate",
+  "section": "Retries",
+  "sentence": "That `[MASK]` does not prove nothing was posted.",
+  "answer": "unknown",
+  "closed_book_guess": "response status",
+  "category": "fact"
+ },
+ {
+  "id": 336,
+  "page": "Supabase",
+  "section": "Schema",
+  "sentence": " These tables reference a `[MASK]` table that your application already owns, keyed by the same tenant ID your authentication resolves.",
+  "answer": "tenants",
+  "closed_book_guess": "users",
+  "category": "example_name"
+ },
+ {
+  "id": 340,
+  "page": "Supabase",
+  "section": "Schema",
+  "sentence": "After creating `[MASK]` from that guide, protect it from Supabase API roles too:   With no policies, `anon` and `authenticated` cannot read, insert, update, or delete claims, even if they have table grants.",
+  "answer": "idempotency_claims",
+  "closed_book_guess": "the table",
+  "category": "example_name"
+ },
+ {
+  "id": 358,
+  "page": "TanStack Start",
+  "section": "Create the client in server code",
+  "sentence": "This client holds one Bluesky session, so it can only publish as `[MASK]`.",
+  "answer": "BLUESKY_DID",
+  "closed_book_guess": "one account",
+  "category": "example_name"
+ },
+ {
+  "id": 363,
+  "page": "TanStack Start",
+  "section": "Create the client in server code",
+  "sentence": " An `idempotencyKey` only stops a retried call from posting twice when the client has an `[MASK]`.",
+  "answer": "idempotencyStore",
+  "closed_book_guess": "idempotencyKeyStore",
+  "category": "fact"
+ },
+ {
+  "id": 365,
+  "page": "TanStack Start",
+  "section": "Publish from a server function",
+  "sentence": "If a retry returns `[MASK]`, the first attempt may have posted.",
+  "answer": "unknown",
+  "closed_book_guess": "undefined",
+  "category": "fact"
+ },
+ {
+  "id": 370,
+  "page": "Trigger.dev",
+  "section": "Share the client and stores",
+  "sentence": "The Threads adapter's `[MASK]` holds each post between `posts.publish` and the later status reads.",
+  "answer": "workflowStore",
+  "closed_book_guess": "postStore",
+  "category": "fact"
+ },
+ {
+  "id": 372,
+  "page": "Trigger.dev",
+  "section": "Scheduled publish as a task",
+  "sentence": "The outcome is `published` when Threads finishes, `[MASK]` when media is still being processed or another run holds the workflow, and `unknown` when a write may or may not have reached Threads.",
+  "answer": "processing",
+  "closed_book_guess": "pending",
+  "category": "fact"
+ },
+ {
+  "id": 374,
+  "page": "Trigger.dev",
+  "section": "Share the client and stores",
+  "sentence": " Task runs can land on different machines, minutes apart, so everything the SDK needs between runs must live in durable storage that every run shares:  The client's `[MASK]` claims each publish before any platform call.",
+  "answer": "idempotencyStore",
+  "closed_book_guess": "publish lock",
+  "category": "fact"
+ },
+ {
+  "id": 375,
+  "page": "Trigger.dev",
+  "section": "Scheduled publish as a task",
+  "sentence": "Your `saveOutcomes` implementation must atomically save the complete outcomes and move a draft with any `[MASK]` outcome to a review state that prevents automatic publishing.",
+  "answer": "unknown",
+  "closed_book_guess": "failed",
+  "category": "fact"
+ },
+ {
+  "id": 376,
+  "page": "Trigger.dev",
+  "section": "Notes",
+  "sentence": "The samples import from `@trigger.dev/sdk`; the older `[MASK]` path still works but is deprecated.",
+  "answer": "@trigger.dev/sdk/v3",
+  "closed_book_guess": "@trigger.dev/sdk/v2",
+  "category": "fact"
+ },
+ {
+  "id": 380,
+  "page": "Operations",
+  "section": "Cost and limits",
+  "sentence": "When the adapter maps the provider's `[MASK]` value, `retryDisposition` is `after-delay` with that delay; otherwise wait before retrying on your own schedule.",
+  "answer": "Retry-After",
+  "closed_book_guess": "retryAfter",
+  "category": "equivalent"
+ },
+ {
+  "id": 385,
+  "page": "Operations",
+  "section": "Diagnostics",
+  "sentence": "For each failure, log the `SocialError` fields `[MASK]`, `operation`, `correlationId`, `upstreamStatus`, `upstreamCode`, and `retryDisposition`.",
+  "answer": "code",
+  "closed_book_guess": "message",
+  "category": "fact"
+ },
+ {
+  "id": 389,
+  "page": "Operations",
+  "section": "Diagnostics",
+  "sentence": "For each failure, log the `[MASK]` fields `code`, `operation`, `correlationId`, `upstreamStatus`, `upstreamCode`, and `retryDisposition`.",
+  "answer": "SocialError",
+  "closed_book_guess": "diagnosticContext",
+  "category": "fact"
+ },
+ {
+  "id": 396,
+  "page": "Bluesky",
+  "section": "Setup",
+  "sentence": "Use a durable `[MASK]` in production.",
+  "answer": "ConnectionStore",
+  "closed_book_guess": "session store",
+  "category": "fact"
+ },
+ {
+  "id": 397,
+  "page": "Bluesky",
+  "section": "Delete a reply",
+  "sentence": " `native.deletePost({ account, post: { uri, cid }, context })`[MASK]`app.bsky.feed.post` record through [`com.atproto.repo.deleteRecord`](https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/repo/deleteRecord.json).",
+  "answer": " deletes a reply's native ",
+  "closed_book_guess": "deletes the original post’s",
+  "category": "ambiguous"
+ },
+ {
+  "id": 415,
+  "page": "LinkedIn",
+  "section": "Upload an image, then publish it",
+  "sentence": "The adapter checks the upstream owner and rejects a returned status other than `[MASK]` before creating the post.",
+  "answer": "AVAILABLE",
+  "closed_book_guess": "READY",
+  "category": "fact"
+ },
+ {
+  "id": 425,
+  "page": "LinkedIn",
+  "section": "Read the connected account",
+  "sentence": "LinkedIn returns `403` unless the member behind the token holds an approved `ADMINISTRATOR` role for that organization, and the call needs `[MASK]`.",
+  "answer": "rw_organization_admin",
+  "closed_book_guess": "r_organization_social_element_finder",
+  "category": "fact"
+ },
+ {
+  "id": 432,
+  "page": "Threads",
+  "section": "Setup",
+  "sentence": "Set `[MASK]` and `THREADS_ACCESS_TOKEN` in server configuration, and `THREADS_GRAPH_VERSION` only when you need a non-default version.",
+  "answer": "THREADS_USER_ID",
+  "closed_book_guess": "THREADS_APP_SECRET",
+  "category": "fact"
+ },
+ {
+  "id": 438,
+  "page": "TikTok",
+  "section": "Receive webhooks",
+  "sentence": "`[MASK]` events decode to `publication.updated` and use `content.publish_id` as `backendRecordId`.",
+  "answer": "post.publish.*",
+  "closed_book_guess": "Video publish status update",
+  "category": "fact"
+ },
+ {
+  "id": 439,
+  "page": "TikTok",
+  "section": "Reconcile the publish ID",
+  "sentence": "Only a single public identity produces `[MASK]`.",
+  "answer": "published",
+  "closed_book_guess": "publish IDs",
+  "category": "fact"
+ },
+ {
+  "id": 443,
+  "page": "TikTok",
+  "section": "Send a video to the creator's inbox",
+  "sentence": "The video inbox endpoint transfers the media without `[MASK]`, so the video caption and other posting choices are not sent.",
+  "answer": "post_info",
+  "closed_book_guess": "publishing_options",
+  "category": "fact"
+ },
+ {
+  "id": 445,
+  "page": "TikTok",
+  "section": "Setup",
+  "sentence": "Its default scopes are `[MASK]` and `video.publish`, sent comma-delimited.",
+  "answer": "user.info.basic",
+  "closed_book_guess": "user.info.basic,video.upload",
+  "category": "fact"
+ },
+ {
+  "id": 450,
+  "page": "X",
+  "section": "Use normalized messages",
+  "sentence": "`[MASK]` reads `GET /2/dm_conversations/{dm_conversation_id}/dm_events`, and `send` uses `POST /2/dm_conversations/{dm_conversation_id}/messages`.",
+  "answer": "listMessages",
+  "closed_book_guess": "list",
+  "category": "fact"
+ },
+ {
+  "id": 476,
+  "page": "Publish content",
+  "section": "Publish a sequence",
+  "sentence": "An item that returned a result goes into `result.items` even when its targets failed, are still pending, or are `unknown`, and `[MASK]` stays empty for it.",
+  "answer": "result.failures",
+  "closed_book_guess": "failedItems",
+  "category": "fact"
+ },
+ {
+  "id": 478,
+  "page": "Publish content",
+  "section": "Prepare locally",
+  "sentence": "It returns `{ ok, targets, issues }`; each issue names a `[MASK]`, `message`, `severity`, and usually a `targetIndex`.",
+  "answer": "code",
+  "closed_book_guess": "field",
+  "category": "fact"
+ },
+ {
+  "id": 482,
+  "page": "Publish content",
+  "section": "Publish a sequence",
+  "sentence": "With `[MASK]`, each item replies to the post the previous item created, so every item must target the same single account and must not set its own `replyTo`; the route must also accept replies.",
+  "answer": "replyToPrevious",
+  "closed_book_guess": "threaded true",
+  "category": "fact"
+ },
+ {
+  "id": 486,
+  "page": "Social graph",
+  "section": "Platform support",
+  "sentence": "Configure `bluesky()` with the PDS service, the account DID, and either an `accessJwt` or an OAuth `[MASK]`, not both.",
+  "answer": "session",
+  "closed_book_guess": "sessionJwt",
+  "category": "fact"
+ },
+ {
+  "id": 489,
+  "page": "Social graph",
+  "section": "Platform support",
+  "sentence": "Configure `[MASK]` with the PDS service, the account DID, and either an `accessJwt` or an OAuth `session`, not both.",
+  "answer": "bluesky()",
+  "closed_book_guess": "AtpAgent",
+  "category": "fact"
+ },
+ {
+  "id": 497,
+  "page": "Read posts and analytics",
+  "section": "Platform support",
+  "sentence": "Use native `getPost({ uri })` or `[MASK]` for additional record or thread data; neither returns a cursor.",
+  "answer": "getPostThread({ uri })",
+  "closed_book_guess": "getThread({ uri })",
+  "category": "fact"
+ },
+ {
+  "id": 502,
+  "page": "Read posts and analytics",
+  "section": "Platform support",
+  "sentence": "`posts.get` returns `id`, `snippet` (`title`, `description`, `channelId`, `publishedAt`), and `status` (`privacyStatus`, `[MASK]`, `selfDeclaredMadeForKids`).",
+  "answer": "uploadStatus",
+  "closed_book_guess": "embeddable",
+  "category": "ambiguous"
+ },
+ {
+  "id": 509,
+  "page": "Notifications and mentions",
+  "section": "Platform support",
+  "sentence": "Instagram Login needs `[MASK]` and `instagram_business_manage_comments`.",
+  "answer": "instagram_business_basic",
+  "closed_book_guess": "instagram_business_manage_messages",
+  "category": "fact"
+ },
+ {
+  "id": 514,
+  "page": "Notifications and mentions",
+  "section": "Normalized API",
+  "sentence": "`[MASK]` follows cursors lazily within its bounds.",
+  "answer": "iterate",
+  "closed_book_guess": "Pagination",
+  "category": "fact"
+ },
+ {
+  "id": 515,
+  "page": "Notifications and mentions",
+  "section": "Platform support",
+  "sentence": "Instagram Login needs `instagram_business_basic` and `[MASK]`.",
+  "answer": "instagram_business_manage_comments",
+  "closed_book_guess": "instagram_business_manage_messages",
+  "category": "fact"
+ },
+ {
+  "id": 516,
+  "page": "Notifications and mentions",
+  "section": "Platform support",
+  "sentence": "Needs a user access token with the OAuth scopes `[MASK]` and `users.read`.",
+  "answer": "tweet.read",
+  "closed_book_guess": "notifications.read",
+  "category": "fact"
+ },
+ {
+  "id": 538,
+  "page": "Search posts and actors",
+  "section": "Platform support",
+  "sentence": "Reposts are included unless the query excludes them with `[MASK]`.",
+  "answer": "-is:retweet",
+  "closed_book_guess": "-is:repost",
+  "category": "fact"
+ },
+ {
+  "id": 540,
+  "page": "Search posts and actors",
+  "section": "Platform support",
+  "sentence": "Normalized** `search.posts` with `[MASK]` only, plus native search.",
+  "answer": "recent",
+  "closed_book_guess": "X",
+  "category": "fact"
+ },
+ {
+  "id": 541,
+  "page": "Search posts and actors",
+  "section": "Platform support",
+  "sentence": "  Normalized** `search.posts` with `[MASK]` and `all` scopes, plus native `searchRecentPosts` and `searchAllPosts`.",
+  "answer": "recent",
+  "closed_book_guess": "recentlySearchable",
+  "category": "fact"
+ },
+ {
+  "id": 542,
+  "page": "Search posts and actors",
+  "section": "Platform support",
+  "sentence": "Full-archive search (`[MASK]`) needs eligible pay-per-use or Enterprise access and accepts 10 to 500.",
+  "answer": "scope: \"all\"",
+  "closed_book_guess": "searchPostsArchive",
+  "category": "fact"
+ },
+ {
+  "id": 543,
+  "page": "Search posts and actors",
+  "section": "Platform support",
+  "sentence": "It sends no ordering, so Threads uses its default `[MASK]` ranking; that is ranking, not a recent-only time horizon.",
+  "answer": "TOP",
+  "closed_book_guess": "relevance",
+  "category": "ambiguous"
+ },
+ {
+  "id": 547,
+  "page": "Capability matrix",
+  "section": "Capability matrix",
+  "sentence": "It is not your configured backend instance key: references use the key registered with `createSocial`, such as `[MASK]` or `company`.",
+  "answer": "default",
+  "closed_book_guess": "personal",
+  "category": "fact"
+ },
+ {
+  "id": 552,
+  "page": "Diagnostic CLI",
+  "section": "Diagnostic CLI",
+  "sentence": "`[MASK]` accepts a JSON file up to 1 MiB.",
+  "answer": "validate",
+  "closed_book_guess": "--input",
+  "category": "fact"
+ },
+ {
+  "id": 555,
+  "page": "Diagnostic CLI",
+  "section": "Diagnostic CLI",
+  "sentence": "The envelope contains `schemaVersion: 1`, `[MASK]`, `ok`, and `data`.",
+  "answer": "command",
+  "closed_book_guess": "timestamp",
+  "category": "fact"
+ },
+ {
+  "id": 557,
+  "page": "Diagnostic CLI",
+  "section": "Diagnostic CLI",
+  "sentence": "The envelope contains `schemaVersion: 1`, `command`, `ok`, and `[MASK]`.",
+  "answer": "data",
+  "closed_book_guess": "result",
+  "category": "fact"
+ },
+ {
+  "id": 558,
+  "page": "Diagnostic CLI",
+  "section": "Diagnostic CLI",
+  "sentence": "Save its `data.request` object as `[MASK]` to validate it.",
+  "answer": "request.json",
+  "closed_book_guess": "requestData",
+  "category": "example_name"
+ },
+ {
+  "id": 560,
+  "page": "Diagnostic CLI",
+  "section": "Diagnostic CLI",
+  "sentence": "The envelope contains `schemaVersion: 1`, `command`, `[MASK]`, and `data`.",
+  "answer": "ok",
+  "closed_book_guess": "timestamp",
+  "category": "fact"
+ },
+ {
+  "id": 569,
+  "page": "Errors",
+  "section": "Retry dispositions",
+  "sentence": "`[MASK]` does not prove a later retry cannot succeed: a rate limit without a parsed delay can carry it.",
+  "answer": "never",
+  "closed_book_guess": "retryable=false",
+  "category": "fact"
+ },
+ {
+  "id": 585,
+  "page": "Pagination and iteration",
+  "section": "Feeds, search, comments, and conversations",
+  "sentence": "Use `[MASK]`, `search.iteratePosts`, `comments.iterate`, `messages.iterateConversations`, `messages.iterateMessages`, or `notifications.iterate` for lazy bounded traversal.",
+  "answer": "posts.iterate",
+  "closed_book_guess": "feeds.iteratePosts",
+  "category": "fact"
+ },
+ {
+  "id": 591,
+  "page": "Pagination and iteration",
+  "section": "Feeds, search, comments, and conversations",
+  "sentence": "Use `posts.iterate`, `search.iteratePosts`, `[MASK]`, `messages.iterateConversations`, `messages.iterateMessages`, or `notifications.iterate` for lazy bounded traversal.",
+  "answer": "comments.iterate",
+  "closed_book_guess": "comments.iterateReplies",
+  "category": "fact"
+ },
+ {
+  "id": 592,
+  "page": "Pagination and iteration",
+  "section": "Feeds, search, comments, and conversations",
+  "sentence": "Use `posts.iterate`, `search.iteratePosts`, `comments.iterate`, `[MASK]`, `messages.iterateMessages`, or `notifications.iterate` for lazy bounded traversal.",
+  "answer": "messages.iterateConversations",
+  "closed_book_guess": "conversations.iterate",
+  "category": "fact"
+ },
+ {
+  "id": 595,
+  "page": "Security",
+  "section": "Webhooks are verified before parsing",
+  "sentence": "The verifier compares that header only; the body is not authenticated (`[MASK]`).",
+  "answer": "bodyAuthenticated: false",
+  "closed_book_guess": "replay attacks",
+  "category": "fact"
+ },
+ {
+  "id": 611,
+  "page": "Evidence levels",
+  "section": "Evidence levels",
+  "sentence": "A manifest declaration carries only `operation`, `platform`, `[MASK]`, and optionally `formats`, `requiredScopes`, and `notes`; the manifest itself names the `backend`, `apiRevision`, and `runtime`.",
+  "answer": "availability",
+  "closed_book_guess": "evidenceLevel",
+  "category": "fact"
+ }
+]

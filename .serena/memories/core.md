@@ -1,7 +1,8 @@
 # bachelor-rag-chunking — Core
 
 Code of Jonas Weirauch's bachelor thesis (IU, B.Sc. Informatik, supervisor Prof. Klaus Quibeldey-Cirkel,
-submission 24.12.2026): RAG pipeline on Vue.js docs, only the chunking strategy varies.
+submission 24.12.2026): RAG pipeline on the Enroute docs (ADR 0038; switch from Vue.js in progress,
+corpus choice in `docs/reference/corpus-selection.md`), only the chunking strategy varies.
 Facts live in `docs/` — start at `docs/README.md`; research design `docs/explanation/research-design.md`
 (Rangfolge: ADRs bindend — section "Rangfolge bei Widersprüchen").
 

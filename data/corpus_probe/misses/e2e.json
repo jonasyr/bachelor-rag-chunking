@@ -1,0 +1,884 @@
+[
+ {
+  "id": 0,
+  "page": "How agent steps work",
+  "section": "How a step ends",
+  "sentence": "Only `failed` and `[MASK]` carry an error code.",
+  "answer": "blocked",
+  "closed_book_guess": "timed_out",
+  "category": "ambiguous"
+ },
+ {
+  "id": 4,
+  "page": "How agent steps work",
+  "section": "What the model sees",
+  "sentence": "`vision: true` adds a masked screenshot, and `[MASK]` judges the screenshot alone.",
+  "answer": "vision: 'only'",
+  "closed_book_guess": "screenshotJudge",
+  "category": "fact"
+ },
+ {
+  "id": 14,
+  "page": "Agents and personas",
+  "section": "Pick an agent per run",
+  "sentence": " `[MASK]` chooses the agent for tests that don't select one.",
+  "answer": "--agent",
+  "closed_book_guess": "defaultAgent",
+  "category": "ambiguous"
+ },
+ {
+  "id": 16,
+  "page": "Agents and personas",
+  "section": "One flow, several personas",
+  "sentence": "Here, `[MASK]` runs only `admin`.",
+  "answer": "--agent admin",
+  "closed_book_guess": "asPersona",
+  "category": "ambiguous"
+ },
+ {
+  "id": 30,
+  "page": "API",
+  "section": "API",
+  "sentence": "`[MASK]` takes any [Standard Schema](/reference/expect#matching-a-schema), such as Zod, Valibot, or ArkType, and returns the value, typed.",
+  "answer": "toMatchSchema",
+  "closed_book_guess": "expectSchema",
+  "category": "fact"
+ },
+ {
+  "id": 31,
+  "page": "API",
+  "section": "API",
+  "sentence": " An API test calls your API with `[MASK]` and checks the response with the value matchers.",
+  "answer": "fetch",
+  "closed_book_guess": "http.Client",
+  "category": "ambiguous"
+ },
+ {
+  "id": 37,
+  "page": "Signing in",
+  "section": "Override a value per run",
+  "sentence": "When two entries map to one variable, such as `[MASK]` and `stripe_key`, the config load fails with `INVALID_CONFIG`.",
+  "answer": "stripe-key",
+  "closed_book_guess": "stripe_secret",
+  "category": "example_name"
+ },
+ {
+  "id": 40,
+  "page": "Signing in",
+  "section": "Sign in once in a setup test",
+  "sentence": " Save the session in a `[MASK]` body.",
+  "answer": "test.setup",
+  "closed_book_guess": "testigma",
+  "category": "fact"
+ },
+ {
+  "id": 41,
+  "page": "Signing in",
+  "section": "The password is a handle",
+  "sentence": " `credentials.user(name)` returns the username as a plain string and the password as a `[MASK]` named `<name>.password`.",
+  "answer": "Secret",
+  "closed_book_guess": "handle",
+  "category": "fact"
+ },
+ {
+  "id": 46,
+  "page": "Working with the browser",
+  "section": "Pick a lease scope",
+  "sentence": "The limits of [`connect.reconnectEndpoint`](/reference/web#recovering-a-cdp-transport) apply:  No `headers`, `basicAuth`, `[MASK]`, `locale`, or `timezoneId`.",
+  "answer": "userAgent",
+  "closed_book_guess": "proxy",
+  "category": "ambiguous"
+ },
+ {
+  "id": 49,
+  "page": "Working with the browser",
+  "section": "Icon fonts and generated content",
+  "sentence": "A control with only an icon reads as its `[MASK]`, when it has one.",
+  "answer": "title",
+  "closed_book_guess": "accessible name",
+  "category": "fact"
+ },
+ {
+  "id": 52,
+  "page": "Working with the browser",
+  "section": "Mock an API",
+  "sentence": "An `[MASK]` that fails in a handler fails the test, at the next step or at the end of the test.",
+  "answer": "expect",
+  "closed_book_guess": "assertion",
+  "category": "equivalent"
+ },
+ {
+  "id": 83,
+  "page": "Bitrise",
+  "section": "Workflow",
+  "sentence": " Bitrise steps boot the devices: `xcode-start-simulator` on macOS, and `[MASK]` with `wait-for-android-emulator` on Linux.",
+  "answer": "avd-manager",
+  "closed_book_guess": "android-emulator-launcher",
+  "category": "fact"
+ },
+ {
+  "id": 93,
+  "page": "Codemagic",
+  "section": "Workflow",
+  "sentence": "`[MASK]` sends `junit.xml` to the Tests tab of the build.",
+  "answer": "test_report",
+  "closed_book_guess": "test_reporter",
+  "category": "fact"
+ },
+ {
+  "id": 94,
+  "page": "Codemagic",
+  "section": "Workflow",
+  "sentence": "`test_report` sends `[MASK]` to the Tests tab of the build.",
+  "answer": "junit.xml",
+  "closed_book_guess": "JUnit test results",
+  "category": "equivalent"
+ },
+ {
+  "id": 111,
+  "page": "GitHub Actions",
+  "section": "Pull request comments",
+  "sentence": "The job needs `pull-requests: write` and `[MASK]` in the test step's env; the workflows above are read-only.",
+  "answer": "GITHUB_TOKEN",
+  "closed_book_guess": "E2E_GITHUB_TOKEN",
+  "category": "fact"
+ },
+ {
+  "id": 114,
+  "page": "GitHub Actions",
+  "section": "Pull request comments",
+  "sentence": "A fork's `[MASK]` run gets a read-only token, so nothing is posted ([why](/github#when-nothing-is-posted)).",
+  "answer": "pull_request",
+  "closed_book_guess": "e2e",
+  "category": "fact"
+ },
+ {
+  "id": 125,
+  "page": "Continuous integration",
+  "section": "Sharding",
+  "sentence": "On GitHub Actions, a matrix runs one job for each shard:   Upload each shard's `[MASK]` and `junit.xml` under a name with the shard index.",
+  "answer": "report.json",
+  "closed_book_guess": "blob report",
+  "category": "fact"
+ },
+ {
+  "id": 134,
+  "page": "Coding agents",
+  "section": "How an agent writes and runs a test",
+  "sentence": "No sleeps.** Locators poll, actions wait for their target, and `[MASK]` retries until its timeout.",
+  "answer": "expect",
+  "closed_book_guess": "assertions",
+  "category": "equivalent"
+ },
+ {
+  "id": 145,
+  "page": "Core concepts",
+  "section": "Goals",
+  "sentence": "For a value that changes on each run, use `unique()` so the [cache can replay the step](/cache#what-must-match):   `[MASK]` gets screenshots when it needs them.",
+  "answer": "act",
+  "closed_book_guess": "e2e",
+  "category": "ambiguous"
+ },
+ {
+  "id": 153,
+  "page": "Core concepts",
+  "section": "Assertions",
+  "sentence": "`[MASK]` waits until a condition is true.",
+  "answer": "agent.waitFor",
+  "closed_book_guess": "expectation",
+  "category": "fact"
+ },
+ {
+  "id": 165,
+  "page": "Decision models",
+  "section": "Install and configure",
+  "sentence": "Set the executor on the agents entry:   Tests are plain `[MASK]` and `agent.assert` calls:    Use `@ai-sdk/openai` 4.0.90 or later, which accepts the [vision](#vision) screenshot.",
+  "answer": "agent.act",
+  "closed_book_guess": "JavaScript",
+  "category": "fact"
+ },
+ {
+  "id": 172,
+  "page": "Decision models",
+  "section": "What the model can do",
+  "sentence": " Each turn offers the operations the engine supports on the elements of the newest screen: `tap`, `type`, `typeSecret`, `submit`, `select`, `check`, `upload`, `hover`, `secondary_tap` (a right-click), `double_tap`, `long_press`, `drag`, `[MASK]`, `scroll_up`, `scroll_down`, and `back`.",
+  "answer": "scroll_to",
+  "closed_book_guess": "scroll_to_element",
+  "category": "fact"
+ },
+ {
+  "id": 202,
+  "page": "Pull request comments",
+  "section": "Setup",
+  "sentence": "     Give the workflow `[MASK]`.",
+  "answer": "pull-requests: write",
+  "closed_book_guess": "a name that ends with `.yml` or `.yaml`",
+  "category": "ambiguous"
+ },
+ {
+  "id": 203,
+  "page": "Pull request comments",
+  "section": "Setup",
+  "sentence": "Source links start at the nearest directory with `[MASK]` inside `GITHUB_WORKSPACE`.",
+  "answer": ".git",
+  "closed_book_guess": "e2e.yml",
+  "category": "fact"
+ },
+ {
+  "id": 206,
+  "page": "Pull request comments",
+  "section": "When nothing is posted",
+  "sentence": "On GitHub Enterprise Server, the reporter uses `GITHUB_SERVER_URL` and `[MASK]`.",
+  "answer": "GITHUB_API_URL",
+  "closed_book_guess": "GITHUB_REPOSITORY",
+  "category": "fact"
+ },
+ {
+  "id": 209,
+  "page": "Pull request comments",
+  "section": "Setup",
+  "sentence": "`actions/checkout` with a `[MASK]` input works too.",
+  "answer": "path",
+  "closed_book_guess": "repository",
+  "category": "ambiguous"
+ },
+ {
+  "id": 210,
+  "page": "Pull request comments",
+  "section": "Setup",
+  "sentence": "Source links start at the nearest directory with `.git` inside `[MASK]`.",
+  "answer": "GITHUB_WORKSPACE",
+  "closed_book_guess": "project root",
+  "category": "fact"
+ },
+ {
+  "id": 212,
+  "page": "Pull request comments",
+  "section": "Setup",
+  "sentence": "`[MASK]` with a `path` input works too.",
+  "answer": "actions/checkout",
+  "closed_book_guess": "Commenting",
+  "category": "fact"
+ },
+ {
+  "id": 214,
+  "page": "Introduction",
+  "section": "How it works",
+  "sentence": "`[MASK]`, `agent.waitFor`, and `agent.extract` judge the screen.",
+  "answer": "agent.assert",
+  "closed_book_guess": "agent.check",
+  "category": "fact"
+ },
+ {
+  "id": 217,
+  "page": "Introduction",
+  "section": "How it works",
+  "sentence": "Agent steps.** `[MASK]` completes a goal.",
+  "answer": "agent.act",
+  "closed_book_guess": "The agent",
+  "category": "fact"
+ },
+ {
+  "id": 219,
+  "page": "Introduction",
+  "section": "How it works",
+  "sentence": "`agent.assert`, `agent.waitFor`, and `[MASK]` judge the screen.",
+  "answer": "agent.extract",
+  "closed_book_guess": "agent.tap",
+  "category": "fact"
+ },
+ {
+  "id": 234,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: hosted iOS simulators and Android emulators for mobile targets.",
+  "answer": "@e2e-dev/eas",
+  "closed_book_guess": "BrowserStack",
+  "category": "fact"
+ },
+ {
+  "id": 235,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: hosted Android emulators, iOS simulators, and real devices for mobile targets.",
+  "answer": "@e2e-dev/testmu",
+  "closed_book_guess": "BrowserStack",
+  "category": "fact"
+ },
+ {
+  "id": 236,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: hosted iOS simulators and Android emulators, with app installation and device cleanup.",
+  "answer": "@e2e-dev/limrun",
+  "closed_book_guess": "BrowserStack",
+  "category": "fact"
+ },
+ {
+  "id": 237,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: the open-source headless browser, started per worker slot on your own machine, no Chromium.",
+  "answer": "@e2e-dev/lightpanda",
+  "closed_book_guess": "Firefox",
+  "category": "fact"
+ },
+ {
+  "id": 238,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: hosted Chromium for web targets, one browser per worker or per test.",
+  "answer": "@e2e-dev/kernel",
+  "closed_book_guess": "BrowserStack Live",
+  "category": "fact"
+ },
+ {
+  "id": 239,
+  "page": "Hosted browsers and devices",
+  "section": "Hosted browsers and devices",
+  "sentence": "`[MASK]`: Chromium microVMs on your computer, each test in a branch of a warm browser.",
+  "answer": "@e2e-dev/smol",
+  "closed_book_guess": "Local browsers",
+  "category": "fact"
+ },
+ {
+  "id": 261,
+  "page": "Lightpanda",
+  "section": "Fetch more of the page",
+  "sentence": "`[MASK]` opts into each, as `--load-resources` on the server:   Inline styles, `<style>` blocks, and the `hidden` attribute already decide visibility; `stylesheet` makes an external file's rules count too, so a node a linked stylesheet hides is hidden to a query.",
+  "answer": "loadResources",
+  "closed_book_guess": "--load-stylesheets",
+  "category": "fact"
+ },
+ {
+  "id": 267,
+  "page": "Test mobile apps on Limrun",
+  "section": "Configure a target",
+  "sentence": "For Android, use `[MASK]`, the app's package name as `bundleId`, and an APK as `appPath`.",
+  "answer": "platform: 'android'",
+  "closed_book_guess": "deviceName",
+  "category": "fact"
+ },
+ {
+  "id": 268,
+  "page": "Test mobile apps on Limrun",
+  "section": "Configure a target",
+  "sentence": "For Android, use `platform: 'android'`, the app's package name as `[MASK]`, and an APK as `appPath`.",
+  "answer": "bundleId",
+  "closed_book_guess": "appId",
+  "category": "fact"
+ },
+ {
+  "id": 272,
+  "page": "Test mobile apps on Limrun",
+  "section": "Install and authenticate",
+  "sentence": " Install the integration alongside the mobile engine and its peers:     Set `[MASK]` in the environment that starts e2e.",
+  "answer": "LIMRUN_API_KEY",
+  "closed_book_guess": "E2E_INTEGRATION=limrun",
+  "category": "fact"
+ },
+ {
+  "id": 276,
+  "page": "smol machines browsers",
+  "section": "Start every test signed in",
+  "sentence": "On a browser from `connectOverCDP`, `[MASK]` only disconnects.",
+  "answer": "browser.close()",
+  "closed_book_guess": "close",
+  "category": "equivalent"
+ },
+ {
+  "id": 287,
+  "page": "smol machines browsers",
+  "section": "Choose a scope",
+  "sentence": "`[MASK]` keeps one machine per worker slot for the run.",
+  "answer": "scope: 'worker'",
+  "closed_book_guess": "worker scope",
+  "category": "equivalent"
+ },
+ {
+  "id": 289,
+  "page": "TestMu AI",
+  "section": "Options",
+  "sentence": "Runs that overlap and share a fixed `[MASK]` and `sessionName` can link each other's videos; the defaults never do.",
+  "answer": "build",
+  "closed_book_guess": "projectId",
+  "category": "fact"
+ },
+ {
+  "id": 305,
+  "page": "MCP server",
+  "section": "Set it up",
+  "sentence": "By hand:    Add the server to `[MASK]`, trust the project, and start a new session:  Add the server to `.cursor/mcp.json`.",
+  "answer": ".codex/config.toml",
+  "closed_book_guess": ".cursor/mcp.json",
+  "category": "fact"
+ },
+ {
+  "id": 306,
+  "page": "MCP server",
+  "section": "Set it up",
+  "sentence": "By hand:    Add the server to `.codex/config.toml`, trust the project, and start a new session:  Add the server to `[MASK]`.",
+  "answer": ".cursor/mcp.json",
+  "closed_book_guess": "mcp_servers.e2e-server",
+  "category": "fact"
+ },
+ {
+  "id": 309,
+  "page": "MCP server",
+  "section": "Set it up",
+  "sentence": "Other clients that read an `[MASK]` map take the same block.",
+  "answer": "mcpServers",
+  "closed_book_guess": "AGENTS.md",
+  "category": "fact"
+ },
+ {
+  "id": 339,
+  "page": "From Maestro",
+  "section": "Rewrite selectors",
+  "sentence": "Use `[MASK]`, a test id, or a goal: `agent.act('enter {email} in the email field', { params })` finds the field.",
+  "answer": "getByLabel",
+  "closed_book_guess": "accessibility label",
+  "category": "fact"
+ },
+ {
+  "id": 370,
+  "page": "Mobile",
+  "section": "Hosted devices",
+  "sentence": "The request carries `platform`, `runId`, `targetName`, `slot`, `slots`, `app` (the target's `app.bundleId`), the resolved `appPath`, `agentDeviceVersion` (for a service that starts a daemon of a chosen version), `projectRoot`, `[MASK]`, an interrupt `signal`, and a `log` that reaches the reporter.",
+  "answer": "env",
+  "closed_book_guess": "deviceName",
+  "category": "ambiguous"
+ },
+ {
+  "id": 372,
+  "page": "Mobile",
+  "section": "The device fixture",
+  "sentence": "`[MASK]` and `open` light the inner one.",
+  "answer": "half-open",
+  "closed_book_guess": "tap",
+  "category": "fact"
+ },
+ {
+  "id": 378,
+  "page": "Mobile",
+  "section": "Hosted devices",
+  "sentence": "`[MASK]`** runs after the last worker exits, within `cleanupTimeout`, on every exit path: a failure, an interrupt, or a `prepare` that threw.",
+  "answer": "release",
+  "closed_book_guess": "teardown",
+  "category": "fact"
+ },
+ {
+  "id": 380,
+  "page": "Mobile",
+  "section": "Launch arguments and permissions",
+  "sentence": " `[MASK]` and `app.permissions` apply to every fresh launch.",
+  "answer": "app.launchArguments",
+  "closed_book_guess": "app.launchArgs",
+  "category": "fact"
+ },
+ {
+  "id": 390,
+  "page": "Models",
+  "section": "Pick a gateway or a provider",
+  "sentence": "Without it, the AI SDK drops the schema with a `responseFormat` warning and agent steps may take more model calls:   Gateways usually use `[MASK]` IDs.",
+  "answer": "provider/model",
+  "closed_book_guess": "provider-specific",
+  "category": "fact"
+ },
+ {
+  "id": 392,
+  "page": "Models",
+  "section": "Data retention and compliance",
+  "sentence": "Every model request names e2e: a `User-Agent` that starts with `e2e/<version> (<platform>; <arch>)`, plus `[MASK]` and `X-Title: e2e` for Vercel AI Gateway and OpenRouter.",
+  "answer": "HTTP-Referer: https://tester.army/e2e",
+  "closed_book_guess": "HTTP-Referer: https://e2e.dev",
+  "category": "fact"
+ },
+ {
+  "id": 393,
+  "page": "Models",
+  "section": "Data retention and compliance",
+  "sentence": "To keep stored responses, set `store` in `[MASK]`.",
+  "answer": "providerOptions",
+  "closed_book_guess": "model_settings",
+  "category": "fact"
+ },
+ {
+  "id": 397,
+  "page": "Quickstart",
+  "section": "Add an agent step",
+  "sentence": "Add `[MASK]` to skip cached actions.",
+  "answer": "--no-cache",
+  "closed_book_guess": "forceAgentStep",
+  "category": "fact"
+ },
+ {
+  "id": 400,
+  "page": "Quickstart",
+  "section": "Use a subscription or API key",
+  "sentence": "For another provider, replace the model import and `model` value in `[MASK]`, and use `agent` as `agents.default`:   See [Models](/models) for local models and more options.",
+  "answer": "e2e.config.ts",
+  "closed_book_guess": "e2e.json",
+  "category": "fact"
+ },
+ {
+  "id": 403,
+  "page": "Quickstart",
+  "section": "Run your first test",
+  "sentence": "Start your app's dev server at `http://localhost:3000`, or set its address in `[MASK]`.",
+  "answer": "e2e.config.ts",
+  "closed_book_guess": "baseUrl",
+  "category": "ambiguous"
+ },
+ {
+  "id": 410,
+  "page": "agent",
+  "section": "Pixel tools: screenshot and the point verbs",
+  "sentence": "`tap_at` needs an engine whose `[MASK]` or `pointerActions` include `tap`, and `hover_at` one whose include `hover`.",
+  "answer": "actions",
+  "closed_book_guess": "pointerActions",
+  "category": "fact"
+ },
+ {
+  "id": 412,
+  "page": "agent",
+  "section": "agent.assert",
+  "sentence": "`[MASK]` controls what the model is shown before it.",
+  "answer": "vision",
+  "closed_book_guess": "agent.assertionContext",
+  "category": "fact"
+ },
+ {
+  "id": 415,
+  "page": "agent",
+  "section": "Action tools",
+  "sentence": "On an engine that declares `tapModifiers`, `tap`, `[MASK]`, and `right_click` take `modifiers` (`Shift`, `Control`, `Alt`, `Meta`, `ControlOrMeta`) to hold keys for the click, as a Shift-click extends a selection.",
+  "answer": "double_tap",
+  "closed_book_guess": "double_click",
+  "category": "fact"
+ },
+ {
+  "id": 419,
+  "page": "app",
+  "section": "Reference",
+  "sentence": "  `open`, `restart`, and `[MASK]` are bounded by `timeout`.",
+  "answer": "clearState",
+  "closed_book_guess": "close",
+  "category": "ambiguous"
+ },
+ {
+  "id": 421,
+  "page": "app",
+  "section": "`open`",
+  "sentence": " Opens the app: the declared URL, a path relative to it, or any absolute `[MASK]` URL.",
+  "answer": "http(s)",
+  "closed_book_guess": "HTTP",
+  "category": "equivalent"
+ },
+ {
+  "id": 424,
+  "page": "app",
+  "section": "`screenshot`",
+  "sentence": "Once a `[MASK]` has been filled, pixels are withheld for the rest of the session, including later tests in a serial group.",
+  "answer": "Secret",
+  "closed_book_guess": "screenshot threshold",
+  "category": "fact"
+ },
+ {
+  "id": 434,
+  "page": "CLI",
+  "section": "Output",
+  "sentence": "A `junit.xml` or `[MASK]` that could not be written is a line on stderr, never a run error.",
+  "answer": "summary.md",
+  "closed_book_guess": "json.json",
+  "category": "fact"
+ },
+ {
+  "id": 438,
+  "page": "CLI",
+  "section": "Prompts",
+  "sentence": "For a new project, the wizard asks for:  The engine.** **Web** (Playwright, the default) adds `[MASK]`.",
+  "answer": "@e2e-dev/web",
+  "closed_book_guess": "@playwright/test",
+  "category": "fact"
+ },
+ {
+  "id": 454,
+  "page": "e2e/engine",
+  "section": "Provider recordings",
+  "sentence": "`[MASK]` creates the attempt's `video` directory and calls `stop` with it.",
+  "answer": "stopProviderRecording",
+  "closed_book_guess": "Provider recording setup",
+  "category": "fact"
+ },
+ {
+  "id": 467,
+  "page": "Environment variables",
+  "section": "What app processes inherit",
+  "sentence": "If the dev server needs it too, pass it through `[MASK]`.",
+  "answer": "command.env",
+  "closed_book_guess": "envFile",
+  "category": "fact"
+ },
+ {
+  "id": 477,
+  "page": "Errors",
+  "section": "AgentError",
+  "sentence": "Test files load in their own module realm, so `[MASK]` can be false.",
+  "answer": "instanceof AgentError",
+  "closed_book_guess": "instanceof",
+  "category": "equivalent"
+ },
+ {
+  "id": 479,
+  "page": "Errors",
+  "section": "AgentError",
+  "sentence": "Use `[MASK]` from `e2e` and branch on `code`, as in the example at the top of this page.",
+  "answer": "isAgentError",
+  "closed_book_guess": "AgentError",
+  "category": "fact"
+ },
+ {
+  "id": 480,
+  "page": "Errors",
+  "section": "Exit codes",
+  "sentence": "`[MASK]`, `e2e logout`, and `e2e models` print a failure's message with no code and exit 1, or 130 when a sign-in or picker is cancelled.",
+  "answer": "e2e login",
+  "closed_book_guess": "e2e run",
+  "category": "fact"
+ },
+ {
+  "id": 488,
+  "page": "expect",
+  "section": "Soft assertions",
+  "sentence": "There is no `expect.soft.poll`; `[MASK]` has its own timeout to fail on.",
+  "answer": "expect.poll",
+  "closed_book_guess": "expect.soft.fail",
+  "category": "fact"
+ },
+ {
+  "id": 504,
+  "page": "MCP server (e2e mcp)",
+  "section": "Actions",
+  "sentence": " `tap`, `double_tap`, `long_press`, `right_click`, `hover`, `type`, `press`, `select`, `check`, `scroll`, `scroll_to`, `[MASK]`, `upload`, `navigate`, `back`, `type_secret`.",
+  "answer": "drag",
+  "closed_book_guess": "drag_and_drop",
+  "category": "fact"
+ },
+ {
+  "id": 513,
+  "page": "Mobile",
+  "section": "`setPermission`",
+  "sentence": "   `permission` is a [`DevicePermission`](#device-fixture); `state` is `grant`, `deny`, or `[MASK]`.",
+  "answer": "reset",
+  "closed_book_guess": "prompt",
+  "category": "fact"
+ },
+ {
+  "id": 514,
+  "page": "Mobile",
+  "section": "Exported types",
+  "sentence": "The runtime exports are `mobile`, and `test`, `describe`, `beforeEach`, `afterEach`, `beforeAll`, and `afterAll`, typed with the `device` fixture; `mobileTools` comes from `[MASK]`.",
+  "answer": "@e2e-dev/mobile/tools",
+  "closed_book_guess": "@e2e/mobile-tools",
+  "category": "fact"
+ },
+ {
+  "id": 519,
+  "page": "Reporters",
+  "section": "`onRunFinished`",
+  "sentence": "Hand `[MASK]` to every request and timer, or an abandoned reporter keeps the CLI alive after the run has ended.",
+  "answer": "signal",
+  "closed_book_guess": "`done`",
+  "category": "fact"
+ },
+ {
+  "id": 522,
+  "page": "Reporters",
+  "section": "Events",
+  "sentence": "`[MASK]` carries the full result record, including every attempt's artifacts.",
+  "answer": "test-finished",
+  "closed_book_guess": "onTestEnd",
+  "category": "fact"
+ },
+ {
+  "id": 524,
+  "page": "Reporters",
+  "section": "Events",
+  "sentence": "`judge` on `[MASK]` is the run agent's judge model, present only when judgments use a model other than `model`.",
+  "answer": "run-started",
+  "closed_book_guess": "events.model",
+  "category": "fact"
+ },
+ {
+  "id": 525,
+  "page": "Reporters",
+  "section": "Step progress",
+  "sentence": "An `end` phase's `[MASK]` and `explanation` are redacted.",
+  "answer": "error",
+  "closed_book_guess": "message",
+  "category": "fact"
+ },
+ {
+  "id": 537,
+  "page": "e2e/runner",
+  "section": "Options",
+  "sentence": "  `config` is a config file path relative to `[MASK]`, or an `E2EConfig` value.",
+  "answer": "cwd",
+  "closed_book_guess": "process.cwd()",
+  "category": "equivalent"
+ },
+ {
+  "id": 538,
+  "page": "e2e/runner",
+  "section": "Options",
+  "sentence": "`[MASK]` cancels host provisioning, a pending session open, or live fixture calls.",
+  "answer": "signal",
+  "closed_book_guess": "AbortSignal",
+  "category": "equivalent"
+ },
+ {
+  "id": 544,
+  "page": "screen and Locator",
+  "section": "Editing hosts",
+  "sentence": "A name from the host's own `aria-label`, `aria-labelledby`, `aria-placeholder`, or `[MASK]` (Quill) stays.",
+  "answer": "data-placeholder",
+  "closed_book_guess": "placeholder",
+  "category": "fact"
+ },
+ {
+  "id": 546,
+  "page": "screen and Locator",
+  "section": "`longPress`",
+  "sentence": "Without it the engine's default applies: 500 ms on the browser engine, one second on the mobile engine, past a React Native `Pressable`'s `[MASK]`.",
+  "answer": "delayLongPress",
+  "closed_book_guess": "delay",
+  "category": "fact"
+ },
+ {
+  "id": 550,
+  "page": "Security rules",
+  "section": "Site check",
+  "sentence": "Configured `[MASK]` go only on requests to the target's site.",
+  "answer": "headers",
+  "closed_book_guess": "security rules",
+  "category": "fact"
+ },
+ {
+  "id": 560,
+  "page": "test",
+  "section": "Your own fixtures",
+  "sentence": "A setup abandoned this way that reaches `[MASK]` later gets an immediate resolve.",
+  "answer": "use",
+  "closed_book_guess": "awaiting teardown",
+  "category": "fact"
+ },
+ {
+  "id": 572,
+  "page": "Browser",
+  "section": "Recovering a CDP transport",
+  "sentence": "The lease's `cdpEndpoint` provisions the attempt's browser, and its `[MASK]` (else `cdpEndpoint` again) reconnects to it.",
+  "answer": "reconnectEndpoint",
+  "closed_book_guess": "webSocketDebuggerUrl",
+  "category": "fact"
+ },
+ {
+  "id": 578,
+  "page": "Browser",
+  "section": "The browser fixture",
+  "sentence": "What belongs to the browser covers every tab: `cookies`, `[MASK]`, `route`, `unroute`, `onDialog`, and `addInitScript`.",
+  "answer": "setCookies",
+  "closed_book_guess": "localStorage",
+  "category": "fact"
+ },
+ {
+  "id": 582,
+  "page": "Security",
+  "section": "How secrets stay out of the model",
+  "sentence": "Every known secret value becomes `<secret:name>` in model input, reports, console output, and `.txt`, `[MASK]`, `.json`, `.html`, and `.htm` downloads.",
+  "answer": ".csv",
+  "closed_book_guess": ".log",
+  "category": "ambiguous"
+ },
+ {
+  "id": 600,
+  "page": "Subscriptions",
+  "section": "Sign-in help",
+  "sentence": "Without `gh`, pass `[MASK]` with your own GitHub OAuth app that has device flow on.",
+  "answer": "--client-id",
+  "closed_book_guess": "--github-client-id",
+  "category": "fact"
+ },
+ {
+  "id": 604,
+  "page": "Telemetry",
+  "section": "What is sent",
+  "sentence": "An engine, platform, model, fleet, or MCP client name, or an MCP client version, that isn't a plain token of letters, digits, dots, dashes, and underscores is sent as `[MASK]`.",
+  "answer": "other",
+  "closed_book_guess": "hashed value",
+  "category": "fact"
+ },
+ {
+  "id": 605,
+  "page": "Telemetry",
+  "section": "Opt out",
+  "sentence": "`[MASK]` prints the status and, when off, the reason.",
+  "answer": "e2e telemetry",
+  "closed_book_guess": "e2e telemetry status",
+  "category": "fact"
+ },
+ {
+  "id": 620,
+  "page": "Project tools",
+  "section": "Declare what a tool does",
+  "sentence": " `[MASK]` takes the AI SDK tool and these annotations:  ",
+  "answer": "defineTool",
+  "closed_book_guess": "tool()",
+  "category": "fact"
+ },
+ {
+  "id": 623,
+  "page": "Project tools",
+  "section": "Add a tool",
+  "sentence": "It also fails for a value `[MASK]` didn't build, and for `tools` on an entry with a custom `executor`.",
+  "answer": "defineTool",
+  "closed_book_guess": "that",
+  "category": "fact"
+ },
+ {
+  "id": 628,
+  "page": "Visual comparison",
+  "section": "In CI",
+  "sentence": "Without `[MASK]`, a CI run never writes into the project.",
+  "answer": "--update-snapshots",
+  "closed_book_guess": "updateSnapshots",
+  "category": "equivalent"
+ },
+ {
+  "id": 633,
+  "page": "Visual comparison",
+  "section": "Visual comparison",
+  "sentence": "`[MASK]` compares the whole screen.",
+  "answer": "expect(screen)",
+  "closed_book_guess": "toMatchScreenshot",
+  "category": "fact"
+ },
+ {
+  "id": 638,
+  "page": "Web",
+  "section": "Protected previews",
+  "sentence": "Use `[MASK]` for HTTP basic authentication.",
+  "answer": "basicAuth",
+  "closed_book_guess": "httpAuth",
+  "category": "fact"
+ },
+ {
+  "id": 657,
+  "page": "Writing an engine",
+  "section": "Keyboard",
+  "sentence": "`keyboard.type` must go through the platform's keyboard path, so the app gets the key events a person's typing makes: `keydown`, `keypress`, `[MASK]`, and `keyup` per character in a browser, the device keyboard on a device.",
+  "answer": "input",
+  "closed_book_guess": "input event",
+  "category": "equivalent"
+ }
+]

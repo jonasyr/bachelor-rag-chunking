@@ -1,0 +1,992 @@
+[
+ {
+  "id": 25,
+  "page": "Grammar of Graphics",
+  "section": "Marks choose geometry",
+  "sentence": "Add `[MASK]` only when none represents the entity.",
+  "answer": "key",
+  "closed_book_guess": "point Mark",
+  "category": "fact"
+ },
+ {
+  "id": 34,
+  "page": "Layout, Axes, and Coordinates",
+  "section": "Clipping and overflow",
+  "sentence": " `[MASK]` clips marks to `scene.chart`.",
+  "answer": "clip: true",
+  "closed_book_guess": "clipToChartBounds",
+  "category": "fact"
+ },
+ {
+  "id": 40,
+  "page": "Layout, Axes, and Coordinates",
+  "section": "Continuous viewports",
+  "sentence": "Custom marks can override either axis as `'content'` or `[MASK]` through `InitializedMark.viewport`.",
+  "answer": "'fixed'",
+  "closed_book_guess": "'viewport'",
+  "category": "fact"
+ },
+ {
+  "id": 57,
+  "page": "Scales",
+  "section": "Curves",
+  "sentence": "Opt into a curve only when the design requires it:   `[MASK]` adapts a D3 curve factory to the small line-and-area curve contract.",
+  "answer": "d3Curve",
+  "closed_book_guess": "d3CurveAdapter",
+  "category": "fact"
+ },
+ {
+  "id": 59,
+  "page": "Scales",
+  "section": "Direct dependency ownership",
+  "sentence": "Apply the same direct-dependency rule when source imports `[MASK]`, `d3-shape`, or another granular D3 module.",
+  "answer": "d3-array",
+  "closed_book_guess": "d3-scale",
+  "category": "ambiguous"
+ },
+ {
+  "id": 78,
+  "page": "Alpine Chart",
+  "section": "Directive options",
+  "sentence": "`[MASK]` receives `points`, `content`, a `DocumentFragment` `defaultBody`, `pinned`, and `dismiss`.",
+  "answer": "renderTooltipBody",
+  "closed_book_guess": "tooltipRenderer",
+  "category": "fact"
+ },
+ {
+  "id": 137,
+  "page": "Octane Adapter",
+  "section": "`class` and `style`",
+  "sentence": "A custom `style.height` remains live when both `height` and `[MASK]` are absent.",
+  "answer": "aspectRatio",
+  "closed_book_guess": "style.height",
+  "category": "fact"
+ },
+ {
+  "id": 141,
+  "page": "Octane Adapter",
+  "section": "SSR and hydration",
+  "sentence": "The adapter generates a sanitized resource prefix from Octane's `useId()` when `[MASK]` is absent.",
+  "answer": "idPrefix",
+  "closed_book_guess": "resourcePrefix",
+  "category": "fact"
+ },
+ {
+  "id": 143,
+  "page": "Octane Adapter",
+  "section": "`class` and `style`",
+  "sentence": "The core renderer's `[MASK]` option applies to a directly rendered surface, not the Octane outer host.",
+  "answer": "className",
+  "closed_book_guess": "class",
+  "category": "fact"
+ },
+ {
+  "id": 153,
+  "page": "Octane Chart",
+  "section": "Exported prop types",
+  "sentence": " The adapter exports `ChartCommonProps`, `[MASK]`, and `ChartTooltipBodyRenderContext`.",
+  "answer": "ChartProps",
+  "closed_book_guess": "ChartTooltipProps",
+  "category": "fact"
+ },
+ {
+  "id": 157,
+  "page": "Octane Chart",
+  "section": "Exported prop types",
+  "sentence": " The adapter exports `[MASK]`, `ChartProps`, and `ChartTooltipBodyRenderContext`.",
+  "answer": "ChartCommonProps",
+  "closed_book_guess": "ChartOptions",
+  "category": "fact"
+ },
+ {
+  "id": 174,
+  "page": "Preact Chart",
+  "section": "Props",
+  "sentence": "`[MASK]` receives `points`, `content`, `defaultBody`, `pinned`, and `dismiss`.",
+  "answer": "renderTooltipBody",
+  "closed_book_guess": "TooltipBody",
+  "category": "fact"
+ },
+ {
+  "id": 179,
+  "page": "Preact Chart",
+  "section": "Props",
+  "sentence": "`renderTooltipBody` receives `points`, `content`, `[MASK]`, `pinned`, and `dismiss`.",
+  "answer": "defaultBody",
+  "closed_book_guess": "position",
+  "category": "fact"
+ },
+ {
+  "id": 181,
+  "page": "Preact Chart",
+  "section": "Props",
+  "sentence": "A fixed `width` prop still controls scene measurement, so do not give `[MASK]` a conflicting value.",
+  "answer": "style.width",
+  "closed_book_guess": "width",
+  "category": "fact"
+ },
+ {
+  "id": 192,
+  "page": "React Adapter",
+  "section": "Tooltip body composition",
+  "sentence": "Composing `[MASK]` keeps the core title, rows, formatting, and swatches; arbitrary React content can sit beside it.",
+  "answer": "defaultBody",
+  "closed_book_guess": "TooltipBody",
+  "category": "fact"
+ },
+ {
+  "id": 195,
+  "page": "React Adapter",
+  "section": "`className` and `style`",
+  "sentence": "A custom `style.height` remains live when both `height` and `[MASK]` are absent.",
+  "answer": "aspectRatio",
+  "closed_book_guess": "className",
+  "category": "fact"
+ },
+ {
+  "id": 207,
+  "page": "React Chart",
+  "section": "Tooltip body",
+  "sentence": "Existing users of this prop should move `Chart` from `@tanstack/charts/react` to `[MASK]`.",
+  "answer": "@tanstack/charts/react/tooltip",
+  "closed_book_guess": "@tanstack/react-charts",
+  "category": "fact"
+ },
+ {
+  "id": 263,
+  "page": "Vue Adapter",
+  "section": "Vue Adapter",
+  "sentence": "`[MASK]` and `style` target the outer host.",
+  "answer": "class",
+  "closed_book_guess": "className",
+  "category": "fact"
+ },
+ {
+  "id": 312,
+  "page": "Bundle Size and Performance",
+  "section": "Import the narrow path",
+  "sentence": "Political boundary data and `[MASK]` remain application dependencies; importing `geoShape` does not bundle an atlas.",
+  "answer": "topojson-client",
+  "closed_book_guess": "topojson",
+  "category": "fact"
+ },
+ {
+  "id": 334,
+  "page": "Custom Marks and Renderers",
+  "section": "Custom SVG serializer",
+  "sentence": " A `[MASK]` accepts the complete `ChartScene` and accessible SVG options:   Pass it through `renderSvg` on the vanilla host or any default SVG framework adapter.",
+  "answer": "ChartSvgRenderer",
+  "closed_book_guess": "custom SVG serializer",
+  "category": "fact"
+ },
+ {
+  "id": 347,
+  "page": "Dynamic Data and Animation",
+  "section": "Stable keys",
+  "sentence": "`[MASK]` uses `x`; `lineY` and `areaY` use `x`; `areaX` uses `y`; rects and cells use their x/y interval tuple.",
+  "answer": "barY",
+  "closed_book_guess": "barX",
+  "category": "fact"
+ },
+ {
+  "id": 361,
+  "page": "Exporting",
+  "section": "Export PNG, JPEG, or WebP",
+  "sentence": "Check `[MASK]` before choosing a file extension, the download helper keeps the filename you supply.",
+  "answer": "blob.type",
+  "closed_book_guess": "downloadChartAsImage",
+  "category": "fact"
+ },
+ {
+  "id": 364,
+  "page": "Exporting",
+  "section": "Export a mixed SVG and Canvas chart",
+  "sentence": "`serializeChartSvg` and `[MASK]` reject a mixed root.",
+  "answer": "downloadChartSvg",
+  "closed_book_guess": "serializeChartCanvas",
+  "category": "fact"
+ },
+ {
+  "id": 366,
+  "page": "Exporting",
+  "section": "Export a Canvas chart",
+  "sentence": "`backgroundCanvas`, `focusUnderCanvas`, `[MASK]`, and `focusCanvas` expose the modeled live layers.",
+  "answer": "sceneCanvas",
+  "closed_book_guess": "seriesCanvas",
+  "category": "fact"
+ },
+ {
+  "id": 367,
+  "page": "Exporting",
+  "section": "Theme and resource policy",
+  "sentence": "Supply `[MASK]` when rendering multiple chart exports into the same document.",
+  "answer": "idPrefix",
+  "closed_book_guess": "uniqueId",
+  "category": "fact"
+ },
+ {
+  "id": 368,
+  "page": "Exporting",
+  "section": "Export a Canvas chart",
+  "sentence": "`[MASK]`, `focusUnderCanvas`, `sceneCanvas`, and `focusCanvas` expose the modeled live layers.",
+  "answer": "backgroundCanvas",
+  "closed_book_guess": "baseCanvas",
+  "category": "fact"
+ },
+ {
+  "id": 375,
+  "page": "Faceting and Composition",
+  "section": "Compose distinct views",
+  "sentence": "Use `[MASK]` when they belong to one accessible figure:   Use `fill`, `layer`, and `inset` when views overlap.",
+  "answer": "composeViews",
+  "closed_book_guess": "hconcat",
+  "category": "fact"
+ },
+ {
+  "id": 380,
+  "page": "Faceting and Composition",
+  "section": "Compose distinct views",
+  "sentence": "Use `composeViews` when they belong to one accessible figure:   Use `fill`, `[MASK]`, and `inset` when views overlap.",
+  "answer": "layer",
+  "closed_book_guess": "stroke",
+  "category": "fact"
+ },
+ {
+  "id": 381,
+  "page": "Framework tick labels",
+  "section": "Framework tick labels",
+  "sentence": "React owns the tick content; `[MASK]` updates its position after chart layout.",
+  "answer": "onRender",
+  "closed_book_guess": "TanStack Charts",
+  "category": "fact"
+ },
+ {
+  "id": 382,
+  "page": "Framework tick labels",
+  "section": "Framework tick labels",
+  "sentence": " `[MASK]` exposes the final `scene.scales` and `scene.chart` plot rectangle.",
+  "answer": "onRender",
+  "closed_book_guess": "useChartContext",
+  "category": "fact"
+ },
+ {
+  "id": 409,
+  "page": "Legends and Color",
+  "section": "Explicit gradient legend",
+  "sentence": "Options:  `label`: optional title; `[MASK]`: rendered color samples, with a minimum of two; `width`: preferred width capped by the chart; `format`: formatter for the domain endpoints; `placement`: `top` by default or `bottom`.",
+  "answer": "steps",
+  "closed_book_guess": "stops",
+  "category": "fact"
+ },
+ {
+  "id": 423,
+  "page": "Migrating",
+  "section": "Move pre-Alpha root scales into the registry",
+  "sentence": "If neither positional scale is used, write `[MASK]`.",
+  "answer": "scales: { angle: null, radius: null }",
+  "closed_book_guess": "scales: []",
+  "category": "fact"
+ },
+ {
+  "id": 429,
+  "page": "Responsive Charts",
+  "section": "Automatic guide space",
+  "sentence": "An explicit side locks only that side:   `[MASK]` locks every side and is appropriate for guide-free sparklines.",
+  "answer": "margin: 0",
+  "closed_book_guess": "true",
+  "category": "fact"
+ },
+ {
+  "id": 436,
+  "page": "Responsive Charts",
+  "section": "Deterministic server output",
+  "sentence": "Use the same `[MASK]` for all requests that render the same layout; do not derive it from browser-only APIs on the server.",
+  "answer": "initialWidth",
+  "closed_book_guess": "seed",
+  "category": "fact"
+ },
+ {
+  "id": 447,
+  "page": "SSR and Hydration",
+  "section": "Give the server a real size",
+  "sentence": "The adapter uses an explicit `[MASK]` before `initialWidth` when deriving the server height.",
+  "answer": "width",
+  "closed_book_guess": "aspectRatio",
+  "category": "fact"
+ },
+ {
+  "id": 448,
+  "page": "SSR and Hydration",
+  "section": "Render without a framework",
+  "sentence": " `[MASK]` and `renderChartSvg` form the server boundary:   `renderChartSvg` returns a string and does not require a DOM.",
+  "answer": "createChartRuntime",
+  "closed_book_guess": "createChartSvg",
+  "category": "fact"
+ },
+ {
+  "id": 461,
+  "page": "Themes and Styling",
+  "section": "HTML tooltip styling",
+  "sentence": "This avoids selector specificity fights with its positioning styles:   `[MASK]`, `--ts-chart-tooltip-padding`, and `--ts-chart-tooltip-font` control the remaining surface defaults.",
+  "answer": "--ts-chart-tooltip-max-width",
+  "closed_book_guess": "--ts-chart-tooltip-background",
+  "category": "ambiguous"
+ },
+ {
+  "id": 465,
+  "page": "Tooltips and Focus",
+  "section": "Rich and nested tooltips",
+  "sentence": "Each receives `[MASK]`, `content`, `defaultBody`, `pinned`, and `dismiss`.",
+  "answer": "points",
+  "closed_book_guess": "title",
+  "category": "fact"
+ },
+ {
+  "id": 468,
+  "page": "Tooltips and Focus",
+  "section": "Rich and nested tooltips",
+  "sentence": "`[MASK]` distinguishes transient inspection from interactive content, and `dismiss()` clears the tooltip and returns focus to the chart when focus was inside the body.",
+  "answer": "pinned",
+  "closed_book_guess": "focusableBody",
+  "category": "fact"
+ },
+ {
+  "id": 487,
+  "page": "Transforms and Reactivity",
+  "section": "Compose structural and analytic transforms",
+  "sentence": "`[MASK]` owns the cross-row numeric comparison.",
+  "answer": "normalize",
+  "closed_book_guess": "filterRows",
+  "category": "fact"
+ },
+ {
+  "id": 498,
+  "page": "TypeScript",
+  "section": "Keep literal information",
+  "sentence": "Avoid annotating an intermediate object as broad `ChartSpec` before passing it to `[MASK]`.",
+  "answer": "defineChart",
+  "closed_book_guess": "createChart",
+  "category": "fact"
+ },
+ {
+  "id": 503,
+  "page": "Installation",
+  "section": "Choose scale capabilities",
+  "sentence": "The core package declares the `[MASK]`, `d3-shape`, `d3-geo`, `d3-delaunay`, `d3-hexbin`, `d3-contour`, `d3-force`, `d3-sankey`, `d3-hierarchy`, `d3-brush`, and `d3-selection` implementations owned by its transforms, curve and geo features, and optional spatial, network, hierarchy, and brush entries.",
+  "answer": "d3-array",
+  "closed_book_guess": "d3-scale",
+  "category": "ambiguous"
+ },
+ {
+  "id": 504,
+  "page": "Installation",
+  "section": "Choose scale capabilities",
+  "sentence": "Add direct data transforms or shape interpolation only when application source imports them:   Other capabilities remain equally granular:   Do not install the `[MASK]` umbrella package just because a chart uses one D3 capability.",
+  "answer": "d3",
+  "closed_book_guess": "d3 package",
+  "category": "equivalent"
+ },
+ {
+  "id": 530,
+  "page": "Quick Start",
+  "section": "What the declaration means",
+  "sentence": "`x: 'month'` and `[MASK]` map existing source fields.",
+  "answer": "y: 'revenue'",
+  "closed_book_guess": "y: 'sales'",
+  "category": "example_name"
+ },
+ {
+  "id": 534,
+  "page": "Adapter Controller",
+  "section": "Entry points",
+  "sentence": "`[MASK]` accepts `ChartRendererHostOptions`, including an explicit `renderer`, so a framework can expose a renderer-neutral binding.",
+  "answer": "createChartRendererAdapter",
+  "closed_book_guess": "createChartController",
+  "category": "fact"
+ },
+ {
+  "id": 538,
+  "page": "Adapter Controller",
+  "section": "Entry points",
+  "sentence": "  `[MASK]` accepts the SVG-oriented `ChartHostOptions`.",
+  "answer": "createChartAdapter",
+  "closed_book_guess": "SVGAdapter",
+  "category": "fact"
+ },
+ {
+  "id": 540,
+  "page": "Adapter Controller",
+  "section": "Initial layout",
+  "sentence": "  `[MASK]` makes server geometry deterministic before browser measurement:   An explicit `width` therefore overrides `initialWidth`, and an explicit `height` overrides ratio-derived height.",
+  "answer": "resolveChartAdapterLayout",
+  "closed_book_guess": "initialWidth",
+  "category": "fact"
+ },
+ {
+  "id": 541,
+  "page": "Adapter Controller",
+  "section": "Initial layout",
+  "sentence": "Framework adapters can also use the validated `[MASK]` to keep the container stable until its measured width is available.",
+  "answer": "aspectRatio",
+  "closed_book_guess": "initialLayout",
+  "category": "fact"
+ },
+ {
+  "id": 548,
+  "page": "Chart Definition API",
+  "section": "Definition behavior",
+  "sentence": "`focusRing` accepts `true`, `false`, or a `ChartFocusRingOptions` object with `[MASK]`, `strokeWidth`, `fill`, and `stroke`.",
+  "answer": "radius",
+  "closed_book_guess": "padding",
+  "category": "fact"
+ },
+ {
+  "id": 564,
+  "page": "Chart Spec",
+  "section": "Theme",
+  "sentence": "`[MASK]` supplies the default built-in focus ring presentation for every chart using the theme.",
+  "answer": "focusRing",
+  "closed_book_guess": "focusRingTheme",
+  "category": "fact"
+ },
+ {
+  "id": 571,
+  "page": "Custom Extensions",
+  "section": "Custom marks",
+  "sentence": "The exported `ChartContinuousDomain<TValue>` type represents viewport state as either `[MASK]` or `readonly [Date, Date]`, narrowed by the mark and axis value type.",
+  "answer": "readonly [number, number]",
+  "closed_book_guess": "readonly [TValue, TValue]",
+  "category": "fact"
+ },
+ {
+  "id": 574,
+  "page": "Custom Extensions",
+  "section": "Final-screen mark layout",
+  "sentence": "`[MASK]` describe data-less presentation resolved from current focus or cursor state.",
+  "answer": "focusGuides",
+  "closed_book_guess": "Annotations",
+  "category": "fact"
+ },
+ {
+  "id": 583,
+  "page": "DOM Host",
+  "section": "Renderer-neutral and Canvas hosts",
+  "sentence": "For the built-in Canvas renderer, `[MASK]` from `@tanstack/charts/canvas` removes the explicit `renderer` option and returns a `CanvasChartHost`.",
+  "answer": "mountCanvasChart",
+  "closed_book_guess": "createCanvasChartHost",
+  "category": "fact"
+ },
+ {
+  "id": 584,
+  "page": "DOM Host",
+  "section": "Responsive sizing",
+  "sentence": "When both `height` and a valid `[MASK]` are absent, it also reads the content-box height.",
+  "answer": "aspectRatio",
+  "closed_book_guess": "width",
+  "category": "fact"
+ },
+ {
+  "id": 585,
+  "page": "DOM Host",
+  "section": "Font measurement",
+  "sentence": "The host clears that cache and relayouts when:  the inherited font signature changes during `update` the document font set emits `loadingdone`  Pass `[MASK]` to own the geometry or to make browser and nonbrowser output use the same metrics.",
+  "answer": "measureText",
+  "closed_book_guess": "measureTextFn",
+  "category": "fact"
+ },
+ {
+  "id": 593,
+  "page": "Focus and Interaction",
+  "section": "Horizontal zoom",
+  "sentence": "`ZoomXChange` reports `[MASK]`, `commit`, or `cancel`; the proposed `value`, the gesture `origin`, a `zoom`, `pan`, or `reset` action, and a wheel, pointer, touch, or keyboard source.",
+  "answer": "preview",
+  "closed_book_guess": "start",
+  "category": "fact"
+ },
+ {
+  "id": 601,
+  "page": "API Reference",
+  "section": "Import map",
+  "sentence": " The root `[MASK]` entry point exports the common grammar, runtime, scene, SVG renderer, browser host, and their public types.",
+  "answer": "@tanstack/charts",
+  "closed_book_guess": "@tanstack/charts-core",
+  "category": "fact"
+ },
+ {
+  "id": 615,
+  "page": "Bar and Rect Marks",
+  "section": "Bar corner radii",
+  "sentence": "Inline-state `[MASK]` overrides accept the same number or physical tuple forms.",
+  "answer": "radius",
+  "closed_book_guess": "cornerRadius",
+  "category": "fact"
+ },
+ {
+  "id": 616,
+  "page": "Bar and Rect Marks",
+  "section": "Stacked bars",
+  "sentence": "The same contract is transposed for `[MASK]`.",
+  "answer": "barX",
+  "closed_book_guess": "horizontal bars",
+  "category": "fact"
+ },
+ {
+  "id": 626,
+  "page": "Box Marks",
+  "section": "Signatures",
+  "sentence": "`[MASK]` requires numeric `x` and categorical `y`.",
+  "answer": "boxX",
+  "closed_book_guess": "BoxPlotMark",
+  "category": "fact"
+ },
+ {
+  "id": 631,
+  "page": "Contour Mark",
+  "section": "Options",
+  "sentence": "  `width` and `height` must be positive integers, and the source length must be exactly `[MASK]`.",
+  "answer": "width * height",
+  "closed_book_guess": "width × height",
+  "category": "equivalent"
+ },
+ {
+  "id": 641,
+  "page": "Delaunay Link Mark",
+  "section": "Delaunay Link Mark",
+  "sentence": "The public type surface includes `[MASK]` and `DelaunayLinkDatum`.",
+  "answer": "DelaunayLinkOptions",
+  "closed_book_guess": "DelaunayLinkMarkOptions",
+  "category": "fact"
+ },
+ {
+  "id": 652,
+  "page": "Density Contour Mark",
+  "section": "Resolved estimation",
+  "sentence": "`[MASK]` affects presentation only and never partitions the estimator.",
+  "answer": "color",
+  "closed_book_guess": "bandwidth",
+  "category": "fact"
+ },
+ {
+  "id": 657,
+  "page": "Density Contour Mark",
+  "section": "Options",
+  "sentence": "`[MASK]` must be at least one; the D3 estimator rounds it down to a supported power of two.",
+  "answer": "cellSize",
+  "closed_book_guess": "threshold",
+  "category": "fact"
+ },
+ {
+  "id": 661,
+  "page": "Difference Marks",
+  "section": "Signatures",
+  "sentence": "`[MASK]` applies the same rule to `x1` and `x2`.",
+  "answer": "differenceX",
+  "closed_book_guess": "yScale",
+  "category": "fact"
+ },
+ {
+  "id": 671,
+  "page": "Dodge Layouts",
+  "section": "Signatures",
+  "sentence": "The public type surface also includes `CreateDotLayoutOptions`, `DotLayout`, `DotLayoutResolveContext`, `DodgeOptions`, `[MASK]`, `DodgeYAnchor`, `DodgeXOptions`, and `DodgeYOptions`.",
+  "answer": "DodgeXAnchor",
+  "closed_book_guess": "DodgeLayoutOptions",
+  "category": "fact"
+ },
+ {
+  "id": 672,
+  "page": "Dodge Layouts",
+  "section": "Signatures",
+  "sentence": "`fit` defaults to `[MASK]`, preserving collision-free placement even when the swarm extends beyond the plot.",
+  "answer": "overflow",
+  "closed_book_guess": "false",
+  "category": "fact"
+ },
+ {
+  "id": 674,
+  "page": "Dodge Layouts",
+  "section": "Scale ownership",
+  "sentence": "A `[MASK]` dot contributes only x scale values, so its chart definition needs an x scale but no y scale.",
+  "answer": "dodgeY",
+  "closed_book_guess": "scatter",
+  "category": "fact"
+ },
+ {
+  "id": 679,
+  "page": "Dodge Layouts",
+  "section": "Collision and radius",
+  "sentence": " Collision distance is the sum of both final dot radii and `[MASK]`.",
+  "answer": "padding",
+  "closed_book_guess": "collisionPadding",
+  "category": "fact"
+ },
+ {
+  "id": 695,
+  "page": "Focus Guide Marks",
+  "section": "Focus Guide Marks",
+  "sentence": "Import them from the exact optional subpath:  For an unsnapped x/y value pair with no datum focus target, use [`[MASK]`](../focus-and-interaction.md#continuous-cursor) instead.",
+  "answer": "continuousCursor",
+  "closed_book_guess": "useContinuousCursor",
+  "category": "fact"
+ },
+ {
+  "id": 706,
+  "page": "Geo Shape Mark",
+  "section": "`GeoShapeOptions`",
+  "sentence": "Add `[MASK]` when the channel carries a magnitude rather than a pixel radius; invalid or negative results are omitted.",
+  "answer": "rScale",
+  "closed_book_guess": "radiusScale",
+  "category": "fact"
+ },
+ {
+  "id": 713,
+  "page": "Hexbin Mark",
+  "section": "Options",
+  "sentence": "  `[MASK]` must be positive and finite.",
+  "answer": "binWidth",
+  "closed_book_guess": "radius",
+  "category": "fact"
+ },
+ {
+  "id": 720,
+  "page": "Hexbin Mark",
+  "section": "Hexbin Mark",
+  "sentence": "Without `[MASK]`, each bin receives a numeric `count` output.",
+  "answer": "outputs",
+  "closed_book_guess": "valueAccessor",
+  "category": "fact"
+ },
+ {
+  "id": 725,
+  "page": "Line and Area Marks",
+  "section": "Options",
+  "sentence": "Use `order: 'inside-out'` with `[MASK]` for nonnegative streamgraphs.",
+  "answer": "offset: 'wiggle'",
+  "closed_book_guess": "stack: 'wiggle'",
+  "category": "fact"
+ },
+ {
+  "id": 736,
+  "page": "Polar Marks",
+  "section": "`radialGrid` and `angleGrid`",
+  "sentence": "Supply explicit `values`, or let `[MASK]` request values from the selected radius scale.",
+  "answer": "ticks",
+  "closed_book_guess": "radialGridValues",
+  "category": "fact"
+ },
+ {
+  "id": 742,
+  "page": "Linear Regression Marks",
+  "section": "Derived data and lineage",
+  "sentence": "The public option types are `[MASK]`, `LinearRegressionRowsXOptions`, `LinearRegressionYOptions`, and `LinearRegressionXOptions`.",
+  "answer": "LinearRegressionRowsYOptions",
+  "closed_book_guess": "LinearRegressionRowsOptions",
+  "category": "fact"
+ },
+ {
+  "id": 746,
+  "page": "Linear Regression Marks",
+  "section": "Linear Regression Marks",
+  "sentence": " `[MASK]` fits numeric y values over a numeric or temporal x channel.",
+  "answer": "linearRegressionY",
+  "closed_book_guess": "LinearRegressionMark",
+  "category": "fact"
+ },
+ {
+  "id": 754,
+  "page": "Ridgeline Marks",
+  "section": "Ridgeline Marks",
+  "sentence": " `[MASK]` draws horizontal profiles above categorical y baselines.",
+  "answer": "ridgelineY",
+  "closed_book_guess": "Ridgeline Mark",
+  "category": "fact"
+ },
+ {
+  "id": 760,
+  "page": "Ridgeline Marks",
+  "section": "Ridgeline Marks",
+  "sentence": "`[MASK]` transposes the contract and extends vertical profiles to the right of categorical x baselines.",
+  "answer": "ridgelineX",
+  "closed_book_guess": "Ridgeline Mark",
+  "category": "fact"
+ },
+ {
+  "id": 765,
+  "page": "Rules, Links, Arrows, Vectors, and Ticks",
+  "section": "`tickX` and `tickY`",
+  "sentence": "`[MASK]` and `span` are mutually exclusive.",
+  "answer": "length",
+  "closed_book_guess": "tickY",
+  "category": "fact"
+ },
+ {
+  "id": 775,
+  "page": "Sankey Diagram Mark",
+  "section": "Sankey Diagram Mark",
+  "sentence": "The exact `@tanstack/charts/network/sankey` subpath keeps `[MASK]` and the resolved flow adapter out of root, universal, force-layout, and ordinary-mark bundles.",
+  "answer": "d3-sankey",
+  "closed_book_guess": "Sankey-specific types",
+  "category": "fact"
+ },
+ {
+  "id": 786,
+  "page": "Sunburst Mark",
+  "section": "Hierarchy input",
+  "sentence": "Source child order is preserved unless `[MASK]` is supplied.",
+  "answer": "sort",
+  "closed_book_guess": "sortFn",
+  "category": "fact"
+ },
+ {
+  "id": 787,
+  "page": "Sunburst Mark",
+  "section": "Options",
+  "sentence": " `SunburstPathOptions<TDatum>` and `[MASK]` form the `SunburstOptions<TDatum>` union.",
+  "answer": "SunburstParentOptions<TDatum>",
+  "closed_book_guess": "SunburstNodeOptions<TDatum>",
+  "category": "fact"
+ },
+ {
+  "id": 792,
+  "page": "Sunburst Mark",
+  "section": "Hierarchy input",
+  "sentence": "The original row and path remain on `[MASK]`; use them when presentation must preserve source spelling.",
+  "answer": "data",
+  "closed_book_guess": "node.original",
+  "category": "fact"
+ },
+ {
+  "id": 805,
+  "page": "Treemap Mark",
+  "section": "Options",
+  "sentence": " `TreemapPathOptions<TDatum>` and `[MASK]` form the `TreemapOptions<TDatum>` union.",
+  "answer": "TreemapParentOptions<TDatum>",
+  "closed_book_guess": "TreemapValueOptions<TDatum>",
+  "category": "fact"
+ },
+ {
+  "id": 808,
+  "page": "Treemap Mark",
+  "section": "Hierarchy input",
+  "sentence": "Authored child order is preserved unless `[MASK]` is supplied.",
+  "answer": "sort",
+  "closed_book_guess": "sortFn",
+  "category": "fact"
+ },
+ {
+  "id": 811,
+  "page": "Treemap Mark",
+  "section": "Hierarchy input",
+  "sentence": " Path input constructs parent-child relationships from a string channel:   Explicit parent references use `nodeId` because `[MASK]` is reserved for the mark:   Path input may omit ancestors.",
+  "answer": "id",
+  "closed_book_guess": "path",
+  "category": "fact"
+ },
+ {
+  "id": 816,
+  "page": "Violin Marks",
+  "section": "Violin Marks",
+  "sentence": "`[MASK]` transposes the contract around categorical y centers.",
+  "answer": "violinX",
+  "closed_book_guess": "horizontal true",
+  "category": "fact"
+ },
+ {
+  "id": 819,
+  "page": "Violin Marks",
+  "section": "Options",
+  "sentence": "Use `d3Curve(curveBasis)` for a curved `[MASK]`.",
+  "answer": "violinX",
+  "closed_book_guess": "violin shape",
+  "category": "ambiguous"
+ },
+ {
+  "id": 822,
+  "page": "Violin Marks",
+  "section": "Options",
+  "sentence": "`[MASK]` makes a peak one complete category step wide.",
+  "answer": "span: 1",
+  "closed_book_guess": "bandwidth",
+  "category": "fact"
+ },
+ {
+  "id": 824,
+  "page": "Violin Marks",
+  "section": "Options",
+  "sentence": "Use `d3AreaXCurve(curveBasis)` for a curved `[MASK]`.",
+  "answer": "violinY",
+  "closed_book_guess": "violin mark",
+  "category": "ambiguous"
+ },
+ {
+  "id": 833,
+  "page": "Waffle Marks",
+  "section": "Options",
+  "sentence": " `[MASK]` contains the shared identity, unit, paint, state, and motion fields.",
+  "answer": "WaffleOptions<TDatum>",
+  "closed_book_guess": "MarkOptions",
+  "category": "fact"
+ },
+ {
+  "id": 834,
+  "page": "Waffle Marks",
+  "section": "Unit boundaries",
+  "sentence": "With `[MASK]`, cumulative boundaries are rounded, so the complete allocation preserves the rounded total without independently rounding every category.",
+  "answer": "round: true",
+  "closed_book_guess": "roundingMode",
+  "category": "fact"
+ },
+ {
+  "id": 840,
+  "page": "Waffle Marks",
+  "section": "Orientation",
+  "sentence": " `[MASK]` treats `y` as each source row's contribution.",
+  "answer": "waffleY",
+  "closed_book_guess": "vertical",
+  "category": "fact"
+ },
+ {
+  "id": 844,
+  "page": "Waffle Marks",
+  "section": "Responsive packing",
+  "sentence": "Set `[MASK]` on `waffleY` or `rows` on `waffleX` when the grid count is part of the chart's meaning, such as a fixed ten-by-ten percentage display.",
+  "answer": "columns",
+  "closed_book_guess": "rows",
+  "category": "fact"
+ },
+ {
+  "id": 846,
+  "page": "Motion",
+  "section": "Standalone spring",
+  "sentence": "   `[MASK]` returns an analytic, frame-rate-independent damped harmonic oscillator.",
+  "answer": "createChartSpring",
+  "closed_book_guess": "springify",
+  "category": "fact"
+ },
+ {
+  "id": 851,
+  "page": "Motion",
+  "section": "Rolling paths",
+  "sentence": "That is useful when values change in place, but a rolling time series should keep each retained sample intact and move the trace left:   Include enough keyed samples before `[MASK]` to cover the largest expected update batch.",
+  "answer": "visibleStart",
+  "closed_book_guess": "the visible window",
+  "category": "fact"
+ },
+ {
+  "id": 857,
+  "page": "Rendering and Export",
+  "section": "Choose a renderer",
+  "sentence": "Import `canvasChartRenderer` from `[MASK]` and attach it to those marks.",
+  "answer": "@tanstack/charts/canvas",
+  "closed_book_guess": "@tanstack/canvas-chart-renderer",
+  "category": "fact"
+ },
+ {
+  "id": 858,
+  "page": "Rendering and Export",
+  "section": "Rectangle geometry helpers",
+  "sentence": "Custom surfaces can reuse the environment-safe focus lifecycle exported from the root and `/universal` entries:   `[MASK]` materializes retargetable focus candidates under stable keys.",
+  "answer": "resolveFocusScene",
+  "closed_book_guess": "I can’t verify the masked term from the information provided.",
+  "category": "fact"
+ },
+ {
+  "id": 859,
+  "page": "Rendering and Export",
+  "section": "React Native adapter",
+  "sentence": "Use `resolveNativePaint` as the default `[MASK]`.",
+  "answer": "NativePaintResolver",
+  "closed_book_guess": "paint resolver",
+  "category": "equivalent"
+ },
+ {
+  "id": 861,
+  "page": "Rendering and Export",
+  "section": "Browser image export",
+  "sentence": "With `[MASK]`, it composites `backgroundCanvas`, `focusUnderCanvas`, `sceneCanvas`, and `focusCanvas` in that order.",
+  "answer": "includeFocus",
+  "closed_book_guess": "renderToCanvas",
+  "category": "fact"
+ },
+ {
+  "id": 868,
+  "page": "Runtime and Scene",
+  "section": "Scene nodes",
+  "sentence": "`[MASK]` is the compatible uniform radius.",
+  "answer": "SceneRect.radius",
+  "closed_book_guess": "cornerRadius",
+  "category": "fact"
+ },
+ {
+  "id": 875,
+  "page": "Runtime and Scene",
+  "section": "Scene nodes",
+  "sentence": "`[MASK]` supports fill, fill opacity, stroke, stroke opacity, stroke width, overall opacity, line cap, line join, and dash array.",
+  "answer": "SceneStyle",
+  "closed_book_guess": "Path",
+  "category": "fact"
+ },
+ {
+  "id": 890,
+  "page": "Scales, Guides, and Color",
+  "section": "Axis options",
+  "sentence": "To keep the scale while hiding its axis, use `[MASK]`.",
+  "answer": "axis: false",
+  "closed_book_guess": "axis: { show: false }",
+  "category": "fact"
+ },
+ {
+  "id": 898,
+  "page": "Data Transforms",
+  "section": "Types",
+  "sentence": "Cumulative exports are `CumulativeOptions` and `[MASK]`.",
+  "answer": "CumulativeDatum",
+  "closed_book_guess": "CumulativeTransformOptions",
+  "category": "fact"
+ },
+ {
+  "id": 900,
+  "page": "Data Transforms",
+  "section": "Group fields",
+  "sentence": "Compound groups use a named object:   The result contains `region` and `[MASK]`, not an opaque `key` or tuple.",
+  "answer": "day",
+  "closed_book_guess": "productline",
+  "category": "example_name"
+ },
+ {
+  "id": 917,
+  "page": "View Composition",
+  "section": "Layout primitives",
+  "sentence": "Every key in `[MASK]` must be placed exactly once.",
+  "answer": "views",
+  "closed_book_guess": "layoutGrids",
+  "category": "fact"
+ },
+ {
+  "id": 925,
+  "page": "View Composition",
+  "section": "Layout primitives",
+  "sentence": "`grid` accepts fixed and flexible tracks:  `[MASK]` requests a fixed pixel size.",
+  "answer": "{ id, size }",
+  "closed_book_guess": "px",
+  "category": "fact"
+ },
+ {
+  "id": 926,
+  "page": "Alpha Stability",
+  "section": "Alpha Stability",
+  "sentence": "Packages use regular `0.x` versions on the normal `latest` npm tag, without an `[MASK]` suffix or separate release channel.",
+  "answer": "-alpha",
+  "closed_book_guess": "alpha",
+  "category": "equivalent"
+ },
+ {
+  "id": 928,
+  "page": "Alpha Stability",
+  "section": "Version contract",
+  "sentence": "The [stable compatibility contract](./compatibility.md) takes effect with `1.0`; published `[MASK]` releases continue to follow this Alpha policy.",
+  "answer": "0.x",
+  "closed_book_guess": "minor",
+  "category": "fact"
+ }
+]
