@@ -42,10 +42,11 @@ verschmilzt; Spannen und Relevanz bleiben unberührt.
 | C2 | 642 | 308.580 | 0,0401 | 14,0 MB | 0,99999 |
 | C3 | 667 | 250.380 | 0,0325 | 17,7 MB | 0,99996 |
 | K1 | 697 | 250.379 | 0,0325 | 13,8 MB | 0,99994 |
-| Summe | 2.535 | 1.059.719 | 0,1376 (+ 0,0010 Prüfung = 0,1386) | 56,9 MB | alle ≥ 0,999 |
+| Summe | 2.535 | 1.059.719 | 0,1378 (+ 0,0010 Prüfung = 0,1387) | 56,9 MB | alle ≥ 0,999 |
 
 ¹ C1 wurde zuerst eingebettet; es gab keine gespeicherte Vektordatei zum Vergleich (die Vue-Dateien sind archiviert).
 Die Prüfungen bei C2, C3 und K1 vergleichen mit den an diesem Tag gespeicherten e2e-Vektoren.
+Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
 
 Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpus bis 18.10.2026.
 
