@@ -126,7 +126,7 @@ def test_cut_off_answer_stops_and_keeps_earlier_answers(tmp_path):
     with pytest.raises(RuntimeError, match="Q002.*finish_reason='length'"):
         screen(questions, truth, FakeCompleter({2: "length"}), path, done)
     assert [r["question_id"] for r in read_screen(path)] == ["Q001"]
-    assert len(done) == 1
+    assert len(done) == 2  # the cut-off reply was billed too, so the run record counts it
 
 
 def test_judge_records_the_verdict_and_the_reference_hash(tmp_path):

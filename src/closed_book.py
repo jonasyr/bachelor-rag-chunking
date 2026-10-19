@@ -79,8 +79,8 @@ def screen(
 ) -> None:
     """Answer every question without a current answer; save after each answer.
 
-    Rows of questions no longer in the catalogue are dropped. Every reply is appended to `done`,
-    so the caller can log a run that stops half-way.
+    Rows of questions no longer in the catalogue are dropped. Every reply, a cut-off or empty one
+    included, is appended to `done`, so the caller can log every billed request.
     """
     keep = {q["question_id"] for q in questions}
     rows = {r["question_id"]: r for r in read_screen(path) if r["question_id"] in keep}
@@ -90,12 +90,12 @@ def screen(
         if status(rows.get(qid), q["question"], _reference(truth, qid)) != NOT_SCREENED:
             continue
         reply = completer(closed_book_messages(q["question"]))
+        done.append(reply)  # billed even if unusable, so the run record counts it
         if reply.finish_reason != "stop" or not reply.text.strip():
             raise RuntimeError(
                 f"{qid}: the answer ended with finish_reason={reply.finish_reason!r} or is empty; "
                 "the answers before it are saved (ADR 0040)"
             )
-        done.append(reply)
         rows[qid] = dict.fromkeys(SCREEN_HEADER, "") | {
             "question_id": qid,
             "question_sha256": text_sha256(q["question"]),

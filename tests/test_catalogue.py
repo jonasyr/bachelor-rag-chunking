@@ -565,7 +565,8 @@ def test_cli_screen_logs_a_partial_run(cli, tmp_path, capsys):
     runs = tmp_path / "generation_runs.jsonl"
     assert catalogue.run_screen(completer=FakeCompleter({2: "length"}), runs_file=runs) == 1
     assert "Q002" in capsys.readouterr().err
-    assert json.loads(runs.read_text(encoding="utf-8"))["answers"] == 1
+    record = json.loads(runs.read_text(encoding="utf-8"))
+    assert record["answers"] == 2 and record["completion_tokens"] == 11 + 12
 
 
 def test_cli_screen_refuses_after_the_freeze(cli, tmp_path, capsys):
