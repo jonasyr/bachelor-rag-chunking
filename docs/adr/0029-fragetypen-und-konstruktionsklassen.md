@@ -2,8 +2,11 @@
 
 ## Status
 
-Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md); Bereichsuntergrenzen ersetzt durch
-[ADR 0039](0039-stichprobenplan-e2e.md))
+Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md); ergänzt durch
+[ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md) (Stichprobenplan, KI-Durchsicht); Bereichsuntergrenzen ersetzt und
+Stoppwörter angepasst (`e2e` statt `v` und `vue`) durch [ADR 0039](0039-stichprobenplan-e2e.md)); Zahlen im Kontext:
+Vue-Korpus `40aa88a` ([ADR 0025](0025-korpus-guide-api-styleguide.md)); aktuelle Werte in
+[Korpus](../reference/corpus.md)
 
 ## Kontext
 

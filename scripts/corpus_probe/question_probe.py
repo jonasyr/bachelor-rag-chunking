@@ -10,8 +10,10 @@ blind BATCH NAME...  shuffles the answers with CORPUS_QUESTIONS_JUDGE_SEEDS[BATC
 unblind         merges the judge's questions/judge-output.json into questions/<name>.json
 summary         prints the share of retrieval-dependent questions per corpus
 
-Usage: uv run python scripts/corpus_probe/question_probe.py COMMAND [NAME...]
-(run from the repo root; the Vue row needs data/processed/documents.jsonl of the Vue snapshot)
+Usage: uv run python scripts/corpus_probe/question_probe.py COMMAND [BATCH] [NAME...]
+(run from the repo root; BATCH only for blind). The Vue row reads data/processed/documents.jsonl,
+which now holds the e2e corpus (ADR 0038): rebuild the Vue corpus first (vuejs/docs at 40aa88a,
+with the code of commit 4115ffc), or the Vue name silently samples e2e pages.
 """
 
 import collections

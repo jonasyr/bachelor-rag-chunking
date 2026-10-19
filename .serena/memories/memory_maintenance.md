@@ -6,7 +6,7 @@
 - Initially, agents are provided with the list of all memories (names only).
 - Agents should read `mem:core` as the top-level entry point (graph root).
   This memory should contain references to other memories covering major project domains.
-  The referenced memories shall, in turn, shall contain references to even more specific memories, and so on.
+  The referenced memories shall, in turn, contain references to even more specific memories, and so on.
   The depth of the graph shall depend on the project complexity.
 - Use topics/folders to group related memories in order to make the content structure explicit.
   Folders can mirror project structure (e.g. modules like frontend/backend) or topics like debugging, architecture, etc.
@@ -17,6 +17,10 @@
 - Memories themselves should not contain information about when to read them; this is the responsibility of the referring memory.
 
 ## Style
+
+Project policy: per topic a 1–3 line summary plus a link into `docs/`, plus genuine agent notes (gotchas,
+recipes). A memory is never the only home of a fact a human needs; such facts go to `docs/` and the memory links them.
+
 
 Dense agent notes, not prose docs. Prefer invariants, terse bullets.
 Avoid obvious context, rationale, and examples unless they prevent likely mistakes.

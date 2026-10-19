@@ -7,6 +7,8 @@ checked by hand. Aborts if a document or section no longer exists.
 Usage: uv run python scripts/remap_pilot.py OLD_DIR PILOT_DIR [PILOT_DIR ...]
 OLD_DIR holds the documents and sections files of the old corpus (names as in src/config.py).
 One-shot: the ground truth is rewritten in place, so a second run aborts on the new IDs.
+Historical (Vue.js corpus, ADR 0025): the new corpus is read from data/processed/, which now holds
+the e2e corpus (ADR 0038), so the script no longer applies to the Vue pilot sets.
 """
 
 import csv

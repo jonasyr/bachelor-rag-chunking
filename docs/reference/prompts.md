@@ -1,6 +1,6 @@
 # Prompt-Vorlagen
 
-> Seitentyp: Nachschlagen (reference). Stand: 17.10.2026; umgesetzt in `src/prompt.py`, die Texte stehen in `src/config.py` (ein Test vergleicht sie mit dieser Seite). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026; umgesetzt in `src/prompt.py`, die Texte stehen in `src/config.py` (ein Test vergleicht sie mit dieser Seite). Übersicht: [Dokumentation](../README.md).
 
 Die Prompts sind für alle Chunking-Strategien gleich ([ADR 0006](../adr/0006-nur-chunking-variiert.md)); jede Änderung
 macht die Läufe der Strategien unvergleichbar. Die Vorlagen sind Englisch, weil Korpus und Fragen Englisch sind.
@@ -53,6 +53,8 @@ Answer:
 
 ## Parameter
 
-Konstant für alle Strategien, die Closed-Book-Prüfung und K0: `LLM_MODEL`, `LLM_REASONING_EFFORT`, `LLM_SEED` ([ADR 0033](../adr/0033-antwortmodell.md)),
-`LLM_TEMPERATURE` und `TOP_K` ([ADR 0014](../adr/0014-temperatur-und-topk.md)), `LLM_MAX_TOKENS`. Werte:
-[Konfiguration](configuration.md#llm-und-embedding).
+Konstant für alle Strategien, die Closed-Book-Prüfung und K0: `LLM_MODEL`, `LLM_REASONING_EFFORT`, `LLM_SEED`,
+`LLM_MAX_TOKENS` ([ADR 0033](../adr/0033-antwortmodell.md)) und `LLM_TEMPERATURE`
+([ADR 0014](../adr/0014-temperatur-und-topk.md)). Nur für den RAG-Prompt außerdem `TOP_K` (Zahl der Auszüge, ADR 0014);
+der Closed-Book-Prompt enthält keine Auszüge. Werte: [Konfiguration](configuration.md#llm-und-embedding),
+`TOP_K` unter [Retrieval](configuration.md#retrieval).

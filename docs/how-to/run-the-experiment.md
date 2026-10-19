@@ -14,7 +14,8 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 2. Chunking für C1–C3 und die Kontrolle K1: `uv run python src/chunking.py`
 3. Embeddings und ein Chroma-Index je Strategie (und für K1): `uv run python src/embed.py` (braucht `OPENAI_API_KEY`)
 4. Retrieval für C1–C3, danach für die Kontrolle K1 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)):
-   `uv run python src/retrieve.py` und `uv run python src/retrieve.py --control`
+   `uv run python src/retrieve.py` und `uv run python src/retrieve.py --control` (neue Frage-Embeddings brauchen
+   `OPENAI_API_KEY`; ohne eingefrorenen Katalog bricht es ab)
 5. Antworten generieren (C1–C3 und im selben Lauf die Kontrolle K0 ohne Retrieval, K1 nicht):
    `uv run python src/generate.py` (braucht `OPENAI_API_KEY`; einmal, die Dateien `generated_answers.csv` und
    `generated_answers_control.csv` werden nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md),
@@ -25,8 +26,8 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    (`uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“), regelbasiert nach
    [ADR 0035](../adr/0035-regelbasierte-bewertung.md): Schritt „Key points“ je Frage 1–4 Kernpunkte prüfen (aus der
    Referenzantwort vorbefüllt, [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md); nur
-   Frage und Referenzantwort sichtbar), wo nötig weiter teilen, speichern und einfrieren (gilt nur für dieses Scaffold; nach einem neuen Scaffold erneut
-   einfrieren); Schritt „Score“ je Code die Prüffragen beantworten, die fünf
+   Frage und Referenzantwort sichtbar), wo nötig weiter teilen, speichern und einfrieren (gilt nur für dieses
+   Scaffold; nach einem neuen Scaffold erneut einfrieren); Schritt „Score“ je Code die Prüffragen beantworten, die fünf
    Werte folgen aus den Regeln ([Evaluation](../reference/evaluation.md#regelbasierte-bewertung); `notes` frei, z. B.
    wenn eine Regel nicht passt). Von Hand eingetragene Werte nimmt `summarise` bei einem neuen Scaffold nicht an
    ([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)); das Lesepaket `data/evaluation/scoring_packet.md`
@@ -34,9 +35,10 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    `scoring_key.csv` nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
    Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
    Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
-7. Kontrolle K0 bewerten, erst nach der C1–C3-Auswertung ([ADR 0041](../adr/0041-kontrolle-k0.md)): K0 nutzt dieselben
-   eingefrorenen Kernpunkte und die Prüffragen ohne Quellenbezug; die Auswertung vergleicht K0 mit C1–C3 über vier
-   Kriterien, auch getrennt nach dem Closed-Book-Urteil.
+7. Kontrolle K0 bewerten, erst nach der C1–C3-Auswertung ([ADR 0041](../adr/0041-kontrolle-k0.md); das Scaffold
+   verlangt ein vorhandenes `scores.csv`): K0 nutzt dieselben eingefrorenen Kernpunkte und die Prüffragen ohne
+   Quellenbezug und ist nicht blind (ohne Auszüge erkennbar); die Auswertung vergleicht K0 mit C1–C3 über die Kriterien
+   aus `config.CONTROL_CRITERIA`, auch getrennt nach dem Closed-Book-Urteil.
 
    ```bash
    uv run python src/evaluate_answers.py --mode scaffold --control
@@ -54,6 +56,6 @@ Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Dat
       SHA-256)
 - [ ] Jedes Zwischenartefakt gespeichert, nicht nur das Endergebnis (alle Dateien aus
       [Datenformate](../reference/data-formats.md), auch `retrieved_results_control.csv` und die Lauf-Protokolle)
-- [ ] Prompts in allen Strategieläufen unverändert ([Prompts](../reference/prompts.md))
+- [ ] Prompts in allen Strategieläufen unverändert, für K0 der Closed-Book-Prompt ([Prompts](../reference/prompts.md))
 - [ ] `LLM_TEMPERATURE` und `TOP_K` in `src/config.py` unverändert ([Konfiguration](../reference/configuration.md),
       [ADR 0014](../adr/0014-temperatur-und-topk.md))

@@ -2,8 +2,9 @@
 
 Layout under config.CORPUS_PROBE_DIR: candidates.csv (sources and screening facts), stats.json
 (page statistics per corpus), results/<name>.jsonl (probe answers), misses/<name>.json (the
-classified misses), summary.json (gap rates, scores, sensitivity). docs/ and probes/ hold the
-rebuilt intermediate files and are not versioned (they quote whole pages).
+classified misses), summary.json (gap rates, scores, sensitivity), questions/<name>.json (the
+closed-book questions). docs/, probes/, sources/ (the clones) and questions/*-sections.json hold
+rebuilt intermediate files and are not versioned (they quote whole pages or sections).
 """
 
 import csv

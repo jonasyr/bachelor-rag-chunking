@@ -2,7 +2,9 @@
 
 ## Status
 
-Angenommen (D15 im Leitfaden; Quelle: Baseline, übernommen)
+Angenommen (D15 im Leitfaden; Quelle: Baseline, übernommen); konkretisiert durch [ADR 0023](0023-embedding-modell.md)
+(Embedding-Modell, SDK- und Chroma-Version) und [ADR 0024](0024-referenzvektoren-und-exakte-suche.md) (Referenzvektoren,
+exakte Suche)
 
 ## Kontext
 

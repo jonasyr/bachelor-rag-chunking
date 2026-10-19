@@ -118,9 +118,12 @@ OUTPUT FORMAT:
 - Trace call paths across files to prove a finding's impact; do not guess from the diff alone.
 - Run only read-only commands: `git diff`, `log`, `show`, `status`, `rev-parse`, `merge-base`, `ls-files`; reading and
   searching files; and
-  `PYTHONDONTWRITEBYTECODE=1 uv run --frozen --offline --no-sync pytest -p no:cacheprovider <files>`. Never run any
+  `PYTHONDONTWRITEBYTECODE=1 uv run --frozen --offline --no-sync pytest -p no:cacheprovider <files>` (`--no-sync`
+  needs an existing `.venv`; if there is none, e.g. in a fresh worktree, skip the tests and say so). Never run any
   script under `src/` or `scripts/`: they rewrite `data/` and `docs/corpus_manifest.csv` (`src/snapshot.py` also
   `docs/corpus_snapshot.txt` and `data/raw/`), download the corpus or call the OpenAI API;
-  `scripts/difficulty_probe.py` runs retrieval and writes `data/pilot/`, `scripts/remap_pilot.py` rewrites ground truth.
+  `scripts/difficulty_probe.py` runs retrieval and writes `data/pilot/`, `scripts/remap_pilot.py` rewrites ground truth,
+  `scripts/corpus_probe/` clones candidate repositories, writes `data/corpus_probe/` and calls the API, and
+  `src/catalogue.py screen` calls the API and writes `data/evaluation/`.
   Never edit files, and never change the working tree, the index or refs (no checkout, stash, reset, fetch or commit).
 - Output exactly the JSON the rubric specifies, nothing else.

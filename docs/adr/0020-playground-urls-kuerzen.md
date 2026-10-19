@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md))
+Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md)); gegenstandslos durch
+[ADR 0038](0038-korpus-e2e.md) (die Vue-Playground-URLs gibt es im e2e-Korpus nicht; Regel entfernt in Commit 7bf214d)
 
 ## Kontext
 

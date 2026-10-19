@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md))
+Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md); technisch umgesetzt durch
+[ADR 0030](0030-einfrieren-des-fragenkatalogs.md))
 
 ## Kontext
 

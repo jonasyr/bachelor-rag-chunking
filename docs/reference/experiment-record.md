@@ -1,10 +1,12 @@
 # Experiment-Protokoll
 
-> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
 
-Messwerte aller Läufe (Chunking, Embedding, Pilotproben) mit Datum; wird mit jedem Lauf fortgeschrieben und ist die
-Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus: [Korpus](corpus.md)
-([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)); Parameter: [Konfiguration](configuration.md).
+Messwerte aller Läufe (Chunking, Embedding, Stichprobenplan, Pilotproben, Vortest) mit Datum; wird mit jedem Lauf
+fortgeschrieben und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus:
+[Korpus](corpus.md) ([ADR 0038](../adr/0038-korpus-e2e.md)); Parameter: [Konfiguration](configuration.md). Der erste
+Teil gilt für den aktuellen e2e-Korpus, der zweite ([Historie](#historie-vuejs-korpus-bis-18102026)) für den
+Vue.js-Korpus bis 18.10.2026.
 
 ## Snapshot (e2e)
 
@@ -14,7 +16,7 @@ Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des
 | Commit | `ef977f4856da009cac26d78d2e9bb14e5991ee41` (Commit-Datum 17.10.2026; [ADR 0038](../adr/0038-korpus-e2e.md)) |
 | Datum des Snapshots | 18.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, SHA-256 je Datei) |
 | Dateien | 62: 60 Seiten (`*.mdx`, genau die Navigation) und `docs.json`, `snippets/model-provider.jsx` |
-| Dokumente, Tokens, Abschnitte | 60 Dokumente, 250.380 Tokens nach dem Preprocessing, 571 Abschnitte (60 H1, 347 H2, 164 H3); je Bereich: [Korpus](corpus.md#bereiche) |
+| Umfang | Tokens und Abschnitte: [Korpus](corpus.md#quelle-und-ausschnitt); je Bereich: [Korpus](corpus.md#bereiche) |
 | K1-Fenster | 375 Tokens: 667 C3-Chunks, Mittel 375,38 → 375 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)) |
 
 ## Chunking (e2e)
@@ -31,10 +33,10 @@ Lauf am 18.10.2026 (`src/chunking.py`).
 ## Embedding (e2e)
 
 Lauf am 18.10.2026 (`src/embed.py`, `text-embedding-3-large`, 3072 Dimensionen, SDK 2.44.0, Chroma 1.5.9; Protokoll
-`data/processed/embedding_runs.jsonl`). Die Vue-Vektoren und der alte Chroma-Index liegen lokal unter
-`data/processed/archive_vue_2026-10-18/` (nicht versioniert). K1 hat einen Eingabe-Token weniger als die
-Korpussumme: Wie beim Vue-Lauf trennt ein fester Fensterschnitt ein Token-Paar, das beim erneuten Kodieren
-verschmilzt; Spannen und Relevanz bleiben unberührt.
+`data/processed/embedding_runs.jsonl`, enthält nur die e2e-Läufe). Die Vue-Vektoren, der alte Chroma-Index und das
+Vue-Protokoll liegen lokal unter `data/processed/archive_vue_2026-10-18/` (nicht versioniert). K1 hat einen
+Eingabe-Token weniger als die Korpussumme: Wie beim Vue-Lauf trennt ein fester Fensterschnitt ein Token-Paar, das beim
+erneuten Kodieren verschmilzt; Spannen und Relevanz bleiben unberührt.
 
 | Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
 |---|---:|---:|---:|---:|---:|
@@ -48,27 +50,54 @@ verschmilzt; Spannen und Relevanz bleiben unberührt.
 Die Prüfungen bei C2, C3 und K1 vergleichen mit den an diesem Tag gespeicherten e2e-Vektoren.
 Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
 
-Die folgenden Abschnitte (Snapshot bis Pilotproben) gelten für den Vue.js-Korpus bis 18.10.2026.
-
 ## Stichprobenplan (e2e)
 
 | Feld | Wert |
 |---|---|
-| Gezogen | 18.10.2026, `uv run python src/catalogue.py plan`, Seed `20261014` ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) |
+| Gezogen | 19.10.2026 (Commit `a73674b`), `uv run python src/catalogue.py plan`, Seed `20261014` ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) |
 | Datei | `data/evaluation/catalogue_plan.csv`, 48 Slots und 48 Reserveabschnitte, SHA-256 `0e348c317fe1a202a0a48a54ea7eed64f045be37aa01ce2f3c45580321dff8c9` |
 | Slots je Bereich | nach Tokenanteil, mindestens 1: [Korpus](corpus.md#bereiche) |
-| Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 14.10.2026, nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
+| Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 15.10.2026, Commit `4b22a45`; nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
 
-## Snapshot (Vue.js, bis 18.10.2026)
+## Antwortmodell: Prüfaufruf (17.10.2026)
+
+Ein Aufruf mit den Einstellungen des Hauptlaufs (Pilotfrage H01 des Vue-Sets `hard`, top-5 von C1 auf dem Vue-Korpus,
+nicht gespeichert) bestätigte, dass die API `temperature = 0`, `seed` und Effort `none` zusammen annimmt: `finish_reason
+= "stop"`, 2.649 Prompt- und 140 Antwort-Tokens, abgerechnet 0,00034 USD. Gemeldet wurden nur das Modell `gpt-6-luna`
+und kein `system_fingerprint`; die Modellliste der API führt für GPT-6 keine datierten Varianten (`gpt-5.6-luna`,
+`gpt-6-astra`, `gpt-6-luna`, `gpt-6-sol`, `gpt-6.1-sol`). Erstellungszeitpunkte laut `GET /v1/models`: `gpt-6-luna`
+14.09.2026, 17:15:02 UTC; `gpt-6-sol` 14.09.2026, 17:12:17 UTC. Folgerung: [ADR 0033](../adr/0033-antwortmodell.md).
+
+## Modellversionen
+
+| Komponente | Version | Datum der ersten Nutzung |
+|---|---|---|
+| LLM | `gpt-6-luna` (Modellobjekt erstellt 14.09.2026, 17:15:02 UTC; Wissensstand 18.05.2026), Effort `none`, Temperatur 0, `seed` 20261017, höchstens 1.024 Ausgabe-Tokens ([ADR 0033](../adr/0033-antwortmodell.md)) | 17.10.2026 (Prüfaufruf) |
+| Embedding-Modell | `text-embedding-3-large`, 3.072 Dimensionen ([ADR 0023](../adr/0023-embedding-modell.md)) | 13.10.2026 |
+| OpenAI Python SDK | 2.44.0 | 13.10.2026 |
+| ChromaDB | 1.5.9 | 13.10.2026 |
+| tiktoken | 0.13.0 | 13.10.2026 |
+
+## Historie: Vue.js-Korpus (bis 18.10.2026)
+
+Alle Abschnitte dieses Teils gelten für den Vue.js-Korpus ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md),
+ersetzt durch [ADR 0038](../adr/0038-korpus-e2e.md)); sie sind abgeschlossen und werden nicht fortgeschrieben.
+Vue-Chunks, -Vektoren, Chroma-Index und Embedding-Protokoll liegen lokal unter `data/processed/archive_vue_2026-10-18/`
+(nicht versioniert). Die Vue-Dateien `documents.jsonl` und `sections.jsonl` sind nicht archiviert; sie lassen sich aus
+dem Vue-Commit `40aa88a` mit dem Code vor dem e2e-Wechsel (Stand `4115ffc`) neu erzeugen. Bis dahin sind die
+Recall@5-Werte der Vue-Pilotproben nicht aus dem Archiv nachrechenbar. Die Pilot-Sets unter `data/pilot/` tragen Vue-IDs
+und lassen sich auf den aktuellen e2e-Daten unter `data/processed/` nicht wiederholen.
+
+### Snapshot (Vue.js, bis 18.10.2026)
 
 | Feld | Wert |
 |---|---|
 | Repository | `vuejs/docs` (https://github.com/vuejs/docs) |
 | Commit | `40aa88af0094f7bab4aaf786e55c748a6a251d88` (Commit-Datum 15.09.2026; [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |
-| Datum des Snapshots | 14.10.2026 ([`corpus_snapshot.txt`](../corpus_snapshot.txt): Commit, Daten, Bereiche, Ausschlüsse, SHA-256 je Datei) |
+| Datum des Snapshots | 14.10.2026 (Datensatz in der Git-Historie: `git show 4115ffc:docs/corpus_snapshot.txt`, mit Commit, Daten, Bereichen, Ausschlüssen, SHA-256 je Datei; die aktuelle [`corpus_snapshot.txt`](../corpus_snapshot.txt) enthält den e2e-Datensatz) |
 | Pfade, Dateien, Tokens, Abschnitte | 79 Dateien (Guide 52, API 22, Style Guide 5), 165.723 Tokens, 813 Abschnitte; Details in der Git-Historie von `docs/reference/corpus.md` |
 
-## Chunking (Vue.js)
+### Chunking (Vue.js)
 
 | Strategie | Chunks | Tokens min / Mittel / max | Median |
 |---|---:|---|---:|
@@ -81,13 +110,13 @@ K1-Fenster = kaufmännisch gerundetes Mittel der C3-Chunklängen (230,8 → 231)
 davon 12 über 800 Tokens, längstes 1.467 (Obergrenze nach [ADR 0021](../adr/0021-c3-grenzen.md), begründet in
 [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
 
-## Embedding (Vue.js)
+### Embedding (Vue.js)
 
-Lauf am 14.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI abgerechneten
-Tokens stimmen für alle vier Strategien exakt mit der eigenen Zählung der gesendeten Texte überein (`src/tokens.py`).
-Bei K1 ist ein Chunk (`K1_D057_0015`) 231 Token-Positionen lang, sein Text kodiert aber zu 230 Tokens: Der feste
-Fensterschnitt trennt ein Token-Paar, das der Tokenizer beim erneuten Kodieren zusammenführt. Spannen und Relevanz
-bleiben davon unberührt.
+Lauf am 14.10.2026 (`src/embed.py`; Protokoll lokal archiviert:
+`data/processed/archive_vue_2026-10-18/embedding_runs.jsonl`). Die von OpenAI abgerechneten Tokens stimmen für alle vier
+Strategien exakt mit der eigenen Zählung der gesendeten Texte überein (`src/tokens.py`). Bei K1 ist ein Chunk
+(`K1_D057_0015`) 231 Token-Positionen lang, sein Text kodiert aber zu 230 Tokens: Der feste Fensterschnitt trennt ein
+Token-Paar, das der Tokenizer beim erneuten Kodieren zusammenführt. Spannen und Relevanz bleiben davon unberührt.
 
 | Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
 |---|---:|---:|---:|---:|---:|
@@ -99,16 +128,16 @@ bleiben davon unberührt.
 
 ¹ Die Prüfung vergleicht mit den jeweils schon gespeicherten übrigen Vektordateien: bei C1 (zuerst eingebettet) mit
 den Vektoren vom 13.10.2026 (alter Korpus), bei C2, C3 und K1 teils schon mit den neuen vom 14.10.2026.
-Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
+Kosten- und Größensummen aus den ungerundeten Werten im archivierten `embedding_runs.jsonl` bzw. den Dateigrößen.
 
 Die Modellstand-Prüfung von K1 (0,99963) liegt unter dem am 13.10.2026 gemessenen Wert für gleiche Texte
 (≥ 0,99996), aber deutlich über dem Schwellwert 0,999 und weit über der Ähnlichkeit verschiedener Chunks (≤ 0,84).
 
-## Korpuserweiterung (14.10.2026): Prüfungen
+### Korpuserweiterung (14.10.2026): Prüfungen
 
-Umstellung nach [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und [ADR 0026](../adr/0026-c3-vergleichbarkeit.md);
-Spezifikation und Plan: `docs/superpowers/specs/2026-10-14-corpus-extension-design.md`,
-`docs/superpowers/plans/2026-10-14-corpus-extension.md`.
+Umstellung nach [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und
+[ADR 0026](../adr/0026-c3-vergleichbarkeit.md); Spezifikation und Plan:
+`docs/superpowers/specs/2026-10-14-corpus-extension-design.md`, `docs/superpowers/plans/2026-10-14-corpus-extension.md`.
 
 | Prüfung | Ergebnis |
 |---|---|
@@ -125,7 +154,7 @@ Gefunden und behoben dabei: Die Integrationsprüfung entdeckte in zwei API-Seite
 (`  ### Function Signature`), die als Text durchgerutscht wären; drei Abschnitte wurden erst mit der CommonMark-Regel
 (bis zu drei Leerzeichen Einrückung) erkannt.
 
-## Pilotproben auf dem erweiterten Korpus (14.10.2026)
+### Pilotproben auf dem erweiterten Korpus (14.10.2026)
 
 Gleiche Fragen und Annotationen wie in den Proben unten (IDs abgebildet, V8); `scripts/difficulty_probe.py`,
 jetzt mit der Kontrolle K1. Keine API-Kosten (gespeicherte Fragevektoren). Kontext@5 = Mittel über die Fragen der
@@ -158,10 +187,10 @@ Nach Fragenart (MRR / Recall@5, blind):
 | detail (n = 4) | 0,88 / 1,00 | 0,62 / 0,75 | 0,75 / 1,00 | 0,62 / 0,75 |
 | paraphrase (n = 7) | 0,43 / 1,00 | 0,44 / 0,71 | 0,60 / 0,86 | 0,63 / 1,00 |
 
-Post-hoc-Sensitivität, **keine Evidenz** ([ADR 0027](../adr/0027-blinde-annotation.md); Annotation nach Sicht der Ergebnisse um drei Abschnitte ergänzt, siehe
-Probe 2 im vorherigen Stand; `data/pilot/hard_posthoc/`): C1 1,00 / 0,76 / 0,34 / 0,92, C2 0,81 / 0,66 / 0,36 / 0,73,
-C3 1,00 / 0,69 / 0,28 / 0,89, K1 0,94 / 0,67 / 0,36 / 0,80 (Hit@5 / MRR / P@5 / R@5). Sie zeigt nur, wie stark eine
-unvollständige Annotation die Werte verschiebt.
+Post-hoc-Sensitivität, **keine Evidenz** ([ADR 0027](../adr/0027-blinde-annotation.md); Annotation nach Sicht der
+Ergebnisse um drei Abschnitte ergänzt, siehe Probe 2 im vorherigen Stand; `data/pilot/hard_posthoc/`): C1 1,00 / 0,76 /
+0,34 / 0,92, C2 0,81 / 0,66 / 0,36 / 0,73, C3 1,00 / 0,69 / 0,28 / 0,89, K1 0,94 / 0,67 / 0,36 / 0,80 (Hit@5 / MRR / P@5
+/ R@5). Sie zeigt nur, wie stark eine unvollständige Annotation die Werte verschiebt.
 
 Befund (Pilot, blinde Annotation, n klein, keine Signifikanz):
 
@@ -173,18 +202,39 @@ Befund (Pilot, blinde Annotation, n klein, keine Signifikanz):
 - Kontext je Antwort: C3 und K1 liefern dem Sprachmodell nur etwa halb so viele Tokens wie C1/C2.
 
 Zur Annotation: Blinde Annotationen sind die Hauptwerte, nachträgliche Ergänzungen nur Sensitivität (Begründung:
-[ADR 0027](../adr/0027-blinde-annotation.md), ausgelöst durch das Codex-Review von PR #6). Die blinde Fassung wurde
-aus der ursprünglichen Datei Byte für Byte wiederhergestellt; ihre SHA-256 (`f9ddb34b…7e860`) ist gleich der im ersten API-Lauf protokollierten
-(`data/pilot/hard/runs.jsonl`, erste Zeile). Sie liegt mit alten IDs in
+[ADR 0027](../adr/0027-blinde-annotation.md), ausgelöst durch das Codex-Review von PR #6). Die blinde Fassung wurde aus
+der ursprünglichen Datei Byte für Byte wiederhergestellt; ihre SHA-256 (`f9ddb34b…7e860`) ist gleich der im ersten
+API-Lauf protokollierten (`data/pilot/hard/runs.jsonl`, erste Zeile). Sie liegt mit alten IDs in
 `data/pilot/hard/history/ground_truth_b75d188.csv` und wurde wie die übrigen Pilotdateien über Pfad und Anker
 abgebildet. Regeln für den echten Fragenkatalog, auch die Folgerungen aus beiden Proben:
 [Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau).
 
-## Vorheriger Stand (13.10.2026, `b75d188`, nur Guide)
+### Vortest Generierung und Bewertung (Pilot `hard`, 17./18.10.2026)
+
+Vortest von Prompt und Bewertungskette auf dem Pilot-Set `data/pilot/hard/` (Vue-Fragen, Vue-Chunks; nicht Teil des
+Fragenkatalogs). Protokoll: `data/pilot/hard/runs.jsonl` (letzte drei Zeilen).
+
+Generierung am 17.10.2026 (`src/generate.py`): 48 Antworten (16 Fragen × C1–C3), Modell `gpt-6-luna`, Effort `none`,
+Temperatur 0, `seed` 20261017, höchstens 1.024 Ausgabe-Tokens; gemeldet (`model_reported`) `gpt-6-luna`,
+`model_created` 14.09.2026, 17:15:02 UTC, `system_fingerprint` leer (`null`). Der Lauf enthält keine K0-Antworten
+(K0 kam am 19.10.2026 hinzu).
+
+| Strategie | Prompt-Tokens | Antwort-Tokens | Kosten (USD) |
+|---|---:|---:|---:|
+| C1 | 40.332 | 1.249 | 0,0047 |
+| C2 | 40.579 | 1.226 | 0,0047 |
+| C3 | 22.279 | 1.314 | 0,0029 |
+| Summe | 103.190 | 3.789 | 0,0122 |
+
+Bewertungsgerüst am 17.10.2026 (`src/evaluate_answers.py --mode scaffold --set data/pilot/hard --limit 8`): 24 Codes,
+die ersten acht Fragen (H01–H08) × C1–C3. Kernpunkte eingefroren am 18.10.2026 (Eintrag `key_points`): 12 Kernpunkte zu
+den acht Fragen in `key_points.csv`. Bewertet ist noch nichts (`scoring_sheet.csv` leer, keine `scoring_checks.csv`).
+
+### Vorheriger Stand (13.10.2026, `b75d188`, nur Guide)
 
 Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden Proben unten liefen auf diesem Stand.
 
-### Snapshot
+#### Snapshot
 
 | Feld | Wert |
 |---|---|
@@ -195,7 +245,7 @@ Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden
 | Anzahl Dateien | 52 |
 | Gesamtumfang (Tokens) | 117.594 nach Preprocessing (`cl100k_base`); 560 Abschnitte (H1–H3) |
 
-### Chunking
+#### Chunking
 
 | Strategie | Chunks | Tokens min / Mittel / max |
 |---|---:|---|
@@ -203,11 +253,13 @@ Ersetzt durch [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); die beiden
 | C2 | 305 | 108 / 469 / 500 |
 | C3 | 493 | 50 / 239 / 799 |
 
-### Embedding
+#### Embedding
 
-Einmaliger Lauf am 13.10.2026 (`src/embed.py`; Protokoll `data/processed/embedding_runs.jsonl`). Die von OpenAI
-abgerechneten Tokens stimmen exakt mit der eigenen Zählung (`cl100k_base`, `src/tokens.py`) überein. Weitere Läufe
-am selben Tag nutzten die gespeicherten Referenzvektoren ohne API-Aufruf ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
+Einmaliger Lauf am 13.10.2026 (`src/embed.py`; Protokoll lokal archiviert:
+`data/processed/archive_vue_2026-10-18/embedding_runs.jsonl`, Zeilen vom 13.10.2026). Die von OpenAI abgerechneten
+Tokens stimmen exakt mit der eigenen Zählung (`cl100k_base`, `src/tokens.py`) überein. Weitere Läufe am selben Tag
+nutzten die gespeicherten Referenzvektoren ohne API-Aufruf
+([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
 | Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei |
 |---|---:|---:|---:|---:|
@@ -216,6 +268,8 @@ am selben Tag nutzten die gespeicherten Referenzvektoren ohne API-Aufruf ([ADR 0
 | C3 | 493 | 117.594 | 0,0153 | 13,0 MB |
 | Summe | 1.058 | 378.082 | 0,0492 | 26,0 MB |
 
+Dateigrößen gemessen am 13.10.2026; die Vektordateien wurden am 14.10.2026 überschrieben.
+
 Prüfung: Für je 25 zufällig gewählte Chunk-Vektoren je Strategie stimmt Chromas Top-5 mit der exakten
 Kosinus-Rangfolge überein, der Chunk selbst steht auf Rang 1 (75/75); Vektornormen 0,9994–1,0007.
 
@@ -223,7 +277,7 @@ Wiederholungsmessung (13.10.2026, 2.706 Tokens, 0,00035 USD): je drei Chunks pro
 Kosinus zum gespeicherten Vektor ≥ 0,99996 (7 von 9 bitgleich), ähnlichster anderer Chunk ≤ 0,84. Daraus der
 Schwellwert 0,999 der Modellstand-Prüfung ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
 
-### Schwierigkeitsprobe 1: einfache Fragen (Pilot, 14.10.2026, alter Korpus)
+#### Schwierigkeitsprobe 1: einfache Fragen (Pilot, 14.10.2026, alter Korpus)
 
 Zweck: prüfen, ob das Retrieval auf dem Korpus schwer genug ist, um die Strategien zu unterscheiden (kein
 Deckeneffekt). Acht Pilotfragen in `data/pilot/` (alle fünf Fragetypen, fünf Korpusbereiche, je ein relevanter
@@ -239,7 +293,7 @@ Befund: Bei einfachen Fragen mit genau einem passenden Abschnitt finden alle Str
 Recall@5 = 1,00, Deckeneffekt); Unterschiede zeigen sich nur in Rang und Präzision (MRR, Precision@5). Folgerung für den
 Fragenkatalog: [Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau).
 
-### Schwierigkeitsprobe 2: schwere Fragen (Pilot, 14.10.2026, alter Korpus)
+#### Schwierigkeitsprobe 2: schwere Fragen (Pilot, 14.10.2026, alter Korpus)
 
 Zweck: prüfen, ob der Deckeneffekt aus Probe 1 an den Fragen oder am Korpus liegt, bevor über eine Erweiterung des
 Korpus (ADR 0019) entschieden wird. 16 bewusst schwere Pilotfragen in `data/pilot/hard/`, **nicht** Teil des
@@ -288,33 +342,15 @@ Befund:
 - C2 verfehlt bei H11 (`v-model.lazy`, 72-Token-Abschnitt) als einzige Strategie jeden relevanten Chunk.
 - n = 16 ist zu klein für Signifikanzaussagen; die Werte zeigen nur, dass der Katalog die Strategien trennen kann.
 
-Folgerung für den Fragenkatalog (fester Anteil schwerer Fragen, Annotation über den ganzen Korpus, MRR und Recall@5
-neben Hit@5): [Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau). Die Lücken oben fand erst die
+Folgerung für den Fragenkatalog (fester Anteil schwerer Fragen, Annotation über den ganzen Korpus):
+[Fragenkatalog](question-catalogue.md#regeln-für-annotation-und-aufbau); für die Auswertung (MRR und Recall@5 neben
+Hit@5): [Evaluation](evaluation.md#retrieval-evaluation). Die Lücken oben fand erst die
 Durchsicht nach dem Retrieval.
 
-Zwischenfall: Der erste Lauf brach ab, weil Chroma für eine C3-Frage einen echten Top-5-Treffer (`C3_D034_0006`,
-Kosinus 0,325) nicht lieferte; die Prüfung gegen die exakte NumPy-Rangfolge ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md))
-verhinderte ein falsches Ergebnis. Nicht reproduzierbar: 12 neue Prozesse gegen den Index, 10 Neuaufbauten mit Abfrage im
-getrennten Prozess und 1.200 leicht verrauschte Anfragen ergaben keine Abweichung; alle Vektoren waren erreichbar.
-Chroma schreibt die Indexdateien beim Lesen neu, sodass der Zustand des Abbruchs nicht erhalten ist. Die Kosten des
-abgebrochenen Laufs (gleiche Größenordnung, rund 0,0004 USD) sind nicht protokolliert, weil `retrieve.py` erst am Ende
-in `runs.jsonl` schreibt.
-
-## Antwortmodell: Prüfaufruf (17.10.2026)
-
-Ein Aufruf mit den Einstellungen des Hauptlaufs (Pilotfrage H01 des Sets `hard`, top-5 von C1, nicht gespeichert)
-bestätigte, dass die API `temperature = 0`, `seed` und Effort `none` zusammen annimmt: `finish_reason = "stop"`,
-2.649 Prompt- und 140 Antwort-Tokens, 0,00034 USD. Gemeldet wurden nur das Modell `gpt-6-luna` und kein
-`system_fingerprint`; die Modellliste der API führt für GPT-6 keine datierten Varianten (`gpt-5.6-luna`,
-`gpt-6-astra`, `gpt-6-luna`, `gpt-6-sol`, `gpt-6.1-sol`). Erstellungszeitpunkte laut `GET /v1/models`:
-`gpt-6-luna` 14.09.2026, 17:15:02 UTC; `gpt-6-sol` 14.09.2026, 17:12:17 UTC. Folgerung: [ADR 0033](../adr/0033-antwortmodell.md).
-
-## Modellversionen (bei der Umsetzung eintragen)
-
-| Komponente | Version | Datum der ersten Nutzung |
-|---|---|---|
-| LLM | `gpt-6-luna` (Modellobjekt erstellt 14.09.2026, 17:15:02 UTC; Wissensstand 18.05.2026), Effort `none`, Temperatur 0, `seed` 20261017, höchstens 1.024 Ausgabe-Tokens ([ADR 0033](../adr/0033-antwortmodell.md)) | 17.10.2026 (Prüfaufruf) |
-| Embedding-Modell | `text-embedding-3-large`, 3.072 Dimensionen ([ADR 0023](../adr/0023-embedding-modell.md)) | 13.10.2026 |
-| OpenAI Python SDK | 2.44.0 | 13.10.2026 |
-| ChromaDB | 1.5.9 | 13.10.2026 |
-| tiktoken | 0.13.0 | 13.10.2026 |
+Zwischenfall: Der erste Lauf brach ab, weil Chroma für eine C3-Frage einen echten Top-5-Treffer (`C3_D034_0006`, Kosinus
+0,325) nicht lieferte; die Prüfung gegen die exakte NumPy-Rangfolge
+([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)) verhinderte ein falsches Ergebnis. Nicht reproduzierbar:
+12 neue Prozesse gegen den Index, 10 Neuaufbauten mit Abfrage im getrennten Prozess und 1.200 leicht verrauschte
+Anfragen ergaben keine Abweichung; alle Vektoren waren erreichbar. Chroma schreibt die Indexdateien beim Lesen neu,
+sodass der Zustand des Abbruchs nicht erhalten ist. Die Kosten des abgebrochenen Laufs (gleiche Größenordnung, rund
+0,0004 USD) sind nicht protokolliert, weil `retrieve.py` erst am Ende in `runs.jsonl` schreibt.

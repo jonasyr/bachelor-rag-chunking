@@ -1,6 +1,6 @@
 # Korpusauswahl (Lückentext-Probe und Closed-Book-Fragen)
 
-> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026. Entscheidung: [ADR 0038](../adr/0038-korpus-e2e.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Entscheidung: [ADR 0038](../adr/0038-korpus-e2e.md).
 > Übersicht: [Dokumentation](../README.md).
 
 Einmalige Diagnose, mit der der Korpus gewählt wurde; kein Teil des Experiments. Frage: Welche Dokumentation kennt
@@ -9,16 +9,20 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
 ## Vorgehen
 
 1. **Kandidaten.** Zwei unabhängige Recherchen (Bibliotheken und Frameworks; CLIs, Infrastruktur und Protokolle) über
-   rund 2.500 GitHub-Repositories, die nach dem 01.06.2026 angelegt wurden; dazu Vue.js (bisheriger Korpus) und Angular
+   rund 2.500 GitHub-Repositories, die ab dem 01.06.2026 angelegt wurden; dazu Vue.js (bisheriger Korpus) und Angular
    (vom Betreuer vorgeschlagen) als bekannte Vergleiche. Ausschlusskriterien, Messung und Gewichte standen fest, bevor
    die neuen Kandidaten gemessen wurden: [`data/corpus_probe/preregistration.md`](../../data/corpus_probe/preregistration.md).
    Vue, Blume und e2e waren schon vorher gemessen und werden nach denselben Regeln gewertet.
 2. **Seiten** (`to_docs.py`): alle `.md`/`.mdx`-Dateien des Docs-Ordners auf dem gepinnten Commit, ohne Übersetzungen,
    Changelogs und die in `candidates.csv` genannten Ausschlüsse; Titel aus dem Frontmatter, MDX-`import`/`export`
-   entfernt. Vue: `data/processed/documents.jsonl` des Snapshots `40aa88a` nach dem Preprocessing.
+   entfernt. Vue: `data/processed/documents.jsonl` des Snapshots `40aa88a` nach dem Preprocessing (heute liegt dort
+   e2e, siehe [Dateien und Befehle](#dateien-und-befehle)).
 3. **Proben** (`build_probes.py`): je Prosasatz (40–400 Zeichen, außerhalb von Code, Tabellen, HTML und Hinweisboxen)
-   wird ein Inline-Code-Ausdruck (2–40 Zeichen) maskiert; höchstens 12 Proben je Seite, Seed 20261018
-   (`config.CORPUS_PROBE_*`). Proben, deren Ausdruck im Seiten- oder Abschnittstitel steht, entfallen (`run_probes.py`).
+   wird jeder Inline-Code-Ausdruck (2–40 Zeichen) einzeln maskiert, je Ausdruck eine Probe; doppelte Ausdrücke,
+   triviale Literale (`true`, `false`, `null`, `undefined`) und Ausdrücke, die im Satz sichtbar bleiben, entfallen.
+   Codeblöcke erkennt nur der Zaun ```` ``` ```` (nicht `~~~`). Höchstens 12 Proben je Seite, Seed 20261018
+   (`config.CORPUS_PROBE_*`). Proben, deren Ausdruck nach Normalisierung (Schritt 4) als Teilzeichenkette im
+   normalisierten Seiten- oder Abschnittstitel vorkommt, entfallen (`run_probes.py`).
 4. **Läufe** (`run_probes.py`): Das Antwortmodell mit den Einstellungen des Experiments (`llm_client`) ergänzt jeden
    Ausdruck einmal nur aus Satz, Seiten- und Abschnittstitel (closed-book) und einmal zusätzlich mit dem maskierten
    Abschnittstext (open-book, höchstens 6.000 Zeichen). Treffer = gleicher Ausdruck nach Normalisierung (erste Zeile,
@@ -34,15 +38,29 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
    ein zweiter Agent später ebenso e2e und TanStack Charts (mindestens acht Seiten).
 8. **Closed-Book-Fragen** (`question_probe.py`) für Vue, Angular, Enroute, e2e, TanStack Charts und xy: je 20
    Abschnitte (H2/H3, mindestens 60 Prosawörter, höchstens 2 je Seite, ohne Beispiele, Changelogs und Blog; Seed
-   20261018, `config.CORPUS_QUESTIONS_*`). Ein Agent schrieb je Abschnitt eine realistische Frage mit Referenzantwort
-   (je Korpus 4 × faktisch, prozedural, konzeptuell, Grenze, Vergleich; Prompt unten). Das Antwortmodell beantwortete
-   jede Frage ohne Kontext und mit dem Abschnitt; ein weiterer Agent beurteilte alle Antworten blind (gemischt, ohne
-   Angabe der Bedingung): `correct`, `partial`, `wrong`, `abstain`. Retrieval-abhängig = mit Abschnitt `correct`, ohne
-   nicht `correct` (Wilson-Intervall). Die Fragen sind Diagnose, kein Teil des Fragenkatalogs. Urteilslauf 1: die fünf
-   Korpora gemeinsam, Lauf 2: Angular allein (auf Wunsch für die Mail an den Betreuer nachgereicht); Seeds in
-   `config.CORPUS_QUESTIONS_JUDGE_SEEDS`, beide Reihenfolgen aus den abgelegten Antworten reproduzierbar.
+   `config.CORPUS_PROBE_SEED` = 20261018, übrige Werte `config.CORPUS_QUESTIONS_*`). Ein Agent schrieb je Abschnitt
+   eine realistische Frage mit Referenzantwort (je Korpus 4 × faktisch, prozedural, konzeptuell, Grenze, Vergleich;
+   Prompt unten). Das Antwortmodell beantwortete jede Frage ohne Kontext und mit dem Abschnitt; ein weiterer Agent
+   beurteilte alle Antworten blind (gemischt, ohne Angabe der Bedingung): `correct`, `partial`, `wrong`, `abstain`.
+   Retrieval-abhängig = mit Abschnitt `correct`, ohne nicht `correct` (Wilson-Intervall). Die Fragen sind Diagnose,
+   kein Teil des Fragenkatalogs. Urteilslauf 1: die fünf Korpora gemeinsam, Lauf 2: Angular allein (auf Wunsch für die
+   Mail an den Betreuer nachgereicht); Seeds in `config.CORPUS_QUESTIONS_JUDGE_SEEDS`, beide Reihenfolgen aus den
+   abgelegten Antworten reproduzierbar.
 
-Prompt der Klassifikation (je Korpus; Eingabe `misses/<name>.json` ohne `category`):
+Prompt der Lückentext-Läufe (`run_probes.py`, wörtlich; Nutzernachricht = `HEAD` + `CONTEXT` (nur open-book) +
+`TAIL`, `{context}` = Fenster des maskierten Abschnittstexts):
+
+```python
+SYSTEM = "You are an expert on {product}."
+HEAD = (
+    'The following sentence is from the official {product} documentation, page "{page}", '
+    'section "{section}". One code term was replaced by [MASK].\n\nSentence: {sentence}\n\n'
+)
+CONTEXT = "Section text (the term is masked there too):\n{context}\n\n"
+TAIL = "Reply with the masked code term only, without backticks or explanation."
+```
+
+Prompt der Klassifikation (je Korpus; Eingabe `misses/<name>.json` mit leerem `category`):
 
 ```text
 Classify each probe into exactly one category, judging ONLY from the sentence, answer and guess (do not rely on your
@@ -85,8 +103,10 @@ Be strict and consistent. A plausible but generic answer that does not hit the s
 if it hedges, or `wrong` if it asserts something else.
 ```
 
-Antwort-Prompt: System „You are an expert on {product}.“, Nutzer „Question about {product}: {question}“ (open-book
-zusätzlich der Abschnitt) und „Answer in 1-3 sentences. If you do not know, say so instead of guessing.“
+Antwort-Prompt (`question_probe.py`): System „You are an expert on {product}.“, Nutzer „Question about {product}:
+{question}“, open-book zusätzlich die Kopfzeile `Documentation section "{section}" (page "{page}"):` und der
+Abschnittstext (gekürzt auf `config.CORPUS_QUESTIONS_SECTION_CHARS` = 5.000 Zeichen), dann „Answer in 1-3 sentences.
+If you do not know, say so instead of guessing.“
 
 ## Ergebnis
 
@@ -96,12 +116,16 @@ und rund 0,01 USD (Closed-Book-Fragen). Vollständige Werte: [`data/corpus_probe
 ### Alle Kandidaten
 
 Rangfolge nach der vorab festgelegten Wertung (0–100). Stufen U/S/St/Q/Sb/P (je 0–4) = Unbekanntheit, Markdown-Sauberkeit,
-Struktur, Dokumentationsqualität, Stabilität, Passung. Tokens = Zeichen / 4 nach `to_docs.py`. Sterne = GitHub-Sterne,
+Struktur, Dokumentationsqualität, Stabilität, Passung. Tokens = Zeichen / 4 nach `to_docs.py`; ADR 0038 und die
+Pipeline zählen dagegen tiktoken-Tokens nach dem Preprocessing (Vue 177.951 hier gegen 166.000, e2e 228.266 gegen
+250.380 in [corpus.md](corpus.md)). Sterne = GitHub-Sterne,
 Commits = Docs-Commits in den 30 Tagen vor der Messung (Stand 17./18.10.2026). CB = Closed-Book-Fragen ohne
 Dokumentation richtig (nur für sechs Korpora gemessen). Vue und Angular sind bekannte Vergleiche, keine Kandidaten
-(Ausschlusskriterium 1).
+(Ausschlusskriterium 1). Sightmap (#16) ist durch Kriterium 5 ausgeschlossen (79.174 < 80.000 Tokens) und wurde
+irrtümlich mitgewertet: `summarise.py` wendet die Token-Grenze nur auf den Pool der Sensitivität an. Ohne Sightmap
+rücken die Plätze 17–24 um einen auf; die Sensitivität (ohnehin ohne Sightmap) und die Wahl ändern sich nicht.
 
-| # | Projekt (Beschreibung im Prompt) | Quelle | Wertung | Wissenslücke % (95-%-KI) | U/S/St/Q/Sb/P | Seiten | Tokens | Sterne | Commits | CB |
+| # | Projekt (Beschreibung im Prompt) | Quelle | Wertung | Wissenslücke % (95-%-Konfidenzintervall) | U/S/St/Q/Sb/P | Seiten | Tokens | Sterne | Commits | CB |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1 | Enroute (git on object storage) | `enroute-sh/enroute` | 81,2 | 50,4 (42,1–58,6) | 4/2/3/2/4/4 | 53 | 81.395 | 253 | 2 | 0/20 |
 | 2 | xy (a Python charting library by Reflex) | `reflex-dev/xy` | 73,8 | 31,7 (25,8–37,5) | 3/2/3/3/4/3 | 81 | 159.453 | 1.878 | 5 | 3/20 |
@@ -118,7 +142,7 @@ Dokumentation richtig (nur für sechs Korpora gemessen). Vue und Angular sind be
 | 13 | Lattice (a PHP admin UI framework) | `lattice-php/lattice` | 58,8 | 28,5 (24,1–32,9) | 2/2/2/3/4/2 | 106 | 145.227 | 63 | 0 | – |
 | 14 | Nimbus (a documentation framework by Cloudflare) | `cloudflare/nimbus` | 56,2 | 39,1 (30,0–48,2) | 3/0/2/4/0/3 | 70 | 86.794 | 1.428 | 188 | – |
 | 15 | gori (a terminal HTTP intercepting proxy) | `hahwul/gori` | 56,2 | 37,1 (28,6–45,6) | 3/2/2/2/0/3 | 46 | 247.971 | 123 | 271 | – |
-| 16 | Sightmap (a site map format and CLI) | `sightmap/sightmap` | 56,2 | 32,1 (22,2–42,1) | 3/0/3/3/3/0 | 38 | 79.174 | 60 | 19 | – |
+| 16 | Sightmap (a site map format and CLI), **ausgeschlossen (Kriterium 5)** | `sightmap/sightmap` | 56,2 | 32,1 (22,2–42,1) | 3/0/3/3/3/0 | 38 | 79.174 | 60 | 19 | – |
 | 17 | Blume (a documentation site framework) | `haydenbleasel/blume` | 55,0 | 26,6 (21,6–31,5) | 2/2/2/4/0/3 | 65 | 158.850 | 1.790 | 288 | – |
 | 18 | Angular | `angular/angular` | 55,0 | 12,8 (9,7–15,9) | 1/4/2/3/1/4 | 256 | 508.000 | 101.075 | 96 | 10/20 |
 | 19 | pgContext (a Postgres retrieval extension) | `Evokoa/pgContext` | 53,8 | 35,5 (28,3–42,7) | 3/2/1/1/4/1 | 66 | 179.407 | 265 | 0 | – |
@@ -128,9 +152,10 @@ Dokumentation richtig (nur für sechs Korpora gemessen). Vue und Angular sind be
 | 23 | Zuke (a typed build automation tool for Deno) | `zuke-build/zuke` | 50,0 | 32,0 (23,8–40,2) | 3/2/2/1/2/0 | 42 | 175.086 | 46 | 53 | – |
 | 24 | NVX (a virtual machine monitor) | `microsoft/nvx` | 43,8 | 29,0 (17,7–40,3) | 2/2/2/1/0/3 | 45 | 138.779 | 407 | 475 | – |
 
-Alle 22 neuen Projekte liegen bei 20–50 %; kein Intervall überschneidet sich mit dem von Vue, mit dem von Angular
-nur das von nub (20,2 %, KI 15,4–25,1) knapp. Die Wertung allein hätte Enroute gewählt: vorn in 4 von 5 Gewichtungen
-(sonst Dritter). Rangfolgen der Sensitivität (beste fünf, nur neue Projekte ab 80.000 Tokens):
+Die 22 neuen Projekte liegen bei 20,2–50,4 % (nub bis Enroute); kein Intervall überschneidet sich mit dem von Vue,
+mit dem von Angular nur das von nub (20,2 %, Konfidenzintervall 15,4–25,1) knapp. Die Wertung allein hätte Enroute
+gewählt: vorn in 4 von 5 Gewichtungen (sonst Dritter). Rangfolgen der Sensitivität (beste fünf, nur neue Projekte
+ab 80.000 Tokens):
 
 | Gewichtung | Rangfolge |
 |---|---|
@@ -179,8 +204,10 @@ GitHub-Daten vom 18.10.2026 (`gh api`).
 
 ### Entscheidungsweg
 
-1. Pilot `data/pilot/hard` (Vue): Antwortqualität an der Obergrenze, 14 von 16 Pilotfragen ohne Retrieval vollständig.
-2. Lückentext-Probe über 24 Dokumentationen: Vue und Angular bekannt, alle neuen Projekte 20–50 % Lücke; die Wertung
+1. Pilot `data/pilot/hard` (Vue): Antwortqualität an der Obergrenze; ohne Retrieval 14 von 16 Pilotfragen
+   vollständig beantwortet (Beobachtung im Pilot, kein abgelegtes Artefakt; Quelle: [plan.md](../plan.md#stand),
+   Kontext von [ADR 0038](../adr/0038-korpus-e2e.md)).
+2. Lückentext-Probe über 24 Dokumentationen: Vue und Angular bekannt, die neuen Projekte 20,2–50,4 % Lücke; die Wertung
    wählte Enroute (Bericht an Jonas, 18.10.2026).
 3. Einwand: Enroute hat einen Maintainer und drei Commits; gesucht war ein ähnlich geeignetes, real genutztes Projekt.
 4. Closed-Book-Fragen für die Spitzengruppe und Vue, auf Wunsch für die Mail an den Betreuer auch Angular: Vue 15/20,
@@ -202,7 +229,7 @@ in `snippets/model-provider.jsx`; das Preprocessing soll sie als Tabelle ausgebe
 
 Je 20 Fragen, Daten in `questions/<name>.json`:
 
-| Korpus | ohne Doku richtig | mit Abschnitt richtig | retrieval-abhängig (95-%-KI) |
+| Korpus | ohne Doku richtig | mit Abschnitt richtig | retrieval-abhängig (95-%-Konfidenzintervall) |
 |---|---|---|---|
 | Vue.js | 15 | 20 | 25 % (11–47) |
 | Angular | 10 (nie „weiß nicht“) | 20 | 50 % (30–70) |
@@ -227,24 +254,44 @@ Mitwirkende); Vorgabe war möglichst viel Inhalt in der Wissensbasis.
   die aufgezeichneten Proben samt maskiertem Abschnittstext aus `results/` und den Seiten wieder auf. Geprüft
   (18.10.2026): Für alle 23 geklonten Kandidaten ergeben gepinnter Commit, `to_docs.py` und `--recorded` dieselben
   Seiten, dieselbe Seitenstatistik und dieselben Proben wie die aufgezeichneten Läufe, für Vue aus
-  `documents.jsonl` des Snapshots `40aa88a`. Die Antworten selbst sind nicht bitgenau wiederholbar (Modell nur als
-  Alias, `seed` nur „best effort“, [ADR 0033](../adr/0033-antwortmodell.md)); belegt sind die Werte durch die
-  abgelegten Ergebnisse.
+  `documents.jsonl` des Snapshots `40aa88a` (damals noch in `data/processed/`; heute muss der Vue-Korpus dafür neu
+  erzeugt werden, siehe [Dateien und Befehle](#dateien-und-befehle)). Die Antworten selbst sind nicht bitgenau
+  wiederholbar (Modell nur als Alias, `seed` nur „best effort“, [ADR 0033](../adr/0033-antwortmodell.md)); belegt sind
+  die Werte durch die abgelegten Ergebnisse.
 - Drei Abweichungen der aufgezeichneten Läufe, in der Codex-Prüfung von PR #21 gefunden; `build_probes.py`,
   `run_probes.py` und `question_probe.py` sind seither korrigiert, `--recorded` wiederholt den alten Stand:
   - Code-Ausdrücke: Das Muster filterte die Länge innerhalb des regulären Ausdrucks, sodass bei benachbarten
     Ein-Zeichen-Ausdrücken (`` `+`/`×` ``) Prosa zwischen zwei Ausdrücken als Ausdruck galt (z. B. Vela,
-    `results/vela.jsonl` Zeile 80). Betroffen sind 0–46 Proben je Korpus, davon höchstens 5 eindeutig gestellt; ohne
-    sie ändert sich keine Wissenslücke um mehr als 0,4 Prozentpunkte (Vue, Angular, e2e, Enroute: unverändert).
+    `results/vela.jsonl` Zeile 80). Betroffen sind laut ursprünglicher Auswertung 0–46 Proben je Korpus, davon
+    höchstens 5 eindeutig gestellt; ohne sie ändere sich keine Wissenslücke um mehr als 0,4 Prozentpunkte (Vue,
+    Angular, e2e, Enroute: unverändert). Nachprüfung 19.10.2026: bis 0,45 Prozentpunkte (Heuristik: Ausdruck beginnt
+    oder endet mit Leerraum).
   - Open-Book-Kontext: Es wurden die ersten 6.000 Zeichen des Abschnitts gezeigt, auch wenn der Satz später stand;
-    solche Proben fallen aus dem Nenner. Betroffen sind 0–23 Proben je Korpus (Vue 0, Enroute 0, e2e 3). Neu: ein
-    Fenster um den Satz.
+    solche Proben fallen aus dem Nenner. Betroffen sind laut ursprünglicher Auswertung 0–23 Proben je Korpus (Vue 0,
+    Enroute 0, e2e 3). Nachprüfung 19.10.2026 (Satz beginnt nach Zeichen 6.000): Enroute 0, e2e 2 sicher, 5 nicht
+    zuzuordnen. Neu: ein Fenster um den Satz.
   - Modellkennung: Die Läufe speicherten nicht, welche Modellversion die API meldete; `gpt-6-luna` ist ein Alias.
-    Alle Läufe fanden am 17./18.10.2026 statt. Neu: `model` und `system_fingerprint` je Ergebniszeile, ein Lauf mit
-    mehreren Modellen bricht ab.
-- Abweichung von der Vorregistrierung: Das Kriterium Struktur nennt dort auch die Streuung der Seitenlängen; die
-  Stufen in `summarise.py` nutzen nur Überschriftendichte und Ebenensprünge (`page_iqr` steht in `summary.json`, geht
-  aber nicht in die Wertung ein). Die Wertung wurde nachträglich nicht geändert. Die Entscheidung für e2e stützt sich
+    Alle Läufe fanden am 17./18.10.2026 statt. Neu: `model` sowie `closed_fingerprint` und `open_fingerprint` (die
+    von der API gemeldete `system_fingerprint` je Lauf) je Ergebniszeile, `model` auch je Closed-Book-Frage; ein Lauf
+    mit mehreren Modellen bricht ab.
+- Abweichungen von der Vorregistrierung (Operationalisierung in `summarise.ratings`):
+  - Struktur: dort auch die Streuung der Seitenlängen; umgesetzt nur Median H2–H4 je Seite (Stufen 3/5/6/8), minus 1
+    bei mehr als 0,1 Ebenensprüngen je Seite (`page_iqr` steht in `summary.json`, geht aber nicht in die Wertung ein).
+  - Dokumentationsqualität: dort Trennung Anleitung / Referenz, konsistente Überschriftenhierarchie,
+    Frontmatter-Titel, Codebeispiele, wenig generierter Text; umgesetzt als Mittel aus Codeblöcken je 10.000 Tokens
+    (Stufen 5/10/20/30), Frontmatter-Titeln (Anteil ≥ 0,9 → 4, sonst 0) und Referenzanteil nach Pfad (0,15–0,6 → 4,
+    0,05–0,8 → 2, sonst 0). Hierarchie und generierter Text gehen nicht ein (Ebenensprünge zählen bei Struktur).
+  - Stabilität: dort Docs-Commits in 30 Tagen und Release-Tags zum Pinnen; umgesetzt nur `commits30` (4 minus Stufe
+    11/31/61/151).
+  - Passung: dort real genutztes Projekt, kein Marketing, nicht überwiegend KI-geschrieben; umgesetzt als Stufe des
+    geschätzten KI-Anteils (`ai`, `config.CORPUS_PROBE_AI_RATING`), minus 1 unter 100 Sternen
+    (`config.CORPUS_PROBE_FEW_STARS`). Marketing wurde nur in der qualitativen Durchsicht beurteilt.
+  - Messung: dort „höchstens 12 Prosasätze mit je einem maskierten Ausdruck“ je Seite; umgesetzt höchstens 12 Proben
+    je Seite, ein Satz kann mehrere Proben liefern (Schritt 3).
+  - Ausschlusskriterium 5 (80.000–300.000 Tokens) gilt in `summarise.py` nur für den Pool der Sensitivität und nur mit
+    der Untergrenze (Sightmap, siehe [Alle Kandidaten](#alle-kandidaten)).
+
+  Die Wertung wurde nachträglich nicht geändert. Die Entscheidung für e2e stützt sich
   vor allem auf die Closed-Book-Fragen und den Umfang, nicht auf die Rangfolge der Wertung.
 - Blume wurde vor der Erweiterung des Changelog-Filters gelesen und enthält die Seite `advanced/changelog.mdx` (eine
   Anleitung zur Changelog-Funktion, kein Changelog); `skip_changelogs` = `no` hält das fest.
@@ -255,15 +302,21 @@ Skripte in `scripts/corpus_probe/`, Daten in `config.CORPUS_PROBE_DIR` = `data/c
 
 | Datei | Inhalt |
 |---|---|
-| `candidates.csv` | `name`, `repo` (`local` = Vue-Snapshot), `docs_path`, `commit`, `commit_date`, `product` (Name im Prompt), `drops`, `skip_changelogs` (`yes` = Changelog-Dateien auslassen), `commits30` (Docs-Commits in 30 Tagen), `stars`, `ai` (Anteil KI-geschriebenen Texts, Einschätzung), `new` (nach dem 31.05.2026 veröffentlicht) |
+| `candidates.csv` | `name`, `repo` (`local` = Vue-Snapshot), `docs_path`, `commit`, `commit_date`, `product` (Name im Prompt), `drops`, `skip_changelogs` (`yes` = Changelog-Dateien auslassen), `commits30` (Docs-Commits in 30 Tagen), `stars`, `ai` (grobe Einschätzung des KI-geschriebenen Textanteils: `low`, `medium`, `medium-high`, `high`; kein Messwert), `new` (nach dem 31.05.2026 veröffentlicht) |
 | `stats.json` | Seitenstatistik je Korpus (Tokens je Seite, H2–H4 je Seite, JSX-Zeilen, Codeblöcke, Frontmatter-Titel, Ebenensprünge, Referenzanteil) |
-| `results/<name>.jsonl` | eine Zeile je Probe: Satz, Ausdruck, beide Antworten, `closed_ok`, `open_ok` |
+| `results/<name>.jsonl` | eine Zeile je Probe: `doc_id`, `path`, `page`, `section`, `sentence` (maskiert), `answer` (Ausdruck), `kind`, `area`, `closed`, `open`, `closed_ok`, `open_ok`; neue Läufe zusätzlich `model`, `closed_fingerprint`, `open_fingerprint` |
 | `misses/<name>.json` | eindeutig gestellte closed-book-Fehltreffer mit `category`; `id` = Zeile in `results/` (ab 0) |
 | `summary.json` | Messwerte, Stufen und Wertung je Korpus, Rangfolgen der Gewichtungen |
-| `questions/<name>.json` | Closed-Book-Fragen: `id`, `path`, `section`, `type`, `question`, `reference`, `closed`, `open`, `closed_verdict`, `open_verdict`, `judge_batch` |
+| `questions/<name>.json` | Closed-Book-Fragen: `id`, `path`, `section`, `type`, `question`, `reference`, `closed`, `open`, `closed_verdict`, `open_verdict`, `judge_batch`; neue Läufe zusätzlich `model` |
 
-`docs/`, `probes/`, `sources/` und `questions/*-sections.json` sind Zwischenstände (ganze Seiten oder Abschnitte) und nicht versioniert. Ein Korpus neu messen:
+`docs/`, `probes/`, `sources/` und `questions/*-sections.json` sind Zwischenstände (ganze Seiten oder Abschnitte) und
+nicht versioniert; die Dateien des Urteilslaufs (`questions/judge-input.json`, `judge-key.json`, `judge-output.json`)
+sind nicht abgelegt. Die Vue-Zeile liest `data/processed/documents.jsonl`; dort liegt seit
+[ADR 0038](../adr/0038-korpus-e2e.md) der e2e-Korpus, und ein Lauf unter dem Namen `vue` würde still e2e messen. Für
+die Vue-Zeile zuerst den Vue-Korpus neu erzeugen: Code-Stand `4115ffc` (pinnt `vuejs/docs` auf `40aa88a`), dort
+`snapshot.py`, `ingest.py`, `preprocess.py`. Ein Korpus neu messen:
 `scripts/corpus_probe/probe_corpus.sh <name>` (ruft die OpenAI-API; `--recorded` wiederholt die aufgezeichneten
-Proben statt eine neue Stichprobe zu ziehen), dann klassifizieren und
+Proben statt eine neue Stichprobe zu ziehen), dann klassifizieren (ein Agent trägt mit dem Prompt oben `category` in
+`misses/<name>.json` ein) und
 `uv run python scripts/corpus_probe/summarise.py`. Closed-Book-Fragen: `question_probe.py sample NAME…`, Fragen
 schreiben lassen, `answer NAME…` (API), `blind BATCH NAME…`, urteilen lassen, `unblind`, `summary`.

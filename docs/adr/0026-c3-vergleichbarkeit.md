@@ -2,7 +2,11 @@
 
 ## Status
 
-Angenommen (14.10.2026; ergänzt [ADR 0005](0005-drei-chunking-strategien.md), [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0021](0021-c3-grenzen.md))
+Angenommen (14.10.2026; ergänzt [ADR 0005](0005-drei-chunking-strategien.md), [ADR 0019](0019-korpus-ausschnitt.md) und
+[ADR 0021](0021-c3-grenzen.md)); Zahlen in Kontext, Entscheidung („derzeit 231“) und Konsequenzen: Vue-Korpus `40aa88a`
+([ADR 0025](0025-korpus-guide-api-styleguide.md)); der Wert von K1 hängt vom Korpus ab, auf e2e `config.K1_CHUNK_SIZE` =
+375 (`config.CONTROL_STRATEGIES`, [Konfiguration](../reference/configuration.md#chunking)); aktuelle Werte im
+[Experiment-Protokoll](../reference/experiment-record.md)
 
 ## Kontext
 

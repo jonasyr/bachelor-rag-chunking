@@ -1,6 +1,6 @@
 # Literaturbasis
 
-> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
 
 
 Die 15 Quellen der ersten Tabelle ([ADR 0018](../adr/0018-literaturbasis.md)) sind im Exposé zitiert; nur ihre BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. Die Webquellen der folgenden Abschnitte sind dort noch nicht enthalten. Zitierstil: APA 7 / biblatex / biber ([ADR 0002](../adr/0002-zitierstil-apa.md)).
@@ -47,7 +47,7 @@ Abgerufen am 14.10.2026; Grundlage von [ADR 0025](../adr/0025-korpus-guide-api-s
 |----------|----------------|--------|
 | `smith2024chunking` | Smith, B., & Troynikov, A. (2024, 3. Juli). *Evaluating chunking strategies for retrieval*. Chroma. https://www.trychroma.com/research/evaluating-chunking | `text-embedding-3-large`, fünf abgerufene Chunks; kleinere Chunks (800 → 200 Tokens) erhöhen die Precision deutlich bei etwa gleichem Recall (rund 85–89 %) |
 | `bhat2025chunksize` | Bhat, S. R., Rudat, M., Spiekermann, J., & Flores-Herr, N. (2025). *Rethinking chunk size for long-document retrieval: A multi-dataset analysis* (arXiv:2505.21700). https://arxiv.org/abs/2505.21700 | beste Chunk-Größe hängt vom Datensatz und Fragetyp ab (64–128 Tokens für knappe Fakten, 512–1.024 für breiten Kontext) und vom Embedding-Modell |
-| `vuejs2026compare` | vuejs/docs. (2026). *Compare b75d188…40aa88a* [GitHub-Vergleich]. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien |
+| `vuejs2026compare` | vuejs/docs. (2026). *Compare b75d188…40aa88a* [GitHub-Vergleich]. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien; historisch (Vue-Korpus, ADR 0025 ersetzt durch [ADR 0038](../adr/0038-korpus-e2e.md)) |
 
 Abgerufen am 17.10.2026; Grundlage von [ADR 0033](../adr/0033-antwortmodell.md).
 
@@ -60,3 +60,10 @@ Abgerufen am 17.10.2026; Grundlage von [ADR 0033](../adr/0033-antwortmodell.md).
 | `renze2024temperature` | Renze, M., & Guven, E. (2024). The effect of sampling temperature on problem solving in large language models. In *Findings of the Association for Computational Linguistics: EMNLP 2024*. https://arxiv.org/abs/2402.05201 | keine signifikante Wirkung der Temperatur 0,0–1,0 auf die Lösungsgüte |
 | `atil2024nondeterminism` | Atil, B., et al. (2024). *Non-determinism of "deterministic" LLM settings* (arXiv:2408.04667). https://arxiv.org/abs/2408.04667 | Genauigkeitsschwankungen bis 15 % trotz „deterministischer“ Einstellungen |
 | `lee2026noisybench` | Lee, S., et al. (2026). *Lost in the noise: How test-time reasoning fails with contextual distractors* (arXiv:2601.07226). https://arxiv.org/abs/2601.07226 | Reasoning-Modelle brechen mit störenden Passagen ebenfalls ein; nur Abstract geprüft, vor dem Zitieren Volltext lesen |
+
+Abgerufen am 18.10.2026 (Snapshot); Grundlage von [ADR 0038](../adr/0038-korpus-e2e.md). Commit, Daten und
+SHA-256 je Datei: `docs/corpus_snapshot.txt`; Umfang und Lizenz: [Korpus](corpus.md).
+
+| Kurzname | Quelle (APA 7) | Belegt |
+|----------|----------------|--------|
+| `testerarmy2026e2e` | TesterArmy, Inc. (2026). *e2e* (Commit ef977f4856da009cac26d78d2e9bb14e5991ee41, 17.10.2026) [Software und Dokumentation, Apache-2.0]. GitHub. https://github.com/tester-army/e2e/tree/ef977f4856da009cac26d78d2e9bb14e5991ee41/docs | Korpus des Experiments: Dokumentation unter `docs/` auf dem festen Commit (`config.CORPUS_COMMIT`) |

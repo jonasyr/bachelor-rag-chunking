@@ -8,7 +8,8 @@ missed closed-book, with an empty category for the classification. Calls the Ope
 
 The open-book context is a CORPUS_PROBE_CONTEXT_CHARS window around the probed sentence; the
 recorded runs used the start of the section (--recorded repeats that). Every result row keeps the
-model and system fingerprint the API reported; a run whose replies name more than one model stops.
+model and, as closed_fingerprint / open_fingerprint, the system_fingerprint the API reported per
+run; a run whose replies name more than one model stops.
 
 Usage: uv run python scripts/corpus_probe/run_probes.py NAME "PRODUCT (description)" [--recorded]
 """

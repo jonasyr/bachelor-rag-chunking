@@ -9,4 +9,5 @@ Strategies: ADR 0005 / `docs/explanation/research-design.md`; parameter values a
 - K1 = size-matched control (ADR 0026): kept out of `STRATEGY_IDS` (own `CONTROL_*` mappings), retrieval only
   (`retrieve.py --control`); `chunk("K1")` aborts if the corpus changed and `K1_CHUNK_SIZE` no longer matches the
   rule — then set the printed value in config.
+- K0 (ADR 0041) is no chunking strategy: answers without retrieval (`config.CONTROL_ANSWER_STRATEGIES`), no chunks.
 - C4 (semantic) only if the 09.11.2026 milestone (ground truth frozen) is met on time (ADR 0028).

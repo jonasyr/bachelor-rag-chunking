@@ -6,7 +6,8 @@
 
 Code of the bachelor's thesis "Einfluss von Chunking-Strategien auf die Retrieval- und Antwortqualität eines
 RAG-Systems für technische Projektdokumentation" (Jonas Weirauch, IU, submission 24.12.2026). A RAG pipeline on the
-documentation of the end-to-end testing tool e2e (ADR 0038; corpus switched from Vue.js, rebuild in progress) in which only the chunking strategy (C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
+documentation of the end-to-end testing tool e2e (ADR 0038, switched from Vue.js) in which only the chunking strategy
+(C1/C2/C3) varies. Status: [docs/plan.md#stand](docs/plan.md#stand).
 Public repo (DOI planned); used by the private PaperLab repo as submodule `code/`.
 
 ## Commands
@@ -23,9 +24,9 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 - All parameters (paths, chunk sizes, models, top-k, temperature) live only in `src/config.py`.
 - Invariants: only chunking varies; `temperature = 0`, `top_k = 5`; prompt constant (`docs/reference/prompts.md`); ground
   truth final before any evaluation (ADR 0006, 0014, 0017).
-- Strategy keys `C1`/`C2`/`C3`; strategy field values and IDs from `config.STRATEGY_IDS` (experiment C1–C3) or
-  `config.CONTROL_STRATEGIES` (control K1, ADR 0026); data formats exactly as in
-  `docs/reference/data-formats.md` (`questions.csv` includes `notes`).
+- Strategy keys `C1`/`C2`/`C3`; strategy field values and IDs from `config.STRATEGY_IDS` (experiment C1–C3),
+  `config.CONTROL_STRATEGIES` (control K1, ADR 0026) or `config.CONTROL_ANSWER_STRATEGIES` (control K0, ADR 0041);
+  data formats exactly as in `docs/reference/data-formats.md` (`questions.csv` includes `notes`).
 - Corpus, questions and answers in English; thesis text in German (lives in PaperLab).
 - Conventional Commits; no AI attribution lines. Never commit `.env`. Plans go to `docs/superpowers/plans/` (versioned).
 - Every change goes through a branch and a pull request; never push to `main` directly. Each PR gets a Codex review
@@ -40,6 +41,9 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 ### Experiment validity
 - Only the chunking strategy (C1/C2/C3) may differ between runs. Anything else that differs per strategy (corpus,
   prompt, model, `temperature`, `top_k`, questions, retrieval) breaks the experiment: P1 (ADR 0006, 0014).
+- The control K0 (`config.CONTROL_ANSWER_STRATEGIES`) differs by having no retrieval; that is the intended exception to
+  the rule above. K0 inside `STRATEGY_IDS` or in retrieval, or K0 answers with any prompt other than the closed-book
+  prompt of `src/config.py` (`CLOSED_BOOK_SYSTEM_PROMPT`, `CLOSED_BOOK_USER_TEMPLATE`), is P1 (ADR 0038, 0041).
 - The ground truth (`questions.csv`, `ground_truth.csv`) is final before any evaluation; a change that lets results
   feed back into questions, answers or relevance judgements is P1 (ADR 0017).
 - Chunks and sections share the token space of `src/tokens.py`, and a chunk's `text` is the exact slice of its
@@ -50,8 +54,9 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 ### Configuration and formats
 - A parameter hard-coded outside `src/config.py` (path, size, model, `top_k`, temperature) is P1.
 - Data artefacts deviating from `docs/reference/data-formats.md`, or strategy keys/IDs not taken from
-  `config.STRATEGY_IDS` (experiment C1–C3) or `config.CONTROL_STRATEGIES` (control K1, ADR 0026), are P1: later steps
-  and the thesis tables depend on them. K1 inside `STRATEGY_IDS` or in answer generation is P1.
+  `config.STRATEGY_IDS` (experiment C1–C3), `config.CONTROL_STRATEGIES` (control K1, ADR 0026) or
+  `config.CONTROL_ANSWER_STRATEGIES` (control K0, ADR 0041), are P1: later steps and the thesis tables depend on them.
+  K1 inside `STRATEGY_IDS` or in answer generation is P1.
 
 ### Secrets and privacy
 - `.env`, API keys and personal data (e-mail, matriculation number) never appear in committed files, logs or output;
@@ -67,6 +72,6 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/reference/configuration.md` — every key of `src/config.py` (meaning, ADR)
 - `docs/plan.md` — status (`#stand`), schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D38
+- `docs/adr/` — decisions D1–D42
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)

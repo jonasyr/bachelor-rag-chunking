@@ -9,6 +9,11 @@ size-matched control K1 (ADR 0026) and prints chunk size and context tokens per 
 
 Usage: uv run python scripts/difficulty_probe.py [SET_DIR]
 (SET_DIR defaults to config.PILOT_DIR = data/pilot; the hard set is data/pilot/hard)
+
+The pilot sets in data/pilot/ are historical: their ground truth carries Vue.js IDs (corpus before
+ADR 0038), while SECTIONS_FILE and the chunk files in data/processed/ now hold the e2e corpus. They
+only run against a rebuilt Vue corpus (vuejs/docs at 40aa88a, built with the code of commit
+4115ffc); a pilot set on e2e is still pending (docs/plan.md).
 """
 
 import csv

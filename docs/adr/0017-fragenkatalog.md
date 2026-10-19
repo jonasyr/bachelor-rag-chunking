@@ -2,7 +2,12 @@
 
 ## Status
 
-Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen); präzisiert durch [ADR 0027](0027-blinde-annotation.md) (Relevanz-Annotation blind vor jedem Retrieval); Typen, Klassen und Quoten in [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md), Einfrieren in [ADR 0030](0030-einfrieren-des-fragenkatalogs.md)
+Angenommen (D17 im Leitfaden; Quelle: Exposé/Baseline, übernommen); präzisiert durch
+[ADR 0027](0027-blinde-annotation.md) (Relevanz-Annotation blind vor jedem Retrieval); Typen, Klassen und Quoten in
+[ADR 0029](0029-fragetypen-und-konstruktionsklassen.md), Einfrieren in
+[ADR 0030](0030-einfrieren-des-fragenkatalogs.md); H1-Abschnitte in der Ground Truth:
+[ADR 0022](0022-h1-abschnitte-in-ground-truth.md); Closed-Book-Prüfung vor dem Einfrieren:
+[ADR 0040](0040-closed-book-pruefung.md)
 
 ## Kontext
 
