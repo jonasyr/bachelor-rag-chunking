@@ -29,6 +29,7 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `GROUND_TRUTH_FILE` | `data/evaluation/ground_truth.csv` | Referenzantworten und relevante Abschnitte | [ADR 0017](../adr/0017-fragenkatalog.md) |
 | `CATALOGUE_PLAN_FILE` | `data/evaluation/catalogue_plan.csv` | Stichprobenplan der Slots | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_FILE` | `data/evaluation/catalogue_review.csv` | Vorschläge und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CLOSED_BOOK_FILE` | `data/evaluation/closed_book_screen.csv` | Antworten ohne Kontext und Urteile | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
 | `CATALOGUE_FREEZE_FILE` | `data/evaluation/catalogue_freeze.json` | Freeze-Datensatz des Katalogs (Datum, Anzahlen, SHA-256) | [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `RETRIEVED_RESULTS_FILE` | `data/evaluation/retrieved_results.csv` | Top-k je Frage und Strategie | – |
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
@@ -130,6 +131,8 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `CATALOGUE_SLOT_FORMAT` | `"S{:02d}"` | Format der Slot-IDs im Plan (S01 … S48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_PLAN_STATUSES` | `("open", "used", "skipped", "reserve")` | Werte von `status` in `catalogue_plan.csv` | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_KINDS`, `CATALOGUE_REVIEW_DECISIONS` | `("missing_section", "wording", "fact", "class")`, `("open", "accepted", "rejected")` | Arten und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CLOSED_BOOK_VERDICTS` | `("", "hit", "miss")` | Urteil: offen, trifft den Kernpunkt, trifft ihn nicht | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
+| `CLOSED_BOOK_MIN_DEPENDENT_SHARE` | `Fraction(2, 3)` | Mindestanteil retrieval-abhängiger Fragen (aufgerundet: 32 von 48) | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `QUESTION_ID_PATTERN`, `QUESTION_ID_FORMAT` | `r"Q\d+"`, `"Q{:03d}"` | Muster vorhandener und Format neuer Frage-IDs (Editor) | – |
 | `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `e2e` (Produktname) | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 
@@ -148,6 +151,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung, wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht beide) | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
+| `CLOSED_BOOK_SYSTEM_PROMPT`, `CLOSED_BOOK_USER_TEMPLATE` | Texte | Prompt der Closed-Book-Prüfung und von K0, wörtlich wie in [Prompts](prompts.md#closed-book-prompt-prüfung-und-k0) | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
 
 ## Evaluation
 

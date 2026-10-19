@@ -47,24 +47,36 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    annehmen oder mit Grund ablehnen. Ein angenommener fehlender Abschnitt wird der Annotation hinzugefügt; Formulierungen
    und Fakten ändert man selbst im Tab „Write“.
 
-4. Jederzeit prüfen:
+4. Nach jedem Block auch die Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)): Das
+   Antwortmodell beantwortet jede neue oder geänderte Frage ohne Kontext (ruft die API auf, wenige Cent je Block):
+
+   ```bash
+   uv run python src/catalogue.py screen
+   ```
+
+   Im Tab „Closed-book“ je Antwort entscheiden: „Hits the core point“, wenn sie den Kernpunkt der Referenzantwort
+   vollständig trifft, sonst „Misses it“ (auch bei teilweise richtig). Höchstens 16 von 48 Fragen dürfen treffen; die
+   Seitenleiste zeigt den Stand. Eine getroffene Frage darf bleiben; wer sie umformuliert, lässt `screen` erneut laufen.
+
+5. Jederzeit prüfen:
 
    ```bash
    uv run python src/catalogue.py check --draft
    ```
 
    `ERROR` (Format, unbekannte Werte oder IDs, veränderter Plan) sofort beheben; `WARNING` (Quoten, Bereiche,
-   Klassenregeln, Dubletten, offene Vorschläge) zeigt, was bis zum Ende fehlt. Kein Retrieval und keine
-   Embedding-Suche auf den Fragen, bevor der Katalog eingefroren ist.
+   Klassenregeln, Dubletten, offene Vorschläge, ungeprüfte oder unbeurteilte Closed-Book-Antworten) zeigt, was bis
+   zum Ende fehlt. Kein Retrieval und keine Embedding-Suche auf den Fragen, bevor der Katalog eingefroren ist.
 
-5. Wenn alle 48 Fragen fertig und alle Vorschläge entschieden sind: streng prüfen, einfrieren und alle Katalogdateien
-   zusammen committen.
+6. Wenn alle 48 Fragen fertig und alle Vorschläge und Closed-Book-Antworten entschieden sind: streng prüfen,
+   einfrieren und alle Katalogdateien zusammen committen.
 
    ```bash
    uv run python src/catalogue.py check
    uv run python src/catalogue.py freeze
    git add data/evaluation/questions.csv data/evaluation/ground_truth.csv data/evaluation/catalogue_plan.csv \
-     data/evaluation/catalogue_review.csv data/evaluation/catalogue_freeze.json
+     data/evaluation/catalogue_review.csv data/evaluation/closed_book_screen.csv \
+     data/evaluation/catalogue_freeze.json
    git commit -m "chore(data): Fragenkatalog eingefroren"
    ```
 
