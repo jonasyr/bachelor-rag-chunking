@@ -2,7 +2,9 @@
 
 ## Status
 
-Angenommen (17.10.2026; konkretisiert [ADR 0016](0016-modell-neutralitaet.md), setzt [ADR 0014](0014-temperatur-und-topk.md) um)
+Angenommen (17.10.2026; konkretisiert [ADR 0016](0016-modell-neutralitaet.md), setzt
+[ADR 0014](0014-temperatur-und-topk.md) um; ergänzt durch [ADR 0041](0041-kontrolle-k0.md) (K0 im selben Lauf)); Korpus
+seit [ADR 0038](0038-korpus-e2e.md) e2e: die Konsequenz, der Wissensstand umfasse Vue.js, betrifft nur den Vue-Korpus
 
 ## Kontext
 

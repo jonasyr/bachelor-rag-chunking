@@ -3,7 +3,10 @@
 ## Status
 
 Angenommen (17.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md), [ADR 0032](0032-blinde-rubrik-bewertung.md) und
-[ADR 0034](0034-bewertung-in-der-app.md); verpflichtend für neue Scaffolds: [ADR 0036](0036-regelbasierte-bewertung-verpflichtend.md); Prüfregeln präzisiert: [ADR 0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md))
+[ADR 0034](0034-bewertung-in-der-app.md); verpflichtend für neue Scaffolds:
+[ADR 0036](0036-regelbasierte-bewertung-verpflichtend.md); Prüfregeln präzisiert:
+[ADR 0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md); für K0 ergänzt durch
+[ADR 0041](0041-kontrolle-k0.md) (Regeln ohne `grounded`))
 
 ## Kontext
 

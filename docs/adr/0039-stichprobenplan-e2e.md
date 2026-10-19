@@ -4,7 +4,8 @@
 
 Angenommen (18.10.2026; ersetzt die Slotzahlen von [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md) und die
 Bereichsuntergrenzen von [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md); folgt aus
-[ADR 0038](0038-korpus-e2e.md))
+[ADR 0038](0038-korpus-e2e.md)); „nie getunt“ (Kontext) steht nicht in ADR 0031, sondern im Kommentar zu
+`config.CATALOGUE_SEED` (Commit b57fc65, 15.10.2026)
 
 ## Kontext
 

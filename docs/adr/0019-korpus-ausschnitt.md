@@ -2,7 +2,16 @@
 
 ## Status
 
-Angenommen (13.10.2026); Ausschnitt und Commit ersetzt durch [ADR 0025](0025-korpus-guide-api-styleguide.md) (14.10.2026) und den Korpus e2e ([ADR 0038](0038-korpus-e2e.md), 18.10.2026), übrige Regeln gelten weiter; Abschnitte um H1 ergänzt durch [ADR 0022](0022-h1-abschnitte-in-ground-truth.md); Sensitivitätsregel (Mindestüberlappung) geändert durch [ADR 0026](0026-c3-vergleichbarkeit.md) (ursprünglich: konkretisiert [ADR 0001](0001-korpus-vuejs.md), ersetzt den Vorschlag der vier Unterordner in [Korpus](../reference/corpus.md))
+Angenommen (13.10.2026); Ausschnitt und Commit ersetzt durch [ADR 0025](0025-korpus-guide-api-styleguide.md)
+(14.10.2026) und den Korpus e2e ([ADR 0038](0038-korpus-e2e.md), 18.10.2026); mit dem Korpus e2e entfällt die Regel „nur
+Composition API“ (`options-api`-Blöcke entfernen, [ADR 0038](0038-korpus-e2e.md)), die Benennung aus expliziten
+`{#…}`-Ankern ersetzt [ADR 0042](0042-mdx-umwandlung.md) (Anker der Website, selbst berechnet); weiter gelten
+`section_id = {doc_id}#{anchor}`, die Relevanzregel (jede Überlappung) mit Sensitivitätsprüfung und die Token-Zählung
+mit `tiktoken` 0.13.0 und `cl100k_base`; Abschnitte um H1 ergänzt durch
+[ADR 0022](0022-h1-abschnitte-in-ground-truth.md); Sensitivitätsregel (Mindestüberlappung) geändert durch
+[ADR 0026](0026-c3-vergleichbarkeit.md); Playground-URLs ergänzt durch [ADR 0020](0020-playground-urls-kuerzen.md),
+gegenstandslos durch [ADR 0038](0038-korpus-e2e.md) (ursprünglich: konkretisiert [ADR 0001](0001-korpus-vuejs.md),
+ersetzt den Vorschlag der vier Unterordner in [Korpus](../reference/corpus.md))
 
 ## Kontext
 

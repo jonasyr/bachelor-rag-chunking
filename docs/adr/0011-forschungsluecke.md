@@ -2,7 +2,9 @@
 
 ## Status
 
-Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
+Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline); „Öl und Gas“ im Kontext ist das Beispiel aus der
+Quelle `taiwo2026chunking`; maßgeblich für die Domäne ist der Wortlaut des Exposés, „unternehmensinterne technische
+Dokumente“ ([Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen))
 
 ## Kontext
 
