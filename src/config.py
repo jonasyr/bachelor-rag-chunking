@@ -179,8 +179,12 @@ QUESTION_TYPES = {
 }
 QUESTION_CLASSES = {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}
 # Minimum number of questions with a relevant section in an area; a question counts for every area
-# it touches (D29). Vue areas until step 4 sets the e2e quotas (plan.md).
-AREA_MIN_QUESTIONS = {"api": 12, "style-guide": 3}
+# it touches (D29). Equal to the area's slots (ADR 0039).
+AREA_MIN_QUESTIONS = {
+    "Get started": 2, "Platforms": 2, "Features": 2, "Models and agents": 2, "Run in CI": 2,
+    "Hosted browsers and devices": 2, "Extend": 1, "Deep dive": 3, "Migrate": 4, "Test API": 7,
+    "Project": 12, "Web": 2, "Mobile": 2, "Engine contract": 4, "Examples": 1,
+}  # fmt: skip
 DETAIL_MAX_ANSWER_WORDS = 30  # `detail`: reference answer at most this many words (D29)
 # Relevant sections per class (D29): `multi-section` at least this many independent sections
 # (a section inside another listed one does not count); single/detail/paraphrase exactly this many.
@@ -195,9 +199,14 @@ CORPUS_SITE_URL = "https://e2e.tester.army/docs"
 # Random sampling plan (D31): one starting section per slot, drawn by text length from the
 # innermost H2/H3 sections of an area with SHA-256 of "{seed}:{area}:{k}" (version-independent).
 CATALOGUE_SEED = 20261014  # fixed on 14.10.2026, the date of the decision; never tuned
-# Vue areas until step 4 sets the e2e slots (plan.md)
-CATALOGUE_AREA_SLOTS = {"api": 12, "style-guide": 3, "guide": 33}  # sums to the catalogue size
-CATALOGUE_RESERVE = {"api": 12, "style-guide": 3, "guide": 33}  # replacement sections per area
+# Slots per area (ADR 0039): share of the corpus tokens, every area at least 1, the rest by largest
+# remainder; written as literals so a corpus change cannot shift them. Sums to the catalogue size.
+CATALOGUE_AREA_SLOTS = {
+    "Get started": 2, "Platforms": 2, "Features": 2, "Models and agents": 2, "Run in CI": 2,
+    "Hosted browsers and devices": 2, "Extend": 1, "Deep dive": 3, "Migrate": 4, "Test API": 7,
+    "Project": 12, "Web": 2, "Mobile": 2, "Engine contract": 4, "Examples": 1,
+}  # fmt: skip
+CATALOGUE_RESERVE = dict(CATALOGUE_AREA_SLOTS)  # replacement sections per area (ADR 0039)
 CATALOGUE_SKIP_REASONS = ("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")
 CATALOGUE_SKIP_MIN_TOKENS = 50  # `too-short`: starting section under this many tokens
 CATALOGUE_PLAN_STATUSES = ("open", "used", "skipped", "reserve")
@@ -221,11 +230,11 @@ CATALOGUE_PREFIX_MIN = 4
 CATALOGUE_PREFIX_SLACK = 3
 CATALOGUE_STOPWORDS = (
     "a", "about", "am", "an", "and", "are", "as", "at", "be", "been", "being", "but", "by",
-    "can", "could", "did", "do", "does", "done", "for", "from", "had", "has", "have", "he",
+    "can", "could", "did", "do", "does", "done", "e2e", "for", "from", "had", "has", "have", "he",
     "here", "how", "i", "if", "in", "into", "is", "it", "its", "may", "me", "might", "must",
     "my", "no", "not", "of", "on", "onto", "or", "our", "over", "shall", "she", "should", "so",
     "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "those",
-    "to", "under", "v", "vue", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
+    "to", "under", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
     "whose", "why", "will", "with", "without", "would", "you", "your",
 )  # fmt: skip
 

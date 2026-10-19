@@ -5,10 +5,11 @@ import json
 import numpy as np
 import pytest
 
+import catalogue
 import tokens
 from catalogue import load_corpus
 from catalogue_plan import PLAN_HEADER
-from config import AREA_MIN_QUESTIONS, QUESTION_CLASSES, QUESTION_TYPES
+from config import QUESTION_CLASSES, QUESTION_TYPES
 from embedding_client import EmbeddingResult
 from preprocess import clean_markdown, section_spans
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
@@ -81,6 +82,16 @@ def build_corpus(tmp_path, pages):
     return docs_file, sections_file
 
 
+# Area minimums for the three-area test corpus; the configured e2e minimums (ADR 0039) need the
+# real corpus and are checked in test_catalogue_plan.py and test_corpus_integration.py.
+TEST_AREA_MIN = {"api": 12, "style-guide": 3}
+
+
+@pytest.fixture(autouse=True)
+def test_area_minimums(monkeypatch):
+    monkeypatch.setattr(catalogue, "AREA_MIN_QUESTIONS", TEST_AREA_MIN)
+
+
 @pytest.fixture
 def corpus_files(tmp_path):
     return build_corpus(tmp_path, PAGES)
@@ -114,9 +125,9 @@ def valid_rows():
     classes = [c for c, n in QUESTION_CLASSES.items() for _ in range(n)]
     rows = []
     for i, (qtype, cls) in enumerate(zip(types, classes, strict=True)):
-        if i < AREA_MIN_QUESTIONS["api"]:
+        if i < TEST_AREA_MIN["api"]:
             first = "D001#ref"
-        elif i < AREA_MIN_QUESTIONS["api"] + AREA_MIN_QUESTIONS["style-guide"]:
+        elif i < TEST_AREA_MIN["api"] + TEST_AREA_MIN["style-guide"]:
             first = "D003#multi-word"
         else:
             first = "D002#once"

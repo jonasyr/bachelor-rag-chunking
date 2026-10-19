@@ -15,7 +15,13 @@ from catalogue_plan import (
     slot_row,
     write_plan,
 )
-from config import CATALOGUE_AREA_SLOTS, CATALOGUE_RESERVE, QUESTION_CLASSES
+from config import (
+    AREA_MIN_QUESTIONS,
+    CATALOGUE_AREA_SLOTS,
+    CATALOGUE_RESERVE,
+    CORPUS_AREAS,
+    QUESTION_CLASSES,
+)
 
 SMALL = {
     "slots": {"api": 1, "style-guide": 1, "guide": 1},
@@ -29,8 +35,21 @@ def test_config_slots_match_the_catalogue():
     assert set(CATALOGUE_RESERVE) == set(CATALOGUE_AREA_SLOTS)
 
 
+def test_area_quotas_follow_the_corpus_areas():
+    # ADR 0039: slots by token share, at least 1; reserve and minimum equal the slots
+    for quotas in (CATALOGUE_AREA_SLOTS, CATALOGUE_RESERVE, AREA_MIN_QUESTIONS):
+        assert list(quotas) == list(CORPUS_AREAS)
+    assert CATALOGUE_RESERVE == CATALOGUE_AREA_SLOTS
+    assert AREA_MIN_QUESTIONS == CATALOGUE_AREA_SLOTS
+    assert min(CATALOGUE_AREA_SLOTS.values()) >= 1
+    assert CATALOGUE_AREA_SLOTS["Project"] == 12 and CATALOGUE_AREA_SLOTS["Test API"] == 7
+
+
 def test_candidates_are_innermost_h2_h3_per_area(corpus):
-    ids = {area: [s["section_id"] for s in secs] for area, secs in candidates(corpus).items()}
+    ids = {
+        area: [s["section_id"] for s in secs]
+        for area, secs in candidates(corpus, SMALL["slots"]).items()
+    }
     assert ids == {
         "api": ["D001#ref", "D001#computed"],
         "style-guide": ["D003#multi-word"],
@@ -39,14 +58,14 @@ def test_candidates_are_innermost_h2_h3_per_area(corpus):
 
 
 def test_draw_area_maps_token_positions_to_sections(corpus, monkeypatch):
-    secs = candidates(corpus)["api"]
+    secs = candidates(corpus, SMALL["slots"])["api"]
     first = secs[0]["end_token"] - secs[0]["start_token"]
     monkeypatch.setattr(catalogue_plan, "_hash_int", lambda text: first)  # position = start of 2nd
     assert [s["section_id"] for s in draw_area(1, "api", secs, 1)] == ["D001#computed"]
 
 
 def test_draw_area_draws_distinct_sections_and_refuses_too_many(corpus):
-    secs = candidates(corpus)["api"]
+    secs = candidates(corpus, SMALL["slots"])["api"]
     drawn = draw_area(7, "api", secs, 2)
     assert sorted(s["section_id"] for s in drawn) == ["D001#computed", "D001#ref"]
     with pytest.raises(ValueError, match="only 2 candidate sections"):

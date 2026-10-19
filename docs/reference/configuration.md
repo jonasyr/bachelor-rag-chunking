@@ -110,7 +110,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 |---|---|---|---|
 | `QUESTION_TYPES` | `{"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6}` | erlaubte Werte von `type` mit Quote | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `QUESTION_CLASSES` | `{"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12}` | erlaubte Werte von `difficulty` (Konstruktionsklasse) mit Quote; Summe 48 | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `AREA_MIN_QUESTIONS` | `{"api": 12, "style-guide": 3}` | Mindestzahl Fragen mit einem relevanten Abschnitt im Bereich; noch Vue-Bereiche, Schritt 4 setzt die e2e-Quoten ([Plan](../plan.md#stand)) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `AREA_MIN_QUESTIONS` | 15 Bereiche, gleich den Slots ([Korpus](corpus.md#bereiche)) | Mindestzahl Fragen mit einem relevanten Abschnitt im Bereich | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 | `DETAIL_MAX_ANSWER_WORDS` | `30` | `detail`: Referenzantwort höchstens so viele Wörter | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `MULTI_SECTION_MIN_SECTIONS` | `2` | `multi-section`: mindestens so viele unabhängige relevante Abschnitte (ein Abschnitt innerhalb eines anderen angegebenen zählt nicht) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `SINGLE_CLASS_SECTIONS` | `1` | `single`, `detail`, `paraphrase`: genau so viele relevante Abschnitte | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
@@ -123,15 +123,15 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_SEED` | `20261014` | Seed des Stichprobenplans (Tag der Entscheidung; nie angepasst) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
-| `CATALOGUE_AREA_SLOTS` | `{"api": 12, "style-guide": 3, "guide": 33}` | Slots je Bereich (Summe 48); noch Vue-Bereiche bis Schritt 4 | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
-| `CATALOGUE_RESERVE` | `{"api": 12, "style-guide": 3, "guide": 33}` | Reserveabschnitte je Bereich für Sprünge | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CATALOGUE_AREA_SLOTS` | 15 Bereiche nach Tokenanteil, mindestens 1 ([Korpus](corpus.md#bereiche)) | Slots je Bereich (Summe 48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
+| `CATALOGUE_RESERVE` | gleich `CATALOGUE_AREA_SLOTS` | Reserveabschnitte je Bereich für Sprünge | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 | `CATALOGUE_SKIP_REASONS` | `("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")` | erlaubte Gründe für einen Sprung | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_MIN_TOKENS` | `50` | `too-short` nur für Abschnitte unter so vielen Tokens | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SLOT_FORMAT` | `"S{:02d}"` | Format der Slot-IDs im Plan (S01 … S48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_PLAN_STATUSES` | `("open", "used", "skipped", "reserve")` | Werte von `status` in `catalogue_plan.csv` | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_KINDS`, `CATALOGUE_REVIEW_DECISIONS` | `("missing_section", "wording", "fact", "class")`, `("open", "accepted", "rejected")` | Arten und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `QUESTION_ID_PATTERN`, `QUESTION_ID_FORMAT` | `r"Q\d+"`, `"Q{:03d}"` | Muster vorhandener und Format neuer Frage-IDs (Editor) | – |
-| `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `v` (Präfix der Direktiven) und `vue` | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `e2e` (Produktname) | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 
 ## LLM und Embedding
 

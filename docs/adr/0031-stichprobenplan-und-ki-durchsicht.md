@@ -3,7 +3,7 @@
 ## Status
 
 Angenommen (14.10.2026; ergänzt [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md) und
-[ADR 0030](0030-einfrieren-des-fragenkatalogs.md))
+[ADR 0030](0030-einfrieren-des-fragenkatalogs.md); Slotzahlen ersetzt durch [ADR 0039](0039-stichprobenplan-e2e.md))
 
 ## Kontext
 

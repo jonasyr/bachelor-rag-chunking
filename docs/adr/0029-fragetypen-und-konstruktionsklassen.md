@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md))
+Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md); Bereichsuntergrenzen ersetzt durch
+[ADR 0039](0039-stichprobenplan-e2e.md))
 
 ## Kontext
 
