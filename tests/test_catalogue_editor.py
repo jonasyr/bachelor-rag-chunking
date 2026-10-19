@@ -23,6 +23,7 @@ def app(corpus_files, corpus, tmp_path, monkeypatch, pilot):
         "CATALOGUE_PLAN_FILE": tmp_path / "catalogue_plan.csv",
         "CATALOGUE_REVIEW_FILE": tmp_path / "catalogue_review.csv",
         "CATALOGUE_FREEZE_FILE": tmp_path / "catalogue_freeze.json",
+        "CLOSED_BOOK_FILE": tmp_path / "closed_book_screen.csv",
         "DOCUMENTS_FILE": docs,
         "SECTIONS_FILE": sections,
         "PILOT_DIR": pilot,
@@ -167,3 +168,76 @@ def test_the_source_is_formatted_by_default_and_raw_on_request(app):
     at.segmented_control(key="view").set_value("Source text").run()
     assert not at.exception
     assert at.segmented_control(key="view").value == "Source text"
+
+
+def save_and_screen(at, paths):
+    """Write Q001 through the editor, then screen it with a fake completer."""
+    from test_closed_book import FakeCompleter
+
+    import closed_book
+
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A reactive ref object.")
+    at.button(key="save").click().run()
+    questions, truth = store.load_catalogue()
+    closed_book.screen(questions, truth, FakeCompleter(), paths["CLOSED_BOOK_FILE"], [])
+    at.run()
+
+
+def test_closed_book_tab_asks_to_screen_first(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A ref.")
+    at.button(key="save").click().run()
+    assert any("catalogue.py screen" in i.value for i in at.info)
+
+
+def test_closed_book_verdict_is_saved(app):
+    import closed_book
+
+    at, paths = app
+    save_and_screen(at, paths)
+    assert any("Guess 1." in h.proto.body for h in at.get("html"))
+    at.text_input(key="cb_note_Q001").input("knows the return value")
+    at.button(key="cb_hit_Q001").click().run()
+    assert not at.exception
+    row = closed_book.read_screen(paths["CLOSED_BOOK_FILE"])[0]
+    assert row["core_point"] == "hit" and row["note"] == "knows the return value"
+    assert any(
+        "0 retrieval-dependent (at least 32), 1 known" in c.value for c in at.sidebar.caption
+    )
+
+
+def test_a_verdict_can_be_changed(app):
+    import closed_book
+
+    at, paths = app
+    save_and_screen(at, paths)
+    at.button(key="cb_miss_Q001").click().run()
+    at.button(key="cb_flip_Q001").click().run()
+    assert not at.exception
+    assert closed_book.read_screen(paths["CLOSED_BOOK_FILE"])[0]["core_point"] == "hit"
+
+
+def test_closed_book_tab_is_read_only_when_frozen(app):
+    at, paths = app
+    save_and_screen(at, paths)
+    paths["CATALOGUE_FREEZE_FILE"].write_text("{}", encoding="utf-8")
+    at.run()
+    assert at.button(key="cb_hit_Q001").disabled and at.button(key="cb_miss_Q001").disabled
+
+
+def test_judge_closed_book_refuses_after_the_freeze(app):
+    at, paths = app
+    save_and_screen(at, paths)
+    paths["CATALOGUE_FREEZE_FILE"].write_text("{}", encoding="utf-8")
+    with pytest.raises(PermissionError, match="frozen"):
+        store.judge_closed_book("Q001", "hit", "", "2026-10-21")
+
+
+def test_write_tab_shows_no_model_answer(app):
+    at, paths = app
+    save_and_screen(at, paths)
+    at.selectbox(key="slot").select("S01").run()
+    write_tab_html = [h.proto.body for h in at.tabs[0].get("html")]
+    assert not any("Guess 1." in body for body in write_tab_html)

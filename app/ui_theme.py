@@ -58,6 +58,11 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
 .checks {list-style: none; padding-left: 0; margin: 0.25rem 0 0.75rem;}
 .checks li {margin: 0.15rem 0;}
 .checks .ok {color: var(--ok);} .checks .problem {color: var(--problem);}
+.cb-reference {color: var(--muted); border-left: 1px solid var(--line); padding-left: 0.85rem;
+  white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 0.5rem;}
+.cb-answer {font-family: "Source Serif", "Source Serif 4", Georgia, serif; font-size: 1.02rem;
+  line-height: 1.6; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 6px; padding: 0.75rem 1.25rem; white-space: pre-wrap; overflow-wrap: anywhere;}
 ::selection {background: var(--select);}
 </style>
 """

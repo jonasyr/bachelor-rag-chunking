@@ -1,8 +1,8 @@
 """Catalogue page (ADR 0029, 0031): write and annotate the question catalogue.
 
-Shows only the corpus and the catalogue files; never chunks, strategies, retrieval results or
-scores (ADR 0027). All reading and writing goes through src/catalogue_store.py. Opened through
-the router app/catalogue_editor.py.
+Shows only the corpus, the catalogue files and the closed-book answers (ADR 0040); never chunks,
+strategies, retrieval results or scores (ADR 0027). All reading and writing goes through
+src/catalogue_store.py. Opened through the router app/catalogue_editor.py.
 """
 
 import html
@@ -18,6 +18,7 @@ import catalogue  # noqa: E402
 import catalogue_plan  # noqa: E402
 import catalogue_review  # noqa: E402
 import catalogue_store as store  # noqa: E402
+import closed_book  # noqa: E402
 from config import (  # noqa: E402
     AREA_MIN_QUESTIONS,
     CATALOGUE_SKIP_REASONS,
@@ -54,7 +55,13 @@ def source_page(
     st.html(f'<div class="heading-path">{path}</div><div class="formatted">{body}</div>')
 
 
-def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None:
+def sidebar(
+    questions: list[dict],
+    truth: dict,
+    plan: list[dict],
+    review: list[dict],
+    screen_rows: list[dict],
+) -> None:
     total = sum(QUESTION_CLASSES.values())
     with st.sidebar:
         st.markdown(f"**{len(questions)} of {total} questions**")
@@ -76,6 +83,8 @@ def sidebar(questions: list[dict], plan: list[dict], review: list[dict]) -> None
         for line in catalogue_plan.plan_summary(plan):
             st.caption(line)
         st.caption(catalogue_review.review_summary(review))
+        counts = closed_book.counts(screen_rows, questions, truth)
+        st.caption(closed_book.summary(counts, total))
 
 
 def checks(corpus, row, question, answer, sections, questions, qid) -> list[tuple[bool, str]]:
@@ -341,6 +350,64 @@ def review_tab(corpus, review: list[dict], questions: list[dict], frozen: bool) 
                 st.markdown(f"{r['question_id']}, {r['kind']}: {r['decision']} ({reason})")
 
 
+VERDICT_LABELS = {"hit": "Hits the core point", "miss": "Misses it"}
+
+
+def closed_book_tab(screen_rows, questions, truth, frozen: bool) -> None:
+    """Jonas' verdict on each answer without context (ADR 0040); the editor never calls the API."""
+    rows = {r["question_id"]: r for r in screen_rows}
+    found = closed_book.states(screen_rows, questions, truth)
+    unscreened = [qid for qid, s in found.items() if s == closed_book.NOT_SCREENED]
+    pending = [q for q in questions if found[q["question_id"]] == closed_book.NOT_JUDGED]
+    judged = [q for q in questions if found[q["question_id"]] in VERDICT_LABELS]
+    if unscreened:
+        st.info(
+            f"{len(unscreened)} question(s) without an answer yet: run "
+            "`uv run python src/catalogue.py screen`."
+        )
+    elif not pending and questions:
+        st.info("Every question is judged.")
+    today = date.today().isoformat()
+
+    def record(qid: str, verdict: str, note: str) -> None:
+        try:
+            store.judge_closed_book(qid, verdict, note, today)
+            st.rerun()
+        except (ValueError, PermissionError) as error:
+            st.error(str(error))
+
+    for q in pending:
+        qid = q["question_id"]
+        with st.container(border=True):
+            st.markdown(f"**{qid}**: {q['question']}")
+            reference = html.escape(truth.get(qid, {}).get("expected_answer", ""))
+            st.html(f'<div class="cb-reference">Reference answer: {reference}</div>')
+            st.caption("Answer without context")
+            st.html(f'<div class="cb-answer">{html.escape(rows[qid]["answer"])}</div>')
+            note = st.text_input("Note", key=f"cb_note_{qid}") or ""
+            a, b = st.columns(2)
+            if a.button(VERDICT_LABELS["hit"], key=f"cb_hit_{qid}", disabled=frozen):
+                record(qid, "hit", note)
+            if b.button(VERDICT_LABELS["miss"], key=f"cb_miss_{qid}", disabled=frozen):
+                record(qid, "miss", note)
+    if judged:
+        with st.expander(f"Judged ({len(judged)})"):
+            for q in judged:
+                qid, verdict = q["question_id"], found[q["question_id"]]
+                other = "miss" if verdict == "hit" else "hit"
+                note = rows[qid]["note"]
+                st.markdown(
+                    f"**{qid}** {VERDICT_LABELS[verdict].lower()}: {q['question']}"
+                    + (f" ({note})" if note else "")
+                )
+                if st.button(
+                    f"Change to: {VERDICT_LABELS[other].lower()}",
+                    key=f"cb_flip_{qid}",
+                    disabled=frozen,
+                ):
+                    record(qid, other, note)
+
+
 def unknown_sections(corpus, plan, truth, review) -> list[str]:
     """Section IDs in the plan, the ground truth or the review that the corpus does not have."""
     ids = {r["section_id"] for r in plan}
@@ -358,6 +425,11 @@ def main() -> None:
         return
     questions, truth = store.load_catalogue()
     review = catalogue_review.read_review(store.CATALOGUE_REVIEW_FILE)
+    try:
+        screen_rows = closed_book.read_screen(store.CLOSED_BOOK_FILE)
+    except ValueError as error:
+        st.error(str(error))
+        return
     unknown = unknown_sections(corpus, plan, truth, review)
     if unknown:
         st.error(
@@ -366,15 +438,28 @@ def main() -> None:
         )
         return
     frozen = store.is_frozen()
-    sidebar(questions, plan, review)
+    sidebar(questions, truth, plan, review, screen_rows)
     if frozen:
         st.info("The catalogue is frozen (ADR 0030). You can read it, but not change it.")
     open_count = sum(1 for r in review if r["decision"] == "open")
-    write, rev = st.tabs(["Write", f"Review ({open_count})" if open_count else "Review"])
+    unjudged = sum(
+        1
+        for s in closed_book.states(screen_rows, questions, truth).values()
+        if s == closed_book.NOT_JUDGED
+    )
+    write, rev, cb = st.tabs(
+        [
+            "Write",
+            f"Review ({open_count})" if open_count else "Review",
+            f"Closed-book ({unjudged})" if unjudged else "Closed-book",
+        ]
+    )
     with write:
         write_tab(corpus, plan, questions, truth, frozen)
     with rev:
         review_tab(corpus, review, questions, frozen)
+    with cb:
+        closed_book_tab(screen_rows, questions, truth, frozen)
 
 
 main()
