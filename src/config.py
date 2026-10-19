@@ -43,6 +43,7 @@ CLOSED_BOOK_FILE = (
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
+GENERATED_ANSWERS_CONTROL_FILE = DATA_EVAL / "generated_answers_control.csv"  # control K0 (D41)
 GENERATION_RUNS_FILE = DATA_EVAL / "generation_runs.jsonl"  # one line per run of generate.py (D33)
 SCORES_FILE = DATA_EVAL / "scores.csv"
 # Blind rubric scoring (D32): the rater fills the sheet while reading the packet; the key that maps
@@ -55,6 +56,11 @@ KEY_POINTS_FILE = (
     DATA_EVAL / "key_points.csv"
 )  # key points per question, frozen before scoring (D35)
 SCORING_CHECKS_FILE = DATA_EVAL / "scoring_checks.csv"  # checks behind every derived score (D35)
+# Control K0 (D41): own scoring set, scored after C1-C3 with the same frozen key points
+SCORING_ITEMS_CONTROL_FILE = DATA_EVAL / "scoring_items_control.jsonl"
+SCORING_SHEET_CONTROL_FILE = DATA_EVAL / "scoring_sheet_control.csv"
+SCORING_CHECKS_CONTROL_FILE = DATA_EVAL / "scoring_checks_control.csv"
+SCORES_CONTROL_FILE = DATA_EVAL / "scores_control.csv"
 # Retrieval metrics per question, strategy and relevance rule (src/evaluate_retrieval.py, D12)
 RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores.csv"
 CONTROL_RETRIEVAL_SCORES_FILE = DATA_EVAL / "retrieval_scores_control.csv"  # control K1 (D26)
@@ -113,6 +119,9 @@ C3_MIN_TOKENS = 50  # floor: shorter segments merge into a neighbour first (D21)
 K1_CHUNK_SIZE = 375  # tokens; rounded mean of the C3 chunks at ef977f4, measured 18.10.2026
 K1_OVERLAP = 0
 CONTROL_STRATEGIES = {"K1": f"fixed_{K1_CHUNK_SIZE}_no_overlap"}
+# Control K0 (D38, D41): the same questions answered without retrieval (closed-book prompt, D40).
+# Not a chunking strategy: not in STRATEGY_IDS, no chunks; used by generate.py and the K0 scoring.
+CONTROL_ANSWER_STRATEGIES = {"K0": "closed_book"}
 
 STRATEGY_IDS = {
     "C1": "fixed_500_no_overlap",
@@ -294,6 +303,8 @@ Answer:"""
 # Evaluation
 # ---------------------------------------------------------------------------
 RUBRIC_CRITERIA = ["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]
+# criteria K0 and C1-C3 share (D41): groundedness needs excerpts, which K0 does not have
+CONTROL_CRITERIA = ["correctness", "completeness", "no_hallucination", "clarity"]
 RUBRIC_MAX_SCORE = 2
 KEY_POINTS_MAX = 4  # key points per question; point 1 is the core point (D35)
 RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completeness 1 (D35)

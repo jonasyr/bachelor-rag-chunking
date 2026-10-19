@@ -18,7 +18,7 @@ from config import (
 )
 from generate import ANSWERS_HEADER, generate, pilot_paths
 from llm_client import Completion
-from prompt import context, messages
+from prompt import closed_book_messages, context, messages
 from retrieve import GROUND_TRUTH_HEADER, HEADER, QUESTIONS_HEADER
 from run_log import sha256_of
 
@@ -56,6 +56,18 @@ def write_csv(path, header, rows):
         writer.writerow(header)
         writer.writerows(rows)
     return path
+
+
+class CutOffAt(FakeCompleter):
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def __call__(self, prompt):
+        answer = super().__call__(prompt)
+        if len(self.calls) == self.number:
+            return dataclasses.replace(answer, finish_reason="length")
+        return answer
 
 
 def read(path):
@@ -114,6 +126,7 @@ def files(tmp_path):
         "freeze_file": tmp_path / "catalogue_freeze.json",
         "chunk_files": {key: chunk_files[key] for key in STRATEGY_IDS},
         "out_file": tmp_path / "generated_answers.csv",
+        "control_file": tmp_path / "generated_answers_control.csv",
         "runs_file": tmp_path / "runs.jsonl",
         "retrieval_runs_file": tmp_path / "retrieval_runs.jsonl",
         "control_chunk_file": chunk_files["K1"],
@@ -202,8 +215,9 @@ def test_run_log_records_versions_inputs_and_cost(files):
     run(files)
     (record,) = runs(files)
     count = len(QUESTIONS) * len(STRATEGIES)
-    prompt_tokens = sum(1000 + n for n in range(1, count + 1))
-    completion_tokens = sum(100 + n for n in range(1, count + 1))
+    calls = count + len(QUESTIONS)  # C1-C3, then K0 (ADR 0041)
+    prompt_tokens = sum(1000 + n for n in range(1, calls + 1))
+    completion_tokens = sum(100 + n for n in range(1, calls + 1))
     assert record["step"] == "generate"
     assert record["model"] == LLM_MODEL
     assert record["model_reported"] == "gpt-6-luna-2026-05-18"
@@ -310,7 +324,10 @@ def test_main_catalogue_must_be_frozen(files, monkeypatch):
 def test_run_log_records_the_checksum_of_the_answers(files):
     run(files)
     (record,) = runs(files)
-    assert record["outputs_sha256"] == {"generated_answers.csv": sha256_of(files["out_file"])}
+    assert record["outputs_sha256"] == {
+        "generated_answers.csv": sha256_of(files["out_file"]),
+        "generated_answers_control.csv": sha256_of(files["control_file"]),
+    }
 
 
 def test_retrieval_without_a_run_record_is_refused(files):
@@ -366,6 +383,7 @@ def test_pilot_retrieval_from_before_output_checksums_is_checked_on_its_inputs(f
     assert run(files, record=False, legacy_retrieval=True) == len(QUESTIONS) * len(STRATEGIES)
     record_retrieval(files, outputs=False, **{"questions.csv": "0" * 64})
     files["out_file"].unlink()
+    files["control_file"].unlink()
     with pytest.raises(RuntimeError, match="questions.csv"):
         run(files, record=False, legacy_retrieval=True)
 
@@ -384,7 +402,8 @@ def test_changed_backend_fingerprint_writes_nothing(files):
 def test_missing_fingerprints_do_not_stop_the_run(files):
     """The API may omit the fingerprint; only two different reported values count as a change."""
     count = len(QUESTIONS) * len(STRATEGIES)
-    completer = FakeCompleter(fingerprints=dict.fromkeys(range(1, count + 1), None))
+    calls = count + len(QUESTIONS)  # C1-C3, then K0
+    completer = FakeCompleter(fingerprints=dict.fromkeys(range(1, calls + 1), None))
     assert run(files, completer) == count
     assert runs(files)[0]["system_fingerprint"] is None
 
@@ -414,3 +433,49 @@ def test_model_is_looked_up_before_the_first_answer_and_after_the_last(files):
     created = FakeCreated()
     run(files, created=created)
     assert created.calls == 2
+
+
+def test_k0_answers_come_without_excerpts_in_the_same_run(files):
+    completer = FakeCompleter()
+    run(files, completer)
+    n = len(QUESTIONS) * len(STRATEGIES)
+    assert completer.calls[n:] == [closed_book_messages(QUESTIONS[q]) for q in sorted(QUESTIONS)]
+    rows = read(files["control_file"])
+    assert list(rows[0]) == ANSWERS_HEADER
+    assert [(r["question_id"], r["strategy"], r["sources"]) for r in rows] == [
+        (q, "K0", "") for q in sorted(QUESTIONS)
+    ]
+    assert len(read(files["out_file"])) == n  # the experiment file holds C1-C3 only
+
+
+def test_the_run_record_has_k0_tokens_and_both_hashes(files):
+    run(files)
+    (record,) = runs(files)
+    assert record["strategy"] == EXPERIMENT and record["control_answers"] == len(QUESTIONS)
+    assert set(record["by_strategy"]) == {*STRATEGIES, "K0"}
+    assert record["outputs_sha256"] == {
+        files["out_file"].name: sha256_of(files["out_file"]),
+        files["control_file"].name: sha256_of(files["control_file"]),
+    }
+    k0 = record["by_strategy"]["K0"]
+    n = len(QUESTIONS) * len(STRATEGIES)
+    assert k0["prompt_tokens"] == sum(1000 + i for i in range(n + 1, n + len(QUESTIONS) + 1))
+
+
+def test_a_cut_off_k0_answer_writes_neither_file(files):
+    last = len(QUESTIONS) * (len(STRATEGIES) + 1)
+    with pytest.raises(RuntimeError, match="K0"):
+        run(files, CutOffAt(last))
+    assert not files["out_file"].exists() and not files["control_file"].exists()
+
+
+def test_an_existing_control_file_is_never_overwritten(files):
+    files["control_file"].write_text("kept\n", encoding="utf-8")
+    with pytest.raises(FileExistsError, match="generated_answers_control.csv"):
+        run(files)
+    assert files["control_file"].read_text(encoding="utf-8") == "kept\n"
+    assert not files["out_file"].exists()
+
+
+def test_pilot_paths_include_the_control_file(tmp_path):
+    assert pilot_paths(tmp_path)["control_file"] == tmp_path / "generated_answers_control.csv"
