@@ -4,6 +4,7 @@ Never hardcode paths, model names, or numeric constants outside this file.
 Pin exact model/SDK versions at implementation time and document them here.
 """
 
+from fractions import Fraction
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -36,6 +37,9 @@ CATALOGUE_PLAN_FILE = DATA_EVAL / "catalogue_plan.csv"  # random sampling plan o
 CATALOGUE_REVIEW_FILE = (
     DATA_EVAL / "catalogue_review.csv"
 )  # AI review suggestions and decisions (D31)
+CLOSED_BOOK_FILE = (
+    DATA_EVAL / "closed_book_screen.csv"
+)  # answers without context and Jonas' verdicts (D38, D40)
 RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
@@ -214,6 +218,10 @@ CATALOGUE_SLOT_FORMAT = "S{:02d}"  # slot IDs S01 … S48 in the plan
 # AI review log (D31): kinds of suggestions and their decisions
 CATALOGUE_REVIEW_KINDS = ("missing_section", "wording", "fact", "class")
 CATALOGUE_REVIEW_DECISIONS = ("open", "accepted", "rejected")
+# Closed-book screen (D38, D40): "" = not judged, "hit" = the answer without context hits the core
+# point of the reference answer (retrieval-independent), "miss" = it does not or only partly.
+CLOSED_BOOK_VERDICTS = ("", "hit", "miss")
+CLOSED_BOOK_MIN_DEPENDENT_SHARE = Fraction(2, 3)  # at least this share retrieval-dependent (D38)
 # Question IDs written by the editor: pattern for existing IDs and format of new ones
 QUESTION_ID_PATTERN = r"Q\d+"
 QUESTION_ID_FORMAT = "Q{:03d}"
@@ -272,6 +280,15 @@ Documentation excerpts:
 
 Answer:"""  # noqa: E501 (verbatim prompt text)
 CONTEXT_SEPARATOR = "\n---\n"  # between the excerpts; each starts with "[Excerpt N]"
+# Closed-book prompt (docs/reference/prompts.md): the screen of the catalogue and the control K0
+# (D38, D40); the RAG prompt without excerpts, so the model may answer from its own knowledge.
+CLOSED_BOOK_SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework.
+If you do not know the answer, state that explicitly."""  # noqa: E501 (verbatim prompt text)
+CLOSED_BOOK_USER_TEMPLATE = """Answer the following question.
+
+Question: {question}
+
+Answer:"""
 
 # ---------------------------------------------------------------------------
 # Evaluation

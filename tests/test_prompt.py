@@ -1,8 +1,14 @@
 import re
 from pathlib import Path
 
-from config import CONTEXT_SEPARATOR, SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
-from prompt import context, messages
+from config import (
+    CLOSED_BOOK_SYSTEM_PROMPT,
+    CLOSED_BOOK_USER_TEMPLATE,
+    CONTEXT_SEPARATOR,
+    SYSTEM_PROMPT,
+    USER_PROMPT_TEMPLATE,
+)
+from prompt import closed_book_messages, context, messages
 
 PROMPTS_DOC = Path(__file__).resolve().parent.parent / "docs" / "reference" / "prompts.md"
 
@@ -38,3 +44,18 @@ def test_braces_in_question_or_chunk_are_kept_verbatim():
     content = messages("Is {context} a slot in {{ msg }}?", "chunk with {question}")[1]["content"]
     assert "Question: Is {context} a slot in {{ msg }}?\n" in content
     assert content.endswith("excerpts:\nchunk with {question}\n\nAnswer:")
+
+
+def test_closed_book_prompt_matches_the_documentation():
+    """The closed-book prompt (screen and K0, ADR 0040) is documented right after the RAG prompt."""
+    assert documented_blocks()[2:4] == [CLOSED_BOOK_SYSTEM_PROMPT, CLOSED_BOOK_USER_TEMPLATE]
+
+
+def test_closed_book_messages_have_no_context_and_keep_braces():
+    result = closed_book_messages("Is {context} a slot in {{ msg }}?")
+    assert result[0] == {"role": "system", "content": CLOSED_BOOK_SYSTEM_PROMPT}
+    assert result[1]["role"] == "user"
+    assert result[1]["content"] == (
+        "Answer the following question.\n\nQuestion: Is {context} a slot in {{ msg }}?\n\nAnswer:"
+    )
+    assert "excerpt" not in result[0]["content"].lower() + result[1]["content"].lower()
