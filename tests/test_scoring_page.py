@@ -1,13 +1,14 @@
 from pathlib import Path
 
 import pytest
-from conftest import SCORING_CODES, write_scoring_set
+from conftest import SCORING_CODES, write_control_set, write_scoring_set
 from streamlit.testing.v1 import AppTest
 
 import catalogue_store as store
 import scoring_rules as rules
 import scoring_store as scoring
 from atomic_csv import read_csv
+from config import CONTROL_CRITERIA
 from evaluate_answers import SHEET_HEADER
 
 APP = Path(__file__).resolve().parent.parent / "app"
@@ -250,3 +251,40 @@ def test_the_checks_carry_the_rules_of_adr_0037_as_help(scoring_page):
     assert "in brackets" in help_of["point_1"] and "other words" in help_of["point_1"]
     assert "illustrative" in help_of["hallucination"]
     assert "core point" in help_of["direct"]
+
+
+@pytest.fixture
+def control_page(dirs):
+    write_scoring_set(dirs[1] / "hard")
+    freeze(dirs[1] / "hard")
+    write_control_set(dirs[1] / "hard")
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    at.selectbox(key="scoring_set").select("Pilot: hard: control K0").run()
+    return at
+
+
+def test_control_page_has_no_grounded_check_and_k0_wording(control_page):
+    at = control_page
+    assert not at.exception
+    keys = [g.key for g in at.button_group]
+    assert not any(k.endswith("|grounded") for k in keys)
+    labels = " ".join(g.label for g in at.button_group)
+    assert "does not know" in labels and "the reference does not cover" in labels
+    assert any("without excerpts" in m.value for m in [*at.markdown, *at.caption])
+
+
+def test_control_page_saves_four_scores(control_page):
+    at = control_page
+    code = "H01-K0"
+    at.button_group(key=f"Pilot: hard: control K0|{code}|point_1").set_value("covered")
+    for check, value in {
+        "declines": "no", "core_wrong": "no", "other_error": "no", "hallucination": "none",
+        "answers_question": "yes", "direct": "yes", "wordy": "no",
+    }.items():  # fmt: skip
+        at.button_group(key=f"Pilot: hard: control K0|{code}|{check}").set_value(value)
+    at.run()
+    at.button(key="scoring_save").click().run()
+    assert not at.exception
+    (s,) = (s for s in scoring.scoring_sets() if s.control)
+    assert scoring.load_scores(s)[code]["values"] == dict.fromkeys(CONTROL_CRITERIA, 2)

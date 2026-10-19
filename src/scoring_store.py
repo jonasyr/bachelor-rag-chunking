@@ -17,6 +17,7 @@ from markdown_it import MarkdownIt
 import scoring_rules as rules
 from atomic_csv import read_csv, write_csv
 from config import (
+    CONTROL_CRITERIA,
     GENERATION_RUNS_FILE,
     KEY_POINTS_FILE,
     KEY_POINTS_MAX,
@@ -24,12 +25,17 @@ from config import (
     PILOT_RUNS_FILE_NAME,
     RUBRIC_CRITERIA,
     RUBRIC_MAX_SCORE,
+    SCORES_CONTROL_FILE,
     SCORES_FILE,
+    SCORING_CHECKS_CONTROL_FILE,
     SCORING_CHECKS_FILE,
+    SCORING_ITEMS_CONTROL_FILE,
     SCORING_ITEMS_FILE,
+    SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
     STRATEGY_IDS,
 )
+from control_k0 import CONTROL_SHEET_HEADER
 from evaluate_answers import SHEET_HEADER
 from run_log import append_key_points_run, latest_run, sha256_of
 
@@ -45,10 +51,40 @@ class ScoringSet:
     key_points_file: Path
     checks_file: Path
     runs_file: Path
+    control: bool = False  # the control K0 (ADR 0041): K0 rules, four criteria
+    freeze_items_file: Path | None = None  # K0: the C1-C3 item file its key points were frozen on
+
+
+def criteria(s: ScoringSet) -> list[str]:
+    return list(CONTROL_CRITERIA) if s.control else list(RUBRIC_CRITERIA)
+
+
+def _sheet_header(s: ScoringSet) -> list[str]:
+    return CONTROL_SHEET_HEADER if s.control else SHEET_HEADER
+
+
+def _control_set(base: ScoringSet) -> ScoringSet | None:
+    """The K0 set next to a C1-C3 set (same folder), if its item file exists."""
+    folder = base.items_file.parent
+    items = folder / SCORING_ITEMS_CONTROL_FILE.name
+    if not items.exists():
+        return None
+    return ScoringSet(
+        f"{base.name}: control K0",
+        items,
+        folder / SCORING_SHEET_CONTROL_FILE.name,
+        folder / SCORES_CONTROL_FILE.name,
+        base.key_points_file,
+        folder / SCORING_CHECKS_CONTROL_FILE.name,
+        base.runs_file,
+        control=True,
+        freeze_items_file=base.items_file,
+    )
 
 
 def scoring_sets() -> list[ScoringSet]:
-    """The main run and every pilot folder that holds an item file."""
+    """The main run and every pilot folder that holds an item file, each followed by its K0 set
+    (ADR 0041) when that exists."""
     sets = []
     if SCORING_ITEMS_FILE.exists():
         sets.append(
@@ -77,7 +113,13 @@ def scoring_sets() -> list[ScoringSet]:
                 folder / PILOT_RUNS_FILE_NAME,
             )
         )
-    return sets
+    with_control = []
+    for s in sets:
+        with_control.append(s)
+        control = _control_set(s)
+        if control is not None:
+            with_control.append(control)
+    return with_control
 
 
 def _sheet(s: ScoringSet) -> list[dict]:
@@ -85,7 +127,7 @@ def _sheet(s: ScoringSet) -> list[dict]:
         raise FileNotFoundError(
             f"{s.sheet_file} not found; run src/evaluate_answers.py --mode scaffold first"
         )
-    return read_csv(s.sheet_file, SHEET_HEADER)
+    return read_csv(s.sheet_file, _sheet_header(s))
 
 
 def load_items(s: ScoringSet) -> list[dict]:
@@ -114,7 +156,7 @@ def load_scores(s: ScoringSet) -> dict[str, dict]:
     """Per code the criterion values (None while empty) and the notes."""
     return {
         r["code"]: {
-            "values": {c: _value(r, c, s.sheet_file) for c in RUBRIC_CRITERIA},
+            "values": {c: _value(r, c, s.sheet_file) for c in criteria(s)},
             "notes": r["notes"],
         }
         for r in _sheet(s)
@@ -147,9 +189,10 @@ def load_key_points(s: ScoringSet) -> dict[str, list[str]]:
 def _freeze(s: ScoringSet) -> dict | None:
     """The latest key-point freeze made on the current scaffold (same item file), or None."""
     record = latest_run(s.runs_file, "key_points", STRATEGY)
-    if record is None or not s.items_file.exists():
+    items = s.freeze_items_file or s.items_file  # K0: frozen on its C1-C3 set
+    if record is None or not items.exists():
         return None
-    if record["outputs_sha256"].get(s.items_file.name) != sha256_of(s.items_file):
+    if record["outputs_sha256"].get(items.name) != sha256_of(items):
         return None  # frozen for an earlier scaffold of this set
     return record
 
@@ -160,6 +203,8 @@ def is_frozen(s: ScoringSet) -> bool:
 
 def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: list[str]) -> None:
     """Replace one question's key points (point 1 = core point); refused after the freeze."""
+    if s.control:
+        raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen")
     known = {q["question_id"] for q in questions(items)}
@@ -186,6 +231,8 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
 def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     """Record the checksums of the key points and of the scaffold they belong to (the item
     file) once every question has some (ADR 0035)."""
+    if s.control:
+        raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen already")
     points = load_key_points(s)
@@ -240,30 +287,34 @@ def save_score(s: ScoringSet, code: str, checks: dict, notes: str) -> dict[str, 
     if row is None:
         raise ValueError(f"unknown code {code} in {s.sheet_file}")
     n_points = len(load_key_points(s).get(row["question_id"], []))
-    rules.validate(checks, n_points)
-    values = rules.derive(checks)
+    rules.validate(checks, n_points, control=s.control)
+    values = rules.derive_control(checks) if s.control else rules.derive(checks)
     order = [r["code"] for r in rows]
     stored: dict[str, dict] = {}
-    for r in read_csv(s.checks_file, rules.CHECKS_HEADER):
+    header = rules.checks_header(s.control)
+    for r in read_csv(s.checks_file, header):
         if r["code"] in stored:
             raise ValueError(f"{s.checks_file}: {r['code']} appears more than once")
         if r["code"] not in order:
             raise ValueError(f"{s.checks_file}: {r['code']} is not in {s.sheet_file}")
         stored[r["code"]] = r
-    stored[code] = rules.to_row(code, checks)
+    stored[code] = rules.to_row(code, checks, control=s.control)
     write_csv(
         s.checks_file,
-        rules.CHECKS_HEADER,
+        header,
         sorted(stored.values(), key=lambda r: order.index(r["code"])),
     )
     row.update({c: str(v) for c, v in values.items()} | {"notes": notes})
-    write_csv(s.sheet_file, SHEET_HEADER, rows)
+    write_csv(s.sheet_file, _sheet_header(s), rows)
     return values
 
 
 def load_checks(s: ScoringSet) -> dict[str, dict]:
     """The stored checks of every scored code."""
-    return {r["code"]: rules.from_row(r)[1] for r in read_csv(s.checks_file, rules.CHECKS_HEADER)}
+    header = rules.checks_header(s.control)
+    return {
+        r["code"]: rules.from_row(r, control=s.control)[1] for r in read_csv(s.checks_file, header)
+    }
 
 
 def is_scored(entry: dict) -> bool:

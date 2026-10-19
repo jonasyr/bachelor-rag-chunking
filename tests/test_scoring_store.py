@@ -1,12 +1,12 @@
 import json
 
 import pytest
-from conftest import SCORING_CODES, log_scaffold, write_scoring_set
+from conftest import SCORING_CODES, log_scaffold, write_control_set, write_scoring_set
 
 import scoring_rules as rules
 import scoring_store as scoring
 from atomic_csv import read_csv, write_csv
-from config import KEY_POINTS_MAX, RUBRIC_CRITERIA
+from config import CONTROL_CRITERIA, KEY_POINTS_MAX, RUBRIC_CRITERIA
 from evaluate_answers import SHEET_HEADER
 
 GOOD = {
@@ -422,3 +422,46 @@ def test_saving_drops_key_points_of_questions_outside_the_scaffold(hard):
     assert scoring.load_key_points(hard) == {"H01": ["Core"], "H02": ["Core two"]}
     scoring.freeze_key_points(hard, items)
     assert scoring.is_frozen(hard)
+
+
+def control_set(frozen):
+    write_control_set(frozen.items_file.parent)
+    return next(s for s in scoring.scoring_sets() if s.control)
+
+
+def k0_checks(**changed):
+    checks = {k: v for k, v in ok("H01-K0").items() if k != "grounded"}
+    return checks | changed
+
+
+def test_a_control_set_is_listed_after_its_c1_c3_set(frozen):
+    s = control_set(frozen)
+    assert s.name == "Pilot: hard: control K0"
+    assert s.key_points_file == frozen.key_points_file
+    assert scoring.criteria(s) == list(CONTROL_CRITERIA)
+
+
+def test_the_control_set_uses_the_frozen_key_points_of_its_c1_c3_set(frozen):
+    s = control_set(frozen)
+    assert scoring.is_frozen(s)
+    with pytest.raises(PermissionError, match="C1-C3"):
+        scoring.save_key_points(s, scoring.load_items(s), "H01", ["Other"])
+
+
+def test_control_save_derives_four_criteria_and_refuses_grounded(frozen):
+    s = control_set(frozen)
+    values = scoring.save_score(s, "H01-K0", k0_checks(), "")
+    assert values == dict.fromkeys(CONTROL_CRITERIA, 2)
+    assert scoring.load_scores(s)["H01-K0"]["values"] == values
+    with pytest.raises(ValueError, match="grounded"):
+        scoring.save_score(s, "H02-K0", k0_checks(grounded="all"), "")
+
+
+def test_control_save_refuses_changed_key_points(frozen):
+    s = control_set(frozen)
+    s.key_points_file.write_text(
+        s.key_points_file.read_text(encoding="utf-8").replace("Core one", "Edited"),
+        encoding="utf-8",
+    )
+    with pytest.raises(PermissionError, match="frozen"):
+        scoring.save_score(s, "H01-K0", k0_checks(), "")

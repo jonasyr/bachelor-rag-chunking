@@ -4,7 +4,8 @@ Two steps: Key points (per question only the question and its reference answer, 
 and Score (factual checks per answer; the five scores follow from src/scoring_rules.py). Shows
 only a set's blind item file and its scoring sheet: no strategy, no chunk ID, and the key stays
 closed. All reading and writing goes through src/scoring_store.py. Opened through the router
-app/catalogue_editor.py.
+app/catalogue_editor.py. The control K0 (ADR 0041) is its own set with the K0 checks; it is not
+blind.
 """
 
 import html
@@ -20,7 +21,7 @@ from ui_theme import SCORING_CSS  # noqa: E402
 
 import scoring_rules as rules  # noqa: E402
 import scoring_store as scoring  # noqa: E402
-from config import KEY_POINTS_MAX, RUBRIC_CRITERIA  # noqa: E402
+from config import KEY_POINTS_MAX  # noqa: E402
 
 STEPS = ["Key points", "Score"]
 LABELS = {
@@ -40,6 +41,11 @@ QUESTIONS = {
     "answers_question": "Does it address what was asked?",
     "direct": "Does the core point come in the first two sentences?",
     "wordy": "Is it repetitive, padded or confusing?",
+}
+# K0 (ADR 0041) saw no excerpts: these two checks refer to the reference answer instead
+CONTROL_QUESTIONS = QUESTIONS | {
+    "declines": "Does the answer say it does not know the answer, and give none?",
+    "hallucination": "Does it contain anything the reference does not cover?",
 }
 # how to apply the checks in borderline cases (ADR 0037, docs/reference/evaluation.md)
 POINT_HELP = (
@@ -67,6 +73,10 @@ SUMMARISE = (
     "Everything is scored. Unblind with `uv run python src/evaluate_answers.py --mode summarise`"
     " (for a pilot set add `--set DIR --limit N` as in scaffold)."
 )
+SUMMARISE_CONTROL = (
+    "Everything is scored. Summarise with `uv run python src/evaluate_answers.py --mode summarise"
+    " --control` (for a pilot set add `--set DIR`)."
+)
 
 
 def choose_set(sets: list[scoring.ScoringSet]) -> scoring.ScoringSet:
@@ -76,7 +86,7 @@ def choose_set(sets: list[scoring.ScoringSet]) -> scoring.ScoringSet:
     return sets[names.index(name)]
 
 
-def sidebar(items: list[dict], scores: dict[str, dict]) -> None:
+def sidebar(s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict]) -> None:
     done, total = scoring.progress(items, scores)
     with st.sidebar:
         st.markdown(f"**{done} of {total} scored**")
@@ -85,7 +95,7 @@ def sidebar(items: list[dict], scores: dict[str, dict]) -> None:
         rows += [f"| {q} | {d} of {n} |" for q, d, n in scoring.by_question(items, scores)]
         st.markdown("\n".join(rows))
         if done == total:
-            st.caption(SUMMARISE)
+            st.caption(SUMMARISE_CONTROL if s.control else SUMMARISE)
 
 
 def page(text: str) -> None:
@@ -221,13 +231,16 @@ def form(
 ) -> None:
     code = item["code"]
     question_cards(item["question"], item["reference_answer"])
+    asked = CONTROL_QUESTIONS if s.control else QUESTIONS
+    variant = rules.checks_for(s.control)
+    skipped_checks = rules.skipped_for(s.control)
     stored = saved_checks or {}
     # checks skipped while the answer was declining were never asked: they start empty
     declined_before = stored.get("declines") == "yes"
     answers = {
         "declines": control(
-            QUESTIONS["declines"],
-            rules.CHECKS["declines"],
+            asked["declines"],
+            variant["declines"],
             stored.get("declines"),
             f"{s.name}|{code}|declines",
             locked,
@@ -250,30 +263,34 @@ def form(
                     POINT_HELP,
                 )
             )
-    for check in list(rules.CHECKS)[1:]:
-        skipped = check in rules.SKIPPED_WHEN_DECLINING
+    for check in list(variant)[1:]:
+        skipped = check in skipped_checks
         if declines and skipped:
             continue
         default = None if declined_before and skipped else stored.get(check)
         if check in GROUPS:
             st.markdown(f"**{GROUPS[check]}**")
         answers[check] = control(
-            QUESTIONS[check],
-            rules.CHECKS[check],
+            asked[check],
+            variant[check],
             default,
             f"{s.name}|{code}|{check}",
             locked,
             HELP.get(check),
         )
     answered = all(v is not None for v in answers.values()) and None not in marks
-    checks = rules.declined(answers | {"points": marks}, len(key_points)) if answered else None
+    checks = (
+        rules.declined(answers | {"points": marks}, len(key_points), control=s.control)
+        if answered
+        else None
+    )
     if checks:
-        values = rules.derive(checks)
+        values = rules.derive_control(checks) if s.control else rules.derive(checks)
         rows = ["| Score | |", "|---|---:|"]
-        rows += [f"| {LABELS[c]} | {values[c]} |" for c in RUBRIC_CRITERIA]
+        rows += [f"| {LABELS[c]} | {values[c]} |" for c in scoring.criteria(s)]
         st.markdown("\n".join(rows))
     else:
-        st.caption("The five scores appear once every check is answered.")
+        st.caption("The scores appear once every check is answered.")
     notes = st.text_input(
         "Notes",
         value=saved_notes,
@@ -322,7 +339,10 @@ def main() -> None:
         return
     locked = scoring.is_read_only(s)
     if locked:
-        st.info("The scores of this set were unblinded (scores.csv exists), so it is read-only.")
+        st.info(
+            f"The scores of this set were summarised ({s.scores_file.name} exists), so it is "
+            "read-only."
+        )
     frozen = scoring.is_frozen(s)
     step_key = f"scoring_step|{s.name}"
     if not frozen:  # no Score step without a freeze for the current scaffold
@@ -343,7 +363,7 @@ def main() -> None:
         st.error(str(error))
         return
 
-    sidebar(items, scores)
+    sidebar(s, items, scores)
     codes = [i["code"] for i in items]
     key = f"scoring_code|{s.name}"
     if "scoring_goto" in st.session_state:  # set by a button; allowed before the widget exists
@@ -373,11 +393,14 @@ def main() -> None:
     with reader:
         st.markdown("**Answer under review**")
         page(item["answer"])
-        st.markdown("**Excerpts the model saw**")
-        tabs = st.tabs([str(n) for n in range(1, len(item["excerpts"]) + 1)])
-        for tab, text in zip(tabs, item["excerpts"], strict=True):
-            with tab:
-                page(text)
+        if s.control:
+            st.caption("Answered without excerpts (control K0).")
+        else:
+            st.markdown("**Excerpts the model saw**")
+            tabs = st.tabs([str(n) for n in range(1, len(item["excerpts"]) + 1)])
+            for tab, text in zip(tabs, item["excerpts"], strict=True):
+                with tab:
+                    page(text)
     if not key_points.get(item["question_id"]):
         with side:
             st.error(
