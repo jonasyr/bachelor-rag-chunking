@@ -158,12 +158,14 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
   "questions": 48,
   "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
+  "closed_book": {"dependent": 40, "known": 8},
   "sha256": {"questions.csv": "…", "ground_truth.csv": "…", "sections.jsonl": "…", "documents.jsonl": "…",
-             "catalogue_plan.csv": "…", "catalogue_review.csv": "…"}
+             "catalogue_plan.csv": "…", "catalogue_review.csv": "…", "closed_book_screen.csv": "…"}
 }
 ```
 
-Plan- und Durchsichtsdatei werden nur aufgezeichnet; die Sperre in `retrieve.py` prüft die vier übrigen Dateien.
+Plan-, Durchsichts- und Closed-Book-Datei werden nur aufgezeichnet; die Sperre in `retrieve.py` prüft die vier
+übrigen Dateien. `closed_book` = Zahl der retrieval-abhängigen (`miss`) und -unabhängigen (`hit`) Fragen.
 
 **`catalogue_plan.csv`** (`data/evaluation/`, versioniert, einmal geschrieben von `catalogue.py plan`, danach ändert
 der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
@@ -183,11 +185,22 @@ Abweichung als Fehler.
 Entscheidung trifft Jonas im Editor; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)):
 ```
 round,question_id,kind,suggestion,section_id,decision,reason,date
-1,Q001,missing_section,onUnmounted shows the same callback timing.,D009#onunmounted,accepted,,2026-10-20
-1,Q002,wording,Name the hook instead of "it".,,rejected,the slot asks for a paraphrase,2026-10-20
+1,Q001,missing_section,The bug bash page installs the same skill.,D006#install-the-skill,accepted,,2026-10-21
+1,Q002,wording,Name the command instead of "it".,,rejected,the slot asks for a paraphrase,2026-10-21
 ```
 `kind` ∈ `config.CATALOGUE_REVIEW_KINDS`, `decision` ∈ `config.CATALOGUE_REVIEW_DECISIONS`; `section_id` nur bei
 `missing_section`, `reason` Pflicht bei `rejected`.
+
+**`closed_book_screen.csv`** (`data/evaluation/`, versioniert; `catalogue.py screen` schreibt Antworten, Jonas die
+Urteile im Editor; [ADR 0040](../adr/0040-closed-book-pruefung.md)): eine Zeile je Katalogfrage, sortiert nach ID.
+```
+question_id,question_sha256,reference_sha256,answer,model,core_point,note,date
+Q001,5d1f…,a90c…,I don't know which command installs the skill.,gpt-6-luna-2026-05-18,miss,,2026-10-21
+```
+`question_sha256` = SHA-256 des Fragetexts, zu dem die Antwort gehört (geänderte Frage: `screen` fragt neu, das Urteil
+wird geleert); `reference_sha256` = SHA-256 der Referenzantwort, zu der das Urteil gehört (geänderte Referenz: Urteil
+offen). `core_point` ∈ `config.CLOSED_BOOK_VERDICTS`: leer = offen, `hit` = trifft den Kernpunkt (Frage
+retrieval-unabhängig), `miss` = trifft ihn nicht oder nur teilweise.
 
 ## Ergebnisse
 
@@ -288,6 +301,7 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
 | `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
 | `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
+| `closed_book_screen.csv` | Antworten ohne Kontext und Urteile der Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | ja |
 | `key_points.csv`, `scoring_checks.csv` | Kernpunkte und Prüffragen der regelbasierten Bewertung ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)) | ja |
 | `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |

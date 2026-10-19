@@ -9,6 +9,7 @@ results, so the annotation stays blind (ADR 0027).
     show SECTION_ID     heading path, tokens and exact text of a section
     check [--draft]     coverage check (ADR 0029); --draft fails only on errors
     freeze              strict check, then record SHA-256 of both files (ADR 0030)
+    screen              closed-book answers of new or changed questions (ADR 0040; calls the API)
 """
 
 import argparse
@@ -20,6 +21,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import closed_book
 import tokens
 from catalogue_plan import (
     draw_plan,
@@ -45,8 +47,10 @@ from config import (
     CATALOGUE_REVIEW_FILE,
     CATALOGUE_STOPWORDS,
     CATALOGUE_WORD_PATTERN,
+    CLOSED_BOOK_FILE,
     DETAIL_MAX_ANSWER_WORDS,
     DOCUMENTS_FILE,
+    GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
     MULTI_SECTION_MIN_SECTIONS,
     PILOT_DIR,
@@ -59,6 +63,7 @@ from config import (
 )
 from embed import load_jsonl
 from freeze import write_freeze
+from llm_client import Completer, Completion, complete
 from retrieve import (
     GROUND_TRUTH_HEADER,
     QUESTIONS_HEADER,
@@ -66,6 +71,7 @@ from retrieve import (
     read_rows,
     relevant_sections,
 )
+from run_log import append_generation_run, sha256_of
 
 WORD_RE = re.compile(CATALOGUE_WORD_PATTERN)
 CAMEL_RE = re.compile(CATALOGUE_CAMEL_BOUNDARY)
@@ -295,6 +301,7 @@ class Report:
     lines: list[str] = field(default_factory=list)
     types: dict[str, int] = field(default_factory=dict)
     classes: dict[str, int] = field(default_factory=dict)
+    closed_book: dict[str, int] = field(default_factory=dict)
 
 
 def _has_rows(path: Path) -> bool:
@@ -362,6 +369,7 @@ def check(
     plan_file: Path = CATALOGUE_PLAN_FILE,
     review_file: Path = CATALOGUE_REVIEW_FILE,
     fresh_plan: list[dict] | None = None,
+    closed_book_file: Path | None = None,
 ) -> Report:
     """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
     report = Report()
@@ -479,7 +487,18 @@ def check(
     still_open = sum(1 for r in review if r["decision"] == "open")
     if still_open:
         report.findings.append(f"{still_open} review suggestion(s) still open")
+    n_quota = sum(QUESTION_TYPES.values())
+    try:
+        screen_rows = closed_book.read_screen(closed_book_file or CLOSED_BOOK_FILE)
+    except ValueError as error:
+        report.errors.append(str(error))
+        screen_rows = []
+    errors, findings = closed_book.findings(screen_rows, questions, truth, n_quota)
+    report.errors += errors
+    report.findings += findings
+    report.closed_book = closed_book.counts(screen_rows, questions, truth)
     plan_lines.append(review_summary(review))
+    plan_lines.append(closed_book.summary(report.closed_book, n_quota))
     report.lines = _overview(corpus, questions, truth, relevant, areas) + plan_lines
     return report
 
@@ -500,14 +519,23 @@ def freeze_catalogue(
     plan_file: Path = CATALOGUE_PLAN_FILE,
     review_file: Path = CATALOGUE_REVIEW_FILE,
     fresh_plan: list[dict] | None = None,
+    closed_book_file: Path | None = None,
 ) -> dict:
     """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
 
     `sections_file` and `documents_file` must be the files `corpus` was loaded from; their hashes
     pin which text the section IDs refer to.
     """
+    closed_book_file = closed_book_file or CLOSED_BOOK_FILE
     report = check(
-        corpus, questions_file, ground_truth_file, pilot_dir, plan_file, review_file, fresh_plan
+        corpus,
+        questions_file,
+        ground_truth_file,
+        pilot_dir,
+        plan_file,
+        review_file,
+        fresh_plan,
+        closed_book_file=closed_book_file,
     )
     if exit_code(report, draft=False):
         raise ValueError(
@@ -517,8 +545,9 @@ def freeze_catalogue(
         "questions": sum(report.classes.values()),
         "types": report.types,
         "classes": report.classes,
+        "closed_book": {k: report.closed_book[k] for k in ("dependent", "known")},
     }
-    recorded = tuple(p for p in (plan_file, review_file) if p.exists())
+    recorded = tuple(p for p in (plan_file, review_file, closed_book_file) if p.exists())
     return write_freeze(
         questions_file,
         ground_truth_file,
@@ -528,6 +557,47 @@ def freeze_catalogue(
         summary,
         recorded=recorded,
     )
+
+
+def run_screen(completer: Completer = complete, runs_file: Path = GENERATION_RUNS_FILE) -> int:
+    """`screen`: closed-book answers of new or changed questions, one run record (ADR 0040)."""
+    if CATALOGUE_FREEZE_FILE.exists():
+        print("the catalogue is frozen (ADR 0030); the screen is final", file=sys.stderr)
+        return 1
+    try:
+        questions = read_rows(
+            QUESTIONS_FILE, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
+        )
+        truth_rows = read_rows(
+            GROUND_TRUTH_FILE, "ground truth", GROUND_TRUTH_HEADER, GROUND_TRUTH_HEADER
+        )
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 1
+    questions.sort(key=lambda q: q["question_id"])
+    truth = {row["question_id"]: row for row in truth_rows}
+    done: list[Completion] = []
+    code = 0
+    try:
+        closed_book.screen(questions, truth, completer, CLOSED_BOOK_FILE, done)
+    except Exception as error:  # API errors included: log what was paid for, then stop
+        print(error, file=sys.stderr)
+        code = 1
+    if done:
+        append_generation_run(
+            {
+                "step": "closed_book_screen",
+                "answers": len(done),
+                "model_reported": sorted({d.model for d in done}),
+                "system_fingerprint": sorted({d.system_fingerprint or "" for d in done}),
+                "outputs_sha256": {CLOSED_BOOK_FILE.name: sha256_of(CLOSED_BOOK_FILE)},
+            },
+            sum(d.prompt_tokens for d in done),
+            sum(d.completion_tokens for d in done),
+            runs_file,
+        )
+    print(f"{len(done)} questions answered without context -> {CLOSED_BOOK_FILE}")
+    return code
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -542,7 +612,12 @@ def main(argv: list[str] | None = None) -> int:
     check_cmd.add_argument("--draft", action="store_true", help="fail only on errors")
     commands.add_parser("freeze", help="strict check, then write the freeze record")
     commands.add_parser("plan", help="draw the sampling plan once (ADR 0031)")
+    commands.add_parser(
+        "screen", help="closed-book answers of new or changed questions (ADR 0040; calls the API)"
+    )
     args = parser.parse_args(argv)
+    if args.command == "screen":
+        return run_screen()
 
     corpus = load_corpus(DOCUMENTS_FILE, SECTIONS_FILE)
     if args.command == "sections":
@@ -584,6 +659,7 @@ def main(argv: list[str] | None = None) -> int:
         PILOT_DIR,
         CATALOGUE_PLAN_FILE,
         CATALOGUE_REVIEW_FILE,
+        closed_book_file=CLOSED_BOOK_FILE,
     )
     draft = args.command == "check" and args.draft
     print("\n".join(report.lines))
@@ -605,6 +681,7 @@ def main(argv: list[str] | None = None) -> int:
             DOCUMENTS_FILE,
             CATALOGUE_PLAN_FILE,
             CATALOGUE_REVIEW_FILE,
+            closed_book_file=CLOSED_BOOK_FILE,
         )
     except (FileExistsError, ValueError) as error:
         print(error, file=sys.stderr)

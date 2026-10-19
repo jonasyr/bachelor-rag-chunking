@@ -54,3 +54,8 @@ Geprüft mit `src/catalogue.py check`, eingefroren mit `src/catalogue.py freeze`
 
 Die letzten drei Regeln folgen aus den Pilotproben
 ([Experiment-Protokoll](experiment-record.md#pilotproben-auf-dem-erweiterten-korpus-14102026)).
+
+**Closed-Book-Prüfung.** Jede Frage wird ohne Kontext beantwortet; trifft die Antwort den Kernpunkt der
+Referenzantwort, ist die Frage retrieval-unabhängig und bleibt markiert im Katalog. Mindestens `ceil(2/3 × 48)` = 32
+Fragen müssen retrieval-abhängig sein; Einfrieren erst, wenn jede Frage auf ihrem aktuellen Text geprüft und beurteilt
+ist ([ADR 0040](../adr/0040-closed-book-pruefung.md)).

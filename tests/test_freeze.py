@@ -1,7 +1,13 @@
 import json
 
 import pytest
-from conftest import fresh_plan_for, valid_rows, write_catalogue, write_plan_for
+from conftest import (
+    fresh_plan_for,
+    valid_rows,
+    write_catalogue,
+    write_plan_for,
+    write_screen_for,
+)
 
 import freeze
 from catalogue import freeze_catalogue
@@ -15,6 +21,7 @@ def main_catalogue(tmp_path, monkeypatch, corpus_files):
     monkeypatch.setattr(freeze, "QUESTIONS_FILE", questions)
     monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", truth)
     ensure_review_file(tmp_path / "catalogue_review.csv")  # `catalogue.py plan` creates it
+    write_screen_for(tmp_path / "closed_book_screen.csv", valid_rows())
     return questions, truth, corpus_files[1], corpus_files[0]
 
 
@@ -42,9 +49,11 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
         "documents.jsonl": sha256_of(documents),
         "catalogue_plan.csv": sha256_of(tmp_path / "catalogue_plan.csv"),
         "catalogue_review.csv": sha256_of(tmp_path / "catalogue_review.csv"),
+        "closed_book_screen.csv": sha256_of(tmp_path / "closed_book_screen.csv"),
     }
     assert stored["questions"] == 48 and stored["types"]["comparative"] == 6
-    assert set(stored) == {"date", "questions", "types", "classes", "sha256"}
+    assert stored["closed_book"] == {"dependent": 48, "known": 0}
+    assert set(stored) == {"date", "questions", "types", "classes", "closed_book", "sha256"}
 
 
 def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
@@ -203,6 +212,26 @@ def test_freeze_requires_the_review_log(corpus, main_catalogue, pilot, tmp_path)
             documents,
             plan_file=write_plan_for(tmp_path, valid_rows()),
             review_file=tmp_path / "missing_review.csv",
+            fresh_plan=fresh_plan_for(valid_rows()),
+        )
+    assert not out.exists()
+
+
+def test_freeze_refuses_too_many_hits(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    write_screen_for(tmp_path / "closed_book_screen.csv", valid_rows(), hits=17)
+    out = tmp_path / "catalogue_freeze.json"
+    with pytest.raises(ValueError, match="strict check"):
+        freeze_catalogue(
+            corpus,
+            questions,
+            truth,
+            out,
+            pilot,
+            sections,
+            documents,
+            plan_file=write_plan_for(tmp_path, valid_rows()),
+            review_file=tmp_path / "catalogue_review.csv",
             fresh_plan=fresh_plan_for(valid_rows()),
         )
     assert not out.exists()

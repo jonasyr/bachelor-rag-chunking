@@ -10,6 +10,7 @@ import re
 
 from markdown_it import MarkdownIt
 
+import closed_book
 from atomic_csv import read_csv, write_csv
 from catalogue import CAMEL_RE, Corpus, same_word
 from catalogue_plan import mark_used, read_plan, save_plan, slot_row
@@ -19,6 +20,7 @@ from config import (
     CATALOGUE_FREEZE_FILE,
     CATALOGUE_PLAN_FILE,
     CATALOGUE_REVIEW_FILE,
+    CLOSED_BOOK_FILE,
     CORPUS_SITE_URL,
     DOCUMENTS_FILE,
     GROUND_TRUTH_FILE,
@@ -169,6 +171,19 @@ def skip_slot(corpus: Corpus, slot_id: str, reason: str) -> dict:
 def reject_suggestion(index: int, reason: str, today: str) -> dict:
     _refuse_if_frozen()
     return decide(CATALOGUE_REVIEW_FILE, index, "rejected", reason, today)
+
+
+def judge_closed_book(question_id: str, verdict: str, note: str, today: str) -> dict:
+    """Jonas' closed-book verdict for the current question and reference (ADR 0040)."""
+    _refuse_if_frozen()
+    questions, truth = load_catalogue()
+    question = next((q for q in questions if q["question_id"] == question_id), None)
+    if question is None:
+        raise ValueError(f"{question_id} is not in the catalogue")
+    reference = truth.get(question_id, {}).get("expected_answer", "")
+    return closed_book.judge(
+        CLOSED_BOOK_FILE, question_id, question["question"], reference, verdict, note, today
+    )
 
 
 def highlight(text: str, words: list[str]) -> str:
