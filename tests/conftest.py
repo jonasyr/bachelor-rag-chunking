@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 import catalogue
+import closed_book
 import tokens
 from catalogue import load_corpus
 from catalogue_plan import PLAN_HEADER
@@ -90,6 +91,33 @@ TEST_AREA_MIN = {"api": 12, "style-guide": 3}
 @pytest.fixture(autouse=True)
 def test_area_minimums(monkeypatch):
     monkeypatch.setattr(catalogue, "AREA_MIN_QUESTIONS", TEST_AREA_MIN)
+
+
+@pytest.fixture(autouse=True)
+def closed_book_file(tmp_path, monkeypatch):
+    """Tests never read data/evaluation/closed_book_screen.csv; check and freeze default to this."""
+    path = tmp_path / "closed_book_screen.csv"
+    monkeypatch.setattr(catalogue, "CLOSED_BOOK_FILE", path)
+    return path
+
+
+def write_screen_for(path, rows, hits=0):
+    """A screen file in which every catalogue row is screened and judged; the first `hits` hit."""
+    screen_rows = [
+        dict.fromkeys(closed_book.SCREEN_HEADER, "")
+        | {
+            "question_id": qid,
+            "question_sha256": closed_book.text_sha256(text),
+            "reference_sha256": closed_book.text_sha256(answer),
+            "answer": "I do not know.",
+            "model": "gpt-6-luna-2026-05-18",
+            "core_point": "hit" if number < hits else "miss",
+            "date": "2026-10-21",
+        }
+        for number, (qid, text, _, _, answer, _) in enumerate(rows)
+    ]
+    closed_book.save_screen(path, screen_rows)
+    return path
 
 
 @pytest.fixture

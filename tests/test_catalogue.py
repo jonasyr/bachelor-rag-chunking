@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from conftest import (
     PAGES,
@@ -6,7 +8,9 @@ from conftest import (
     valid_rows,
     write_catalogue,
     write_plan_for,
+    write_screen_for,
 )
+from test_closed_book import FakeCompleter
 
 import catalogue
 import tokens
@@ -204,11 +208,13 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
     ]
 
 
-def run_check(corpus, tmp_path, rows, pilot_dir):
+def run_check(corpus, tmp_path, rows, pilot_dir, screen=True):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows)
     review = tmp_path / "catalogue_review.csv"
     ensure_review_file(review)
+    if screen:
+        write_screen_for(tmp_path / "closed_book_screen.csv", rows)
     return check(
         corpus,
         questions,
@@ -227,6 +233,10 @@ def test_valid_catalogue_passes_strictly(corpus, tmp_path, pilot):
     assert report.types == QUESTION_TYPES and report.classes == QUESTION_CLASSES
     text = "\n".join(report.lines)
     assert "| total |" in text and "api 12 (at least 12)" in text
+    assert (
+        "Closed-book: 48 retrieval-dependent (at least 32), 0 known, 0 not screened, 0 not judged"
+        in report.lines
+    )
 
 
 def test_format_errors_fail_even_in_draft(corpus, tmp_path, pilot):
@@ -311,6 +321,7 @@ def test_cli_sections_find_show(cli, capsys):
 
 
 def test_cli_check_and_freeze(cli, capsys):
+    write_screen_for(cli / "closed_book_screen.csv", valid_rows())
     assert main(["check"]) == 0
     assert main(["freeze"]) == 0
     assert (cli / "freeze.json").exists()
@@ -511,3 +522,53 @@ def test_accepted_missing_sections_must_stay_annotated(corpus, tmp_path, pilot):
         "Q001: accepted section D002#cleanup (review row 2) is no longer annotated"
         in report.findings
     )
+
+
+def test_unscreened_catalogue_warns_in_draft_and_fails_strictly(corpus, tmp_path, pilot):
+    report = run_check(corpus, tmp_path, valid_rows(), pilot, screen=False)
+    assert report.errors == []
+    assert any(f.startswith("closed-book: not screened Q001, Q002") for f in report.findings)
+    assert exit_code(report, draft=True) == 0 and exit_code(report, draft=False) == 1
+
+
+def test_too_many_hits_is_a_finding(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    write_screen_for(tmp_path / "closed_book_screen.csv", rows, hits=17)
+    report = run_check(corpus, tmp_path, rows, pilot, screen=False)
+    assert "closed-book: 17 questions hit without context, at most 16 of 48 (ADR 0038)" in (
+        report.findings
+    )
+
+
+def test_malformed_screen_file_is_an_error(corpus, tmp_path, pilot):
+    (tmp_path / "closed_book_screen.csv").write_text("id,text\n", encoding="utf-8")
+    report = run_check(corpus, tmp_path, valid_rows(), pilot, screen=False)
+    assert any("closed_book_screen.csv has columns" in e for e in report.errors)
+
+
+def test_check_uses_the_redirected_screen_file(closed_book_file, tmp_path):
+    assert catalogue.CLOSED_BOOK_FILE == closed_book_file == tmp_path / "closed_book_screen.csv"
+
+
+def test_cli_screen_answers_and_logs_a_run(cli, tmp_path):
+    write_catalogue(tmp_path, valid_rows()[:2])  # the cli fixture's files, now two questions
+    runs = tmp_path / "generation_runs.jsonl"
+    assert catalogue.run_screen(completer=FakeCompleter(), runs_file=runs) == 0
+    record = json.loads(runs.read_text(encoding="utf-8"))
+    assert record["step"] == "closed_book_screen" and record["answers"] == 2
+    assert record["prompt_tokens"] == 51 + 52 and record["completion_tokens"] == 11 + 12
+    assert set(record["outputs_sha256"]) == {"closed_book_screen.csv"}
+
+
+def test_cli_screen_logs_a_partial_run(cli, tmp_path, capsys):
+    write_catalogue(tmp_path, valid_rows()[:3])
+    runs = tmp_path / "generation_runs.jsonl"
+    assert catalogue.run_screen(completer=FakeCompleter({2: "length"}), runs_file=runs) == 1
+    assert "Q002" in capsys.readouterr().err
+    assert json.loads(runs.read_text(encoding="utf-8"))["answers"] == 1
+
+
+def test_cli_screen_refuses_after_the_freeze(cli, tmp_path, capsys):
+    (tmp_path / "freeze.json").write_text("{}", encoding="utf-8")  # cli's CATALOGUE_FREEZE_FILE
+    assert catalogue.run_screen(completer=FakeCompleter(), runs_file=tmp_path / "r.jsonl") == 1
+    assert "frozen" in capsys.readouterr().err
