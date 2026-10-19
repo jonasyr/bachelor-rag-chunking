@@ -22,6 +22,9 @@ checks by fixed rules (ADR 0035, 0036).
                  overall and per question type and construction class. With a checks file
                  (scoring_checks.csv, ADR 0035) the key points must be the frozen ones and every
                  sheet row must equal the scores its checks derive under the current rules.
+--control        Both modes on the control K0 instead (src/control_k0.py, ADR 0041): scaffold
+                 only after C1-C3 are summarised (scores.csv exists); summarise compares K0 with
+                 C1-C3 on the four criteria of config.CONTROL_CRITERIA.
 
 Both modes use the main catalogue only while it matches its freeze record (ADR 0030). With --set
 DIR they work on a pilot set instead, and --limit N (pilot sets only) scores its first N
@@ -482,9 +485,29 @@ if __name__ == "__main__":
         "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/hard) instead"
     )
     p.add_argument("--limit", type=int, metavar="N", help="pilot sets only: the first N questions")
+    p.add_argument("--control", action="store_true", help="the control K0 (ADR 0041), after C1-C3")
     args = p.parse_args()
     if args.limit is not None and not args.set:
         p.error("--limit needs --set: every experiment answer is scored (ADR 0032)")
+    if args.control:
+        import control_k0
+
+        if args.limit is not None:
+            p.error("--control takes the questions of scores.csv; --limit does not apply")
+        cpaths = control_k0.control_paths(args.set) if args.set else {}
+        if args.mode == "scaffold":
+            keep = control_k0.SCAFFOLD_KEYS
+            count = control_k0.scaffold_control(**{k: v for k, v in cpaths.items() if k in keep})
+            sheet = cpaths.get("sheet_file", control_k0.SCORING_SHEET_CONTROL_FILE)
+            print(f"{count} K0 answers -> {sheet}")
+        else:
+            summary_args: dict = {k: v for k, v in cpaths.items() if k != "control_answers_file"}
+            if args.set:
+                summary_args["closed_book_file"] = None  # the verdicts belong to the main catalogue
+            control_k0.print_control_summary(control_k0.summarise_control(**summary_args))
+            scores = cpaths.get("control_scores_file", control_k0.SCORES_CONTROL_FILE)
+            print(f"K0 scores -> {scores}")
+        raise SystemExit(0)
     paths = pilot_paths(args.set) if args.set else {}
     if args.mode == "scaffold":
         scaffold_args = {

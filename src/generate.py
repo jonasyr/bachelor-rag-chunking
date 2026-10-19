@@ -4,8 +4,10 @@ For every question of the catalogue and every experiment strategy C1-C3, builds 
 the top-k chunks of retrieved_results.csv in rank order (docs/reference/prompts.md), asks the
 pinned model (config.LLM_MODEL, temperature 0, reasoning effort "none") and writes
 generated_answers.csv. All strategies run together from the same inputs; the control K1 gets no
-answers (ADR 0026). The main catalogue is used only while it matches its freeze record (ADR
-0030), and everything is checked before the first API call.
+answers (ADR 0026). The control K0 answers every question once without excerpts (closed-book
+prompt, ADR 0040) in the same run, into generated_answers_control.csv (ADR 0041). The main
+catalogue is used only while it matches its freeze record (ADR 0030), and everything is checked
+before the first API call.
 
 OpenAI offers the model only as an alias, so the answers are generated once: an existing
 answer file is never overwritten, the results must come from the latest retrieval run over the
@@ -15,8 +17,8 @@ if the creation time of the model object behind the alias differs before and aft
 The run log records the model and fingerprint the API reported, the input and output checksums,
 tokens and cost per strategy.
 
-Output schema (docs/reference/data-formats.md): question_id, strategy, answer, sources,
-prompt_tokens, completion_tokens
+Output schema of both files (docs/reference/data-formats.md): question_id, strategy, answer,
+sources, prompt_tokens, completion_tokens
 """
 
 from datetime import UTC, datetime
@@ -26,8 +28,10 @@ from atomic_csv import write_csv
 from config import (
     CATALOGUE_FREEZE_FILE,
     CHUNK_FILES,
+    CONTROL_ANSWER_STRATEGIES,
     DOCUMENTS_FILE,
     EMBEDDING_RUNS_FILE,
+    GENERATED_ANSWERS_CONTROL_FILE,
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
@@ -43,7 +47,7 @@ from embed import load_jsonl
 from evaluate_retrieval import ranked_results
 from freeze import require_frozen
 from llm_client import Completer, Completion, ModelCreated, complete, model_created
-from prompt import context, messages
+from prompt import closed_book_messages, context, messages
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import append_generation_run, generation_cost, require_run, sha256_of
 
@@ -98,6 +102,7 @@ def generate(
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
     chunk_files: dict[str, Path] = CHUNK_FILES,
     out_file: Path = GENERATED_ANSWERS_FILE,
+    control_file: Path = GENERATED_ANSWERS_CONTROL_FILE,
     runs_file: Path = GENERATION_RUNS_FILE,
     retrieval_runs_file: Path = EMBEDDING_RUNS_FILE,
     legacy_retrieval: bool = False,
@@ -107,11 +112,12 @@ def generate(
     `legacy_retrieval` lets a retrieval record without an output checksum (pilot sets, written
     before 17.10.2026) pass on its inputs; the main experiment always needs the checksum.
     """
-    if out_file.exists():
-        raise FileExistsError(
-            f"{out_file} exists; answers are generated once (ADR 0033), delete it deliberately "
-            "to generate them again"
-        )
+    for path in (out_file, control_file):
+        if path.exists():
+            raise FileExistsError(
+                f"{path} exists; answers are generated once (ADR 0033), delete it deliberately "
+                "to generate them again"
+            )
     require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
     keys = list(STRATEGY_IDS)  # always the complete experiment, never K1 (ADR 0026)
     if sorted(chunk_files) != sorted(keys):
@@ -166,6 +172,30 @@ def generate(
                 }
             )
 
+    (control,) = CONTROL_ANSWER_STRATEGIES  # K0: no retrieval, the closed-book prompt (ADR 0041)
+    control_rows: list[dict] = []
+    control_tokens = [0, 0]
+    for question in questions:
+        qid = question["question_id"]
+        answer = checked(
+            completer(closed_book_messages(question["question"])),
+            f"{qid}/{control}",
+            models,
+            fingerprints,
+        )
+        control_tokens[0] += answer.prompt_tokens
+        control_tokens[1] += answer.completion_tokens
+        control_rows.append(
+            {
+                "question_id": qid,
+                "strategy": control,
+                "answer": answer.text,
+                "sources": "",
+                "prompt_tokens": answer.prompt_tokens,
+                "completion_tokens": answer.completion_tokens,
+            }
+        )
+
     created_after = model_created()
     if created_after != created_before:
         raise RuntimeError(
@@ -174,6 +204,7 @@ def generate(
             "written (ADR 0033)"
         )
     write_csv(out_file, ANSWERS_HEADER, rows)
+    write_csv(control_file, ANSWERS_HEADER, control_rows)
     append_generation_run(
         {
             "step": "generate",
@@ -182,19 +213,23 @@ def generate(
             "model_created": created_iso(created_before),
             "system_fingerprint": next(iter(fingerprints), None),
             "answers": len(rows),
+            "control_answers": len(control_rows),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
-            "outputs_sha256": {out_file.name: sha256_of(out_file)},
+            "outputs_sha256": {
+                out_file.name: sha256_of(out_file),
+                control_file.name: sha256_of(control_file),
+            },
             "by_strategy": {
                 key: {
                     "prompt_tokens": p,
                     "completion_tokens": c,
                     "cost_usd": generation_cost(p, c),
                 }
-                for key, (p, c) in tokens.items()
+                for key, (p, c) in {**tokens, control: control_tokens}.items()
             },
         },
-        sum(p for p, _ in tokens.values()),
-        sum(c for _, c in tokens.values()),
+        sum(p for p, _ in tokens.values()) + control_tokens[0],
+        sum(c for _, c in tokens.values()) + control_tokens[1],
         runs_file,
     )
     return len(rows)
@@ -208,6 +243,7 @@ def pilot_paths(set_dir: Path) -> dict:
         "questions_file": set_dir / QUESTIONS_FILE.name,
         "ground_truth_file": set_dir / GROUND_TRUTH_FILE.name,
         "out_file": set_dir / GENERATED_ANSWERS_FILE.name,
+        "control_file": set_dir / GENERATED_ANSWERS_CONTROL_FILE.name,
         "runs_file": set_dir / PILOT_RUNS_FILE_NAME,
         "retrieval_runs_file": set_dir / PILOT_RUNS_FILE_NAME,
         "legacy_retrieval": True,
@@ -227,3 +263,5 @@ if __name__ == "__main__":
     paths = pilot_paths(args.set) if args.set else {}
     count = generate(**paths)
     print(f"{count} answers -> {paths.get('out_file', GENERATED_ANSWERS_FILE)}")
+    control_out = paths.get("control_file", GENERATED_ANSWERS_CONTROL_FILE)
+    print(f"control K0 (one answer per question, no retrieval) -> {control_out}")

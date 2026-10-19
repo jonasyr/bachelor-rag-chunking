@@ -102,14 +102,16 @@ abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte
   das Modell, das die API für alle Antworten des Laufs gemeldet hat; `model_created`: Erstellungszeitpunkt des
   Modellobjekts (ISO 8601, UTC), vor und nach dem Lauf gleich; `system_fingerprint`: die gemeldete
   Backend-Konfiguration (`null`, wenn die API keine meldet).
-- `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten).
+- `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten C1–C3),
+  `control_answers` (Zahl der K0-Antworten, [ADR 0041](../adr/0041-kontrolle-k0.md)).
 - `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
-  `generated_answers.csv`. `evaluate_answers.py --mode scaffold` prüft beide gegen die aktuellen Dateien.
-- `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie
+  `generated_answers.csv` und `generated_answers_control.csv`. `evaluate_answers.py --mode scaffold` prüft beide
+  gegen die aktuellen Dateien.
+- `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie und für K0
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
 ```json
-{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","model_created":"…","system_fingerprint":"…","answers":144,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
+{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","model_created":"…","system_fingerprint":"…","answers":144,"control_answers":48,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…","generated_answers_control.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"},"K0":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
 ```
 
 ## Fragen und Ground Truth
@@ -233,6 +235,10 @@ question_id,strategy,answer,sources,prompt_tokens,completion_tokens
 Q001,C1,"...",C1_D049_0004,1200,180
 ```
 
+**`generated_answers_control.csv`** (Kontrolle K0, im selben Lauf von `generate.py` mit dem Closed-Book-Prompt; Format
+wie `generated_answers.csv`, `strategy` = `K0`, `sources` leer; wird nie überschrieben;
+[ADR 0041](../adr/0041-kontrolle-k0.md)).
+
 Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
 aus `generated_answers.csv` drei Dateien, je Frage die drei Antworten in der mit `config.SCORING_SEED` gemischten
 Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben (liegen beide
@@ -287,6 +293,17 @@ question_id,strategy,correctness,completeness,groundedness,no_hallucination,clar
 Q001,C1,2,2,2,2,2,2.0
 ```
 
+**Kontrolle K0** ([ADR 0041](../adr/0041-kontrolle-k0.md)): `evaluate_answers.py --mode scaffold --control` schreibt
+erst nach `scores.csv` für deren Fragen `scoring_items_control.jsonl` (Einträge wie `scoring_items.jsonl`, Code
+`Q001-K0`, `excerpts` leer; versioniert, da es kein Wiederherstellen gibt) und `scoring_sheet_control.csv`
+(`code,question_id,correctness,completeness,no_hallucination,clarity,notes`); die Seite schreibt
+`scoring_checks_control.csv` (Kopf von `scoring_checks.csv` ohne `grounded`). `--mode summarise --control` schreibt
+`scores_control.csv` (nicht versioniert; Gesamtwert = Mittel der vier Kriterien mit zwei Nachkommastellen):
+```
+question_id,strategy,correctness,completeness,no_hallucination,clarity,total_score
+Q001,K0,1,0,2,2,1.25
+```
+
 ## Pilot-Sets
 
 Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
@@ -299,10 +316,12 @@ Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter de
 | `query_embeddings.npz` | gespeicherte Fragevektoren | nein |
 | `retrieved_results.csv` | Top-5 für C1–C3 | ja |
 | `retrieved_results_control.csv` | Top-5 für K1 | ja |
-| `generated_answers.csv` | Antworten C1–C3 (`generate.py --set`) | ja |
+| `generated_answers.csv`, `generated_answers_control.csv` | Antworten C1–C3 und K0 (`generate.py --set`) | ja |
 | `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
 | `closed_book_screen.csv` | Antworten ohne Kontext und Urteile der Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | ja |
 | `key_points.csv`, `scoring_checks.csv` | Kernpunkte und Prüffragen der regelbasierten Bewertung ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)) | ja |
+| `scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung der Kontrolle K0 (`evaluate_answers.py --set DIR --control`, [ADR 0041](../adr/0041-kontrolle-k0.md)) | ja |
+| `scores_control.csv` | ausgewertete K0-Bewertung | nein |
 | `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
 | `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
 

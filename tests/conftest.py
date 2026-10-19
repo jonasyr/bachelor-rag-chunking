@@ -242,6 +242,34 @@ def write_scoring_set(folder, codes=tuple(SCORING_CODES)):
     log_scaffold(folder / "scoring_items.jsonl")
 
 
+def write_control_set(folder, qids=("H01", "H02")):
+    """A K0 set next to a scaffolded C1-C3 set, as control_k0.scaffold_control writes it."""
+    from atomic_csv import write_csv
+    from config import CONTROL_CRITERIA
+    from control_k0 import CONTROL_SHEET_HEADER
+
+    items = [
+        {
+            "code": f"{q}-K0",
+            "question_id": q,
+            "question": f"Question {q}?",
+            "reference_answer": "Use `ref()`.",
+            "answer": f"Closed-book {q}.",
+            "excerpts": [],
+        }
+        for q in qids
+    ]
+    (folder / "scoring_items_control.jsonl").write_text(
+        "".join(json.dumps(i) + "\n" for i in items), encoding="utf-8"
+    )
+    rows = [
+        {"code": i["code"], "question_id": i["question_id"]}
+        | dict.fromkeys([*CONTROL_CRITERIA, "notes"], "")
+        for i in items
+    ]
+    write_csv(folder / "scoring_sheet_control.csv", CONTROL_SHEET_HEADER, rows)
+
+
 def log_scaffold(items_file):
     """The scaffold record evaluate_answers.py writes into a pilot set's runs.jsonl."""
     import hashlib

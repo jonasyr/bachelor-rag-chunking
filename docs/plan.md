@@ -31,7 +31,8 @@ e2e (MDX-Umwandlung ohne Inhaltsverlust, erledigt 18.10.2026: 60 Seiten, 250.380
 Chunks, 0,14 USD; [Experiment-Protokoll](reference/experiment-record.md#embedding-e2e)); (4)
 Katalogwerkzeuge: (4a) Quoten je Bereich, Stichprobenplan, Stoppwörter (erledigt 18.10.2026,
 [ADR 0039](adr/0039-stichprobenplan-e2e.md)), (4b) Closed-Book-Prüfung im Editor (erledigt 19.10.2026,
-[ADR 0040](adr/0040-closed-book-pruefung.md)), (4c) K0; (5) neuer
+[ADR 0040](adr/0040-closed-book-pruefung.md)), (4c) K0 (erledigt 19.10.2026,
+[ADR 0041](adr/0041-kontrolle-k0.md)); (5) neuer
 Pilot auf e2e.
 
 ## Zeitplan (13.10.–24.12.2026)

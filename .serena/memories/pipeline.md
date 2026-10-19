@@ -29,6 +29,9 @@ data formats: `docs/reference/data-formats.md`; order and procedure: `README.md`
   a corpus change renumbers them; remap annotations by path + anchor (`scripts/remap_pilot.py`), never by hand.
 - Closed-book screen: `catalogue.py screen` (API) → `closed_book_screen.csv` → editor tab Closed-book; check/freeze
   need all judged and ≤ 16 hits. Code `src/closed_book.py`; ADR 0040, docs/reference/data-formats.md.
+- Control K0: generate.py writes generated_answers_control.csv in the same run; scoring via
+  `evaluate_answers.py --control` (src/control_k0.py) only after scores.csv; page set "…: control K0" (no grounded).
+  ADR 0041, docs/reference/evaluation.md#kontrolle-k0.
 - Catalogue quotas: 15 e2e areas, slots = reserve = minimum by token share (ADR 0039); plan drawn 18.10.2026, Vue plan in `data/evaluation/archive_vue/`.
 - Raw and processed data are gitignored; their folders survive via `.gitkeep` negation rules in `.gitignore`.
 - Results for the thesis: `docs/how-to/deliver-results-to-thesis.md` (`output/figures/*.pdf` is versioned via a

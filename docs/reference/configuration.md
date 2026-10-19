@@ -36,6 +36,7 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
 | `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten (nie überschrieben) | [ADR 0033](../adr/0033-antwortmodell.md) |
+| `GENERATED_ANSWERS_CONTROL_FILE` | `data/evaluation/generated_answers_control.csv` | Antworten der Kontrolle K0 (nie überschrieben) | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 | `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll von `generate.py` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen mit Strategie (abgeleitet aus Bogen und Schlüssel) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
@@ -44,6 +45,7 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `SCORING_ITEMS_FILE` | `data/evaluation/scoring_items.jsonl` | blinde Einträge der Bewertungsseite | [ADR 0034](../adr/0034-bewertung-in-der-app.md) |
 | `KEY_POINTS_FILE` | `data/evaluation/key_points.csv` | Kernpunkte je Frage, vor der Bewertung eingefroren | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `SCORING_CHECKS_FILE` | `data/evaluation/scoring_checks.csv` | Antworten auf die Prüffragen je Code | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
+| `SCORING_ITEMS_CONTROL_FILE`, `SCORING_SHEET_CONTROL_FILE`, `SCORING_CHECKS_CONTROL_FILE`, `SCORES_CONTROL_FILE` | `data/evaluation/scoring_items_control.jsonl`, `…/scoring_sheet_control.csv`, `…/scoring_checks_control.csv`, `…/scores_control.csv` | Bewertungssatz der Kontrolle K0 | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 
 Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 
@@ -77,6 +79,7 @@ Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 | `K1_CHUNK_SIZE` | `375` | Kontrolle K1: Fenstergröße = kaufmännisch gerundetes Mittel der C3-Chunklängen (gemessen 18.10.2026 auf `ef977f4`); `chunking.py` bricht ab, wenn der Wert nicht mehr der Regel entspricht | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `K1_OVERLAP` | `0` | K1: ohne Overlap | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `CONTROL_STRATEGIES` | `{"K1": "fixed_375_no_overlap"}` (aus `K1_CHUNK_SIZE` gebildet) | Schlüssel und `strategy`-Wert der Kontrolle; nur Retrieval, keine Generierung | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `CONTROL_ANSWER_STRATEGIES` | `{"K0": "closed_book"}` | Kontrolle K0: Antworten ohne Retrieval (Closed-Book-Prompt); nicht in `STRATEGY_IDS` | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 | `STRATEGY_IDS` | `{"C1": "fixed_500_no_overlap", "C2": "fixed_500_overlap_100", "C3": "structure_h2h3"}` | Schlüssel und `strategy`-Werte des Experiments (C1–C3); K1 gehört nicht hinein | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `CHUNK_FILES` | `{"C1": CHUNKS_C1_FILE, "C2": …, "C3": …}` | Chunk-Datei je Strategie | – |
 | `EMBEDDING_FILES` | `{"C1": data/processed/embeddings_c1.npz, …c2, …c3}` | gespeicherte Referenzvektoren je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
@@ -158,6 +161,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
 | `RUBRIC_CRITERIA` | `["correctness", "completeness", "groundedness", "no_hallucination", "clarity"]` | Rubrik-Kriterien = Spalten in `scores.csv` | [ADR 0013](../adr/0013-antwort-rubrik.md) |
+| `CONTROL_CRITERIA` | `["correctness", "completeness", "no_hallucination", "clarity"]` | Kriterien, die K0 und C1–C3 teilen (ohne Quellenbezug) | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |

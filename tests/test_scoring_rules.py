@@ -2,6 +2,7 @@ import pytest
 
 import scoring_rules as rules
 from config import (
+    CONTROL_CRITERIA,
     KEY_POINTS_MAX,
     RUBRIC_COMPLETENESS_PARTIAL,
     RUBRIC_CRITERIA,
@@ -185,3 +186,62 @@ def test_a_long_reference_keeps_the_extra_parts_in_the_last_point():
     parts = rules.split_reference("A; b; c; d; e; f.")
     assert parts == ["A", "b", "c", "d; e; f."]
     assert len(parts) == KEY_POINTS_MAX
+
+
+def k0_ok(**changed):
+    checks = {
+        "points": ["covered"],
+        "declines": "no",
+        "core_wrong": "no",
+        "other_error": "no",
+        "hallucination": "none",
+        "answers_question": "yes",
+        "direct": "yes",
+        "wordy": "no",
+    }
+    return checks | changed
+
+
+def test_k0_checks_have_no_grounded():
+    assert "grounded" not in rules.CONTROL_CHECKS
+    assert list(rules.CONTROL_CHECKS) == [c for c in rules.CHECKS if c != "grounded"]
+    assert rules.checks_header(True) == ["code", "rules_version", "points", *rules.CONTROL_CHECKS]
+    assert rules.checks_header(False) == rules.CHECKS_HEADER
+
+
+def test_k0_validate_rejects_grounded_and_accepts_the_rest():
+    rules.validate(k0_ok(), 1, control=True)
+    with pytest.raises(ValueError, match="grounded"):
+        rules.validate(k0_ok(grounded="all"), 1, control=True)
+    with pytest.raises(ValueError):
+        rules.validate(k0_ok(), 1)  # the C1-C3 rules need grounded
+
+
+def test_k0_declining_answer_skips_without_grounded():
+    stored = rules.declined(k0_ok(declines="yes"), 2, control=True)
+    assert stored["points"] == ["missing", "missing"]
+    assert "grounded" not in stored and stored["hallucination"] == "none"
+    rules.validate(stored, 2, control=True)
+
+
+def test_derive_control_follows_the_rule_table():
+    assert rules.derive_control(k0_ok()) == dict.fromkeys(CONTROL_CRITERIA, 2)
+    assert rules.derive_control(k0_ok(core_wrong="yes", hallucination="minor", direct="no")) == {
+        "correctness": 0,
+        "completeness": 2,
+        "no_hallucination": 1,
+        "clarity": 1,
+    }
+    declining = rules.declined(k0_ok(declines="yes"), 1, control=True)
+    assert rules.derive_control(declining) == {
+        "correctness": 1,
+        "completeness": 0,
+        "no_hallucination": 2,
+        "clarity": 2,
+    }
+
+
+def test_k0_rows_round_trip():
+    row = rules.to_row("Q001-K0", k0_ok(), control=True)
+    assert list(row) == rules.checks_header(True)
+    assert rules.from_row(row, control=True) == (rules.RUBRIC_RULES_VERSION, k0_ok())

@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. Übertragen aus dem Decision Log des
-früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0040 sind seit
+früheren Ground-Truth-Leitfadens (D1–D18 = ADR 0001–0018, Stand Juni 2026; in der Git-Historie); ADR 0019–0041 sind seit
 der Umsetzung hinzugekommen. Hintergrund: [Forschungsdesign](../explanation/research-design.md); offene Entscheidungen: [Plan](../plan.md).
 Format: Michael Nygard (Status, Kontext, Entscheidung, Konsequenzen), Nummern und Dateinamen bleiben fest.
 Neue oder geänderte Entscheidungen: neue Datei mit der nächsten Nummer, alte auf „ersetzt durch …“ setzen.
@@ -47,6 +47,7 @@ bleibt unverändert.
 | [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037 |
 | [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |
 | [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen |
-| [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen; Beurteilung festgelegt durch 0040 |
+| [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen; Beurteilung festgelegt durch 0040; K0 umgesetzt durch 0041 |
 | [0039](0039-stichprobenplan-e2e.md) | Stichprobenplan und Bereichsquoten auf e2e | Angenommen |
 | [0040](0040-closed-book-pruefung.md) | Closed-Book-Prüfung des Fragenkatalogs (Urteil durch Jonas, gemeinsamer Prompt mit K0) | Angenommen |
+| [0041](0041-kontrolle-k0.md) | Kontrolle K0: Antworten ohne Retrieval, eigener Bewertungssatz nach C1–C3 | Angenommen |
