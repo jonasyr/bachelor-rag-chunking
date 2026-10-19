@@ -1,17 +1,20 @@
 # Datenartefakte und Formate
 
-> Seitentyp: Nachschlagen (reference). Stand: 17.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Dateinamen und Pfade kommen aus [`src/config.py`](../../src/config.py) ([Konfiguration](configuration.md)); welche
-Dateien versioniert sind: [Werkzeuge und Repository](tooling.md#versioniert-und-ignoriert). Die Korpus-Beispiele sind echte
-Datensätze auf `ef977f4` ([Korpus](corpus.md)); Katalog- und Ergebnisbeispiele stammen noch aus dem Vue-Korpus und
-werden mit dem neuen Pilot ersetzt ([Plan](../plan.md#stand)). Texte gekürzt (`...`), Prüfsummen gekürzt (`…`).
+Dateien versioniert sind: [Versioniert und ignoriert](#versioniert-und-ignoriert). Korpus-Beispiele und der
+`embed.py`-Eintrag sind echte Datensätze auf `ef977f4` ([Korpus](corpus.md)). Katalog- und Ergebnisbeispiele nutzen
+echte e2e-IDs aus `sections.jsonl` mit Platzhaltern (`…`) für Texte; ihre Zahlen zeigen nur die Form, denn einen Lauf
+des Hauptexperiments gibt es noch nicht ([Plan](../plan.md#stand)). Der `retrieve.py`-Eintrag stammt aus einem
+historischen Pilot-Set ([Pilot-Sets](#pilot-sets)). Texte gekürzt (`...`), Prüfsummen gekürzt
+(`…`).
 
 ## Korpus
 
-**`docs/corpus_snapshot.txt`** (versioniert, geschrieben von `snapshot.py`): Kopfzeilen `schlüssel: wert`, eine
-Leerzeile, dann je Datei `SHA-256  pfad` (zwei Leerzeichen; Pfad relativ zu `docs/`, sortiert; Seiten und die
-beiden mitkopierten Dateien `docs.json` und `snippets/model-provider.jsx`).
+**`docs/corpus_snapshot.txt`** (geschrieben von `snapshot.py`): Kopfzeilen `schlüssel: wert`, eine Leerzeile, dann je
+Datei `SHA-256  pfad` (zwei Leerzeichen; Pfad relativ zu `docs/`, sortiert; Seiten und die beiden mitkopierten
+Dateien `docs.json` und `snippets/model-provider.jsx`).
 
 ```
 repository: https://github.com/tester-army/e2e.git
@@ -24,7 +27,11 @@ files: 62
 2b64177a…f8671c8  agent-steps.mdx
 ```
 
-**`docs/corpus_manifest.csv`** (versioniert, geschrieben von `preprocess.py`): Spalten und Beispielzeilen in
+**`data/raw/e2e_docs_snapshot/`** (`config.DATA_RAW`, geschrieben von `snapshot.py`): die Seiten (`*.mdx`) und die
+beiden mitkopierten Dateien mit denselben relativen Pfaden wie unter `docs/` im Repository; `snapshot.py` leert den
+Ordner vorher (bis auf Dateien, die mit `.` beginnen, z. B. `.gitkeep`).
+
+**`docs/corpus_manifest.csv`** (geschrieben von `preprocess.py`): Spalten und Beispielzeilen in
 [Korpus](corpus.md#korpusmanifest-corpus_manifestcsv).
 
 **`documents.jsonl`** (`area` = Gruppe der Navigation, [Korpus](corpus.md#bereiche); `text` nach `ingest.py` das
@@ -33,11 +40,23 @@ rohe MDX, nach `preprocess.py` das umgewandelte Markdown)
 {"doc_id":"D031","path":"migrate/detox.mdx","title":"From Detox","area":"Migrate","text":"# From Detox\n\nUse your existing app build and testIDs with s...","tokens":2409}
 ```
 
+- `doc_id` = Position der Seite in der nach Pfad sortierten Seitenliste (`D001` = `agent-steps.mdx`, `D002` =
+  `agents.mdx`, …). Jede Änderung der Seitenmenge nummeriert die folgenden Seiten um; Annotationen eines anderen
+  Korpusstands werden über Pfad und Anker umgeschrieben, nie von Hand (so am 14.10.2026 mit
+  `scripts/remap_pilot.py`, [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md); das Skript gilt nur für den
+  Vue-Korpus).
+- `preprocess.py` schreibt `documents.jsonl` an Ort und Stelle neu und bricht ab, wenn die Datei schon umgewandelt
+  ist; vor einem zweiten Lauf erst `ingest.py` ausführen.
+
 **`sections.jsonl`** (ein Eintrag je H1–H3-Abschnitt; Spanne in Tokens des bereinigten `text`, Ende exklusiv; ein
-Abschnitt reicht bis zur nächsten Überschrift gleicher oder höherer Ebene; [ADR 0019](../adr/0019-korpus-ausschnitt.md))
+Abschnitt reicht bis zur nächsten Überschrift gleicher oder höherer Ebene; [ADR 0019](../adr/0019-korpus-ausschnitt.md),
+Anker nach [ADR 0042](../adr/0042-mdx-umwandlung.md))
 ```json
 {"section_id":"D013#let-the-agent-use-the-app","doc_id":"D013","anchor":"let-the-agent-use-the-app","title":"Let the agent use the app","level":2,"start_token":639,"end_token":710}
 ```
+
+`chunking.py` bricht ab, wenn `sections.jsonl` nicht zum Text in `documents.jsonl` passt (etwa nach `ingest.py` ohne
+anschließendes `preprocess.py`).
 
 ## Chunks
 
@@ -64,6 +83,11 @@ Modell, IDs und Texte unverändert sind; sonst bricht der Lauf ab, bis die Datei
 **`query_embeddings.npz`** (`data/evaluation/` bzw. je Pilot-Set): Arrays `model`, `ids` (Frage-IDs), `texts`
 (Fragen), `vectors`.
 
+**`chroma_db/`** (`config.CHROMA_DIR`, Chroma-Index): je Strategie eine Collection aus `config.CHROMA_COLLECTIONS`
+(`rag_c1`–`rag_c3`) bzw. `config.CONTROL_COLLECTIONS` (`rag_k1`), die `embed.py` aus den Vektoren der `.npz`-Datei
+aufbaut; Metadaten je Chunk `doc_id`, `start_token`, `end_token`. `retrieve.py` bricht ab, wenn eine Collection nicht
+so viele Einträge hat wie die Chunk-Datei.
+
 ## Laufprotokoll
 
 **`embedding_runs.jsonl`** (`data/processed/`; ein Eintrag je Lauf von `embed.py` oder `retrieve.py`; Kosten nach
@@ -74,9 +98,10 @@ Modell, IDs und Texte unverändert sind; sonst bricht der Lauf ab, bis die Datei
   keine Prüfung nötig war), damit sie die Kosten einer Strategie nicht verfälscht.
 - `api_called`: `false`, wenn gespeicherte Vektoren wiederverwendet wurden.
 
-`embed.py` (eine Zeile je Strategie; Lauf C1 vom 14.10.2026):
+`embed.py` (eine Zeile je Strategie; Lauf C2 vom 18.10.2026, alle Läufe im
+[Experiment-Protokoll](experiment-record.md#embedding-e2e)):
 ```json
-{"date":"2026-10-14","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C1","dimensions":3072,"vectors":369,"vector_bytes":4534272,"inputs_sha256":{"chunks_c1.jsonl":"6d8ca599…"},"canary_min_cosine":0.9999061226844788,"input_tokens":165723,"cost_usd":0.02154399,"canary_input_tokens":2706,"canary_cost_usd":0.00035178,"api_called":true}
+{"date":"2026-10-18","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"embed","strategy":"C2","dimensions":3072,"vectors":642,"vector_bytes":7888896,"inputs_sha256":{"chunks_c2.jsonl":"5c65075b…"},"canary_min_cosine":0.9999860525131226,"input_tokens":308580,"cost_usd":0.0401154,"canary_input_tokens":1499,"canary_cost_usd":0.00019487,"api_called":true}
 ```
 
 `retrieve.py` (eine Zeile je Lauf; `strategy` listet alle Strategien des Laufs, `vectors`/`dimensions` beziehen sich
@@ -84,19 +109,33 @@ auf die Fragen, `inputs_sha256` belegt alle Eingaben, u. a. die Ground Truth nac
 [ADR 0017](../adr/0017-fragenkatalog.md); seit 17.10.2026 zusätzlich `outputs_sha256` mit der Prüfsumme der
 geschriebenen Ergebnisdatei, gegen die `generate.py` prüft (Pflicht für den Hauptlauf; ältere Pilot-Einträge
 ohne sie werden nur an den Eingaben geprüft) ([ADR 0033](../adr/0033-antwortmodell.md)); Beispiel:
-erster Lauf des Pilot-Sets `hard`, noch ohne `outputs_sha256`):
+erster Lauf des Pilot-Sets `hard` vom 14.10.2026 auf dem Vue-Korpus, noch ohne `outputs_sha256`):
 ```json
 {"date":"2026-10-14","model":"text-embedding-3-large","openai_sdk":"2.44.0","chromadb":"1.5.9","step":"retrieve","strategy":"C1,C2,C3","dimensions":3072,"vectors":16,"inputs_sha256":{"questions.csv":"6f4a2e9f…","ground_truth.csv":"f9ddb34b…","sections.jsonl":"…","query_embeddings.npz":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…","embeddings_c1.npz":"…","embeddings_c2.npz":"…","embeddings_c3.npz":"…"},"canary_min_cosine":0.9999592304229736,"input_tokens":391,"cost_usd":5.083e-05,"canary_input_tokens":2706,"canary_cost_usd":0.00035178,"api_called":true}
 ```
 
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
 
-**`generation_runs.jsonl`** (`data/evaluation/`, versioniert; ein Eintrag je erfolgreichem Lauf von `generate.py`, dazu je
-neu erzeugter blinder Bewertung ein Eintrag `{"step":"scaffold","strategy":"C1,C2,C3","scoring":"rules","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}`
-(`scoring` = `config.SCORING_METHOD`: nur regelbasiert zu bewerten, [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md); ältere Einträge ohne das Feld), je
-Einfrieren der Kernpunkte ein Eintrag `"step":"key_points"` (siehe `key_points.csv`);
-[ADR 0033](../adr/0033-antwortmodell.md)). Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`. Ein
-abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte daher nur zur Form):
+**`generation_runs.jsonl`** (`data/evaluation/`; Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`;
+[ADR 0033](../adr/0033-antwortmodell.md)). Jeder Eintrag beginnt mit `date`; die Einträge mit API-Aufrufen tragen
+danach die gepinnten Einstellungen und enden mit `prompt_tokens`, `completion_tokens`, `cost_usd`.
+
+| `step` | `strategy` | geschrieben von | weitere Felder |
+|---|---|---|---|
+| `generate` | `C1,C2,C3` | `generate.py`, nur nach einem erfolgreichen Lauf; ein abgebrochener Lauf schreibt nichts | siehe unten |
+| `scaffold` | `C1,C2,C3` | `evaluate_answers.py --mode scaffold`, nur bei neu erzeugtem Bogen | `scoring`, `codes` (Zahl der Codes), `outputs_sha256` mit `scoring_items.jsonl` |
+| `scaffold` | `K0` | `evaluate_answers.py --mode scaffold --control` ([ADR 0041](../adr/0041-kontrolle-k0.md)) | `scoring`, `codes` (Zahl der K0-Codes), `outputs_sha256` mit `scoring_items_control.jsonl` |
+| `key_points` | `C1,C2,C3` | Einfrieren der Kernpunkte auf der Bewertungsseite (siehe `key_points.csv`) | `outputs_sha256` mit `key_points.csv` und `scoring_items.jsonl` |
+| `closed_book_screen` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten |
+
+`scoring` = `config.SCORING_METHOD` (`rules`): das Scaffold ist nur regelbasiert zu bewerten
+([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)); ältere Einträge haben das Feld nicht.
+
+```json
+{"date":"…","step":"scaffold","strategy":"C1,C2,C3","scoring":"rules","codes":…,"outputs_sha256":{"scoring_items.jsonl":"…"}}
+```
+
+Felder des Eintrags `generate`:
 
 - `model`, `reasoning_effort`, `temperature`, `seed`, `max_completion_tokens`: die gepinnten Einstellungen; `model_reported`:
   das Modell, das die API für alle Antworten des Laufs gemeldet hat; `model_created`: Erstellungszeitpunkt des
@@ -104,14 +143,33 @@ abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte
   Backend-Konfiguration (`null`, wenn die API keine meldet).
 - `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten C1–C3),
   `control_answers` (Zahl der K0-Antworten, [ADR 0041](../adr/0041-kontrolle-k0.md)).
-- `inputs_sha256`: Ergebnisdatei des Retrievals, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
-  `generated_answers.csv` und `generated_answers_control.csv`. `evaluate_answers.py --mode scaffold` prüft beide
-  gegen die aktuellen Dateien.
+- `inputs_sha256`: `retrieved_results.csv`, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
+  `generated_answers.csv` und `generated_answers_control.csv`.
 - `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie und für K0
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
+Der Eintrag wird geprüft, bevor ein späterer Schritt auf ihm aufbaut: `evaluate_answers.py --mode scaffold` vergleicht
+`questions.csv`, `ground_truth.csv`, die drei Chunk-Dateien und `generated_answers.csv`,
+`evaluate_answers.py --mode scaffold --control` vergleicht `questions.csv`, `ground_truth.csv` und
+`generated_answers_control.csv` mit den aktuellen Dateien. `retrieved_results.csv` prüft `generate.py` schon vor dem
+Lauf gegen den `retrieve.py`-Eintrag; im `generate`-Eintrag ist die Prüfsumme nur aufgezeichnet.
+
+Bisher gibt es keinen `generate`-Lauf des Hauptexperiments. Der einzige echte Eintrag steht im historischen Pilot-Set
+`data/pilot/hard/runs.jsonl` (17.10.2026, vor K0: ohne `control_answers`, ohne `generated_answers_control.csv` in
+`outputs_sha256`, `by_strategy` ohne K0). Form des Eintrags (Zahlen nur zur Form):
+
 ```json
 {"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","model_created":"…","system_fingerprint":"…","answers":144,"control_answers":48,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…","generated_answers_control.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"},"K0":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
+```
+
+Der Eintrag `closed_book_screen` hat die gepinnten Einstellungen und `openai_sdk` wie `generate`, dann `answers` (Zahl
+der abgerechneten Antworten dieses Aufrufs), `model_reported` und `system_fingerprint` als **sortierte Listen** aller
+gemeldeten Werte (fehlender Fingerprint als `""`), `outputs_sha256` mit `closed_book_screen.csv`; er hat weder
+`strategy` noch `inputs_sha256`. `screen` schreibt ihn, sobald mindestens eine Antwort abgerechnet wurde, auch nach
+einem Abbruch (API-Fehler, abgeschnittene oder leere Antwort).
+
+```json
+{"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"closed_book_screen","answers":…,"model_reported":["…"],"system_fingerprint":["…"],"outputs_sha256":{"closed_book_screen.csv":"…"},"prompt_tokens":…,"completion_tokens":…,"cost_usd":…}
 ```
 
 ## Fragen und Ground Truth
@@ -119,7 +177,7 @@ abgebrochener Lauf schreibt keinen Eintrag. Felder (noch kein echter Lauf, Werte
 **`questions.csv`**
 ```
 question_id,question,type,difficulty,notes
-Q001,"What is the difference between ref and reactive in Vue?",comparative,multi-section,
+Q001,"How do I …?",procedural,single,
 ```
 
 `type` und `difficulty` nehmen nur die Werte aus [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) an (`config.QUESTION_TYPES`,
@@ -128,7 +186,7 @@ Q001,"What is the difference between ref and reactive in Vue?",comparative,multi
 **`ground_truth.csv`**
 ```
 question_id,expected_answer,relevant_doc_ids,relevant_section_ids
-Q001,"ref wraps any value in a reactive object with a .value property; reactive makes an object deeply reactive but only works on objects.",D049,"D049#reactive"
+Q001,"…",D013,D013#install-the-skill
 ```
 
 Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `config.ID_SEPARATOR` (`;`) getrennt.
@@ -139,24 +197,27 @@ Mehrere IDs in `relevant_doc_ids` bzw. `relevant_section_ids` werden durch `conf
   `question_id`.
 - Pflichtfelder nicht leer: in `questions.csv` alle außer `notes`, in `ground_truth.csv` alle.
 - Jede Frage hat eine Ground-Truth-Zeile und umgekehrt; jede Frage hat mindestens eine `relevant_section_id`, und alle
-  existieren in `sections.jsonl`; keine ID steht in einer Zeile doppelt.
-- `relevant_doc_ids` liegen im Korpus und sind genau die Dokumente der `relevant_section_ids`.
+  existieren in `sections.jsonl`; keine Abschnitts-ID steht in einer Zeile doppelt.
+- `relevant_doc_ids` liegen im Korpus und sind als Menge genau die Dokumente der `relevant_section_ids` (eine doppelt
+  genannte Dokument-ID fällt dabei nicht auf).
 - Nur für den Hauptkatalog: Der Freeze-Datensatz existiert und die Prüfsummen von `questions.csv`, `ground_truth.csv`,
   `sections.jsonl` und `documents.jsonl` passen ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)).
 
-**`section_index.md`** (`data/processed/`, nicht versioniert, geschrieben von `catalogue.py sections`): Markdown-Tabelle,
-eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
+**`section_index.md`** (`data/processed/`, geschrieben von `catalogue.py sections`): Überschrift `# Section index`,
+eine Zeile mit Herkunft und Zahl der Abschnitte („Generated by … do not edit. 571 sections.“), dann eine
+Markdown-Tabelle mit einer Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
 ```
 | section_id | area | path | heading path | tokens |
 |---|---|---|---|---:|
-| `D001#createapp` | api | api/application.md | Application API › createApp() | 164 |
+| `D001#agent-steps` | Deep dive | agent-steps.mdx | How agent steps work | 1176 |
 ```
-`area` ist der Bereich der Seite (Gruppe der Navigation, Feld `area` in `documents.jsonl`; [Korpus](corpus.md#bereiche)).
+`area` ist der Bereich der Seite (Gruppe der Navigation, Feld `area` in `documents.jsonl`; [Korpus](corpus.md#bereiche));
+`heading path` verbindet die Überschriften mit `config.CATALOGUE_HEADING_SEPARATOR` (` › `).
 
-**`catalogue_freeze.json`** (`data/evaluation/`, versioniert, geschrieben von `catalogue.py freeze`; [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)):
+**`catalogue_freeze.json`** (`data/evaluation/`, geschrieben von `catalogue.py freeze`; [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)):
 ```
 {
-  "date": "2026-11-09",
+  "date": "…",
   "questions": 48,
   "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
@@ -166,12 +227,14 @@ eine Zeile je Abschnitt in der Reihenfolge von `sections.jsonl`:
 }
 ```
 
-Plan-, Durchsichts- und Closed-Book-Datei werden nur aufgezeichnet; die Sperre in `retrieve.py` prüft die vier
-übrigen Dateien. `closed_book` = Zahl der retrieval-abhängigen (`miss`) und -unabhängigen (`hit`) Fragen.
+Plan-, Durchsichts- und Closed-Book-Datei werden nur aufgezeichnet, und nur, sofern sie vorhanden sind; die Sperre in
+`retrieve.py` prüft die vier übrigen Dateien. `closed_book` = Zahl der retrieval-abhängigen (`miss`) und
+-unabhängigen (`hit`) Fragen.
 
-**`catalogue_plan.csv`** (`data/evaluation/`, versioniert, einmal geschrieben von `catalogue.py plan`, danach ändert
-der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
-die Reserve in Ziehungsreihenfolge.
+**`catalogue_plan.csv`** (`data/evaluation/`, einmal geschrieben von `catalogue.py plan`, danach ändert
+der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md)): eine Zeile je gezogenem Abschnitt, je Bereich erst die Slots, dann
+die Reserve in Ziehungsreihenfolge. Der unbenutzte Vue-Plan liegt unverändert in
+`data/evaluation/archive_vue/catalogue_plan.csv` ([Experiment-Protokoll](experiment-record.md#stichprobenplan-e2e)).
 ```
 area,draw,section_id,slot_id,class,status,skip_reason,question_id
 Get started,1,D013#install-the-skill,S01,single,used,,Q001
@@ -183,35 +246,37 @@ Get started,4,D037#add-an-agent-step,,,reserve,,
 `config.CATALOGUE_SKIP_REASONS`. `check` vergleicht den Plan mit einer frischen Ziehung und meldet jede andere
 Abweichung als Fehler.
 
-**`catalogue_review.csv`** (`data/evaluation/`, versioniert; Claude hängt Zeilen mit `decision = open` an, die
+**`catalogue_review.csv`** (`data/evaluation/`; Claude hängt Zeilen mit `decision = open` an, die
 Entscheidung trifft Jonas im Editor; [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)):
 ```
 round,question_id,kind,suggestion,section_id,decision,reason,date
-1,Q001,missing_section,The bug bash page installs the same skill.,D006#install-the-skill,accepted,,2026-10-21
-1,Q002,wording,Name the command instead of "it".,,rejected,the slot asks for a paraphrase,2026-10-21
+1,Q001,missing_section,…,D006#install-the-skill,accepted,,…
+1,Q002,wording,…,,rejected,…,…
 ```
 `kind` ∈ `config.CATALOGUE_REVIEW_KINDS`, `decision` ∈ `config.CATALOGUE_REVIEW_DECISIONS`; `section_id` nur bei
 `missing_section`, `reason` Pflicht bei `rejected`.
 
-**`closed_book_screen.csv`** (`data/evaluation/`, versioniert; `catalogue.py screen` schreibt Antworten, Jonas die
-Urteile im Editor; [ADR 0040](../adr/0040-closed-book-pruefung.md)): eine Zeile je Katalogfrage, sortiert nach ID.
+**`closed_book_screen.csv`** (`data/evaluation/`, nur für den Hauptkatalog; `catalogue.py screen` schreibt Antworten,
+Jonas die Urteile im Editor; [ADR 0040](../adr/0040-closed-book-pruefung.md)): eine Zeile je Katalogfrage, sortiert
+nach ID.
 ```
 question_id,question_sha256,reference_sha256,answer,model,core_point,note,date
-Q001,5d1f…,a90c…,I don't know which command installs the skill.,gpt-6-luna-2026-05-18,miss,,2026-10-21
+Q001,5d1f…,a90c…,…,gpt-6-luna,miss,,…
 ```
 `question_sha256` = SHA-256 des Fragetexts, zu dem die Antwort gehört (geänderte Frage: `screen` fragt neu, das Urteil
 wird geleert); `reference_sha256` = SHA-256 der Referenzantwort, zu der das Urteil gehört (geänderte Referenz: Urteil
-offen). `core_point` ∈ `config.CLOSED_BOOK_VERDICTS`: leer = offen, `hit` = trifft den Kernpunkt (Frage
-retrieval-unabhängig), `miss` = trifft ihn nicht oder nur teilweise.
+offen). `model` = das von der API gemeldete Modell. `core_point` ∈ `config.CLOSED_BOOK_VERDICTS`: leer = offen,
+`hit` = trifft den Kernpunkt (Frage retrieval-unabhängig), `miss` = trifft ihn nicht oder nur teilweise.
 
 ## Ergebnisse
 
-**`retrieved_results.csv`** (`retrieve.py` läuft über alle Strategien C1–C3 und schreibt die Datei vollständig neu;
-[ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)). `score` = Kosinus-Ähnlichkeit mit sechs
-Nachkommastellen; `is_relevant` = `1`/`0` nach der Hauptregel ([Evaluation](evaluation.md#relevanz-eines-chunks)).
+**`retrieved_results.csv`** (`retrieve.py` läuft über alle Strategien C1–C3 und schreibt die Datei vollständig neu,
+sortiert nach `question_id`, Strategie und Rang; [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)).
+`score` = Kosinus-Ähnlichkeit mit sechs Nachkommastellen; `is_relevant` = `1`/`0` nach der Hauptregel
+([Evaluation](evaluation.md#relevanz-eines-chunks)).
 ```
 question_id,strategy,rank,chunk_id,score,is_relevant
-Q001,C1,1,C1_D049_0004,0.840000,1
+Q001,C1,1,C1_D013_0001,0.840000,1
 ```
 
 **`retrieved_results_control.csv`** (`retrieve.py --control`): gleiche Spalten, `strategy` immer `K1`.
@@ -232,7 +297,7 @@ Strategie; wird nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md)). `
 `prompt_tokens`/`completion_tokens` = Abrechnung der API (`usage`).
 ```
 question_id,strategy,answer,sources,prompt_tokens,completion_tokens
-Q001,C1,"...",C1_D049_0004,1200,180
+Q001,C1,"...",C1_D013_0001;…,1200,180
 ```
 
 **`generated_answers_control.csv`** (Kontrolle K0, im selben Lauf von `generate.py` mit dem Closed-Book-Prompt; Format
@@ -240,49 +305,56 @@ wie `generated_answers.csv`, `strategy` = `K0`, `sources` leer; wird nie übersc
 [ADR 0041](../adr/0041-kontrolle-k0.md)).
 
 Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
-aus `generated_answers.csv` drei Dateien, je Frage die drei Antworten in der mit `config.SCORING_SEED` gemischten
-Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen und Schlüssel werden nie überschrieben (liegen beide
-vor, stimmt der Schlüssel und sind die neuen Einträge byte-gleich zur Prüfsumme im Laufprotokoll, schreibt ein
-erneuter Aufruf nur Lesepaket und `scoring_items.jsonl` neu).
+aus `generated_answers.csv` vier Dateien (Lesepaket, Bogen, Schlüssel, `scoring_items.jsonl`), je Frage die drei
+Antworten in der mit `config.SCORING_SEED` gemischten Reihenfolge unter den Codes `<question_id>-A`, `-B`, `-C`; Bogen
+und Schlüssel werden nie überschrieben (liegen beide vor, stimmt der Schlüssel und sind die neuen Einträge byte-gleich
+zur Prüfsumme im Laufprotokoll, schreibt ein erneuter Aufruf nur Lesepaket und `scoring_items.jsonl` neu).
 
-**`scoring_packet.md`** (Lesepaket, nur Lesekopie; bewertet wird in der App über die Prüffragen): Hinweis, dann je Frage `## Q001` mit Frage und Referenzantwort, je Code
-`### Q001-A` mit der Antwort und den Passagen, die das Modell sah (`[Excerpt N]`, getrennt durch `---`, ohne
-Chunk-IDs), beide in einem Code-Block, dessen Zaun länger ist als jede Backtick-Folge im Text.
+**`scoring_packet.md`** (Lesepaket, nur Lesekopie; bewertet wird in der App über die Prüffragen): Hinweis, dann je
+Frage `## Q001` mit Frage und Referenzantwort, je Code `### Q001-A` mit der Antwort und den Passagen, die das Modell
+sah (`[Excerpt N]`, getrennt durch `---`, ohne Chunk-IDs), jeweils in einem eigenen Code-Block, dessen Zaun länger ist
+als jede Backtick-Folge im Text.
 
-**`scoring_sheet.csv`** (Bewertungsbogen, von Hand gefüllt: Kriterien ganze Zahlen 0–2, `notes` frei)
+**`scoring_sheet.csv`** (Bewertungsbogen: Kriterien ganze Zahlen 0–2, `notes` frei). Die Bewertungsseite schreibt die
+Werte, abgeleitet aus den Prüffragen in `scoring_checks.csv`; `--mode summarise` lehnt jeden Wert ab, der von dieser
+Ableitung abweicht ([ADR 0035](../adr/0035-regelbasierte-bewertung.md),
+[ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)). Von Hand eingetragene Werte gelten nur für ein
+Scaffold vor ADR 0036 ohne Kernpunkte und Prüffragen.
 ```
 code,question_id,correctness,completeness,groundedness,no_hallucination,clarity,notes
-Q001-A,Q001,2,1,2,2,2,lists only one of the two hooks
+Q001-A,Q001,2,1,2,2,2,…
 ```
 
-**`scoring_key.csv`** (Schlüssel; erst `--mode summarise` liest ihn)
+**`scoring_key.csv`** (Schlüssel; erst `--mode summarise` entblindet mit ihm; ein erneutes `--mode scaffold` liest ihn
+nur, um ihn maschinell mit dem berechneten zu vergleichen)
 ```
 code,question_id,strategy
 Q001-A,Q001,C3
 ```
 
-**`scoring_items.jsonl`** (Daten der Bewertungsseite, [ADR 0034](../adr/0034-bewertung-in-der-app.md); nicht
-versioniert): eine Zeile je Code in der Reihenfolge des Lesepakets mit `code`, `question_id`, `question`,
-`reference_answer`, `answer` und `excerpts` (Texte der Passagen in Rangfolge, ohne Chunk-IDs); keine Strategie.
+**`scoring_items.jsonl`** (Daten der Bewertungsseite, [ADR 0034](../adr/0034-bewertung-in-der-app.md)): eine Zeile je
+Code in der Reihenfolge des Lesepakets mit `code`, `question_id`, `question`, `reference_answer`, `answer` und
+`excerpts` (Texte der Passagen in Rangfolge, ohne Chunk-IDs); keine Strategie.
 
 **`key_points.csv`** (Kernpunkte je Frage, von Jonas vor der Bewertung geschrieben und eingefroren,
-[ADR 0035](../adr/0035-regelbasierte-bewertung.md); versioniert): eine Zeile je Punkt, `point` ab 1 ohne Lücken
+[ADR 0035](../adr/0035-regelbasierte-bewertung.md)): eine Zeile je Punkt, `point` ab 1 ohne Lücken
 (1 = Kernaussage), höchstens `config.KEY_POINTS_MAX` je Frage, `text` einzeilig. Das Einfrieren schreibt einen
-Eintrag `{"step":"key_points","strategy":"C1,C2,C3","outputs_sha256":{"key_points.csv":"…","scoring_items.jsonl":"…"}}`
+Eintrag `{"date":"…","step":"key_points","strategy":"C1,C2,C3","outputs_sha256":{"key_points.csv":"…","scoring_items.jsonl":"…"}}`
 ins Laufprotokoll; er gilt nur für das Scaffold mit dieser `scoring_items.jsonl`. Nach einem neuen Scaffold werden die
-Kernpunkte erneut eingefroren (eine `scoring_checks.csv` des alten Scaffolds vorher beiseitelegen).
+Kernpunkte erneut eingefroren; das Einfrieren verweigert, solange eine `scoring_checks.csv` eines früheren Scaffolds
+vorliegt.
 ```
 question_id,point,text
-Q001,1,"ref() wraps any value, reactive() only objects"
+Q001,1,"…"
 ```
 
 **`scoring_checks.csv`** (Antworten auf die Prüffragen je bewertetem Code, in der Reihenfolge des Bogens,
-[ADR 0035](../adr/0035-regelbasierte-bewertung.md); versioniert): `points` = Markierungen der Kernpunkte in
-Punktreihenfolge, durch `;` getrennt; übrige Spalten und Optionen nach
-[Evaluation](evaluation.md#regelbasierte-bewertung).
+[ADR 0035](../adr/0035-regelbasierte-bewertung.md)): `rules_version` = `config.RUBRIC_RULES_VERSION` (Zeilen mit
+einer anderen Version lehnt `--mode summarise` ab); `points` = Markierungen der Kernpunkte in Punktreihenfolge, durch
+`;` getrennt; übrige Spalten und Optionen nach [Evaluation](evaluation.md#regelbasierte-bewertung).
 ```
 code,rules_version,points,declines,core_wrong,other_error,grounded,hallucination,answers_question,direct,wordy
-Q001-A,2026-10-17,covered;missing,no,no,no,all,none,yes,yes,no
+Q001-A,2026-10-18,covered;missing,no,no,no,all,none,yes,yes,no
 ```
 
 **`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach
@@ -293,12 +365,14 @@ question_id,strategy,correctness,completeness,groundedness,no_hallucination,clar
 Q001,C1,2,2,2,2,2,2.0
 ```
 
-**Kontrolle K0** ([ADR 0041](../adr/0041-kontrolle-k0.md)): `evaluate_answers.py --mode scaffold --control` schreibt
-erst nach `scores.csv` für deren Fragen `scoring_items_control.jsonl` (Einträge wie `scoring_items.jsonl`, Code
-`Q001-K0`, `excerpts` leer; versioniert, da es kein Wiederherstellen gibt) und `scoring_sheet_control.csv`
-(`code,question_id,correctness,completeness,no_hallucination,clarity,notes`); die Seite schreibt
-`scoring_checks_control.csv` (Kopf von `scoring_checks.csv` ohne `grounded`). `--mode summarise --control` schreibt
-`scores_control.csv` (nicht versioniert; Gesamtwert = Mittel der vier Kriterien mit zwei Nachkommastellen):
+**Kontrolle K0** ([ADR 0041](../adr/0041-kontrolle-k0.md), [Evaluation](evaluation.md#kontrolle-k0)):
+`evaluate_answers.py --mode scaffold --control` schreibt erst nach `scores.csv` für deren Fragen
+`scoring_items_control.jsonl` (Einträge wie `scoring_items.jsonl`, Code `Q001-K0`, `excerpts` leer; versioniert, da es
+kein Wiederherstellen gibt) und `scoring_sheet_control.csv`
+(`code,question_id,correctness,completeness,no_hallucination,clarity,notes`); die Bewertungsseite schreibt
+`scoring_checks_control.csv` (Kopf von `scoring_checks.csv` ohne `grounded`) und die abgeleiteten Werte in den Bogen.
+`--mode summarise --control` schreibt `scores_control.csv` (Gesamtwert = Mittel der vier Kriterien mit zwei
+Nachkommastellen):
 ```
 question_id,strategy,correctness,completeness,no_hallucination,clarity,total_score
 Q001,K0,1,0,2,2,1.25
@@ -306,30 +380,51 @@ Q001,K0,1,0,2,2,1.25
 
 ## Pilot-Sets
 
-Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
-Fragenkatalogs. Jedes Set ist ein Ordner mit den Dateien der Evaluation unter denselben Namen und Formaten:
+Historisch (Vue-Korpus). Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
+Fragenkatalogs. Alle drei Sets entstanden auf dem Vue.js-Korpus vor [ADR 0038](../adr/0038-korpus-e2e.md): Ihre
+Abschnitts- und Chunk-IDs gibt es im e2e-Korpus nicht, sie lassen sich darauf nicht neu ausführen und bleiben als
+Aufzeichnung erhalten; ein neuer Pilot auf e2e ist geplant ([Plan](../plan.md#stand)). Ein Set ist ein Ordner mit den
+Dateien der Evaluation unter denselben Namen und Formaten (Schritte mit `--set DIR`, `evaluate_answers.py` dazu
+`--limit N` für die ersten N Fragen); das Laufprotokoll heißt `config.PILOT_RUNS_FILE_NAME` = `runs.jsonl` und hat
+das Format von `embedding_runs.jsonl` und `generation_runs.jsonl`. Eine Closed-Book-Prüfung gibt es für Pilot-Sets
+nicht. Welche Dateien versioniert sind: [Versioniert und ignoriert](#versioniert-und-ignoriert).
 
-| Datei | Inhalt | Versioniert |
+| Set | Fragen | vorhandene Dateien |
 |---|---|---|
-| `questions.csv` | Pilotfragen (IDs `P01`… bzw. `H01`…; `notes` = `pilot <Art>`, Art z. B. `multi-section`, `detail`, `paraphrase`) | ja |
-| `ground_truth.csv` | Relevanz-Annotation | ja |
-| `query_embeddings.npz` | gespeicherte Fragevektoren | nein |
-| `retrieved_results.csv` | Top-5 für C1–C3 | ja |
-| `retrieved_results_control.csv` | Top-5 für K1 | ja |
-| `generated_answers.csv`, `generated_answers_control.csv` | Antworten C1–C3 und K0 (`generate.py --set`) | ja |
-| `scoring_sheet.csv`, `scoring_key.csv` | blinde Bewertung (`evaluate_answers.py --set`, ggf. nur die ersten N Fragen mit `--limit`) | ja |
-| `closed_book_screen.csv` | Antworten ohne Kontext und Urteile der Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | ja |
-| `key_points.csv`, `scoring_checks.csv` | Kernpunkte und Prüffragen der regelbasierten Bewertung ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)) | ja |
-| `scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung der Kontrolle K0 (`evaluate_answers.py --set DIR --control`, [ADR 0041](../adr/0041-kontrolle-k0.md)) | ja |
-| `scores_control.csv` | ausgewertete K0-Bewertung | nein |
-| `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv` | Lesepaket, Daten der Bewertungsseite, entblindete Bewertung | nein |
-| `runs.jsonl` (`config.PILOT_RUNS_FILE_NAME`) | Laufprotokoll im Format von `embedding_runs.jsonl` und `generation_runs.jsonl` | ja |
-
-| Set | Inhalt |
-|---|---|
-| `data/pilot/` | Probe 1: 8 einfache Fragen |
-| `data/pilot/hard/` | Probe 2: 16 schwere Fragen, Annotation blind vor jedem Retrieval (Hauptwerte; [ADR 0027](../adr/0027-blinde-annotation.md)) |
-| `data/pilot/hard_posthoc/` | dieselben Fragen mit nachträglich ergänzter Annotation; nur Sensitivität, keine Evidenz ([ADR 0027](../adr/0027-blinde-annotation.md)) |
-| `data/pilot/hard/history/` | `ground_truth_b75d188.csv`: blinde Annotation mit den IDs des alten Korpus (`b75d188`) |
+| `data/pilot/` | Probe 1: 8 Fragen `P01`–`P08` (`difficulty`: 3 `easy`, 4 `medium`, 1 `hard`; `notes` = `pilot`) | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `runs.jsonl` (nur `retrieve`) |
+| `data/pilot/hard/` | Probe 2: 16 schwere Fragen `H01`–`H16` (`notes` = `pilot <Art>`: `multi-section`, `detail`, `paraphrase`), Annotation blind vor jedem Retrieval (Hauptwerte; [ADR 0027](../adr/0027-blinde-annotation.md)) | wie `data/pilot/`, dazu `generated_answers.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `key_points.csv`; `runs.jsonl` mit `retrieve`, `generate` (17.10.2026), `scaffold` (ohne `scoring`) und `key_points` (18.10.2026) |
+| `data/pilot/hard_posthoc/` | dieselben Fragen mit nachträglich ergänzter Annotation; nur Sensitivität, keine Evidenz ([ADR 0027](../adr/0027-blinde-annotation.md)) | wie `data/pilot/` |
+| `data/pilot/hard/history/` | `ground_truth_b75d188.csv`: blinde Annotation mit den IDs des älteren Vue-Korpus (`b75d188`) | |
 
 Ergebnisse der Proben: [Experiment-Protokoll](experiment-record.md#pilotproben-auf-dem-erweiterten-korpus-14102026).
+
+## Versioniert und ignoriert
+
+Einzige vollständige Liste der Datenartefakte nach `.gitignore`; alles, was hier nicht als ignoriert steht, ist
+versioniert, sobald es existiert. Ignoriert sind Dateien, die sich aus versionierten Daten neu erzeugen lassen;
+versioniert sind Primärdaten, die kein Lauf exakt wiederholt (Antworten, [ADR 0033](../adr/0033-antwortmodell.md)),
+und alles, was Jonas schreibt oder entscheidet.
+
+| Pfad | Inhalt | Status |
+|---|---|---|
+| `docs/corpus_snapshot.txt`, `docs/corpus_manifest.csv` | Snapshot-Datensatz, Korpusmanifest | versioniert |
+| `data/raw/e2e_docs_snapshot/` | Rohseiten des Snapshots | ignoriert; nur `.gitkeep` versioniert |
+| übrige Ordner in `data/raw/` (z. B. `vue_docs_snapshot/`) | alter Vue-Snapshot, nur lokal | ignoriert (`data/raw/*`) |
+| `data/processed/` | `documents.jsonl`, `sections.jsonl`, `section_index.md`, `chunks_*.jsonl`, `embeddings_*.npz`, `embedding_runs.jsonl` | ignoriert; nur `.gitkeep` versioniert |
+| `data/processed/archive_vue_2026-10-18/` | Vue-Chunks, -Vektoren, -Laufprotokoll und alter Chroma-Index, nur lokal ([Experiment-Protokoll](experiment-record.md#embedding-e2e)) | ignoriert |
+| `chroma_db/` (auch `*.chroma`) | Chroma-Index; entsteht beim ersten `embed.py` | ignoriert (ganzer Ordner, kein `.gitkeep`) |
+| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | versioniert |
+| `data/evaluation/archive_vue/catalogue_plan.csv` | unbenutzter Vue-Plan ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) | versioniert |
+| `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse | ignoriert |
+| `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | versioniert |
+| `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | versioniert |
+| `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | versioniert |
+| `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | ignoriert |
+| `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien in den Pilot-Sets | ignoriert; alle übrigen Pilotdateien versioniert |
+| `data/corpus_probe/docs/`, `probes/`, `sources/`, `questions/*-sections.json` | nachgebaute Seiten, Proben mit Abschnittstext, Klone der Kandidaten | ignoriert; übrige Dateien in `data/corpus_probe/` versioniert ([Korpusauswahl](corpus-selection.md#dateien-und-befehle)) |
+| `*.pdf` | erzeugte Dokumente | ignoriert, außer `output/figures/*.pdf` |
+| `.env`, `.venv/`, `venv/`, `env/`, `__pycache__/`, `*.py[cod]`, `*.pyo`, `.vscode/`, `.ipynb_checkpoints/`, `.DS_Store` | Geheimnisse, Umgebung, Editor | ignoriert |
+
+Die Vue-Verarbeitungsdateien, die nicht im Archivordner liegen (`documents.jsonl`, `sections.jsonl`), entstehen neu
+aus `vuejs/docs` auf Commit `40aa88a` mit dem Code vor ADR 0038
+([Experiment-Protokoll](experiment-record.md#snapshot-vuejs-bis-18102026)).

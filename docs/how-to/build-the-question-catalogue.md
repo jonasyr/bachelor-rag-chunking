@@ -13,8 +13,10 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
 
 ## Schritte
 
-1. Der Stichprobenplan ist gezogen (18.10.2026, [Experiment-Protokoll](../reference/experiment-record.md#stichprobenplan-e2e));
-   nur nach einem neuen ADR wird er so neu gezogen und sofort committet:
+1. Der Stichprobenplan ist gezogen ([Experiment-Protokoll](../reference/experiment-record.md#stichprobenplan-e2e)).
+   Neu gezogen wird er nur nach einem neuen ADR: `catalogue.py plan` überschreibt keinen bestehenden Plan, also die
+   alte Datei zuerst nach `data/evaluation/archive_…/` verschieben (wie `archive_vue/`), dann ziehen und sofort
+   committen:
 
    ```bash
    uv run python src/catalogue.py plan
@@ -23,7 +25,10 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    ```
 
    Der Plan legt für 48 Slots je einen Ausgangsabschnitt und eine Konstruktionsklasse fest (je Bereich nach
-   Tokenanteil, [Korpus](../reference/corpus.md#bereiche)) und wird nie überschrieben.
+   Tokenanteil, [Korpus](../reference/corpus.md#bereiche)) und wird nie überschrieben. Der Zug ist deterministisch:
+   Ein neuer Plan unterscheidet sich nur bei geänderten Werten (`config.CATALOGUE_SEED`,
+   `config.CATALOGUE_AREA_SLOTS`, Korpus), und `catalogue.py check` meldet einen Plan, der nicht zu einem frischen Zug
+   passt, als `ERROR`.
 
 2. Den Editor starten (nur auf diesem Rechner erreichbar; die Option gilt unabhängig vom Arbeitsverzeichnis):
 
@@ -57,6 +62,14 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    Im Tab „Closed-book“ je Antwort entscheiden: „Hits the core point“, wenn sie den Kernpunkt der Referenzantwort
    vollständig trifft, sonst „Misses it“ (auch bei teilweise richtig). Höchstens 16 von 48 Fragen dürfen treffen; die
    Seitenleiste zeigt den Stand. Eine getroffene Frage darf bleiben; wer sie umformuliert, lässt `screen` erneut laufen.
+   Danach den Block zusammen committen: `screen` schreibt die Antworten nach `closed_book_screen.csv` und einen
+   Laufeintrag nach `generation_runs.jsonl`.
+
+   ```bash
+   git add data/evaluation/questions.csv data/evaluation/ground_truth.csv data/evaluation/catalogue_review.csv \
+     data/evaluation/closed_book_screen.csv data/evaluation/generation_runs.jsonl
+   git commit -m "chore(data): Fragenkatalog Block N"
+   ```
 
 5. Jederzeit prüfen:
 
@@ -76,7 +89,7 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    uv run python src/catalogue.py freeze
    git add data/evaluation/questions.csv data/evaluation/ground_truth.csv data/evaluation/catalogue_plan.csv \
      data/evaluation/catalogue_review.csv data/evaluation/closed_book_screen.csv \
-     data/evaluation/catalogue_freeze.json
+     data/evaluation/generation_runs.jsonl data/evaluation/catalogue_freeze.json
    git commit -m "chore(data): Fragenkatalog eingefroren"
    ```
 

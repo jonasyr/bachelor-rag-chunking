@@ -1,11 +1,13 @@
 # Korpus (e2e)
 
-> Seitentyp: Nachschlagen (reference). Stand: 18.10.2026, festgelegt in [ADR 0038](../adr/0038-korpus-e2e.md) (Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md)). Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026, festgelegt in [ADR 0038](../adr/0038-korpus-e2e.md) (Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md), Umwandlung nach [ADR 0042](../adr/0042-mdx-umwandlung.md)). Übersicht: [Dokumentation](../README.md).
 
 Bis 18.10.2026 war der Korpus die Vue.js-Dokumentation ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md),
 abgelöst durch [ADR 0038](../adr/0038-korpus-e2e.md)); ihre Zahlen stehen weiter im
 [Experiment-Protokoll](experiment-record.md), ihre Bereinigungsregeln in der Git-Historie von `src/preprocess.py`.
-Warum e2e: [Korpusauswahl](corpus-selection.md).
+Warum e2e: [Korpusauswahl](corpus-selection.md). Diese Seite ist die einzige Stelle für die Zahlen des Korpus (Seiten,
+Tokens, Abschnitte, Bereiche); andere Seiten verlinken hierher. Die Slots je Bereich stehen verbindlich in
+`config.CATALOGUE_AREA_SLOTS` ([Konfiguration](configuration.md#fragenkatalog)).
 
 ## Quelle und Ausschnitt
 
@@ -50,7 +52,9 @@ Slots, Reserve und Mindestzahl je Bereich sind gleich (nach Tokenanteil, mindest
 ## Aufbereitung (MDX → Markdown)
 
 `src/mdx.py` wandelt jede Seite in Markdown um, `src/preprocess.py` zeichnet danach die Abschnitte auf. Ziel: jeder
-Text, den eine Leserin oder ein Leser der Website sieht, bleibt erhalten ([ADR 0038](../adr/0038-korpus-e2e.md)).
+Text, den eine Leserin oder ein Leser der Website sieht, bleibt erhalten ([ADR 0038](../adr/0038-korpus-e2e.md)); dass
+Agent-Prompts und Video-Karten deshalb bleiben und die Anker selbst berechnet werden, hält
+[ADR 0042](../adr/0042-mdx-umwandlung.md) fest.
 Code in Fences bleibt unverändert bis auf Info-String, Einrückung und Leerzeichen am Zeilenende.
 
 | Eingabe | Ausgabe |
@@ -76,7 +80,8 @@ ist rein regelbasiert und deterministisch; Tests je Regel in `tests/test_mdx.py`
 
 ## Abschnitte und Relevanz
 
-- **`section_id`** = `{doc_id}#{anchor}`. H2/H3-Anker sind die Anker der Website: Linkziele und Backticks weg,
+- **`section_id`** = `{doc_id}#{anchor}`. H2/H3-Anker berechnet `src/mdx.py` wie die Website
+  ([ADR 0042](../adr/0042-mdx-umwandlung.md)): Linkziele und Backticks weg,
   Kleinschreibung, jede Folge anderer Zeichen als `a-z0-9` wird `-`, `-` an den Rändern entfällt
   (`` `.env` files `` → `env-files`, `agent.act` → `agent-act`). Geprüft am 18.10.2026 an allen 503 abrufbaren
   H2/H3 der Live-Seite; nur `/docs/mcp` liefert dort Mintlifys MCP-Endpunkt statt der Seite.

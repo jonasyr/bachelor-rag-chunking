@@ -3,8 +3,12 @@
 > Seitentyp: Anleitung (how-to). Übersicht: [Dokumentation](../README.md).
 
 Welcher Commit und welche Regeln: [Korpus](../reference/corpus.md) ([ADR 0038](../adr/0038-korpus-e2e.md)); die
-Werte stehen in `src/config.py` ([Konfiguration](../reference/configuration.md#korpus)). Gemessene Zahlen des
-aktuellen Snapshots: [Experiment-Protokoll](../reference/experiment-record.md).
+Werte stehen in `src/config.py` ([Konfiguration](../reference/configuration.md#korpus)). Zahlen des aktuellen
+Snapshots: Tokens und Abschnitte in [Korpus](../reference/corpus.md#quelle-und-ausschnitt), Commit, Datum und
+Dateizahl im [Experiment-Protokoll](../reference/experiment-record.md#snapshot-e2e).
+
+`snapshot.py`, `ingest.py` und `preprocess.py` kennen keine Optionen: auch `--help` führt den Schritt aus
+(`snapshot.py` holt den Korpus und ersetzt `data/raw/`).
 
 1. `uv run python src/snapshot.py` holt den Commit aus `config.CORPUS_COMMIT`, kopiert alle `*.mdx` unter
    `config.CORPUS_ROOT` sowie `config.CORPUS_SUPPORT_FILES` (`docs.json`, `snippets/model-provider.jsx`) nach
@@ -19,10 +23,15 @@ aktuellen Snapshots: [Experiment-Protokoll](../reference/experiment-record.md).
 3. `uv run python src/preprocess.py` wandelt die MDX-Seiten um (schreibt `documents.jsonl` neu) und erzeugt
    `data/processed/sections.jsonl` und `docs/corpus_manifest.csv`. Erwartet: `60 documents, 571 sections`. Eine
    unbekannte Komponente oder ein unbekanntes Tag bricht mit Seite und Zeile ab: dann eine Regel in `src/mdx.py`
-   ergänzen (zuerst ein Test in `tests/test_mdx.py`), nie eine Seite einzeln behandeln.
+   ergänzen (zuerst ein Test in `tests/test_mdx.py`), nie eine Seite einzeln behandeln. Ein zweiter Lauf auf einem
+   schon umgewandelten `documents.jsonl` bricht ab („already preprocessed“): zuerst `ingest.py` erneut ausführen.
+   Wer `ingest.py` neu laufen lässt, muss auch `preprocess.py` neu laufen lassen: `chunking.py` bricht ab, wenn
+   `sections.jsonl` nicht zum Text in `documents.jsonl` passt.
 4. `uv run python src/catalogue.py sections` schreibt die Nachschlageliste `data/processed/section_index.md`.
 5. Prüfen: `uv run pytest` (die Integrationstests in `tests/test_corpus_integration.py` laufen nur mit vorhandenem
    Snapshot). Weicht das gerundete Mittel der C3-Chunks von `config.K1_CHUNK_SIZE` ab, nennt der K1-Test den neuen
    Wert ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)).
-6. Dateizahl, Tokens und Abschnitte ins [Experiment-Protokoll](../reference/experiment-record.md) übernehmen; die
-   erzeugten Dateien `docs/corpus_snapshot.txt` und `docs/corpus_manifest.csv` unverändert committen.
+6. Bei einem neuen Snapshot Dateizahl, Commit und Datum ins
+   [Experiment-Protokoll](../reference/experiment-record.md#snapshot-e2e), Tokens und Abschnitte in
+   [Korpus](../reference/corpus.md#quelle-und-ausschnitt) übernehmen; die erzeugten Dateien
+   `docs/corpus_snapshot.txt` und `docs/corpus_manifest.csv` unverändert committen.

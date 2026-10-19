@@ -3,7 +3,11 @@
 Reads candidates.csv, stats.json, results/ and the classified misses/ and writes summary.json.
 Gap rate = fact misses / well-posed probes (open-book correct), with a normal-approximation 95 %
 interval. The criteria, weights and rating bands follow data/corpus_probe/preregistration.md;
-the bands were fixed before the score table was computed.
+the bands were fixed before the score table was computed. Where the bands measure Structure,
+Quality, Stability and Fit differently from the preregistration, docs/reference/corpus-selection.md
+("Grenzen") lists it. "eligible" marks the new projects only; the lower token bound of exclusion
+criterion 5 (CORPUS_PROBE_MIN_TOKENS) applies to the sensitivity pool, so a smaller candidate is
+still listed in the ranked corpora.
 
 Usage: uv run python scripts/corpus_probe/summarise.py
 """

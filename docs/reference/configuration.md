@@ -1,11 +1,12 @@
 # Konfiguration (`src/config.py`)
 
-> Seitentyp: Nachschlagen (reference). Stand: 14.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Alle Parameter des Experiments stehen ausschließlich in [`src/config.py`](../../src/config.py); **die Datei ist
 maßgeblich**, diese Seite beschreibt sie. Weicht ein Wert hier ab, gilt `config.py` und diese Seite ist zu
-korrigieren. Andere Seiten der Dokumentation nennen Parameterwerte nicht, sondern verlinken hierher. Gruppen und
-Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
+korrigieren. Andere Seiten dürfen einen Wert nur zusammen mit seinem Schlüssel (`config.X`) nennen und verlinken
+hierher. Gruppen und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`). Spalte
+„Entscheidung“: die ADR, die den Wert festgelegt hat, dahinter die ADR, die ihn zuletzt geändert oder ergänzt hat.
 
 ## Pfade
 
@@ -15,26 +16,24 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `DATA_RAW` | `data/raw/e2e_docs_snapshot` | Rohdateien des Snapshots | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `DATA_PROCESSED` | `data/processed` | Zwischenstände (Dokumente, Abschnitte, Chunks, Vektoren) | – |
 | `DATA_EVAL` | `data/evaluation` | Fragen, Ground Truth, Ergebnisse | – |
-| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | [ADR 0027](../adr/0027-blinde-annotation.md) |
+| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | – |
 | `PILOT_RUNS_FILE_NAME` | `"runs.jsonl"` | Laufprotokoll je Pilot-Set; die übrigen Pilotdateien tragen die Namen der Evaluationsartefakte | – |
 | `CHROMA_DIR` | `chroma_db` | Chroma-Index (lokal, persistent) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `DOCS_DIR` | `docs` | Dokumentation | – |
 | `DOCUMENTS_FILE` | `data/processed/documents.jsonl` | Dokumente nach Ingest/Preprocessing | – |
 | `SNAPSHOT_INFO_FILE` | `docs/corpus_snapshot.txt` | Snapshot-Datensatz (versioniert): Commit, Daten, SHA-256 je Datei | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
-| `SECTIONS_FILE` | `data/processed/sections.jsonl` | H1–H3-Abschnitte mit Token-Spannen | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
+| `SECTIONS_FILE` | `data/processed/sections.jsonl` | H1–H3-Abschnitte mit Token-Spannen | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) |
 | `SECTION_INDEX_FILE` | `data/processed/section_index.md` | Abschnitts-Nachschlageliste für die Annotation (`catalogue.py sections`) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CORPUS_MANIFEST_FILE` | `docs/corpus_manifest.csv` | Korpusmanifest (versioniert) | – |
 | `CHUNKS_C1_FILE`, `CHUNKS_C2_FILE`, `CHUNKS_C3_FILE` | `data/processed/chunks_c1.jsonl`, `chunks_c2.jsonl`, `chunks_c3.jsonl` | Chunks je Strategie | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `QUESTIONS_FILE` | `data/evaluation/questions.csv` | Fragenkatalog | [ADR 0017](../adr/0017-fragenkatalog.md) |
 | `GROUND_TRUTH_FILE` | `data/evaluation/ground_truth.csv` | Referenzantworten und relevante Abschnitte | [ADR 0017](../adr/0017-fragenkatalog.md) |
+| `CATALOGUE_FREEZE_FILE` | `data/evaluation/catalogue_freeze.json` | Freeze-Datensatz des Katalogs (Datum, Anzahlen, SHA-256) | [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `CATALOGUE_PLAN_FILE` | `data/evaluation/catalogue_plan.csv` | Stichprobenplan der Slots | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_FILE` | `data/evaluation/catalogue_review.csv` | Vorschläge und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CLOSED_BOOK_FILE` | `data/evaluation/closed_book_screen.csv` | Antworten ohne Kontext und Urteile | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
-| `CATALOGUE_FREEZE_FILE` | `data/evaluation/catalogue_freeze.json` | Freeze-Datensatz des Katalogs (Datum, Anzahlen, SHA-256) | [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `RETRIEVED_RESULTS_FILE` | `data/evaluation/retrieved_results.csv` | Top-k je Frage und Strategie | – |
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
-| `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
-| `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten (nie überschrieben) | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `GENERATED_ANSWERS_CONTROL_FILE` | `data/evaluation/generated_answers_control.csv` | Antworten der Kontrolle K0 (nie überschrieben) | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 | `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll von `generate.py` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
@@ -46,6 +45,8 @@ Reihenfolge wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`).
 | `KEY_POINTS_FILE` | `data/evaluation/key_points.csv` | Kernpunkte je Frage, vor der Bewertung eingefroren | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `SCORING_CHECKS_FILE` | `data/evaluation/scoring_checks.csv` | Antworten auf die Prüffragen je Code | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `SCORING_ITEMS_CONTROL_FILE`, `SCORING_SHEET_CONTROL_FILE`, `SCORING_CHECKS_CONTROL_FILE`, `SCORES_CONTROL_FILE` | `data/evaluation/scoring_items_control.jsonl`, `…/scoring_sheet_control.csv`, `…/scoring_checks_control.csv`, `…/scores_control.csv` | Bewertungssatz der Kontrolle K0 | [ADR 0041](../adr/0041-kontrolle-k0.md) |
+| `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
+| `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 
 Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 
@@ -62,7 +63,7 @@ Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 | `CORPUS_SUPPORT_FILES` | `(CORPUS_NAV_FILE, CORPUS_PROVIDER_SNIPPET)` | mit den Seiten kopiert und im Snapshot-Datensatz geprüft | – |
 | `CORPUS_AREAS` | Tupel der 15 Navigationsgruppen in Reihenfolge (Get started … Engine contract, Examples) | Bereiche; `ingest.py` bricht ab, wenn die Navigation abweicht | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `TOKEN_ENCODING` | `"cl100k_base"` | Token-Kodierung (`tiktoken` 0.13.0, gepinnt in `pyproject.toml`) | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
-| `SECTION_MAX_LEVEL` | `3` | H1–H3 werden Abschnitte (`sections.jsonl`, C3-Grenzen) | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0021](../adr/0021-c3-grenzen.md) |
+| `SECTION_MAX_LEVEL` | `3` | H1–H3 werden Abschnitte (`sections.jsonl`, C3-Grenzen) | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0021](../adr/0021-c3-grenzen.md), [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) |
 
 Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 
@@ -74,7 +75,7 @@ Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 | `C1_OVERLAP` | `0` | C1: ohne Overlap | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `C2_CHUNK_SIZE` | `500` | C2: Fenstergröße in Tokens | [ADR 0005](../adr/0005-drei-chunking-strategien.md), [ADR 0010](../adr/0010-starke-baseline.md) |
 | `C2_OVERLAP` | `100` | C2: Overlap in Tokens | [ADR 0005](../adr/0005-drei-chunking-strategien.md), [ADR 0010](../adr/0010-starke-baseline.md) |
-| `C3_MAX_TOKENS` | `800` | C3: harte Obergrenze je Chunk; zu lange Abschnitte werden an Absätzen geteilt | [ADR 0021](../adr/0021-c3-grenzen.md), [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `C3_MAX_TOKENS` | `800` | C3: harte Obergrenze je Chunk; zu lange Abschnitte werden an Absätzen geteilt | [ADR 0005](../adr/0005-drei-chunking-strategien.md), [ADR 0021](../adr/0021-c3-grenzen.md) |
 | `C3_MIN_TOKENS` | `50` | C3: Untergrenze; kürzere Segmente verschmelzen zuerst mit einem Nachbarn | [ADR 0021](../adr/0021-c3-grenzen.md) |
 | `K1_CHUNK_SIZE` | `375` | Kontrolle K1: Fenstergröße = kaufmännisch gerundetes Mittel der C3-Chunklängen (gemessen 18.10.2026 auf `ef977f4`); `chunking.py` bricht ab, wenn der Wert nicht mehr der Regel entspricht | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `K1_OVERLAP` | `0` | K1: ohne Overlap | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
@@ -104,7 +105,7 @@ Die Kontrolle hat eigene `CONTROL_*`-Zuordnungen, damit sie nie in die Schleifen
 | `CANARY_PROBE_POSITIONS` | `(0.0, 0.5, 1.0)` | relative Positionen der erneut eingebetteten Texte je Vektordatei (erster, mittlerer, letzter) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `ID_SEPARATOR` | `";"` | Trennzeichen mehrerer IDs in einem Feld von `ground_truth.csv` | – |
 | `RELEVANCE_MIN_OVERLAP` | `1` | Hauptregel: Chunk relevant bei mindestens so vielen Tokens Überlappung mit einem relevanten Abschnitt (jede Überlappung) | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
-| `SENSITIVITY_MIN_OVERLAP` | `100` | Sensitivitätsprüfung: benötigt werden min(100, Chunk-Länge) Tokens, mindestens 1 (`relevance.is_relevant`); noch nicht in einem Auswertungsskript verwendet | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
+| `SENSITIVITY_MIN_OVERLAP` | `100` | Sensitivitätsprüfung: benötigt werden min(100, Chunk-Länge) Tokens, mindestens 1 (`relevance.is_relevant`); von `evaluate_retrieval.py` als Regel `sensitivity` ausgewertet | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 
 Metriken und Relevanzregel: [Evaluation](evaluation.md).
 
@@ -120,23 +121,23 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `SINGLE_CLASS_SECTIONS` | `1` | `single`, `detail`, `paraphrase`: genau so viele relevante Abschnitte | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_REPORT_MIN_PAGES` | `2` | Bericht von `check`: Anzahl der `multi-section`-Fragen mit Abschnitten auf mindestens so vielen Seiten (nur Anzeige, keine Regel) | – |
 | `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext je Seite eines Treffers (nie über den Abschnitt hinaus) | – |
-| `CORPUS_SITE_URL` | `"https://e2e.tester.army/docs"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
 | `CATALOGUE_HEADING_SEPARATOR` | `" › "` | Trenner im Überschriftenpfad (`section_index.md`, `find`, `show`) | – |
-| `CATALOGUE_WORD_PATTERN` | `r"[a-z0-9]+"` | Wörter für den Paraphrase-Vergleich (nach Kleinschreibung) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CORPUS_SITE_URL` | `"https://e2e.tester.army/docs"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
 | `CATALOGUE_SEED` | `20261014` | Seed des Stichprobenplans (Tag der Entscheidung; nie angepasst) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_AREA_SLOTS` | 15 Bereiche nach Tokenanteil, mindestens 1 ([Korpus](corpus.md#bereiche)) | Slots je Bereich (Summe 48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 | `CATALOGUE_RESERVE` | gleich `CATALOGUE_AREA_SLOTS` | Reserveabschnitte je Bereich für Sprünge | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 | `CATALOGUE_SKIP_REASONS` | `("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")` | erlaubte Gründe für einen Sprung | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_SKIP_MIN_TOKENS` | `50` | `too-short` nur für Abschnitte unter so vielen Tokens | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
-| `CATALOGUE_SLOT_FORMAT` | `"S{:02d}"` | Format der Slot-IDs im Plan (S01 … S48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_PLAN_STATUSES` | `("open", "used", "skipped", "reserve")` | Werte von `status` in `catalogue_plan.csv` | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CATALOGUE_SLOT_FORMAT` | `"S{:02d}"` | Format der Slot-IDs im Plan (S01 … S48) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CATALOGUE_REVIEW_KINDS`, `CATALOGUE_REVIEW_DECISIONS` | `("missing_section", "wording", "fact", "class")`, `("open", "accepted", "rejected")` | Arten und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CLOSED_BOOK_VERDICTS` | `("", "hit", "miss")` | Urteil: offen, trifft den Kernpunkt, trifft ihn nicht | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
-| `CLOSED_BOOK_MIN_DEPENDENT_SHARE` | `Fraction(2, 3)` | Mindestanteil retrieval-abhängiger Fragen (aufgerundet: 32 von 48) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CLOSED_BOOK_MIN_DEPENDENT_SHARE` | `Fraction(2, 3)` | Mindestanteil retrieval-abhängiger Fragen (auf ganze Fragen aufgerundet: 32 von 48); `catalogue.py freeze` verweigert darunter | [ADR 0038](../adr/0038-korpus-e2e.md), [ADR 0040](../adr/0040-closed-book-pruefung.md) |
 | `QUESTION_ID_PATTERN`, `QUESTION_ID_FORMAT` | `r"Q\d+"`, `"Q{:03d}"` | Muster vorhandener und Format neuer Frage-IDs (Editor) | – |
+| `CATALOGUE_WORD_PATTERN` | `r"[a-z0-9]+"` | Wörter für den Paraphrase-Vergleich (nach Kleinschreibung) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `e2e` (Produktname) | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 
 ## LLM und Embedding
@@ -145,7 +146,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 |---|---|---|---|
 | `EMBEDDING_MODEL` | `"text-embedding-3-large"` | Embedding-Modell (nur als Alias angeboten, daher Vektoren einmal speichern) | [ADR 0023](../adr/0023-embedding-modell.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `EMBEDDING_DIMENSIONS` | `3072` | Vektordimension (Modellstandard) | [ADR 0023](../adr/0023-embedding-modell.md) |
-| `EMBEDDING_BATCH_SIZE` | `100` | Texte je API-Anfrage (API-Grenze: ≤ 2.048 Eingaben, ≤ 300.000 Tokens) | [ADR 0023](../adr/0023-embedding-modell.md) |
+| `EMBEDDING_BATCH_SIZE` | `100` | Texte je API-Anfrage (API-Grenze: ≤ 2.048 Eingaben, ≤ 300.000 Tokens) | – |
 | `EMBEDDING_PRICE_PER_MTOK` | `0.13` | USD je 1 Mio. Eingabe-Tokens (OpenAI-Modellseite, abgerufen 13.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0023](../adr/0023-embedding-modell.md) |
 | `LLM_MODEL` | `"gpt-6-luna"` | Antwortmodell, gepinnt 17.10.2026 (nur als Alias angeboten, daher Antworten einmal erzeugen) | [ADR 0016](../adr/0016-modell-neutralitaet.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md) |
@@ -165,8 +166,8 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
-| `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `RUBRIC_RULES_VERSION` | `"2026-10-18"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) |
+| `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 
 ## Korpusauswahl
@@ -187,9 +188,9 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 | `CORPUS_PROBE_SENSITIVITY` | fünf Gewichtungen | Rangfolge je Gewichtung als Sensitivität | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_PROBE_MIN_TOKENS` | `80000` | untere Größengrenze (Ausschlusskriterium 5) für die Sensitivität | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_PROBE_TOP` | `5` | Kandidaten je Gewichtung in `summary.json` | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROBE_AI_RATING`, `CORPUS_PROBE_FEW_STARS` | `low` 4 … `high` 1; `100` | Stufe „Passung“ nach KI-Textanteil, minus 1 unter 100 GitHub-Sternen | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_PER_CORPUS` | `20` | Closed-Book-Diagnosefragen je Korpus, eine je gezogenem Abschnitt | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_MIN_WORDS` | `60` | Prosawörter (ab 3 Buchstaben, außerhalb von Code), die ein gezogener Abschnitt braucht | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_PER_PAGE` | `2` | höchstens so viele gezogene Abschnitte je Seite | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_SECTION_CHARS` | `5000` | Abschnittstext für Fragenschreiber und Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_JUDGE_SEEDS` | `{1: 7, 2: 8}` | Reihenfolge der verblindeten Antworten je Urteilslauf (1: fünf Korpora, 2: Angular) | [ADR 0038](../adr/0038-korpus-e2e.md) |
-| `CORPUS_PROBE_AI_RATING`, `CORPUS_PROBE_FEW_STARS` | `low` 4 … `high` 1; `100` | Stufe „Passung“ nach KI-Textanteil, minus 1 unter 100 GitHub-Sternen | [ADR 0038](../adr/0038-korpus-e2e.md) |

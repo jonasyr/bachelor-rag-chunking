@@ -4,7 +4,10 @@ Keeps .md/.mdx files, drops translations, changelogs (unless the candidate's ski
 "no") and the candidate's drops (prefixes relative to the docs folder) from candidates.csv,
 takes the title from the frontmatter (else the file name) and removes MDX import/export lines.
 With a documents.jsonl as SOURCE (the Vue snapshot after preprocessing) its pages are taken as
-they are. Also records the page statistics in stats.json.
+they are. The Vue row's SOURCE, data/processed/documents.jsonl, now holds the e2e corpus (ADR
+0038): rebuild the Vue corpus first (vuejs/docs at 40aa88a, with the code of commit 4115ffc).
+Tokens = characters / 4 (not the tiktoken count of the pipeline). Also records the page
+statistics in stats.json.
 
 Usage: uv run python scripts/corpus_probe/to_docs.py NAME SOURCE
 """
