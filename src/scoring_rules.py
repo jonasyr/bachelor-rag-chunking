@@ -2,12 +2,15 @@
 
 The rater answers checks with fixed options; derive() turns them into the five criteria of
 config.RUBRIC_CRITERIA by the rule table in docs/reference/evaluation.md. Same checks, same
-scores; config.RUBRIC_RULES_VERSION names the version of these rules.
+scores; config.RUBRIC_RULES_VERSION names the version of these rules. The control K0 (ADR 0041)
+uses the same checks without `grounded` (it saw no excerpts) and derives the four criteria of
+config.CONTROL_CRITERIA.
 """
 
 import re
 
 from config import (
+    CONTROL_CRITERIA,
     KEY_POINTS_MAX,
     RUBRIC_COMPLETENESS_PARTIAL,
     RUBRIC_CRITERIA,
@@ -34,6 +37,7 @@ SKIPPED_WHEN_DECLINING = {
     "hallucination": "none",
 }
 CHECKS_HEADER = ["code", "rules_version", "points", *CHECKS]
+CONTROL_CHECKS = {c: o for c, o in CHECKS.items() if c != "grounded"}  # K0 saw no excerpts (D41)
 KEY_POINTS_HEADER = ["question_id", "point", "text"]  # key_points.csv, one row per point
 # a pre-fill boundary: a semicolon, or a sentence end before an upper-case word (not "e.g. use")
 REFERENCE_BREAK = re.compile(r";\s*|(?<=[.!?])\s+(?=[A-Z])")
@@ -41,18 +45,31 @@ LEVEL = {"all": 2, "some": 1, "none": 0}
 HALLUCINATION = {"none": 2, "minor": 1, "substantive": 0}
 
 
-def declined(checks: dict, n_points: int) -> dict:
+def checks_for(control: bool) -> dict:
+    return CONTROL_CHECKS if control else CHECKS
+
+
+def skipped_for(control: bool) -> dict:
+    return {c: v for c, v in SKIPPED_WHEN_DECLINING.items() if c in checks_for(control)}
+
+
+def checks_header(control: bool) -> list[str]:
+    return ["code", "rules_version", "points", *checks_for(control)]
+
+
+def declined(checks: dict, n_points: int, control: bool = False) -> dict:
     """With declines = yes: every key point missing and the skipped checks at their values."""
     if checks.get("declines") != "yes":
         return checks
-    return checks | {"points": ["missing"] * n_points} | SKIPPED_WHEN_DECLINING
+    return checks | {"points": ["missing"] * n_points} | skipped_for(control)
 
 
-def validate(checks: dict, n_points: int) -> None:
-    expected = {"points", *CHECKS}
+def validate(checks: dict, n_points: int, control: bool = False) -> None:
+    variant = checks_for(control)
+    expected = {"points", *variant}
     if set(checks) != expected:
         wrong = sorted(set(checks) ^ expected)
-        raise ValueError(f"checks must be exactly points and {list(CHECKS)}; differs in {wrong}")
+        raise ValueError(f"checks must be exactly points and {list(variant)}; differs in {wrong}")
     if n_points < 1:
         raise ValueError(
             "the question has no frozen key points (added after the freeze?); a set needs key "
@@ -64,13 +81,13 @@ def validate(checks: dict, n_points: int) -> None:
     for mark in points:
         if mark not in POINT_MARKS:
             raise ValueError(f"key point mark {mark!r} is not one of {POINT_MARKS}")
-    for check, options in CHECKS.items():
+    for check, options in variant.items():
         if checks[check] not in options:
             raise ValueError(f"{check} is {checks[check]!r}, not one of {options}")
-    if checks["declines"] == "yes" and checks != declined(checks, n_points):
+    if checks["declines"] == "yes" and checks != declined(checks, n_points, control):
         raise ValueError(
             "a declining answer has every key point missing and the skipped checks at "
-            f"{SKIPPED_WHEN_DECLINING}"
+            f"{skipped_for(control)}"
         )
 
 
@@ -101,17 +118,23 @@ def derive(checks: dict) -> dict[str, int]:
     return dict(zip(RUBRIC_CRITERIA, values, strict=True))
 
 
-def to_row(code: str, checks: dict) -> dict[str, str]:
+def derive_control(checks: dict) -> dict[str, int]:
+    """The four criteria of K0 (ADR 0041) by the same rules; groundedness does not apply."""
+    values = derive(checks | {"grounded": "all"})
+    return {c: values[c] for c in CONTROL_CRITERIA}
+
+
+def to_row(code: str, checks: dict, control: bool = False) -> dict[str, str]:
     return {
         "code": code,
         "rules_version": RUBRIC_RULES_VERSION,
         "points": ";".join(checks["points"]),
-    } | {c: checks[c] for c in CHECKS}
+    } | {c: checks[c] for c in checks_for(control)}
 
 
-def from_row(row: dict) -> tuple[str, dict]:
+def from_row(row: dict, control: bool = False) -> tuple[str, dict]:
     checks = {"points": row["points"].split(";") if row["points"] else []}
-    return row["rules_version"], checks | {c: row[c] for c in CHECKS}
+    return row["rules_version"], checks | {c: row[c] for c in checks_for(control)}
 
 
 def key_points(rows: list[dict]) -> dict[str, list[str]]:
