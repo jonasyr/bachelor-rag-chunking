@@ -96,6 +96,17 @@ eine Regel nicht, wird das in `notes` vermerkt. Die Antworten stehen in `scoring
 ([Datenformate](data-formats.md)); `--mode summarise` prüft, dass die Kernpunkte die eingefrorenen sind, jede
 Zeile so viele Kernpunkte markiert, wie ihre Frage hat, und jede Zeile des Bogens den abgeleiteten Werten entspricht.
 
+## Kontrolle K0
+
+K0 beantwortet dieselben Fragen ohne Retrieval mit dem Closed-Book-Prompt
+([Prompts](prompts.md#closed-book-prompt-prüfung-und-k0)) und wird nach C1–C3 als eigener Satz bewertet
+([ADR 0041](../adr/0041-kontrolle-k0.md)): dieselben eingefrorenen Kernpunkte und Prüffragen ohne `grounded`.
+`declines` fragt, ob die Antwort sagt, dass sie die Antwort nicht weiß; `hallucination`, ob sie etwas enthält, das die
+Referenz nicht deckt. Abgeleitet werden Korrektheit, Vollständigkeit, Halluzinationsfreiheit und Verständlichkeit nach
+den Regeln oben (`config.CONTROL_CRITERIA`); der Gesamtwert ist ihr Mittelwert. Der Vergleich mit C1–C3 nutzt dieselben
+vier Kriterien, getrennt nach dem Closed-Book-Urteil (retrieval-abhängig / bekannt,
+[ADR 0040](../adr/0040-closed-book-pruefung.md)). K0 wird nicht blind bewertet.
+
 ## Triangulation (verbindlich)
 
 Entscheidung: [ADR 0007](../adr/0007-triangulation.md).

@@ -15,8 +15,10 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 3. Embeddings und ein Chroma-Index je Strategie (und für K1): `uv run python src/embed.py` (braucht `OPENAI_API_KEY`)
 4. Retrieval für C1–C3, danach für die Kontrolle K1 ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)):
    `uv run python src/retrieve.py` und `uv run python src/retrieve.py --control`
-5. Antworten generieren (nur C1–C3, K1 nicht): `uv run python src/generate.py` (braucht `OPENAI_API_KEY`; einmal, die
-   Datei wird nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md))
+5. Antworten generieren (C1–C3 und im selben Lauf die Kontrolle K0 ohne Retrieval, K1 nicht):
+   `uv run python src/generate.py` (braucht `OPENAI_API_KEY`; einmal, die Dateien `generated_answers.csv` und
+   `generated_answers_control.csv` werden nie überschrieben, [ADR 0033](../adr/0033-antwortmodell.md),
+   [ADR 0041](../adr/0041-kontrolle-k0.md))
 6. Auswerten: `uv run python src/evaluate_retrieval.py` und `uv run python src/evaluate_retrieval.py --control`; für die Rubrik
    `uv run python src/evaluate_answers.py --mode scaffold`, dann blind bewerten
    ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md), [ADR 0034](../adr/0034-bewertung-in-der-app.md)): in der App
@@ -32,6 +34,15 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    `scoring_key.csv` nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
    Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
    Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
+7. Kontrolle K0 bewerten, erst nach der C1–C3-Auswertung ([ADR 0041](../adr/0041-kontrolle-k0.md)): K0 nutzt dieselben
+   eingefrorenen Kernpunkte und die Prüffragen ohne Quellenbezug; die Auswertung vergleicht K0 mit C1–C3 über vier
+   Kriterien, auch getrennt nach dem Closed-Book-Urteil.
+
+   ```bash
+   uv run python src/evaluate_answers.py --mode scaffold --control
+   # Seite „Scoring“, Satz „Main catalogue: control K0“: jede Antwort prüfen
+   uv run python src/evaluate_answers.py --mode summarise --control
+   ```
 
 Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Datenformate](../reference/data-formats.md).
 

@@ -4,7 +4,7 @@
 
 Angenommen (18.10.2026; ersetzt [ADR 0025](0025-korpus-guide-api-styleguide.md) und den Vue-spezifischen Ausschnitt
 von [ADR 0019](0019-korpus-ausschnitt.md); Umsetzung in eigenen Pull Requests, Stand in [plan.md](../plan.md#stand); wer den Kernpunkt beurteilt:
-[ADR 0040](0040-closed-book-pruefung.md))
+[ADR 0040](0040-closed-book-pruefung.md); K0: [ADR 0041](0041-kontrolle-k0.md))
 
 ## Kontext
 

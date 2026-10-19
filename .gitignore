@@ -25,6 +25,7 @@ data/evaluation/retrieved_results_control.csv
 data/evaluation/retrieval_scores.csv
 data/evaluation/retrieval_scores_control.csv
 data/evaluation/scores.csv
+data/evaluation/scores_control.csv
 data/evaluation/scoring_packet.md
 data/evaluation/scoring_items.jsonl
 data/evaluation/query_embeddings.npz
@@ -48,6 +49,7 @@ data/pilot/**/query_embeddings.npz
 data/pilot/**/scoring_packet.md
 data/pilot/**/scoring_items.jsonl
 data/pilot/**/scores.csv
+data/pilot/**/scores_control.csv
 
 # Corpus selection probe: rebuilt pages, probes with section text and source clones (ADR 0038)
 data/corpus_probe/docs/
