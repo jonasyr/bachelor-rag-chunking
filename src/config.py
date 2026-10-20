@@ -329,9 +329,31 @@ REPORT_P_DECIMALS = 3  # decimals of p-values; smaller ones are shown as "<0,001
 REPORT_COST_DECIMALS = 5  # decimals of costs in USD in the efficiency table
 BYTES_PER_MB = 1_000_000  # index size in MB (decimal)
 JSON_DECIMALS = 6  # floats in analysis.json are rounded to this many decimals
-FIGURE_SIZE = (6.0, 3.6)  # inches
+# Figures in final size for the thesis (PaperLab SoT 2, AUD-01 Nr. 13): 17 cm wide, Arial >= 8 pt,
+# class palette FigBlue/FigOrange (iupaper.cls) plus a third hue validated for colour-vision
+# deficiency (all pairs CVD dE >= 10); controls in neutral greys with hatching, never colour alone.
+FIGURE_WIDTH_CM = 17.0
+FIGURE_HEIGHT_CM = 6.5  # default height; small multiples and the heatmap grow with their rows
 FIGURE_FONT_SIZE = 9
 FIGURE_DPI = 300
+FIGURE_FONT_FILE = "arial282/Arial282-Regular.ttf"  # below PAPERLAB_FONTS or PaperLab's fonts/
+FIGURE_COLORS = {
+    "C1": "#184F95",  # FigBlue
+    "C2": "#B8461A",  # FigOrange
+    "C3": "#11866A",  # validated third hue
+    "K1": "#52514E",  # FigInk, control (hatched)
+    "K0": "#8E8C87",  # light ink, control (hatched)
+}
+FIGURE_HATCHES = {"C1": "", "C2": "", "C3": "", "K1": "///", "K0": "xxx"}
+FIGURE_MARKERS = {"C1": "o", "C2": "s", "C3": "D", "K0": "^"}
+FIGURE_INK = "#0B0B0B"  # text
+FIGURE_MUTED = "#52514E"  # axes, ticks, secondary text
+FIGURE_GRID = "#E4E3DF"
+FIGURE_SEQUENTIAL = [
+    "#F2F7FE",
+    "#CDE2FB",
+    "#184F95",
+]  # one hue, light to dark (FigBlue); 0 stays visible
 FIGURE_HISTOGRAM_BINS = 20  # bins of the chunk-length histograms
 
 # ---------------------------------------------------------------------------

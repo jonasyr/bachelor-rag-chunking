@@ -33,7 +33,50 @@ def test_missing_chunks_skips_histogram(tmp_path):
 
 def test_missing_embedding_and_control_still_write(tmp_path):
     paths, results = _run(tmp_path, embedding=False, control=False)
-    assert "cost.pdf" in {p.name for p in paths} and "answers_boxplot.pdf" in {
+    assert "cost.pdf" in {p.name for p in paths} and "answers_distribution.pdf" in {
         p.name for p in paths
     }
     assert any("Embedding" in n for n in results["notes"])
+
+
+def test_score_axis_ticks_are_whole_halves():
+    import matplotlib.pyplot as plt
+
+    import report_figures
+
+    fig, ax = plt.subplots()
+    ax.set_ylim(0, 2)
+    report_figures._score_axis(ax.yaxis)
+    fig.canvas.draw()
+    low, high = ax.get_ylim()
+    labels = [
+        t.get_text()
+        for t, v in zip(ax.get_yticklabels(), ax.get_yticks(), strict=False)
+        if low <= v <= high
+    ]
+    assert labels == ["0,0", "0,5", "1,0", "1,5", "2,0"]
+    plt.close(fig)
+
+
+def test_cost_decimals_fit_the_values():
+    import report_figures
+
+    assert report_figures._cost_decimals([0.00028, 0.0002]) == 5
+    assert report_figures._cost_decimals([0.04, 0.0325]) == 3
+
+
+def test_figures_use_the_paperlab_palette_and_final_width(tmp_path):
+    from config import FIGURE_COLORS, FIGURE_WIDTH_CM
+
+    assert FIGURE_COLORS["C1"] == "#184F95" and FIGURE_COLORS["C2"] == "#B8461A"
+    paths, _ = _run(tmp_path)
+    recall = next(p for p in paths if p.name == "recall.pdf").read_bytes()
+    width_pt = float(recall.split(b"/MediaBox [ 0 0 ")[1].split(b" ")[0])
+    assert abs(width_pt - FIGURE_WIDTH_CM / 2.54 * 72) < 0.5
+
+
+def test_dot_offsets_centre_equal_values():
+    import report_figures
+
+    offsets = report_figures._dot_offsets([2.0, 2.0, 2.0, 1.0])
+    assert offsets[3] == 0.0 and offsets[1] == 0.0 and offsets[0] == -offsets[2] != 0

@@ -182,7 +182,12 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `REPORT_COST_DECIMALS` | `5` | Nachkommastellen der Kosten (USD) in der Effizienztabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `BYTES_PER_MB` | `1000000` | Indexgröße in MB (dezimal) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `JSON_DECIMALS` | `6` | Rundung der Gleitkommazahlen in `analysis.json` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_SIZE` | `(6.0, 3.6)` | Abbildungsgröße in Zoll | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_WIDTH_CM`, `FIGURE_HEIGHT_CM` | `17.0`, `6.5` | Abbildungen in Endgröße (Breite des Satzspiegels; Standardhöhe, Panels und Heatmap wachsen mit ihren Zeilen) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_FONT_FILE` | `"arial282/Arial282-Regular.ttf"` | Arial unter `PAPERLAB_FONTS` oder `fonts/` von PaperLab (eine Schrift in der Arbeit, Prüfung `schrift`); fehlt sie, DejaVu Sans mit Hinweis | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_COLORS` | `C1` `#184F95`, `C2` `#B8461A`, `C3` `#11866A`, `K1` `#52514E`, `K0` `#8E8C87` | Farben der Strategien: Klassenfarben FigBlue und FigOrange, dritter Farbton auf Farbsehschwäche geprüft (alle Paare ΔE ≥ 10), Kontrollen grau | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_HATCHES`, `FIGURE_MARKERS` | Kontrollen schraffiert; Marker je Strategie | Farbe nie alleiniger Informationsträger | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_INK`, `FIGURE_MUTED`, `FIGURE_GRID` | `#0B0B0B`, `#52514E`, `#E4E3DF` | Text, Achsen, Gitterlinien | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_SEQUENTIAL` | `#F2F7FE` → `#CDE2FB` → `#184F95` | einfarbige Skala der Heatmap und Zähltabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_HISTOGRAM_BINS` | `20` | Klassen der Chunk-Längen-Histogramme | [ADR 0044](../adr/0044-statistische-auswertung.md) |
