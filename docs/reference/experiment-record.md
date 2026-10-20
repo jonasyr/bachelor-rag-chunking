@@ -1,8 +1,8 @@
 # Experiment-Protokoll
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 20.10.2026. Übersicht: [Dokumentation](../README.md).
 
-Messwerte aller Läufe (Chunking, Embedding, Stichprobenplan, Pilotproben, Vortest) mit Datum; wird mit jedem Lauf
+Messwerte aller Läufe (Chunking, Embedding, Stichprobenplan, Pilot e2e, Pilotproben, Vortest) mit Datum; wird mit jedem Lauf
 fortgeschrieben und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus:
 [Korpus](corpus.md) ([ADR 0038](../adr/0038-korpus-e2e.md)); Parameter: [Konfiguration](configuration.md). Der erste
 Teil gilt für den aktuellen e2e-Korpus, der zweite ([Historie](#historie-vuejs-korpus-bis-18102026)) für den
@@ -77,6 +77,70 @@ und kein `system_fingerprint`; die Modellliste der API führt für GPT-6 keine d
 | OpenAI Python SDK | 2.44.0 | 13.10.2026 |
 | ChromaDB | 1.5.9 | 13.10.2026 |
 | tiktoken | 0.13.0 | 13.10.2026 |
+
+## Pilot e2e (19./20.10.2026)
+
+Vortest der ganzen Pipeline auf dem e2e-Korpus vor dem Fragenkatalog (Schritt 5 in [plan.md](../plan.md#stand)); zählt
+nicht zur Auswertung. Set `data/pilot/e2e/`, 16 Fragen `E01`–`E16`, je 4 der Klassen single, multi-section, detail,
+paraphrase, alle fünf Fragetypen, 11 Bereiche, 18 Seiten. Fragen, Referenzantworten und Annotation schrieb ein Agent,
+nur zu innersten H2/H3-Abschnitten, die weder Slot noch Reserve im [Stichprobenplan](#stichprobenplan-e2e) sind
+(377 von 473 Kandidaten); keine annotierte Stelle liegt im Plan, so bleibt die blinde Annotation des Katalogs
+gewahrt. Jede Zeile besteht die Klassenregeln (`catalogue.class_findings`).
+
+**Retrieval** (`scripts/difficulty_probe.py data/pilot/e2e`, 19.10.2026; Fragevektoren 460 Tokens, 0,00006 USD,
+Modellstand-Prüfung Kosinus 0,99994):
+
+| Strategie | Hit@5 | MRR | P@5 | R@5 |
+|---|---:|---:|---:|---:|
+| C1 | 0,94 | 0,69 | 0,26 | 0,91 |
+| C2 | 0,88 | 0,65 | 0,28 | 0,80 |
+| C3 | 0,88 | 0,61 | 0,21 | 0,83 |
+| K1 | 0,81 | 0,59 | 0,28 | 0,77 |
+
+Kein Deckeneffekt; die Strategien trennen sich je Klasse unterschiedlich (single: C3 Hit@5 0,50 gegen 1,00 bei C1 und
+C2; paraphrase: C3 1,00 gegen 0,75). Ohne Treffer in den Top 5: E03 bei C3, E04 bei C3 und K1, E10 bei C2 und K1, E13 bei C1, C2 und K1.
+
+**Generierung** (`generate.py --set data/pilot/e2e`, 19.10.2026): 48 Antworten C1–C3 und 16 K0-Antworten in einem Lauf,
+105.207 Prompt- und 4.622 Antwort-Tokens, 0,0128 USD (C1 0,0045, C2 0,0045, C3 0,0032, K0 0,0006). `model_reported`
+`gpt-6-luna`, Modellobjekt erstellt 14.09.2026 17:15:02 UTC (vor und nach dem Lauf gleich), kein `system_fingerprint`.
+
+**Bewertung**: Kernpunkte E01–E03 von Jonas geprüft und eingefroren, E04–E16 von einem Agenten aus den Referenzantworten
+(ohne Blick auf die Antworten); ein Agent bewertete alle Antworten regelbasiert und blind als Entwicklungshilfe
+(`scores.csv`, `scores_control.csv` im Set). Mittel über die vier gemeinsamen Kriterien
+(`config.CONTROL_CRITERIA`, `evaluate_answers.py --mode summarise --control`):
+
+| | Gesamt | Korrektheit | Vollständigkeit | Halluzinationsfreiheit | Verständlichkeit |
+|---|---:|---:|---:|---:|---:|
+| K0 | 0,92 | 0,94 | 0,38 | 0,38 | 2,00 |
+| C1 | 1,84 | 1,88 | 1,69 | 1,88 | 1,94 |
+| C2 | 1,80 | 1,81 | 1,62 | 1,88 | 1,88 |
+| C3 | 1,72 | 1,75 | 1,50 | 1,75 | 1,88 |
+
+Mit allen fünf Kriterien (C1–C3): C1 1,86, C2 1,82, C3 1,76; 34 der 48 Antworten erreichen überall 2. Die Abzüge sitzen
+in wenigen Fragen: E06 (alle drei Strategien beantworten den Bitrise-Teil mit dem Abschnitt eines anderen
+CI-Dienstes), E04 und E13 (Teilantworten bei allen drei), E05 (C1, C3), E03 (C3), E10 (C2), E16 (C3, unvollständig).
+
+**Closed-Book-Probelauf**: Die K0-Antworten nutzen den Prompt der Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)).
+Sie treffen den Kernpunkt bei 5 von 16 Fragen (E06, E11, E13, E15, E16); E06 trifft nur Punkt 1 und ist im Übrigen
+falsch, E13 und E16 nur bei großzügiger Lesart: streng 2–4 von 16. K0 lehnt nie ab, sondern antwortet sicher und oft
+falsch (Korrektheit 0 bei 8 von 16).
+
+**Offen**: Jonas' Übungsbewertung der ersten 3 Fragen (9 Antworten, Set `data/pilot/e2e_jonas/`, Kernpunkte
+eingefroren) und ihr Vergleich mit der Agentenbewertung.
+
+**Folgerungen** (Empfehlungen, Entscheidung bei Jonas):
+- Der Korpus erfüllt den Zweck von [ADR 0038](../adr/0038-korpus-e2e.md): K0 liegt weit unter C1–C3, das Retrieval
+  trägt den größten Teil der Antwortqualität; H2 ist damit auswertbar.
+- Die Antwortbewertung liegt nahe an der Obergrenze (Mittel 1,7–1,9); Unterschiede zwischen den Strategien zeigen sich
+  vor allem in den Retrieval-Metriken und bei single- und multi-section-Fragen. Die harten Klassen des Katalogs
+  ([ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md)) bleiben nötig.
+- Selbst Fragen außerhalb des Plans trifft das Modell ohne Kontext zu rund einem Viertel; die Grenze von höchstens 16
+  bekannten Katalogfragen ist erreichbar, aber nicht großzügig. Die Prüfung nach jedem Block lohnt sich.
+- Unklar in den Regeln: ob `direct` „ja“ ist, wenn die (falsche) Kernaussage der Antwort vorn steht. Der Agent wertete
+  „nein“, wenn der Kernpunkt fehlt oder falsch ist, „ja“, wenn er nur teilweise vorn steht. Vor der echten Bewertung
+  in [Evaluation](evaluation.md#regelbasierte-bewertung) präzisieren.
+- Teilantworten mit Hinweis „die Passagen enthalten den Rest nicht“ (E04, E13) wertete der Agent als Antwort, nicht als
+  `declines`; die Regel deckt das, sollte aber im Hilfetext stehen.
 
 ## Historie: Vue.js-Korpus (bis 18.10.2026)
 

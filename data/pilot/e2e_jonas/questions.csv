@@ -1,0 +1,17 @@
+question_id,question,type,difficulty,notes
+E01,"We split our suite across CI machines with --shard. Can e2e combine the shard reports into one, and what should each job upload?",limitation,single,pilot single
+E02,"I set a Kernel profile for my hosted browser, but my tests don't seem to use it. Why, and how do I make it apply?",conceptual,single,pilot single
+E03,"With a decision model driving the agent, what happens when three actions in a row fail or change nothing on the screen?",factual,single,pilot single
+E04,"My custom executor wants to report that a step ran out of budget or time. Which error codes may it return for that, and what happens if it uses them otherwise?",procedural,single,pilot single
+E05,"In one run, a test fails and another test hits an infrastructure failure. Which exit code does the e2e process return, and does the report still show each result?",factual,multi-section,pilot multi-section
+E06,"How do I provide the model key to e2e on Bitrise and on EAS Workflows, and can pull request builds read it on each?",comparative,multi-section,pilot multi-section
+E07,"In a bug bash, how does the agent decide that a finding is a real bug, and how do I keep the resulting repro tests from breaking the run that gates merges?",procedural,multi-section,pilot multi-section
+E08,"With the Lightpanda browser, frameLocator finds nothing inside my iframes. Why, and how can I get frame content to work?",limitation,multi-section,pilot multi-section
+E09,"By default, after how many steps or how much time does an e2e explore run stop?",factual,detail,pilot detail
+E10,"After migrating from Maestro, can my e2e tests talk to the agent-device client directly?",comparative,detail,pilot detail
+E11,"Does e2e sandbox my tests, config, reporters and app commands, or do they run with my own operating-system permissions?",conceptual,detail,pilot detail
+E12,"When the MCP server checks a locator my coding agent guessed from the source, where does a wrong locator fail?",factual,detail,pilot detail
+E13,"My app already depends on Playwright. Does e2e drive my copy of Playwright, and can the two reuse the same downloaded Chromium binaries?",comparative,paraphrase,pilot paraphrase
+E14,"If e2e's GitHub reporter can't publish its summary on my PR, can that make the CI job fail?",limitation,paraphrase,pilot paraphrase
+E15,"When an open drawer marks the rest of my page as non-interactive with the HTML attribute for that, can the AI agent still click buttons behind it, and will locators and toBeVisible still find them?",conceptual,paraphrase,pilot paraphrase
+E16,"Can I use the platforms or requires filters to skip a spec only on narrow screens, or how else do I limit it to desktop widths?",procedural,paraphrase,pilot paraphrase

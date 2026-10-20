@@ -1,0 +1,49 @@
+code,question_id,correctness,completeness,groundedness,no_hallucination,clarity,notes
+E01-A,E01,2,2,2,2,2,
+E01-B,E01,2,2,2,2,2,
+E01-C,E01,2,2,2,2,2,
+E02-A,E02,2,2,2,2,2,
+E02-B,E02,2,2,2,2,2,
+E02-C,E02,2,2,2,2,2,
+E03-A,E03,0,0,2,0,1,"Applies the LLM-agent loop rule (change approach) to the decision model, contradicting the reference: core_wrong, hallucination substantive (contradicts). Statements literally match the excerpts, so grounded all. direct no: the core point never appears."
+E03-B,E03,2,2,2,2,2,
+E03-C,E03,2,2,2,2,2,
+E04-A,E04,2,1,2,2,2,"Point 1 missing: names the three codes but never says they go in a blocked verdict (partly = missing). Point 3 counted: 'refuses ... any other reason' plus 'also rejects ..., reporting MODEL_OUTPUT_INVALID' reads as one mechanism."
+E04-B,E04,2,0,2,2,2,"Gives only two of three codes (no CANCELLED, no blocked) and says the excerpts do not cover misuse: not a decline since it answers part; all points missing."
+E04-C,E04,2,1,2,2,2,Same as E04-A: no blocked verdict (point 1 partly = missing); MODEL_OUTPUT_INVALID attached via 'also rejects' counted for point 3.
+E05-A,E05,2,1,2,2,2,Point 2 missing: never gives exit code 1 for the test failure. Point 3 counted: 'infrastructure takes precedence over a test failure in a mixed run' applies the precedence rule (order in brackets not required).
+E05-B,E05,2,2,2,2,2,Point 3 counted from 'infrastructure failure takes precedence over a test failure' (order in brackets not required).
+E05-C,E05,2,1,2,2,2,Point 4 partly: keeps each result but omits that precedence affects only the exit code (partly = missing). Point 3 counted as in E05-B.
+E06-A,E06,0,1,1,0,1,"Bitrise part uses the unlabelled e2e-variable-group section (another CI service) although its Bitrise excerpt says Secrets + Expose for Pull Requests: core wrong, PR claim wrong, Bitrise statements not backed and contradicting. EAS part correct (production default in brackets not required)."
+E06-B,E06,0,1,1,0,1,Same Bitrise mix-up as E06-A (env group instead of Secrets/Expose for Pull Requests); EAS part correct.
+E06-C,E06,0,1,1,0,1,Same Bitrise mix-up; mentions public-app builds never get the key but not Expose for Pull Requests and says PR builds can read it on both (point 2 partly = missing).
+E07-A,E07,2,2,2,2,2,
+E07-B,E07,2,2,2,2,2,
+E07-C,E07,2,2,2,2,2,
+E08-A,E08,2,2,2,2,2,Point 1 counted: 'does not load iframes by default' carries the meaning without naming sub-resources.
+E08-B,E08,2,2,2,2,2,"Point 1 counted as in E08-A; the lightpanda({ loadResources }) snippet combines two excerpt facts, treated as backed."
+E08-C,E08,2,2,2,2,2,Point 1 counted as in E08-A.
+E09-A,E09,2,2,2,2,2,
+E09-B,E09,2,2,2,2,2,
+E09-C,E09,2,2,2,2,2,
+E10-A,E10,2,2,2,2,2,
+E10-B,E10,2,2,2,2,2,
+E10-C,E10,1,0,2,2,1,Declines (excerpts lacked the 'What differs on purpose' section). answers_question yes: it stays on the asked question; direct no: no core point given.
+E11-A,E11,2,2,2,2,2,
+E11-B,E11,2,2,2,2,2,
+E11-C,E11,2,2,2,2,2,
+E12-A,E12,2,2,2,2,2,
+E12-B,E12,2,2,2,2,2,
+E12-C,E12,2,2,2,2,2,"Point 1 counted: 'in the live MCP session, before a test run' read as 'not in a test run'."
+E13-A,E13,2,1,2,2,2,Point 2 missing: never says the engine always runs the Playwright it was tested against. Install-command advice is backed by its excerpt.
+E13-B,E13,2,0,2,2,2,"Answers the first part, says the excerpts do not cover the shared browser cache: partial answer, not a decline. Point 1 counted ('own pinned playwright-core' without 'exact')."
+E13-C,E13,2,0,2,2,2,Same as E13-B.
+E14-A,E14,2,2,2,2,2,Point 2 counted: 'reports the reason in the job summary' for 'one row under the summary gives the reason'.
+E14-B,E14,2,2,2,2,2,
+E14-C,E14,2,2,2,2,2,
+E15-A,E15,2,2,2,2,2,
+E15-B,E15,2,2,2,2,2,
+E15-C,E15,2,2,2,2,2,"Omits 'as in Playwright' (bracketed qualifier, not required); closing sentence restates the excerpt, not counted as an addition."
+E16-A,E16,2,2,2,2,2,"Extra --target alternative (one target per viewport) is backed by its excerpts, so no hallucination."
+E16-B,E16,2,2,2,2,2,"Same extra --target alternative as E16-A, backed by its excerpts."
+E16-C,E16,2,1,2,2,2,Point 3 missing: offers per-viewport targets with --target (backed by its excerpts) instead of a separate config run with --config.

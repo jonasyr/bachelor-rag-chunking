@@ -380,10 +380,12 @@ Q001,K0,1,0,2,2,1.25
 
 ## Pilot-Sets
 
-Historisch (Vue-Korpus). Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
-Fragenkatalogs. Alle drei Sets entstanden auf dem Vue.js-Korpus vor [ADR 0038](../adr/0038-korpus-e2e.md): Ihre
-Abschnitts- und Chunk-IDs gibt es im e2e-Korpus nicht, sie lassen sich darauf nicht neu ausführen und bleiben als
-Aufzeichnung erhalten; ein neuer Pilot auf e2e ist geplant ([Plan](../plan.md#stand)). Ein Set ist ein Ordner mit den
+Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
+Fragenkatalogs. Aktuell ist das Set `e2e` (IDs `E01`–`E16`, nur Abschnitte außerhalb des Stichprobenplans) mit der
+Übungskopie `e2e_jonas` (die ersten 3 Fragen; [Experiment-Protokoll](experiment-record.md#pilot-e2e-1920102026)).
+Historisch sind die drei Vue-Sets: Sie entstanden vor [ADR 0038](../adr/0038-korpus-e2e.md), ihre Abschnitts- und
+Chunk-IDs gibt es im e2e-Korpus nicht, sie lassen sich darauf nicht neu ausführen und bleiben als Aufzeichnung
+erhalten. Ein Set ist ein Ordner mit den
 Dateien der Evaluation unter denselben Namen und Formaten (Schritte mit `--set DIR`, `evaluate_answers.py` dazu
 `--limit N` für die ersten N Fragen); das Laufprotokoll heißt `config.PILOT_RUNS_FILE_NAME` = `runs.jsonl` und hat
 das Format von `embedding_runs.jsonl` und `generation_runs.jsonl`. Eine Closed-Book-Prüfung gibt es für Pilot-Sets
@@ -391,7 +393,9 @@ nicht. Welche Dateien versioniert sind: [Versioniert und ignoriert](#versioniert
 
 | Set | Fragen | vorhandene Dateien |
 |---|---|---|
-| `data/pilot/` | Probe 1: 8 Fragen `P01`–`P08` (`difficulty`: 3 `easy`, 4 `medium`, 1 `hard`; `notes` = `pilot`) | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `runs.jsonl` (nur `retrieve`) |
+| `data/pilot/e2e/` | Pilot e2e: 16 Fragen `E01`–`E16` (je 4 `single`, `multi-section`, `detail`, `paraphrase`; `notes` = `pilot <Klasse>`), nur Abschnitte außerhalb des Stichprobenplans | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `generated_answers.csv`, `generated_answers_control.csv`, `key_points.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_checks.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv`, `scores_control.csv`; `runs.jsonl` mit `retrieve`, `generate` (mit K0), `scaffold` (C1–C3 und `K0`), `key_points` |
+| `data/pilot/e2e_jonas/` | Übungskopie: die ersten 3 Fragen von `e2e` (9 Antworten, gleiche Codes), Kernpunkte von Jonas | `questions.csv`, `ground_truth.csv`, `generated_answers*.csv`, `key_points.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_packet.md`, `scoring_items.jsonl`; `runs.jsonl` (Kopie aus `e2e`, dazu `scaffold` mit `--limit 3` und `key_points`) |
+| `data/pilot/` | Probe 1 (Vue, historisch): 8 Fragen `P01`–`P08` (`difficulty`: 3 `easy`, 4 `medium`, 1 `hard`; `notes` = `pilot`) | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `runs.jsonl` (nur `retrieve`) |
 | `data/pilot/hard/` | Probe 2: 16 schwere Fragen `H01`–`H16` (`notes` = `pilot <Art>`: `multi-section`, `detail`, `paraphrase`), Annotation blind vor jedem Retrieval (Hauptwerte; [ADR 0027](../adr/0027-blinde-annotation.md)) | wie `data/pilot/`, dazu `generated_answers.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `key_points.csv`; `runs.jsonl` mit `retrieve`, `generate` (17.10.2026), `scaffold` (ohne `scoring`) und `key_points` (18.10.2026) |
 | `data/pilot/hard_posthoc/` | dieselben Fragen mit nachträglich ergänzter Annotation; nur Sensitivität, keine Evidenz ([ADR 0027](../adr/0027-blinde-annotation.md)) | wie `data/pilot/` |
 | `data/pilot/hard/history/` | `ground_truth_b75d188.csv`: blinde Annotation mit den IDs des älteren Vue-Korpus (`b75d188`) | |

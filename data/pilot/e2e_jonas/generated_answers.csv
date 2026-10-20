@@ -1,0 +1,158 @@
+question_id,strategy,answer,sources,prompt_tokens,completion_tokens
+E01,C1,"No. e2e can’t merge shard reports yet. Have each shard job upload its own `.e2e/report.json` and `.e2e/junit.xml`, using a name that includes the shard index so the files stay distinct.",C1_D008_0005;C1_D008_0004;C1_D008_0001;C1_D015_0004;C1_D040_0014,2423,52
+E01,C2,"No. e2e can’t merge shard reports yet. Have each shard job upload its own `report.json` and `junit.xml`, using artifact names that include the shard index.",C2_D008_0006;C2_D008_0005;C2_D008_0004;C2_D008_0001;C2_D008_0002,2419,41
+E01,C3,"No. e2e can’t merge shard reports yet. Have each job upload its own `report.json` and `junit.xml`, using an artifact name that includes the shard index. Also upload the full `.e2e/` directory at the end of each job—even if tests fail—if you need the test results and other artifacts such as traces or screenshots.",C3_D008_0008;C3_D008_0003;C3_D011_0006;C3_D012_0006;C3_D058_0003,1007,78
+E02,C1,"By default, `kernel()` uses `scope: 'worker'`. In that scope, each test runs in a fresh browser context, while Kernel’s `profile` applies only to the browser’s default context—so the profile has no effect.
+
+Set the scope to `'attempt'` so each attempt runs in the browser’s default context, where the profile applies:
+
+```ts
+web({
+  browser: kernel({ profile: 'your-profile', scope: 'attempt' }),
+})
+```
+
+This leases a new browser for each attempt, including retries, so each test incurs a browser start.",C1_D024_0001;C1_D024_0002;C1_D024_0003;C1_D027_0004;C1_D005_0003,2223,121
+E02,C2,"`kernel()` defaults to `scope: 'worker'`. In that scope, each test attempt gets a fresh browser context, while Kernel’s `profile` applies only to the browser’s default context—so the profile has no effect.
+
+Set the scope to `'attempt'` so the attempt uses the browser’s default context:
+
+```ts
+browser: kernel({ profile: yourProfile, scope: 'attempt' })
+```
+
+This leases a new browser for each attempt, including retries, so each attempt incurs a browser start and the per-attempt lease limits apply.",C2_D024_0001;C2_D024_0002;C2_D024_0003;C2_D027_0004;C2_D005_0004,2557,116
+E02,C3,"With Kernel’s default `scope: 'worker'`, each attempt gets a new browser context, while the Kernel profile applies only to the browser’s default context. So the profile has no effect in worker scope.
+
+Set Kernel to `scope: 'attempt'` so each attempt runs in its browser’s default context, where the profile applies. This leases a new browser for every attempt, including retries, and each test incurs a browser start.",C3_D024_0001;C3_D024_0005;C3_D024_0002;C3_D005_0013;C3_D023_0001,1663,91
+E03,C1,"After three consecutive actions fail or leave the screen unchanged, the step is blocked with `AUTOMATION_UNSUPPORTED`.",C1_D001_0001;C1_D016_0003;C1_D016_0005;C1_D016_0001;C1_D038_0012,2601,26
+E03,C2,"After three consecutive actions fail or leave the screen unchanged, the step is blocked with `AUTOMATION_UNSUPPORTED`.",C2_D001_0002;C2_D016_0003;C2_D001_0001;C2_D016_0006;C2_D016_0001,2598,26
+E03,C3,"After three consecutive failed actions, the loop tells the model to change its approach. A failed action returns the current screen so the model can choose what to try next. The documentation doesn’t specify a separate rule for actions that merely leave the screen unchanged.",C3_D001_0004;C3_D001_0001;C3_D016_0001;C3_D001_0003;C3_D044_0005,1698,53
+E04,C1,"Return `STEP_BUDGET_EXHAUSTED` when the step’s budget is spent, `STEP_TIMEOUT` when its deadline has passed, or `CANCELLED` when the test was cancelled.
+
+The runner refuses these codes when used for any other reason. It also rejects a `passed` verdict that includes an error code, reporting `MODEL_OUTPUT_INVALID`.",C1_D044_0004;C1_D018_0005;C1_D044_0013;C1_D001_0002;C1_D018_0004,2533,76
+E04,C2,"A custom executor may return `STEP_BUDGET_EXHAUSTED` when the model-call or action-step budget is spent, or `STEP_TIMEOUT` when the invocation deadline has passed. It may return `CANCELLED` only when the test was cancelled.
+
+The runner refuses these codes if used for any other reason. It also rejects a passed verdict that includes an error code, reporting `MODEL_OUTPUT_INVALID`.",C2_D044_0004;C2_D001_0003;C2_D044_0005;C2_D018_0006;C2_D042_0035,2542,86
+E04,C3,"A custom executor may return `STEP_BUDGET_EXHAUSTED` when a budget runs out, or `STEP_TIMEOUT` when the deadline runs out. The excerpts don’t specify what happens if it returns either code when that condition hasn’t occurred.",C3_D038_0004;C3_D044_0004;C3_D044_0011;C3_D018_0005;C3_D044_0010,2720,54
+E05,C1,The process returns **exit code 3**. Infrastructure failure takes precedence over a test failure in a mixed run. **Yes**—the report still keeps each individual test result; precedence affects only the process exit code.,C1_D040_0032;C1_D044_0013;C1_D040_0022;C1_D044_0012;C1_D015_0005,2316,47
+E05,C2,The e2e process returns **exit code 3**: infrastructure failure takes precedence over a test failure (exit code 1). **Yes.** The report still keeps each individual result; precedence affects only the process exit code.,C2_D044_0016;C2_D044_0014;C2_D040_0039;C2_D044_0015;C2_D040_0040,2212,50
+E05,C3,"The e2e process returns **exit code 3**: infrastructure failure takes precedence over a test failure (code 1). The report still keeps **each individual result**, so both outcomes remain visible.",C3_D040_0025;C3_D044_0011;C3_D044_0010;C3_D015_0002;C3_D044_0002,2309,44
+E06,C1,"- **Bitrise:** Add the model key as a **secret** in the `e2e` environment variable group, and use that group in the jobs that run e2e. Any build that reads the group—including an untrusted pull-request build—can access the key, so only enable it for contributors you trust.
+- **EAS Workflows:** Store the key (for example, `AI_GATEWAY_API_KEY`) as a **secret EAS environment variable**, then set `environment:` on each test job so it reads the environment containing the key. Any job that reads it—including one running an untrusted pull request—can access it.
+
+So, **yes, pull-request builds can read the key on both services** if the relevant secret environment is made available to the job. Bitrise also notes that public-app builds never receive the key; on EAS, the excerpt warns that any job configured to read the environment can access it.",C1_D009_0003;C1_D010_0002;C1_D011_0003;C1_D011_0001;C1_D008_0001,2249,195
+E06,C2,"- **Bitrise:** Add the model key to the `e2e` environment variable group and mark it as secret. Any build that reads that group—including a pull request build—can read the key. Only use the group for pull requests from contributors you trust.
+- **EAS Workflows:** Store the key (for example, `AI_GATEWAY_API_KEY`) as a secret EAS environment variable, then set `environment:` on each test job so it reads that environment. A job that reads it can access the key even when it runs an untrusted pull request.",C2_D010_0002;C2_D009_0003;C2_D010_0003;C2_D011_0001;C2_D011_0003,2344,120
+E06,C3,"- **Bitrise:** Put the model key in the `e2e` environment variable group and mark it as secret. Any build that reads that group—including an untrusted pull request build—can read the key. Only enable the group for pull requests from contributors you trust.
+
+- **EAS Workflows:** Store the key as a secret EAS environment variable, then set `environment:` on each job that needs it (custom jobs otherwise read `production` by default). A pull request job that reads that environment can access the key, including for an untrusted pull request. The excerpts don’t specify an EAS setting that limits exposure to trusted contributors.",C3_D010_0003;C3_D009_0006;C3_D011_0004;C3_D011_0001;C3_D009_0001,867,136
+E07,C1,"The agent treats a finding as a real bug only after it writes and runs a repro test for the expected behavior, and that test fails with `ASSERTION_FAILED`. Before that, it rejects findings with a known cause—such as an explorer limitation, local environment, intended design, or seed data.
+
+Repro tests are tagged `bugbash` because they fail until the bug is fixed. Exclude them from the merge-gating run:
+
+```bash
+npx e2e run --exclude-tag bugbash
+```
+
+Use `pnpm exec e2e run --exclude-tag bugbash` or `bunx e2e run --exclude-tag bugbash` if applicable. Once the bug is fixed and the test passes, remove the tag and keep it as a regression test.",C1_D006_0002;C1_D006_0001;C1_D008_0004;C1_D002_0002;C1_D013_0003,2544,161
+E07,C2,"The agent treats a finding as a real bug only after it writes and runs a repro test that asserts the expected behavior, and that test fails with `ASSERTION_FAILED`. Findings with a known cause—such as an explorer limitation, local environment, intended design, or seed data—are rejected.
+
+Repro tests are tagged `bugbash` because they fail until the bug is fixed. Exclude them from the merge-gating run with:
+
+```bash
+npx e2e run --exclude-tag bugbash
+```
+
+Use the equivalent `pnpm exec` or `bunx` command if applicable. After the bug is fixed and the test passes, remove the tag and keep the test as a regression test.",C2_D006_0002;C2_D006_0001;C2_D006_0003;C2_D013_0003;C2_D008_0005,2259,147
+E07,C3,"The agent treats a finding as a real bug only after it writes and runs a repro test that asserts the expected behavior, and that test fails with `ASSERTION_FAILED`. Before writing repros, it rejects findings with known causes such as explorer limitations, local environment issues, intended design, or seed data.
+
+Repro tests are tagged `bugbash` because they fail until the bug is fixed. Keep them out of the merge-gating run with:
+
+```bash
+npx e2e run --exclude-tag bugbash
+```
+
+Use the equivalent `pnpm exec` or `bunx` command if applicable. After the bug is fixed and the repro passes, remove the tag and keep the test as a regression test.",C3_D006_0004;C3_D006_0005;C3_D006_0001;C3_D008_0007;C3_D013_0004,1488,149
+E08,C1,"Lightpanda does not load iframes by default, so `frameLocator` has no frame content to find. Enable iframe loading in the Lightpanda browser provider:
+
+```ts
+web({ browser: lightpanda({ loadResources: ['iframe'] }) })
+```
+
+Then frame queries and fills work. One limitation remains: a listener in the host page on an element created by the frame will not fire.",C1_D025_0005;C1_D005_0010;C1_D025_0004;C1_D025_0001;C1_D025_0003,2315,87
+E08,C2,"Lightpanda does not load iframes by default, so `frameLocator` has no frame content to query. Configure the Lightpanda browser with `loadResources: ['iframe']`; then frame queries and fills work.
+
+One limitation remains: a listener in the host page on an element created by the frame will not fire.",C2_D025_0006;C2_D025_0005;C2_D025_0001;C2_D005_0012;C2_D053_0014,2411,70
+E08,C3,"Lightpanda does not load iframes by default, so `frameLocator` has no frame content to query. Configure the Lightpanda browser to load iframe resources with `loadResources: ['iframe']`; then frame queries and fills work.
+
+The excerpts don’t show the exact configuration syntax. One limitation remains: a listener in the host page on an element created by the frame will not fire.",C3_D005_0005;C3_D025_0001;C3_D025_0007;C3_D025_0008;C3_D005_0018,1422,84
+E09,C1,"By default, an e2e explore run stops after **8 steps or 10 minutes**, whichever limit is reached first.",C1_D040_0023;C1_D019_0002;C1_D040_0022;C1_D019_0001;C1_D040_0025,2487,28
+E09,C2,"By default, an e2e explore run stops after **8 steps or 10 minutes (600,000 ms)**—whichever limit is reached first. It may stop earlier if the agent covers the goal.",C2_D019_0002;C2_D040_0028;C2_D019_0001;C2_D040_0029;C2_D040_0027,2590,46
+E09,C3,"By default, an e2e explore run stops after **8 steps or 10 minutes**, whichever comes first.",C3_D019_0005;C3_D019_0002;C3_D040_0018;C3_D040_0020;C3_D040_0017,2173,26
+E10,C1,"No. The documentation says e2e tests get **no agent-device client**. Calls go through `screen`, `app`, `device`, or the agent, so e2e can record and redact them.",C1_D032_0001;C1_D031_0001;C1_D032_0002;C1_D031_0002;C1_D032_0008,2616,46
+E10,C2,"The excerpts don’t say whether tests can talk directly to the agent-device client after migrating from Maestro. They mention running `npx agent-device doctor` during setup, but don’t document direct client access from tests.",C2_D032_0001;C2_D031_0001;C2_D032_0002;C2_D031_0002;C2_D032_0003,2613,46
+E10,C3,"No. The documentation says e2e tests get no agent-device client: calls go through `screen`, `app`, `device`, or the agent so e2e can record and redact them.",C3_D031_0001;C3_D032_0001;C3_D032_0002;C3_D032_0009;C3_D034_0001,2454,43
+E11,C1,"They run with your operating-system permissions, unsandboxed. This includes your tests, config, engines, tools, reporters, stores, secret providers, and app commands. Run untrusted pull-request code in an external sandbox without secrets or write tokens.",C1_D054_0002;C1_D051_0010;C1_D054_0001;C1_D041_0011;C1_D004_0002,2485,53
+E11,C2,"No. e2e’s tests, config, engines, tools, reporters, stores, secret providers, and app commands run **unsandboxed with your operating-system permissions**. Use an external sandbox without secrets or write tokens for untrusted pull-request code.",C2_D054_0002;C2_D054_0001;C2_D037_0003;C2_D040_0039;C2_D051_0013,2282,55
+E11,C3,"They run with your operating-system permissions, unsandboxed. This includes your tests, config, reporters, and app commands (as well as engines, tools, stores, and secret providers). Run untrusted pull-request code in an external sandbox with no secrets or write tokens.",C3_D054_0005;C3_D047_0005;C3_D054_0006;C3_D054_0001;C3_D040_0001,1358,58
+E12,C1,"It fails in the live MCP session, when the server checks the locator—not during a test run. A wrong locator returns a message such as “0 nodes match” and says a test using it would fail with `LOCATOR_NOT_FOUND`.",C1_D029_0001;C1_D029_0002;C1_D046_0001;C1_D046_0007;C1_D005_0010,2326,51
+E12,C2,"A wrong locator fails in the **live MCP session**, when the server checks it—not during a test run. The server reports that no nodes match and says a test using it would fail with `LOCATOR_NOT_FOUND`.",C2_D029_0001;C2_D029_0002;C2_D046_0001;C2_D046_0009;C2_D051_0012,2584,47
+E12,C3,"It fails in the live MCP session, before a test run. The server reports that no nodes match the locator and notes that a test using it would fail with `LOCATOR_NOT_FOUND`.",C3_D029_0001;C3_D013_0003;C3_D046_0001;C3_D029_0005;C3_D006_0006,571,41
+E13,C1,"No. e2e does not drive your app’s `@playwright/test` copy: `@e2e-dev/web` brings its own pinned `playwright-core`, while your Playwright version remains yours.
+
+The excerpts don’t say whether e2e and Playwright can reuse the same downloaded Chromium binaries, so I can’t confirm that.",C1_D033_0001;C1_D018_0006;C1_D033_0002;C1_D033_0013;C1_D005_0003,2244,74
+E13,C2,"No. e2e uses its own pinned `playwright-core`; your `@playwright/test` version remains yours, so e2e does not drive your copy.
+
+The excerpts don’t say whether the two can reuse the same downloaded Chromium binaries, so I can’t confirm that.",C2_D033_0001;C2_D033_0002;C2_D033_0017;C2_D033_0016;C2_D018_0007,2346,61
+E13,C3,"No. e2e uses the exact `playwright-core` version pinned by its web package; your app keeps its own Playwright copy.
+
+They share downloaded browser binaries only when the two Playwright versions match. If they don’t match, install Chromium for e2e with `npx @e2e-dev/web install chromium` (or the equivalent pnpm/bun command).",C3_D033_0001;C3_D053_0013;C3_D033_0010;C3_D033_0013;C3_D018_0008,2810,81
+E14,C1,"No. The GitHub reporter never changes the run’s status or exit code. If it can’t post the PR comment, it reports the reason in the job summary instead.",C1_D020_0001;C1_D020_0004;C1_D020_0003;C1_D012_0005;C1_D008_0005,2158,38
+E14,C2,"No. The documentation says the GitHub reporter **never changes the run’s status or exit code**. If it can’t publish the PR comment—for example, because the token is read-only or `pull-requests: write` is missing—it reports the reason in the summary instead.",C2_D020_0004;C2_D020_0001;C2_D020_0005;C2_D012_0006;C2_D008_0006,2058,60
+E14,C3,"No. The documentation says the GitHub reporter never changes the run’s status or exit code. If it can’t post the PR comment, it reports the reason in the summary; the CI job’s status is unaffected.",C3_D012_0006;C3_D020_0006;C3_D020_0001;C3_D043_0009;C3_D020_0002,1652,47
+E15,C1,"No. The agent does not see elements with the `inert` attribute or anything beneath them, so it won’t aim at or click buttons behind the open drawer.
+
+Locators can still find inert content, and `toBeVisible` still passes for it, as in Playwright.",C1_D005_0010;C1_D025_0004;C1_D050_0016;C1_D025_0005;C1_D050_0014,2353,61
+E15,C2,"No. The agent does not see an element with `inert` or anything beneath it, so it won’t aim at or click buttons behind the open drawer.
+
+Locators can still find inert content, and `toBeVisible()` can still pass for it. `inert` affects the agent’s ability to interact with the content, not those locator and visibility checks.",C2_D005_0012;C2_D050_0007;C2_D025_0005;C2_D025_0006;C2_D033_0021,2456,78
+E15,C3,"No. The agent doesn’t see elements with `inert` or anything beneath them, so it won’t aim at or click buttons behind the open drawer.
+
+Locators can still find inert content, and `toBeVisible()` still passes for it, as in Playwright.",C3_D005_0018;C3_D005_0019;C3_D059_0009;C3_D025_0006;C3_D005_0005,1063,59
+E16,C1,"No. `platforms` and `requires` can’t select viewport sizes; every browser target has platform `web`.
+
+To skip a spec on narrow screens, check the width in the test and call `test.skip`, for example:
+
+```ts
+test('desktop layout only', async ({ app, browser }) => {
+  await app.open('/');
+  test.skip(
+    (await browser.evaluate(() => window.innerWidth)) < 768,
+    'desktop layout only',
+  );
+  // desktop-width assertions
+});
+```
+
+Alternatively, put size-specific tests in a separate config and run it with `--config`. You can also define targets at different viewport sizes, but every test runs on every target; use `--target` to run only one target.",C1_D059_0005;C1_D059_0004;C1_D059_0003;C1_D035_0005;C1_D031_0003,2669,155
+E16,C2,"No. `platforms` and `requires` can’t select by viewport: every browser target has platform `web`.
+
+To skip a spec on narrow screens, check the width in the test and call `test.skip`, for example:
+
+```ts
+test('desktop layout only', async ({ app, browser }) => {
+  await app.open('/');
+  test.skip(
+    (await browser.evaluate(() => window.innerWidth)) < 768,
+    'desktop layout only',
+  );
+
+  // Desktop-width assertions
+});
+```
+
+Alternatively, put size-specific tests in a separate config and run it with `--config`. You can also define targets with different viewport sizes and run a particular target with `--target`.",C2_D059_0006;C2_D059_0005;C2_D059_0004;C2_D031_0004;C2_D033_0005,2683,145
+E16,C3,"No. `platforms` and `requires` can’t select a viewport because every browser target has platform `web`. To skip a spec on narrow screens, check `window.innerWidth` in the test and call `test.skip()`, for example when the width is below 768.
+
+Alternatively, define separate targets with different viewport sizes and run only the desktop target with `--target desktop`. Every test runs on every configured target unless you select one.",C3_D059_0010;C3_D059_0011;C3_D059_0006;C3_D031_0005;C3_D035_0018,1245,94

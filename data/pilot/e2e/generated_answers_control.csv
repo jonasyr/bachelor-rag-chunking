@@ -1,0 +1,30 @@
+question_id,strategy,answer,sources,prompt_tokens,completion_tokens
+E01,K0,"Yes. Each shard should generate and upload its own report as a CI artifact. After all shard jobs finish, download the reports into a single directory and run the report-combining command on that directory to produce one combined report.",,77,49
+E02,K0,"A Kernel profile only applies when the browser session is launched through Kernel. Setting a profile on a hosted browser configuration doesn’t automatically make tests use that configuration.
+
+Make sure your test runner is configured to connect to Kernel and that the profile is selected in the Kernel launch/session options. Then start a new browser session; an already-running session won’t pick up profile changes.",,76,76
+E03,K0,"The agent stops after three consecutive actions that fail or leave the screen unchanged, rather than continuing to repeat them.",,71,25
+E04,K0,A custom executor may return `ErrCodeBudgetExceeded` or `ErrCodeTimeout` to report that a step ran out of budget or time. These codes are reserved for those conditions; using them for another kind of failure can cause the framework to treat the step as budget-exceeded or timed out rather than as the actual error.,,81,69
+E05,K0,"The e2e process returns the test-failure exit code; the test failure takes precedence over the infrastructure failure. The report still includes both results, showing one test as failed and the other as an infrastructure failure.",,82,46
+E06,K0,"Set the model key as a secret environment variable in each CI system, then have the e2e workflow read that variable.
+
+- **Bitrise:** Add the key in the app’s **Secrets** (or secret environment variables) and reference it in the e2e step. Pull-request builds can read it only if Bitrise is configured to expose secrets to pull requests; check that setting, since secrets may be withheld for builds from forks.
+- **EAS Workflows:** Add the key as an EAS environment variable with **Secret** visibility, in the environment used by the workflow. Pull-request workflows can use it when they run in your project’s trusted environment, but secrets are generally unavailable to workflows triggered by external fork PRs.
+
+Don’t put the key directly in the workflow file or commit it to the repository.",,78,169
+E07,K0,"Treat a finding as a real bug when you can reproduce it reliably and confirm that the observed behavior violates an expected requirement—not merely because it looks unusual. Record the steps, inputs, and expected versus actual result, and rule out setup or environment issues.
+
+Keep repro tests from blocking merge-gating runs by marking them as quarantined or otherwise excluded from the required CI suite while the bug is unresolved. Keep them runnable in a separate or opt-in job, and remove the quarantine once the fix is verified. The exact mechanism depends on your e2e framework’s configuration.",,82,116
+E08,K0,"Lightpanda doesn’t currently support iframe browsing, so `frameLocator()` can’t find elements inside an iframe. It’s a browser limitation, not a locator issue.
+
+To access frame content, use a browser that supports iframes (for example, Chromium) for that test. If you need to stay on Lightpanda, the frame content isn’t available to automate there yet.",,76,81
+E09,K0,"By default, an e2e explore run stops after **100 steps or 10 minutes**, whichever comes first.",,67,26
+E10,K0,"Yes. After migrating from Maestro, your e2e tests can talk directly to the agent-device client.",,66,24
+E11,K0,"They run with your operating-system permissions. e2e does not sandbox your tests, configuration, reporters, or app commands, so only run code you trust.",,73,35
+E12,K0,"A wrong locator fails when the MCP server tries to resolve or use it against the page—for example, during a locator check or an action. It won’t necessarily fail just because the locator was guessed from the source.",,69,46
+E13,K0,"e2e uses its own Playwright dependency rather than driving the copy installed by your app. It may reuse Chromium binaries if both Playwright versions expect the same browser revision and use the same browser cache location; otherwise, e2e may download a separate copy.",,77,56
+E14,K0,"Yes. If the GitHub reporter can’t publish its summary—for example, because the CI token lacks the required permissions—the reporter can cause the CI job to fail. Check the reporter’s error output and the workflow’s GitHub permissions.",,71,50
+E15,K0,"No. When the drawer marks the rest of the page as inert, the AI agent should treat those elements as non-interactive and won’t click buttons behind it. Locators may still find the elements in the DOM, but `toBeVisible()` can still report them as visible—visibility is different from whether an element is interactive.",,90,70
+E16,K0,"No. `platforms` and `requires` filter by platform or capability, not screen width.
+
+To skip a spec on narrow screens, check the viewport width in the spec and skip conditionally—for example, use your test framework’s skip mechanism when `window.innerWidth` is below your desktop-width threshold. Alternatively, configure the test runner to use desktop-sized viewports for that spec.",,75,81

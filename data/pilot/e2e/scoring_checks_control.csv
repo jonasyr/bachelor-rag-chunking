@@ -1,0 +1,17 @@
+code,rules_version,points,declines,core_wrong,other_error,hallucination,answers_question,direct,wordy
+E01-K0,2026-10-18,missing;missing,no,yes,no,substantive,yes,yes,no
+E02-K0,2026-10-18,missing;missing,no,yes,no,substantive,yes,yes,no
+E03-K0,2026-10-18,missing,no,no,no,minor,yes,yes,no
+E04-K0,2026-10-18,missing;missing;missing;missing,no,yes,yes,substantive,yes,yes,no
+E05-K0,2026-10-18,missing;missing;missing;covered,no,yes,no,substantive,yes,yes,no
+E06-K0,2026-10-18,covered;missing;missing;missing,no,no,yes,substantive,yes,yes,no
+E07-K0,2026-10-18,missing;missing;missing;missing,no,no,no,substantive,yes,yes,no
+E08-K0,2026-10-18,missing;missing;missing;missing,no,yes,yes,substantive,yes,yes,no
+E09-K0,2026-10-18,missing;covered,no,yes,no,substantive,yes,yes,no
+E10-K0,2026-10-18,missing;missing;missing,no,yes,no,substantive,yes,yes,no
+E11-K0,2026-10-18,covered;missing,no,no,no,minor,yes,yes,no
+E12-K0,2026-10-18,missing;missing;missing,no,no,no,minor,yes,yes,no
+E13-K0,2026-10-18,covered;missing;covered,no,no,no,minor,yes,yes,no
+E14-K0,2026-10-18,missing;missing,no,yes,no,substantive,yes,yes,no
+E15-K0,2026-10-18,covered;covered;covered,no,no,no,minor,yes,yes,no
+E16-K0,2026-10-18,covered;covered;missing,no,no,no,minor,yes,yes,no

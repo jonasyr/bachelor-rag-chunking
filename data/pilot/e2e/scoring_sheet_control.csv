@@ -1,0 +1,17 @@
+code,question_id,correctness,completeness,no_hallucination,clarity,notes
+E01-K0,E01,0,0,0,2,Agent rater (pilot). Says shard reports can be combined (reference: not yet); invents a report-combining command; upload of 'its own report' lacks report.json/junit.xml and shard-index naming.
+E02-K0,E02,0,0,0,2,Agent rater (pilot). Wrong cause (launch through Kernel) instead of scope worker vs default context; no scope 'attempt' fix.
+E03-K0,E03,2,0,1,2,"Agent rater (pilot). 'Agent stops' does not name the blocked step or AUTOMATION_UNSUPPORTED; vague restatement, not a contradiction."
+E04-K0,E04,0,0,0,2,Agent rater (pilot). Invented codes ErrCodeBudgetExceeded/ErrCodeTimeout; 'reserved for those conditions' only partly P2 (no CANCELLED); misuse said to be treated as budget/timeout instead of refused with MODEL_OUTPUT_INVALID (other_error).
+E05-K0,E05,0,0,0,2,"Agent rater (pilot). Says test-failure code wins (reference: exit 3, infrastructure takes precedence); P4 covered (report keeps both results)."
+E06-K0,E06,1,0,0,2,"Agent rater (pilot). Bitrise Secrets covered; PR exposure only partly (no 'public app never'); EAS lacks 'environment:' on each job; claims fork PRs cannot read the secret, reference says any job reading the environment can, incl. untrusted PRs (other_error)."
+E07-K0,E07,2,0,0,2,"Agent rater (pilot). Generic human bug triage instead of repro test failing with ASSERTION_FAILED; quarantine instead of tag bugbash/--exclude-tag; no regression-test step. Borderline core_wrong: generic, not contradicting."
+E08-K0,E08,0,0,0,2,Agent rater (pilot). Claims Lightpanda does not support iframes (reference: sub-resources off by default) and that frame content cannot be automated there (contradicts loadResources fix: other_error).
+E09-K0,E09,0,1,0,2,Agent rater (pilot). 100 steps instead of 8; 10 minutes correct.
+E10-K0,E10,0,0,0,2,Agent rater (pilot). Says yes; reference says no direct agent-device client.
+E11-K0,E11,2,1,1,2,"Agent rater (pilot). Core covered; engines, tools, stores, secret providers not named; 'only run code you trust' is a minor addition."
+E12-K0,E12,2,0,1,2,"Agent rater (pilot). Borderline P1: says it fails when the MCP server resolves it during a locator check, but not 'in the MCP session, not in a test run'; no 'no nodes match' or LOCATOR_NOT_FOUND."
+E13-K0,E13,2,1,1,2,"Agent rater (pilot). Borderline P1: 'own Playwright dependency, not your copy' covered though exact-version pinning not named; P3 covered (reuse if same browser revision); 'same cache location'/'may download separate copy' minor additions."
+E14-K0,E14,0,0,0,2,Agent rater (pilot). Says the reporter can fail the job; reference says it never changes status or exit code.
+E15-K0,E15,2,2,1,2,"Agent rater (pilot). 'Treat as non-interactive and won't click' taken as P1 (mechanism 'does not see' not named, borderline); hedged 'may' on locators; visibility-vs-interactivity remark is a minor addition."
+E16-K0,E16,2,1,1,2,"Agent rater (pilot). Borderline P1: 'filter by platform, not width' without 'every browser target has platform web'; third option is desktop viewports, not own config with --config (minor addition)."
