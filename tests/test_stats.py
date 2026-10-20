@@ -1,10 +1,12 @@
 """Statistics for the strategy comparison (D44): pure functions, hand-checked values."""
 
 import math
+from statistics import NormalDist
 
 import pytest
 
 import stats
+from stats import confirmatory, wilcoxon_pair
 
 
 def test_holm_adjusts_and_keeps_order():
@@ -134,3 +136,26 @@ def test_spearman_constant_is_not_nan():
     result = stats.spearman([1, 2, 3], [2, 2, 2])
     assert result["rho"] is None
     assert "p" not in result
+
+
+def test_wilcoxon_ties_survive_float_error():
+    """Equal differences of fractional metrics (1 - 2/3 vs 1/3 - 0) must form one tie group.
+    By hand: 12 differences 1/3 (rank 6.5), 4 differences -0.5 (rank 14.5); W- = 58, n = 16,
+    var = 16*17*33/24 - (12**3 - 12 + 4**3 - 4)/48 = 337, z = (58 - 68)/sqrt(337)."""
+    a = [1.0] * 6 + [1 / 3] * 6 + [0.5] * 4
+    b = [2 / 3] * 6 + [0.0] * 6 + [1.0] * 4
+    result = wilcoxon_pair(a, b)
+    z = 10 / math.sqrt(337)
+    assert result["p"] == pytest.approx(2 * (1 - NormalDist().cdf(z)), abs=1e-9)
+    assert result["r"] == pytest.approx(z / 4, abs=1e-9)
+    assert result["median_diff"] == pytest.approx(1 / 3)
+
+
+def test_holm_over_testable_metrics_only_and_pairs_flagged():
+    rising = {"C1": [0, 0, 0, 0, 0, 0], "C2": [1, 1, 1, 1, 1, 1], "C3": [2, 2, 2, 2, 2, 2]}
+    const = {"C1": [2] * 6, "C2": [2] * 6, "C3": [2] * 6}
+    result = confirmatory({"rising": rising, "const": const}, alpha=0.05)
+    assert result["rising"]["p_adj"] == result["rising"]["p"]  # m = 1: const is untestable
+    assert "p_adj" not in result["const"] and result["const"]["significant"] is False
+    pairs = result["rising"]["pairs"]
+    assert all("significant" in pair for pair in pairs.values())

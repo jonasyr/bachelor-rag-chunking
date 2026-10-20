@@ -318,6 +318,9 @@ TABLES_DIR = OUTPUT_DIR / "tables"
 FIGURES_DIR = OUTPUT_DIR / "figures"
 ANALYSIS_FILE = OUTPUT_DIR / "analysis.json"
 ANALYSIS_ALPHA = 0.05  # significance level of the confirmatory tests (Holm-adjusted)
+ANALYSIS_DIFF_DECIMALS = (
+    12  # Wilcoxon differences rounded: float noise is far below, real steps far above
+)
 # Confirmatory metrics (column in the per-question table -> display name)
 ANALYSIS_PRIMARY = {"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}
 ANALYSIS_RULE = "main"  # relevance rule of the retrieval metrics used in the analysis

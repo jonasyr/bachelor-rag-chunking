@@ -13,6 +13,8 @@ from itertools import combinations
 import numpy as np
 from scipy import stats as sps
 
+from config import ANALYSIS_DIFF_DECIMALS
+
 
 def _finite(x: float) -> float | None:
     x = float(x)
@@ -57,12 +59,15 @@ def friedman(values: dict[str, list[float]]) -> dict:
 def wilcoxon_pair(a: list[float], b: list[float]) -> dict:
     """Two-sided Wilcoxon signed-rank test, zero differences dropped (``zero_method="wilcox"``).
 
-    Normal approximation with tie correction (exact p-values are not defined with ties);
-    effect size r = |z| / sqrt(n_nonzero).
+    Normal approximation with tie correction and without continuity correction (exact p-values
+    are not defined with ties); effect size r = |z| / sqrt(n_nonzero), unsigned, so the
+    direction is ``median_diff`` (median of a - b). Differences are rounded to
+    ``config.ANALYSIS_DIFF_DECIMALS`` places so that equal differences of fractional metrics
+    (1 - 2/3 and 1/3) form one tie group despite float error.
     """
     if len(a) != len(b):
         raise ValueError(f"lists differ in length: {len(a)} vs {len(b)}")
-    diff = np.asarray(a, dtype=float) - np.asarray(b, dtype=float)
+    diff = np.round(np.asarray(a, dtype=float) - np.asarray(b, dtype=float), ANALYSIS_DIFF_DECIMALS)
     n_nonzero = int(np.count_nonzero(diff))
     if n_nonzero == 0:
         return {"statistic": None, "r": None, "n_nonzero": 0, "testable": False}
@@ -74,6 +79,7 @@ def wilcoxon_pair(a: list[float], b: list[float]) -> dict:
         "statistic": float(res.statistic),
         "p": p,
         "r": abs(z) / math.sqrt(n_nonzero),
+        "median_diff": float(np.median(diff)),
         "n_nonzero": n_nonzero,
         "testable": True,
     }
@@ -120,6 +126,9 @@ def confirmatory(metrics: dict[str, dict[str, list[float]]], alpha: float) -> di
     for key, p_adj in holm(pair_p).items():
         metric, name = key.split("|")
         result[metric]["pairs"][name]["p_adj"] = p_adj
+    for r in result.values():
+        for pair in r.get("pairs", {}).values():
+            pair["significant"] = bool(pair.get("p_adj", 1.0) < alpha)
     return result
 
 
