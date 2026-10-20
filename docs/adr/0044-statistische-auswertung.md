@@ -28,7 +28,7 @@ runden, damit gleiche Differenzen trotz Gleitkommafehler eine Bindung bilden; ei
 ungleich 0 gilt als testbar, sein Ergebnis wird mit n′ berichtet.
 Wir werden alle übrigen Metriken, die Sensitivitätsregel, K0 gegen C1–C3 und die Aufteilung nach Fragetyp,
 Konstruktionsklasse und Closed-Book-Urteil nur beschreibend berichten (Mittel, Median, Effektstärken, keine p-Werte);
-der Zusammenhang von Retrieval und Antwort (H2) wird mit Spearmans ρ je Strategie und gepoolt berichtet. Alle
+der Zusammenhang von Retrieval und Antwort (H2) wird mit Spearmans ρ je Strategie und gepoolt berichtet (gepoolt ohne p-Wert, weil jede Frage dreifach eingeht). Alle
 p-Werte gelten als explorativ.
 Wir werden die Abbildungen in Endgröße nach den PaperLab-Regeln erzeugen (17 cm, Arial, kein Titel im Bild,
 deutsche Zahlen, Klassenfarben FigBlue und FigOrange, dritter Farbton auf Farbsehschwäche geprüft, Kontrollen grau und

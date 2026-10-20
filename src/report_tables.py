@@ -247,7 +247,9 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
         per = {s: stats.spearman(wide[s], awide["total_score"][s]) for s in STRATEGY_IDS}
         pooled_x = [v for s in STRATEGY_IDS for v in wide[s]]
         pooled_y = [v for s in STRATEGY_IDS for v in awide["total_score"][s]]
-        per["pooled"] = stats.spearman(pooled_x, pooled_y)
+        # each question appears once per strategy, so the pairs are not independent: rho only
+        pooled = stats.spearman(pooled_x, pooled_y)
+        per["pooled"] = {k: v for k, v in pooled.items() if k != "p"}
         correlation[col] = per
     results["correlation"] = correlation
 
@@ -429,7 +431,8 @@ def _correlation_table(results: dict) -> str:
             )
     caption = (
         "Rangkorrelation (Spearman, explorativ) zwischen dem Retrieval je Frage (R@5 bzw. MRR, "
-        "Hauptregel) und dem Gesamtwert der Antwort, je Strategie und über alle Strategien."
+        "Hauptregel) und dem Gesamtwert der Antwort, je Strategie und über alle Strategien "
+        "(gesamt: jede Frage dreifach, daher ohne p-Wert)."
     )
     return latex_table("correlation", caption, header, rows, "llrrr")
 

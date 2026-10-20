@@ -186,7 +186,7 @@ Strategie, mit R@5 und Gesamtwert).
 | Effektstärken | Kendalls W = χ² / (n (k − 1)) und r = \|z\| / √n′ (n′ = Differenzen ungleich 0); die Richtung zeigt die Median-Differenz |
 
 **Zusammenhang Retrieval und Antwort (H2,** [ADR 0009](../adr/0009-hypothesen.md)**):** Spearmans ρ zwischen R@5
-bzw. MRR und dem Gesamtwert, je Strategie und gepoolt. Alle p-Werte gelten als explorativ. Teile ohne Eingabedaten
+bzw. MRR und dem Gesamtwert, je Strategie und gepoolt (gepoolt nur ρ: jede Frage geht dreifach ein). Alle p-Werte gelten als explorativ. Teile ohne Eingabedaten
 (Kontrolle K0, Chunk-Dateien, Embedding-Läufe, Closed-Book-Urteile) entfallen mit einem Hinweis in `notes` von
 `analysis.json`. Die Mittel der Einzelschritte (`evaluate_retrieval.py`, `evaluate_answers.py --mode summarise`) bleiben
 als Konsolenausgabe.

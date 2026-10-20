@@ -198,3 +198,18 @@ def test_constant_metric_does_not_crash(tmp_path):
     assert results["confirmatory"]["total_score"]["testable"] is False
     write_tables(results, tmp_path)
     assert "nan" not in (tmp_path / "tests.tex").read_text(encoding="utf-8").lower()
+
+
+def test_pooled_spearman_has_no_pvalue(tmp_path):
+    """Pooled pairs repeat each question three times (not independent): rho only, no p."""
+    results = build_results(make_data(), 0.05)
+    for per in results["correlation"].values():
+        assert "p" not in per["pooled"]
+        assert all("p" in per[s] for s in C if per[s]["testable"])
+    write_tables(results, tmp_path)
+    pooled = [
+        line
+        for line in (tmp_path / "correlation.tex").read_text(encoding="utf-8").splitlines()
+        if "& gesamt &" in line
+    ]
+    assert pooled and all("& -- &" in line for line in pooled)

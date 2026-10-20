@@ -41,7 +41,12 @@ def paths(tmp_path):
         "embedding_runs_file": tmp_path / "embedding_runs.jsonl",
         "chunk_files": {},
         "closed_book_file": None,
-    }
+        "retrieval_inputs": {",".join(STRATEGIES): [tmp_path / "retrieved_results.csv"],
+                             "K1": [tmp_path / "retrieved_results_control.csv"]},
+        "scores_inputs": [tmp_path / "scoring_sheet.csv"],
+        "scores_control_inputs": [tmp_path / "scoring_sheet_control.csv"],
+        "answers_files": [tmp_path / "generated_answers.csv"],
+    }  # fmt: skip
     write_csv(
         p["questions_file"],
         QUESTIONS_HEADER,
@@ -141,3 +146,36 @@ def test_set_paths_use_the_shared_corpus(tmp_path):
     assert p["closed_book_file"] is None
     assert p["embedding_runs_file"].name == "embedding_runs.jsonl"
     assert "K1" in p["chunk_files"]
+
+
+def test_main_refuses_stale_inputs(paths):
+    """scores.csv still matches its summarise record, but the sheet it was built from changed."""
+    sheet = paths["scores_inputs"][0]
+    sheet.write_text("code,correctness\nA1,2\n", encoding="utf-8")
+    runs = paths["generation_runs_file"]
+    append_step_run("summarise", ",".join(STRATEGIES), [sheet], [paths["scores_file"]], runs)
+    load(paths, main=False)
+    sheet.write_text("code,correctness\nA1,1\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        load(paths, main=False)
+
+
+def test_costs_need_the_answers_of_the_latest_generate_run(paths):
+    answers = paths["answers_files"][0]
+    answers.write_text("question_id,strategy,answer\n", encoding="utf-8")
+    runs = paths["generation_runs_file"]
+    record = json.loads(runs.read_text(encoding="utf-8").splitlines()[-1])
+    record["outputs_sha256"] = {answers.name: "0" * 64}
+    with runs.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+    with pytest.raises(RuntimeError, match="generated_answers.csv"):
+        load(paths, main=False)
+
+
+def test_set_pointing_at_main_catalogue_is_refused(paths, monkeypatch):
+    """--set data/evaluation must not reach the pilot exceptions: it is the main catalogue."""
+    import freeze
+
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", paths["questions_file"])
+    with pytest.raises(RuntimeError, match="not frozen"):
+        load(paths, main=False)

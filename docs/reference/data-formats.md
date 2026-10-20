@@ -402,7 +402,7 @@ Oberste Schlüssel von `analysis.json`: `n_questions`, `alpha`, `retrieval` (Mit
 `sensitivity` und Strategie, einschließlich K1), `answers` (`means` je Strategie und Kriterium, einschließlich K0),
 `confirmatory` (Friedman-Test, Holm-korrigierte p, Kendalls W und paarweise Wilcoxon-Tests je Metrik aus
 `config.ANALYSIS_PRIMARY`), `descriptive_effects` (Effektstärken ohne p-Werte, getrennt nach Regel und `answers`),
-`control_k0` (K0 gegen C1–C3, `null` ohne K0-Bewertung), `correlation` (Spearmans ρ je Strategie und `pooled`),
+`control_k0` (K0 gegen C1–C3, `null` ohne K0-Bewertung), `correlation` (Spearmans ρ je Strategie und `pooled`, dieses ohne `p`),
 `efficiency` (Chunks, Längen, Kontext-Tokens, Indexgröße, Embedding- und Generierungskosten je Strategie),
 `breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil) und `notes` (entfallene Teile, Hinweise).
 
