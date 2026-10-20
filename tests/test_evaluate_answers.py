@@ -746,3 +746,13 @@ def test_the_packet_points_to_the_checks_not_to_hand_entered_scores(files):
     run_scaffold(files)
     packet = files["packet_file"].read_text(encoding="utf-8")
     assert "regelbasierte-bewertung" in packet and "integer 0-2" not in packet
+
+
+def test_summarise_logs_a_run_record(files):
+    from run_log import latest_run
+
+    run_scaffold(files)
+    fill(files, all_two())
+    run_summarise(files)
+    record = latest_run(files["generation_runs_file"], "summarise", ",".join(STRATEGIES))
+    assert record["outputs_sha256"] == {"scores.csv": sha256_of(files["scores_file"])}

@@ -17,3 +17,4 @@ artefacts and run logs: `docs/reference/data-formats.md`; corpus rules: `docs/re
   `fake_embedder`, never the API.
 - A corpus change renumbers doc IDs: remap annotations with `scripts/remap_pilot.py`, never by hand.
 - `pre-commit run --all-files` skips untracked files: `git add` new files first.
+- Analysis: src/analyse.py (ADR 0044) reads only result files with current run records; pilot sets via --set write DIR/output/; figures follow PaperLab rules, paperlab check validates them.

@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (D12 im Leitfaden; Quelle: Exposé/Baseline, übernommen)
+Angenommen (D12 im Leitfaden; Quelle: Exposé/Baseline, übernommen; ergänzt durch
+[ADR 0044](0044-statistische-auswertung.md))
 
 ## Kontext
 

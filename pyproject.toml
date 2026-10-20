@@ -25,6 +25,7 @@ dependencies = [
     # Secondary evaluation (RAGAS)
     "ragas>=0.1.0",
     "markdown-it-py>=3",
+    "scipy==1.17.1",
 ]
 
 [dependency-groups]

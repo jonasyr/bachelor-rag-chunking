@@ -1,6 +1,6 @@
 # Datenartefakte und Formate
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 20.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Dateinamen und Pfade kommen aus [`src/config.py`](../../src/config.py) ([Konfiguration](configuration.md)); welche
 Dateien versioniert sind: [Versioniert und ignoriert](#versioniert-und-ignoriert). Korpus-Beispiele und der
@@ -116,6 +116,12 @@ erster Lauf des Pilot-Sets `hard` vom 14.10.2026 auf dem Vue-Korpus, noch ohne `
 
 Ein Lauf mit `--control` steht mit `"strategy":"K1"` und den K1-Dateien in `inputs_sha256` im Protokoll.
 
+`evaluate_retrieval.py` (lokaler Schritt ohne API, geschrieben von `run_log.append_step_run`; ein Eintrag je Lauf in
+`embedding_runs.jsonl`, mit `--set DIR` in der `runs.jsonl` des Sets): `date`, `step` (`evaluate_retrieval`),
+`strategy` (`C1,C2,C3` bzw. `K1` mit `--control`), `inputs_sha256` (`retrieved_results*.csv`, Fragen, Ground Truth,
+`sections.jsonl`, Chunk-Dateien) und `outputs_sha256` mit `retrieval_scores*.csv`. `analyse.py` prüft die Datei gegen
+diesen Eintrag.
+
 **`generation_runs.jsonl`** (`data/evaluation/`; Pilot-Sets schreiben dieselben Einträge in ihre `runs.jsonl`;
 [ADR 0033](../adr/0033-antwortmodell.md)). Jeder Eintrag beginnt mit `date`; die Einträge mit API-Aufrufen tragen
 danach die gepinnten Einstellungen und enden mit `prompt_tokens`, `completion_tokens`, `cost_usd`.
@@ -126,6 +132,8 @@ danach die gepinnten Einstellungen und enden mit `prompt_tokens`, `completion_to
 | `scaffold` | `C1,C2,C3` | `evaluate_answers.py --mode scaffold`, nur bei neu erzeugtem Bogen | `scoring`, `codes` (Zahl der Codes), `outputs_sha256` mit `scoring_items.jsonl` |
 | `scaffold` | `K0` | `evaluate_answers.py --mode scaffold --control` ([ADR 0041](../adr/0041-kontrolle-k0.md)) | `scoring`, `codes` (Zahl der K0-Codes), `outputs_sha256` mit `scoring_items_control.jsonl` |
 | `key_points` | `C1,C2,C3` | Einfrieren der Kernpunkte auf der Bewertungsseite (siehe `key_points.csv`) | `outputs_sha256` mit `key_points.csv` und `scoring_items.jsonl` |
+| `summarise` | `C1,C2,C3` | `evaluate_answers.py --mode summarise` (auch mit `--set`; Pilot-Sets von vor diesem Eintrag haben ihn nicht, `analyse.py --set` wertet sie mit Hinweis aus, [ADR 0044](../adr/0044-statistische-auswertung.md)) | `inputs_sha256` (Bogen, Schlüssel, `scoring_checks.csv`, `key_points.csv`), `outputs_sha256` mit `scores.csv` |
+| `summarise_control` | `K0` | `evaluate_answers.py --mode summarise --control` | `inputs_sha256` (Bogen, Prüfungen und Kernpunkte von K0, `scores.csv`), `outputs_sha256` mit `scores_control.csv` |
 | `closed_book_screen` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten |
 
 `scoring` = `config.SCORING_METHOD` (`rules`): das Scaffold ist nur regelbasiert zu bewerten
@@ -378,6 +386,26 @@ question_id,strategy,correctness,completeness,no_hallucination,clarity,total_sco
 Q001,K0,1,0,2,2,1.25
 ```
 
+## Auswertung (`output/`)
+
+`analyse.py` ([ADR 0044](../adr/0044-statistische-auswertung.md)) schreibt jedes Mal alle Dateien neu; Ordner und
+Namen: `config.OUTPUT_DIR`, `TABLES_DIR`, `FIGURES_DIR`, `ANALYSIS_FILE`. Ein Pilot-Set (`--set DIR`) schreibt
+dieselbe Struktur nach `DIR/output/`, nie nach `output/`.
+
+| Pfad | Inhalt |
+|---|---|
+| `output/tables/*.tex` | acht Tabellen (`table`-Umgebung mit Beschriftung und Label `tab:<Name>`): `retrieval`, `retrieval_sensitivity`, `answers`, `tests`, `control_k0`, `correlation`, `efficiency`, `breakdown` (`report_tables.TABLE_NAMES`) |
+| `output/figures/*.pdf` | acht Abbildungen in Endgröße: `recall`, `mrr`, `answers_distribution`, `heatmap`, `scatter_retrieval_answer`, `catalogue_composition`, `chunk_lengths`, `cost` (`report_figures.FIGURE_NAMES`, Inhalte: [Evaluation](evaluation.md#visualisierungen)) |
+| `output/analysis.json` | alle Kennzahlen und Testergebnisse, sortierte Schlüssel, Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet |
+
+Oberste Schlüssel von `analysis.json`: `n_questions`, `alpha`, `retrieval` (Mittel je Relevanzregel `main` und
+`sensitivity` und Strategie, einschließlich K1), `answers` (`means` je Strategie und Kriterium, einschließlich K0),
+`confirmatory` (Friedman-Test, Holm-korrigierte p, Kendalls W und paarweise Wilcoxon-Tests je Metrik aus
+`config.ANALYSIS_PRIMARY`), `descriptive_effects` (Effektstärken ohne p-Werte, getrennt nach Regel und `answers`),
+`control_k0` (K0 gegen C1–C3, `null` ohne K0-Bewertung), `correlation` (Spearmans ρ je Strategie und `pooled`, dieses ohne `p`),
+`efficiency` (Chunks, Längen, Kontext-Tokens, Indexgröße, Embedding- und Generierungskosten je Strategie),
+`breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil) und `notes` (entfallene Teile, Hinweise).
+
 ## Pilot-Sets
 
 Pilotproben (`scripts/difficulty_probe.py`) liegen in `config.PILOT_DIR` = `data/pilot/`; sie sind **nicht** Teil des
@@ -425,8 +453,11 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | versioniert |
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | ignoriert |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien in den Pilot-Sets | ignoriert; alle übrigen Pilotdateien versioniert |
+| `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`) | ignoriert |
+| `output/tables/*.tex`, `output/analysis.json` | Tabellen und Kennzahlen der Auswertung | versioniert (nicht in `.gitignore`) |
+| `output/figures/*.pdf` | Abbildungen der Auswertung | versioniert (Ausnahme von `*.pdf`) |
 | `data/corpus_probe/docs/`, `probes/`, `sources/`, `questions/*-sections.json` | nachgebaute Seiten, Proben mit Abschnittstext, Klone der Kandidaten | ignoriert; übrige Dateien in `data/corpus_probe/` versioniert ([Korpusauswahl](corpus-selection.md#dateien-und-befehle)) |
-| `*.pdf` | erzeugte Dokumente | ignoriert, außer `output/figures/*.pdf` |
+| `*.pdf` | erzeugte Dokumente | ignoriert, außer `output/figures/*.pdf` (siehe oben) |
 | `.env`, `.venv/`, `venv/`, `env/`, `__pycache__/`, `*.py[cod]`, `*.pyo`, `.vscode/`, `.ipynb_checkpoints/`, `.DS_Store` | Geheimnisse, Umgebung, Editor | ignoriert |
 
 Die Vue-Verarbeitungsdateien, die nicht im Archivordner liegen (`documents.jsonl`, `sections.jsonl`), entstehen neu

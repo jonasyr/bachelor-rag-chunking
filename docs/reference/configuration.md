@@ -169,6 +169,28 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+| `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `TABLES_DIR` | `output/tables` | Tabellen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURES_DIR` | `output/figures` | Abbildungen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_FILE` | `output/analysis.json` | Kennzahlen und Testergebnisse der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_ALPHA` | `0.05` | Signifikanzniveau der konfirmatorischen Tests (Holm-korrigiert) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_DIFF_DECIMALS` | `12` | Rundung der Differenzen im Wilcoxon-Test, damit gleiche Differenzen gebrochener Metriken trotz Gleitkommafehler eine Bindungsgruppe bilden | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_PRIMARY` | `{"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}` | konfirmatorische Metriken: Spalte → Anzeigename | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_RULE` | `"main"` | Relevanzregel der Retrieval-Metriken in der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_DECIMALS` | `2` | Nachkommastellen von Werten, Kennzahlen, Teststatistiken und Effektstärken in den Tabellen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_P_DECIMALS` | `3` | Nachkommastellen der p-Werte; kleinere erscheinen als `<0,001` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_COST_DECIMALS` | `5` | Nachkommastellen der Kosten (USD) in der Effizienztabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `BYTES_PER_MB` | `1000000` | Indexgröße in MB (dezimal) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `JSON_DECIMALS` | `6` | Rundung der Gleitkommazahlen in `analysis.json` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_WIDTH_CM`, `FIGURE_HEIGHT_CM` | `17.0`, `6.5` | Abbildungen in Endgröße (Breite des Satzspiegels; Standardhöhe, Panels und Heatmap wachsen mit ihren Zeilen) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_FONT_FILE` | `"arial282/Arial282-Regular.ttf"` | Arial unter `PAPERLAB_FONTS` oder `fonts/` von PaperLab (eine Schrift in der Arbeit, Prüfung `schrift`); fehlt sie, DejaVu Sans mit Hinweis | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_COLORS` | `C1` `#184F95`, `C2` `#B8461A`, `C3` `#11866A`, `K1` `#52514E`, `K0` `#8E8C87` | Farben der Strategien: Klassenfarben FigBlue und FigOrange, dritter Farbton auf Farbsehschwäche geprüft (alle Paare ΔE ≥ 10), Kontrollen grau | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_HATCHES`, `FIGURE_MARKERS` | Kontrollen schraffiert; Marker je Strategie | Farbe nie alleiniger Informationsträger | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_INK`, `FIGURE_MUTED`, `FIGURE_GRID` | `#0B0B0B`, `#52514E`, `#E4E3DF` | Text, Achsen, Gitterlinien | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_SEQUENTIAL` | `#F2F7FE` → `#CDE2FB` → `#184F95` | einfarbige Skala der Heatmap und Zähltabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_HISTOGRAM_BINS` | `20` | Klassen der Chunk-Längen-Histogramme | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 
 ## Korpusauswahl
 

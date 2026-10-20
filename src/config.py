@@ -312,6 +312,50 @@ RUBRIC_RULES_VERSION = "2026-10-20"  # version of the rules in src/scoring_rules
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
 
+# Analysis and report output (D44): statistics in src/stats.py, tables and figures from analyse.py
+OUTPUT_DIR = ROOT / "output"
+TABLES_DIR = OUTPUT_DIR / "tables"
+FIGURES_DIR = OUTPUT_DIR / "figures"
+ANALYSIS_FILE = OUTPUT_DIR / "analysis.json"
+ANALYSIS_ALPHA = 0.05  # significance level of the confirmatory tests (Holm-adjusted)
+ANALYSIS_DIFF_DECIMALS = (
+    12  # Wilcoxon differences rounded: float noise is far below, real steps far above
+)
+# Confirmatory metrics (column in the per-question table -> display name)
+ANALYSIS_PRIMARY = {"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}
+ANALYSIS_RULE = "main"  # relevance rule of the retrieval metrics used in the analysis
+REPORT_DECIMALS = 2  # decimals of scores, metrics, test statistics and effect sizes in the tables
+REPORT_P_DECIMALS = 3  # decimals of p-values; smaller ones are shown as "<0,001"
+REPORT_COST_DECIMALS = 5  # decimals of costs in USD in the efficiency table
+BYTES_PER_MB = 1_000_000  # index size in MB (decimal)
+JSON_DECIMALS = 6  # floats in analysis.json are rounded to this many decimals
+# Figures in final size for the thesis (PaperLab SoT 2, AUD-01 Nr. 13): 17 cm wide, Arial >= 8 pt,
+# class palette FigBlue/FigOrange (iupaper.cls) plus a third hue validated for colour-vision
+# deficiency (all pairs CVD dE >= 10); controls in neutral greys with hatching, never colour alone.
+FIGURE_WIDTH_CM = 17.0
+FIGURE_HEIGHT_CM = 6.5  # default height; small multiples and the heatmap grow with their rows
+FIGURE_FONT_SIZE = 9
+FIGURE_DPI = 300
+FIGURE_FONT_FILE = "arial282/Arial282-Regular.ttf"  # below PAPERLAB_FONTS or PaperLab's fonts/
+FIGURE_COLORS = {
+    "C1": "#184F95",  # FigBlue
+    "C2": "#B8461A",  # FigOrange
+    "C3": "#11866A",  # validated third hue
+    "K1": "#52514E",  # FigInk, control (hatched)
+    "K0": "#8E8C87",  # light ink, control (hatched)
+}
+FIGURE_HATCHES = {"C1": "", "C2": "", "C3": "", "K1": "///", "K0": "xxx"}
+FIGURE_MARKERS = {"C1": "o", "C2": "s", "C3": "D", "K0": "^"}
+FIGURE_INK = "#0B0B0B"  # text
+FIGURE_MUTED = "#52514E"  # axes, ticks, secondary text
+FIGURE_GRID = "#E4E3DF"
+FIGURE_SEQUENTIAL = [
+    "#F2F7FE",
+    "#CDE2FB",
+    "#184F95",
+]  # one hue, light to dark (FigBlue); 0 stays visible
+FIGURE_HISTOGRAM_BINS = 20  # bins of the chunk-length histograms
+
 # ---------------------------------------------------------------------------
 # Corpus selection probe (D38): a diagnostic run once to choose the corpus, not part of the
 # experiment; scripts/corpus_probe/, method in docs/reference/corpus-selection.md

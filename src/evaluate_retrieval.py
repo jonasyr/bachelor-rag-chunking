@@ -25,7 +25,9 @@ from config import (
     CONTROL_RETRIEVED_FILE,
     CONTROL_STRATEGIES,
     DOCUMENTS_FILE,
+    EMBEDDING_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RELEVANCE_MIN_OVERLAP,
     RETRIEVAL_SCORES_FILE,
@@ -46,6 +48,7 @@ from retrieve import (
     read_rows,
     relevant_sections,
 )
+from run_log import append_step_run
 
 SCORES_HEADER = [
     "question_id",
@@ -112,6 +115,7 @@ def evaluate(
     strategies: dict[str, str] = STRATEGY_IDS,
     out_file: Path = RETRIEVAL_SCORES_FILE,
     freeze_file: Path = CATALOGUE_FREEZE_FILE,
+    runs_file: Path = EMBEDDING_RUNS_FILE,
 ) -> list[dict]:
     """Write one score row per question, strategy and rule; return the rows."""
     require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
@@ -161,8 +165,24 @@ def evaluate(
                 + [f"{row[m]:.6f}" for m in ("reciprocal_rank", "precision", "recall")]
                 + [row["context_tokens"]]
             )
+    inputs = [results_file, questions_file, ground_truth_file, sections_file, *chunk_files.values()]
+    append_step_run("evaluate_retrieval", ",".join(keys), inputs, [out_file], runs_file)
     with out_file.open(encoding="utf-8", newline="") as f:  # the rows as written
         return list(csv.DictReader(f))
+
+
+def set_paths(set_dir: Path, control: bool = False) -> dict[str, Path]:
+    """The files of a pilot set (data/pilot/...): results, catalogue, scores and run log in the set;
+    sections, documents and chunks are the shared processed corpus."""
+    return {
+        "results_file": set_dir
+        / (CONTROL_RETRIEVED_FILE if control else RETRIEVED_RESULTS_FILE).name,
+        "questions_file": set_dir / QUESTIONS_FILE.name,
+        "ground_truth_file": set_dir / GROUND_TRUTH_FILE.name,
+        "out_file": set_dir
+        / (CONTROL_RETRIEVAL_SCORES_FILE if control else RETRIEVAL_SCORES_FILE).name,
+        "runs_file": set_dir / PILOT_RUNS_FILE_NAME,
+    }
 
 
 def summarise(rows: list[dict], questions_file: Path = QUESTIONS_FILE) -> dict[tuple, dict]:
@@ -206,14 +226,21 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser(description="Retrieval metrics per strategy (ADR 0012).")
     p.add_argument("--control", action="store_true", help="the size-matched control K1")
+    p.add_argument(
+        "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/e2e) instead"
+    )
     args = p.parse_args()
+    paths = set_paths(args.set, args.control) if args.set else {}
     if args.control:
         rows = evaluate(
-            results_file=CONTROL_RETRIEVED_FILE,
-            chunk_files=CONTROL_CHUNK_FILES,
-            strategies=CONTROL_STRATEGIES,
-            out_file=CONTROL_RETRIEVAL_SCORES_FILE,
+            **{
+                "results_file": CONTROL_RETRIEVED_FILE,
+                "out_file": CONTROL_RETRIEVAL_SCORES_FILE,
+                **paths,
+                "chunk_files": CONTROL_CHUNK_FILES,
+                "strategies": CONTROL_STRATEGIES,
+            }
         )
     else:
-        rows = evaluate()
-    print_summary(summarise(rows))
+        rows = evaluate(**paths)
+    print_summary(summarise(rows, paths.get("questions_file", QUESTIONS_FILE)))

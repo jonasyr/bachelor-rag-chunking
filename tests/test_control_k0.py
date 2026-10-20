@@ -246,3 +246,13 @@ def test_control_paths_of_a_pilot_set(tmp_path):
     assert paths["scores_file"] == tmp_path / "scores.csv"
     assert "closed_book_file" not in paths  # the verdicts belong to the main catalogue
     assert RUBRIC_CRITERIA[2] == "groundedness"  # the criterion K0 does not have
+
+
+def test_summarise_control_logs_a_run_record(k0):
+    from run_log import latest_run
+
+    run_scaffold(k0)
+    score_all(k0)
+    run_summary(k0)
+    record = latest_run(k0["generation_runs_file"], "summarise_control", "K0")
+    assert record["outputs_sha256"] == {"scores_control.csv": sha256_of(k0["control_scores_file"])}

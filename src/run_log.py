@@ -146,6 +146,22 @@ def append_key_points_run(strategy: str, outputs: dict[str, str], runs_file: Pat
     return full
 
 
+def append_step_run(
+    step: str, strategy: str, inputs: list[Path], outputs: list[Path], runs_file: Path
+) -> dict:
+    """Log a local step (no API) with the checksums of its inputs and outputs, so a later step
+    can check it builds on exactly these files (`require_run`)."""
+    full = {
+        "date": date.today().isoformat(),
+        "step": step,
+        "strategy": strategy,
+        "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
+        "outputs_sha256": {f.name: sha256_of(f) for f in outputs},
+    }
+    _append(full, runs_file)
+    return full
+
+
 def _append(record: dict, runs_file: Path) -> None:
     runs_file.parent.mkdir(parents=True, exist_ok=True)
     with runs_file.open("a", encoding="utf-8") as f:
