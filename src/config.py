@@ -312,7 +312,7 @@ RUBRIC_RULES_VERSION = "2026-10-20"  # version of the rules in src/scoring_rules
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
 
-# Analysis and report output (D44): statistics in src/stats.py, tables and figures from analyze.py
+# Analysis and report output (D44): statistics in src/stats.py, tables and figures from analyse.py
 OUTPUT_DIR = ROOT / "output"
 TABLES_DIR = OUTPUT_DIR / "tables"
 FIGURES_DIR = OUTPUT_DIR / "figures"
