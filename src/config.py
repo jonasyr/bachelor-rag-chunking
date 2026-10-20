@@ -324,6 +324,11 @@ ANALYSIS_DIFF_DECIMALS = (
 # Confirmatory metrics (column in the per-question table -> display name)
 ANALYSIS_PRIMARY = {"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}
 ANALYSIS_RULE = "main"  # relevance rule of the retrieval metrics used in the analysis
+REPORT_DECIMALS = 2  # decimals of scores, metrics, test statistics and effect sizes in the tables
+REPORT_P_DECIMALS = 3  # decimals of p-values; smaller ones are shown as "<0,001"
+REPORT_COST_DECIMALS = 5  # decimals of costs in USD in the efficiency table
+BYTES_PER_MB = 1_000_000  # index size in MB (decimal)
+JSON_DECIMALS = 6  # floats in analysis.json are rounded to this many decimals
 FIGURE_SIZE = (6.0, 3.6)  # inches
 FIGURE_FONT_SIZE = 9
 FIGURE_DPI = 300

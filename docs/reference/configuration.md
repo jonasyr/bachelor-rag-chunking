@@ -177,6 +177,11 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `ANALYSIS_DIFF_DECIMALS` | `12` | Rundung der Differenzen im Wilcoxon-Test, damit gleiche Differenzen gebrochener Metriken trotz Gleitkommafehler eine Bindungsgruppe bilden | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_PRIMARY` | `{"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}` | konfirmatorische Metriken: Spalte → Anzeigename | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_RULE` | `"main"` | Relevanzregel der Retrieval-Metriken in der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_DECIMALS` | `2` | Nachkommastellen von Werten, Kennzahlen, Teststatistiken und Effektstärken in den Tabellen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_P_DECIMALS` | `3` | Nachkommastellen der p-Werte; kleinere erscheinen als `<0,001` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `REPORT_COST_DECIMALS` | `5` | Nachkommastellen der Kosten (USD) in der Effizienztabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `BYTES_PER_MB` | `1000000` | Indexgröße in MB (dezimal) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `JSON_DECIMALS` | `6` | Rundung der Gleitkommazahlen in `analysis.json` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_SIZE` | `(6.0, 3.6)` | Abbildungsgröße in Zoll | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
