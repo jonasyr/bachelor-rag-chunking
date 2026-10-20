@@ -37,9 +37,9 @@ DASH = "--"
 CRITERION_LABELS = {
     "correctness": "Korrektheit",
     "completeness": "Vollständigkeit",
-    "groundedness": "Fundiertheit",
+    "groundedness": "Quellenbezug",
     "no_hallucination": "Halluzinationsfreiheit",
-    "clarity": "Klarheit",
+    "clarity": "Verständlichkeit",
 }
 RETRIEVAL_METRICS = {  # column -> label
     "hit": "Hit@5",
@@ -347,7 +347,7 @@ def _answers_table(results: dict) -> str:
         )
     caption = (
         "Antwortqualität je Strategie (Mittelwerte der Bewertung 0 bis 2). K0 ohne Retrieval wird "
-        "ohne Fundiertheit bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 "
+        "ohne Quellenbezug bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 "
         "mit C1 bis C3 vergleichbar."
     )
     return latex_table("answers", caption, header, rows, "l" + "r" * 7)
