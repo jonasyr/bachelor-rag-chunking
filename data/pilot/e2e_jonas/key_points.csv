@@ -1,0 +1,6 @@
+question_id,point,text
+E01,1,Not yet: e2e can't merge shard reports.
+E01,2,Upload each shard's report.json and junit.xml under a name that includes the shard index.
+E02,1,"With scope: 'worker' each attempt gets a new browser context, and a Kernel profile applies only to the browser's default context, so it has no effect."
+E02,2,"With scope: 'attempt' each attempt leases a new browser and runs in its default context, so the profile applies."
+E03,1,The step is blocked with AUTOMATION_UNSUPPORTED.

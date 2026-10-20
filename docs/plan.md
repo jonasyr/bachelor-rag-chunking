@@ -11,8 +11,9 @@ Stand 19.10.2026: Die Schritte 1–4 des Korpuswechsels zu e2e ([ADR 0038](adr/0
 und Stichprobenplan ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), (4b) Closed-Book-Prüfung im Editor
 ([ADR 0040](adr/0040-closed-book-pruefung.md)), (4c) Kontrolle K0 ohne Retrieval
 ([ADR 0041](adr/0041-kontrolle-k0.md)). Alle Schritte der Pipeline sind umgesetzt und getestet, echte Läufe auf dem
-Katalog stehen aus. Nächster Schritt: (5) neuer Pilot auf e2e (ersetzt den Vortest von Prompt und Rubrik), danach
-48 Fragen in sechs Blöcken zu 8 schreiben und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
+Katalog stehen aus. (5) Pilot auf e2e erledigt 20.10.2026 ([Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026);
+offen nur Jonas' Übungsbewertung von 3 Fragen). Nächster Schritt: Empfehlungen des Pilots entscheiden (Regel zu
+`direct` präzisieren), danach 48 Fragen in sechs Blöcken zu 8 schreiben und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
 Frühere Stände: [Verlauf](#verlauf).
 
 ## Zeitplan (13.10.–24.12.2026)
@@ -24,7 +25,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 |----------|-------|--------------|----------|
 | 13.–19.10. | Korpus | **erledigt 18.10.:** Snapshot, `ingest.py`, `preprocess.py` (test-first), Korpusmanifest; am 18.10. Wechsel zu e2e beschlossen ([ADR 0038](adr/0038-korpus-e2e.md)) und Snapshot und Neuaufbau auf e2e abgeschlossen | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll |
 | 20.10.–02.11. | Pipeline | **erledigt:** Chunking C1–C3 und K1, Embedding, Chroma, Retrieval (13.10., auf e2e neu am 18.10.); Embedding-Modell, SDK und Chroma gepinnt (13.–14.10.); Generierung und GPT-Modell (17.10.); Kontrolle K0 (19.10.). Der Prototyp mit einer Frage ist durch die Pilotläufe auf Vue.js abgedeckt und wird auf e2e durch Schritt (5) ersetzt | lauffähige Pipeline, Modellversionen dokumentiert |
-| 20.10.–08.11. | Fragenkatalog (parallel) | Vorab Schritt (5): neuer Pilot auf e2e (nicht aus dem Katalog) als Vortest von Prompt und Rubrik; der Vortest auf dem Vue-Set `hard` ist erledigt (18.10., zählt nicht). Dann 48 Fragen in sechs Blöcken zu 8 (zwei je Woche ab 20.10., Einfrieren 06.11.; Stichprobenplan gezogen 19.10. ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)) nach jedem Block), Referenzantworten, `relevant_section_ids` (blind annotiert, [ADR 0027](adr/0027-blinde-annotation.md)) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` |
+| 20.10.–08.11. | Fragenkatalog (parallel) | Vorab Schritt (5): Pilot auf e2e (nicht aus dem Katalog) als Vortest von Prompt und Rubrik, **erledigt** 20.10.; der Vortest auf dem Vue-Set `hard` ist erledigt (18.10., zählt nicht). Dann 48 Fragen in sechs Blöcken zu 8 (zwei je Woche ab 20.10., Einfrieren 06.11.; Stichprobenplan gezogen 19.10. ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)) nach jedem Block), Referenzantworten, `relevant_section_ids` (blind annotiert, [ADR 0027](adr/0027-blinde-annotation.md)) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` |
 | 03.–09.11. | Auswertungsskripte | **erledigt 16.–17.10.:** Relevanz per Token-Überlappung (`retrieve.py`/`relevance.py`); Recall/Precision/MRR/Hit@5, Kostenerfassung, Kontext-Tokens je Antwort (16.10.); regelbasierte Bewertung in der App (17.10., [ADR 0035](adr/0035-regelbasierte-bewertung.md)). RAGAS nur optional, nach der regelbasierten Bewertung | `evaluate_retrieval.py`, `evaluate_answers.py` getestet |
 | **09.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)) | Commit-Hash im Experiment-Protokoll |
 | 10.–16.11. | Experimente | volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (ohne Retrieval, im selben Generierungslauf, [ADR 0041](adr/0041-kontrolle-k0.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) |
@@ -85,3 +86,5 @@ Einfrieren vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.
 - 19.10.2026: Stichprobenplan auf e2e, Closed-Book-Prüfung, Kontrolle K0
   ([ADR 0039](adr/0039-stichprobenplan-e2e.md)–[0041](adr/0041-kontrolle-k0.md)); die Regeln der MDX-Umwandlung
   nachträglich festgehalten ([ADR 0042](adr/0042-mdx-umwandlung.md)).
+- 19./20.10.2026: Pilot `data/pilot/e2e` (16 Fragen außerhalb des Stichprobenplans, ganze Pipeline mit K0;
+  [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026)).

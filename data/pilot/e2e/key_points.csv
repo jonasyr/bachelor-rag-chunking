@@ -1,0 +1,47 @@
+question_id,point,text
+E01,1,Not yet: e2e can't merge shard reports.
+E01,2,Upload each shard's report.json and junit.xml under a name that includes the shard index.
+E02,1,"With scope: 'worker' each attempt gets a new browser context, and a Kernel profile applies only to the browser's default context, so it has no effect."
+E02,2,"With scope: 'attempt' each attempt leases a new browser and runs in its default context, so the profile applies."
+E03,1,The step is blocked with AUTOMATION_UNSUPPORTED.
+E04,1,"Return a blocked verdict with STEP_BUDGET_EXHAUSTED, STEP_TIMEOUT or CANCELLED."
+E04,2,"Use them only when the budget is spent, the deadline passed or the test was cancelled."
+E04,3,The runner refuses any other use with MODEL_OUTPUT_INVALID.
+E04,4,A passed verdict that carries a code is also refused with MODEL_OUTPUT_INVALID.
+E05,1,Exit code 3.
+E05,2,A test failure is exit code 1 and an infrastructure failure is exit code 3.
+E05,3,In a mixed run the highest-precedence code wins (130 > 4 > 3 > 2 > 1 > 0).
+E05,4,The report still keeps every individual result; precedence affects only the process exit code.
+E06,1,Bitrise: add the key under Secrets in the app's workflow editor.
+E06,2,"Bitrise: a pull request build gets the key only when Expose for Pull Requests is on, and a public app's build never does."
+E06,3,EAS Workflows: keep the key in an EAS environment variable with secret visibility and set environment: on each job (a custom job reads production by default).
+E06,4,"EAS Workflows: every job that reads that environment can read the key, including one running an untrusted pull request."
+E07,1,A finding counts as a bug only when its repro test (which asserts the expected behavior) fails with ASSERTION_FAILED.
+E07,2,Repro tests are tagged bugbash.
+E07,3,Run the merge-gating run with --exclude-tag bugbash.
+E07,4,"After the fix, remove the tag and keep the test as a regression test."
+E08,1,"lightpanda serve requests no sub-resources by default, so iframes are not loaded."
+E08,2,Add 'iframe' to the provider's loadResources option (--load-resources on the server).
+E08,3,Queries and fills inside the frame then work.
+E08,4,A listener in the host page on an element the frame created still does not fire.
+E09,1,After 8 steps.
+E09,2,Or after 10 minutes.
+E10,1,No: tests get no agent-device client.
+E10,2,"Every call goes through screen, app, device or the agent."
+E10,3,That way e2e records and redacts every call.
+E11,1,"No sandbox: tests, config, reporters and app commands run with your operating-system permissions."
+E11,2,"The same holds for engines, tools, stores and secret providers."
+E12,1,"In the MCP session, not in a test run."
+E12,2,The server reports that no nodes match the locator.
+E12,3,The server says a test using the locator would fail with LOCATOR_NOT_FOUND.
+E13,1,"No: e2e pins its own playwright-core to an exact version and does not use your app's copy, which your app keeps."
+E13,2,The engine always runs the Playwright version it was tested against.
+E13,3,The two share a browser cache (Chromium binaries) only when their versions match.
+E14,1,No: the reporter never changes the run's status or exit code.
+E14,2,"When it can't post, one row under the summary gives the reason."
+E15,1,"No: the agent doesn't see an element with the inert attribute or anything under it, so it never aims at a control behind an open drawer."
+E15,2,Locators still find inert content (as in Playwright).
+E15,3,toBeVisible still passes on inert content (as in Playwright).
+E16,1,"No: every browser target has platform web, so platforms and requires can't select a viewport."
+E16,2,Read the width in the test (e.g. browser.evaluate(() => window.innerWidth)) and call test.skip below a threshold.
+E16,3,Or give size-specific tests their own config and run it with --config.

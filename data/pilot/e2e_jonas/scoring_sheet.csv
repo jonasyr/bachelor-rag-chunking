@@ -1,0 +1,10 @@
+code,question_id,correctness,completeness,groundedness,no_hallucination,clarity,notes
+E01-A,E01,,,,,,
+E01-B,E01,,,,,,
+E01-C,E01,,,,,,
+E02-A,E02,,,,,,
+E02-B,E02,,,,,,
+E02-C,E02,,,,,,
+E03-A,E03,,,,,,
+E03-B,E03,,,,,,
+E03-C,E03,,,,,,
