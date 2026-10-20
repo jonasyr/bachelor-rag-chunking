@@ -112,7 +112,8 @@ Zeile so viele Kernpunkte markiert, wie ihre Frage hat, und jede Zeile des Bogen
 K0 beantwortet dieselben Fragen ohne Retrieval mit dem Closed-Book-Prompt
 ([Prompts](prompts.md#closed-book-prompt-prüfung-und-k0)) und wird nach C1–C3 als eigener Satz bewertet
 ([ADR 0041](../adr/0041-kontrolle-k0.md)): dieselben eingefrorenen Kernpunkte und Prüffragen ohne `grounded`. `declines`
-fragt, ob die Antwort sagt, dass sie die Antwort nicht weiß, und keine gibt; `hallucination`, ob sie etwas enthält, das
+fragt, ob die Antwort sagt, dass sie die Antwort nicht weiß, und keine gibt (eine Teilantwort mit dem Hinweis, der Rest
+sei unbekannt, ist keine Ablehnung, [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)); `hallucination`, ob sie etwas enthält, das
 die Referenz nicht deckt. Abgeleitet werden Korrektheit, Vollständigkeit, Halluzinationsfreiheit und Verständlichkeit
 nach den Regeln oben (`config.CONTROL_CRITERIA`); der Gesamtwert ist ihr Mittelwert. Der Vergleich mit C1–C3 nutzt
 dieselben vier Kriterien (die Gesamtwerte von C1–C3 werden dafür auf diesen vier neu gemittelt), über alle Fragen, je

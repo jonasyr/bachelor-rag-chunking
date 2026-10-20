@@ -64,8 +64,8 @@ HELP = {
         "later."
     ),
     "declines": (
-        "No when it gives part of the answer and says the rest is not covered: the missing parts "
-        "count as missing key points."
+        "No when it gives part of the answer and says the rest is not covered (K0: unknown): the "
+        "missing parts count as missing key points."
     ),
 }
 OPTION_LABELS = {"minor": "Minor addition"}
