@@ -169,6 +169,16 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
+| `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `TABLES_DIR` | `output/tables` | Tabellen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURES_DIR` | `output/figures` | Abbildungen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_FILE` | `output/analysis.json` | Kennzahlen und Testergebnisse der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_ALPHA` | `0.05` | Signifikanzniveau der konfirmatorischen Tests (Holm-korrigiert) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_PRIMARY` | `{"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}` | konfirmatorische Metriken: Spalte → Anzeigename | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_RULE` | `"main"` | Relevanzregel der Retrieval-Metriken in der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_SIZE` | `(6.0, 3.6)` | Abbildungsgröße in Zoll | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 
 ## Korpusauswahl
 

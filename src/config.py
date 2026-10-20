@@ -312,6 +312,19 @@ RUBRIC_RULES_VERSION = "2026-10-20"  # version of the rules in src/scoring_rules
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
 
+# Analysis and report output (D44): statistics in src/stats.py, tables and figures from analyze.py
+OUTPUT_DIR = ROOT / "output"
+TABLES_DIR = OUTPUT_DIR / "tables"
+FIGURES_DIR = OUTPUT_DIR / "figures"
+ANALYSIS_FILE = OUTPUT_DIR / "analysis.json"
+ANALYSIS_ALPHA = 0.05  # significance level of the confirmatory tests (Holm-adjusted)
+# Confirmatory metrics (column in the per-question table -> display name)
+ANALYSIS_PRIMARY = {"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}
+ANALYSIS_RULE = "main"  # relevance rule of the retrieval metrics used in the analysis
+FIGURE_SIZE = (6.0, 3.6)  # inches
+FIGURE_FONT_SIZE = 9
+FIGURE_DPI = 300
+
 # ---------------------------------------------------------------------------
 # Corpus selection probe (D38): a diagnostic run once to choose the corpus, not part of the
 # experiment; scripts/corpus_probe/, method in docs/reference/corpus-selection.md
