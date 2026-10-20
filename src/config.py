@@ -332,6 +332,7 @@ JSON_DECIMALS = 6  # floats in analysis.json are rounded to this many decimals
 FIGURE_SIZE = (6.0, 3.6)  # inches
 FIGURE_FONT_SIZE = 9
 FIGURE_DPI = 300
+FIGURE_HISTOGRAM_BINS = 20  # bins of the chunk-length histograms
 
 # ---------------------------------------------------------------------------
 # Corpus selection probe (D38): a diagnostic run once to choose the corpus, not part of the

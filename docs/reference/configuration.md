@@ -185,6 +185,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `FIGURE_SIZE` | `(6.0, 3.6)` | Abbildungsgröße in Zoll | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_HISTOGRAM_BINS` | `20` | Klassen der Chunk-Längen-Histogramme | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 
 ## Korpusauswahl
 
