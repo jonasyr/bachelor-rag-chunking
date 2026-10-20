@@ -111,6 +111,7 @@ def files(tmp_path):
         ),
         "chunk_files": {key: chunk_files[key] for key in STRATEGY_IDS},
         "out_file": tmp_path / "retrieval_scores.csv",
+        "runs_file": tmp_path / "runs.jsonl",
         "_control_chunk_files": {key: chunk_files[key] for key in CONTROL_STRATEGIES},
     }
 
@@ -292,3 +293,23 @@ def test_question_scores_is_pure(files):
         "context_tokens": 610,
     }
     assert chunks  # chunk IDs are unique per strategy
+
+
+def test_evaluate_logs_a_run_record(files):
+    from run_log import latest_run, sha256_of
+
+    run(files)
+    record = latest_run(files["runs_file"], "evaluate_retrieval", ",".join(STRATEGY_IDS))
+    assert record["outputs_sha256"] == {"retrieval_scores.csv": sha256_of(files["out_file"])}
+    assert record["inputs_sha256"]["retrieved_results.csv"] == sha256_of(files["results_file"])
+
+
+def test_evaluate_retrieval_set_paths(tmp_path):
+    from evaluate_retrieval import set_paths
+
+    paths = set_paths(tmp_path)
+    assert paths["out_file"] == tmp_path / "retrieval_scores.csv"
+    assert paths["runs_file"] == tmp_path / "runs.jsonl"
+    control = set_paths(tmp_path, control=True)
+    assert control["out_file"] == tmp_path / "retrieval_scores_control.csv"
+    assert control["results_file"] == tmp_path / "retrieved_results_control.csv"

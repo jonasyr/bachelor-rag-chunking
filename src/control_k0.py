@@ -44,7 +44,7 @@ from config import (
 )
 from evaluate_answers import GROUPS, SCORES_HEADER, catalogue
 from generate import ANSWERS_HEADER
-from run_log import append_scaffold_run, latest_run, require_run, sha256_of
+from run_log import append_scaffold_run, append_step_run, latest_run, require_run, sha256_of
 
 (CODE_SUFFIX,) = CONTROL_ANSWER_STRATEGIES  # "K0"
 CONTROL_SHEET_HEADER = ["code", "question_id", *CONTROL_CRITERIA, "notes"]
@@ -208,6 +208,13 @@ def summarise_control(
             | {"total_score": f"{sum(values) / len(values):.2f}"}  # steps of 1/4: exact
         )
     write_csv(control_scores_file, CONTROL_SCORES_HEADER, rows)
+    append_step_run(
+        "summarise_control",
+        CODE_SUFFIX,
+        [sheet_file, checks_file, key_points_file, scores_file],
+        [control_scores_file],
+        generation_runs_file,
+    )
 
     k0_ids = {r["question_id"] for r in rows}
     entries = [

@@ -79,7 +79,7 @@ from retrieve import (
     read_rows,
     split_ids,
 )
-from run_log import append_scaffold_run, latest_run, require_run, sha256_of
+from run_log import append_scaffold_run, append_step_run, latest_run, require_run, sha256_of
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
@@ -430,6 +430,10 @@ def summarise(
     check_derived(sheet_file, checks_file, key_points_file, generation_runs_file)
     rows = unblind(sheet_file, key_file, scored)
     write_csv(scores_file, SCORES_HEADER, rows)
+    inputs = [p for p in (sheet_file, key_file, checks_file, key_points_file) if p.exists()]
+    append_step_run(
+        "summarise", ",".join(STRATEGY_IDS), inputs, [scores_file], generation_runs_file
+    )
 
     buckets: dict[tuple, list[dict]] = {}
     for row in rows:
