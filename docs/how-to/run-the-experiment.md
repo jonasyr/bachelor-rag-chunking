@@ -46,6 +46,20 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    uv run python src/evaluate_answers.py --mode summarise --control
    ```
 
+8. Auswertung für die Arbeit, als Letztes, wenn der Hauptkatalog eingefroren ist und alle Ergebnisdateien zu den
+   aktuellen Läufen gehören ([ADR 0044](../adr/0044-statistische-auswertung.md)): erst die Retrieval-Metriken neu
+   schreiben, damit sie einen Laufeintrag haben, dann auswerten.
+
+   ```bash
+   uv run python src/evaluate_retrieval.py
+   uv run python src/evaluate_retrieval.py --control
+   uv run python src/analyse.py
+   ```
+
+   `analyse.py` schreibt `output/tables/*.tex`, `output/figures/*.pdf` und `output/analysis.json` und bricht ab, wenn
+   der Katalog nicht eingefroren ist oder eine Ergebnisdatei nicht zum letzten Laufeintrag passt (dann den Schritt
+   wiederholen); entfallene Teile meldet es als `note:`. Weiter: [Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md).
+
 Optionen der Skripte: [Werkzeuge](../reference/tooling.md); Ausgabedateien: [Datenformate](../reference/data-formats.md).
 
 ## Vor jedem Evaluationslauf prüfen

@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (D9 im Leitfaden; Quelle: Chat, ersetzt die alten H1–H3 der Baseline)
+Angenommen (D9 im Leitfaden; Quelle: Chat, ersetzt die alten H1–H3 der Baseline; ergänzt durch
+[ADR 0044](0044-statistische-auswertung.md))
 
 ## Kontext
 

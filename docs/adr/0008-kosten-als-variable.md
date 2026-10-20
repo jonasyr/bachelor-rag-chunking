@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D8 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
+Angenommen (D8 im Leitfaden; Quelle: Chat, ergänzt die Baseline; ergänzt durch [ADR 0044](0044-statistische-auswertung.md))
 
 ## Kontext
 

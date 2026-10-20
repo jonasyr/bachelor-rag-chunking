@@ -3,7 +3,8 @@
 ## Status
 
 Angenommen (D13 im Leitfaden; Quelle: Exposé/Baseline, übernommen; blinde Bewertung ergänzt durch
-[ADR 0032](0032-blinde-rubrik-bewertung.md); Stufen operationalisiert durch [ADR 0035](0035-regelbasierte-bewertung.md))
+[ADR 0032](0032-blinde-rubrik-bewertung.md); Stufen operationalisiert durch [ADR 0035](0035-regelbasierte-bewertung.md);
+ergänzt durch [ADR 0044](0044-statistische-auswertung.md))
 
 ## Kontext
 

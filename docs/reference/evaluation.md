@@ -1,6 +1,6 @@
 # Evaluation
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 20.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Parameterwerte (`TOP_K`, Überlappungsschwellen, Rubrik): [Konfiguration](configuration.md).
 
@@ -151,8 +151,9 @@ kein Retrieval):
 | Embedding-Tokens und -Kosten | `input_tokens`, `cost_usd` (Modellstand-Prüfung getrennt) | `embedding_runs.jsonl` |
 | Generierungs-Tokens | `prompt_tokens` + `completion_tokens` je Antwort; Summen und Kosten je Strategie und K0 unter `by_strategy` im Laufprotokoll | `generated_answers.csv`, `generated_answers_control.csv` (K0), `generation_runs.jsonl` |
 
-Geplant (noch nicht umgesetzt): Qualitätsunterschiede den Kosten gegenüberstellen
-([ADR 0008](../adr/0008-kosten-als-variable.md)).
+Umgesetzt: Die Kosten stehen neben den Qualitätswerten (Tabelle `efficiency.tex`, Abbildung `cost.pdf`, Generierung
+und Embedding getrennt), ohne Verhältniszahl ([ADR 0008](../adr/0008-kosten-als-variable.md),
+[ADR 0044](../adr/0044-statistische-auswertung.md)).
 
 ## Zweitbewertung (empfohlen)
 
@@ -166,25 +167,47 @@ je Prüffrage und je Kriterium = gleiche Antworten / alle Antworten, oder durchs
 
 ## Statistische Auswertung
 
-Umgesetzt: `evaluate_retrieval.py` gibt die Mittel der Retrieval-Metriken aus; `evaluate_answers.py --mode summarise`
-(mit `--control` für K0 gegen C1–C3) gibt Mittel, Median und Standardabweichung des Gesamtwerts und das Mittel je
-Kriterium aus, jeweils je Strategie über alle Fragen, je Fragetyp und je Konstruktionsklasse (siehe oben).
+Entscheidung: [ADR 0044](../adr/0044-statistische-auswertung.md); Befehl `uv run python src/analyse.py` (liest nur
+Ergebnisdateien mit aktuellem Laufeintrag, schreibt `output/`; Formate: [Datenformate](data-formats.md#auswertung-output)).
+Rechnung in `src/stats.py`, Tabellen in `src/report_tables.py`, Abbildungen in `src/report_figures.py`.
 
-Geplant für die Phase „Bewertung und Analyse" ([Plan](../plan.md)), noch nicht umgesetzt: Boxplots, Korrelation von
-Retrieval- und Antwortwerten, optional Signifikanztests (Friedman-Test für mehrere verbundene Gruppen, Wilcoxon
-Signed-Rank paarweise).
+**Beschreibend** (Mittel, Median, Effektstärken, keine p-Werte): alle Retrieval-Metriken außer R@5 und MRR, beide
+Relevanzregeln (Hauptregel `config.ANALYSIS_RULE`, Sensitivitätsregel), die fünf Kriterien der Rubrik, K0 gegen C1–C3
+über `config.CONTROL_CRITERIA` und die Aufteilung nach Fragetyp, Konstruktionsklasse und Closed-Book-Urteil (je
+Strategie, mit R@5 und Gesamtwert).
 
-## Visualisierungen (geplant)
+**Konfirmatorisch** (Plan vor dem Hauptlauf festgelegt, `config.ANALYSIS_PRIMARY`):
 
-Noch nicht umgesetzt; Grundlage der Abbildungen in der Arbeit.
+| Schritt | Verfahren |
+|---|---|
+| Metriken | R@5, MRR (Hauptregel) und Gesamtwert der Antworten |
+| Omnibus | Friedman-Test über C1–C3 je Metrik, Holm-Korrektur über die drei p-Werte, Niveau `config.ANALYSIS_ALPHA` |
+| Paare | nur für Metriken mit korrigiertem p < α Wilcoxon-Tests C1–C2, C1–C3, C2–C3 (zweiseitig, Normalapproximation, Bindungskorrektur, Nulldifferenzen verworfen), Holm über alle diese Paare |
+| Effektstärken | Kendalls W = χ² / (n (k − 1)) und r = \|z\| / √n′ (n′ = Differenzen ungleich 0); die Richtung zeigt die Median-Differenz |
 
-| Visualisierung | Zweck |
-|----------------|-------|
-| Balkendiagramm Recall@k je Strategie (K1 als Kontrolle) | Retrieval-Vergleich |
-| Balkendiagramm MRR je Strategie (K1 als Kontrolle) | Rankingqualität |
-| Boxplot Antwortscore je Strategie | Verteilung der Antwortqualität |
-| Heatmap Frage × Strategie | Wo funktioniert welche Strategie? |
-| Scatterplot Retrieval-Score vs. Antwortscore | Entkopplung Retrieval/Antwort (H2, [ADR 0009](../adr/0009-hypothesen.md)) |
-| Balkendiagramm Fragetypen und Konstruktionsklassen | Zusammensetzung des Katalogs |
-| Chunk-Längen-Histogramm | Unterschiede der Strategien |
-| Kosten-/Tokenvergleich | Effizienzbetrachtung ([ADR 0008](../adr/0008-kosten-als-variable.md)) |
+**Zusammenhang Retrieval und Antwort (H2,** [ADR 0009](../adr/0009-hypothesen.md)**):** Spearmans ρ zwischen R@5
+bzw. MRR und dem Gesamtwert, je Strategie und gepoolt. Alle p-Werte gelten als explorativ. Teile ohne Eingabedaten
+(Kontrolle K0, Chunk-Dateien, Embedding-Läufe, Closed-Book-Urteile) entfallen mit einem Hinweis in `notes` von
+`analysis.json`. Die Mittel der Einzelschritte (`evaluate_retrieval.py`, `evaluate_answers.py --mode summarise`) bleiben
+als Konsolenausgabe.
+
+## Visualisierungen
+
+Umgesetzt in `src/report_figures.py` ([ADR 0044](../adr/0044-statistische-auswertung.md)); `src/analyse.py` schreibt
+die acht PDFs nach `output/figures/`:
+
+| Datei | Zeigt | Zweck |
+|---|---|---|
+| `recall.pdf` | Balken R@5 je Strategie, K1 als schraffierte Kontrolle | Retrieval-Vergleich |
+| `mrr.pdf` | Balken MRR je Strategie, K1 schraffiert | Rankingqualität |
+| `answers_distribution.pdf` | Punktdiagramm des Gesamtwerts je Frage und Strategie mit Median und Mittel (statt Boxplot: die Werte sind stark gebunden) | Verteilung der Antwortqualität |
+| `heatmap.pdf` | Gesamtwert je Frage × Strategie, einfarbige Skala, Werte in den Zellen | Wo funktioniert welche Strategie? |
+| `scatter_retrieval_answer.pdf` | R@5 gegen Gesamtwert, ein Panel je Strategie (Small Multiples), Markerfläche = Zahl der Fragen, ρ im Panel | Entkopplung Retrieval/Antwort (H2) |
+| `catalogue_composition.pdf` | Zähltabelle der Fragen nach Fragetyp × Konstruktionsklasse | Zusammensetzung des Katalogs |
+| `chunk_lengths.pdf` | Histogramm der Chunk-Längen je Strategie, gemeinsame Klassen, Median markiert | Unterschiede der Strategien |
+| `cost.pdf` | Generierungskosten je 1.000 Antworten (C1–C3, K0) neben den einmaligen Embedding-Kosten je Strategie (inkl. K1) | Effizienzbetrachtung ([ADR 0008](../adr/0008-kosten-als-variable.md)) |
+
+Gestaltung nach den PaperLab-Regeln (Werte in `config.FIGURE_*`): 17 cm breit in Endgröße (Einbinden ohne
+Skalieren), Arial (eingebettet; sonst DejaVu Sans mit Hinweis in `notes`), kein Titel im Bild (Titel über
+`\caption`), deutsche Dezimalkommas, Klassenfarben FigBlue und FigOrange plus ein auf Farbsehschwäche geprüfter dritter
+Farbton, Kontrollen grau und schraffiert, Werte der Heatmap beschriftet. Die PDFs sind byte-reproduzierbar.
