@@ -116,9 +116,9 @@ C2; paraphrase: C3 1,00 gegen 0,75). Ohne Treffer in den Top 5: E03 bei C3, E04 
 | C2 | 1,80 | 1,81 | 1,62 | 1,88 | 1,88 |
 | C3 | 1,72 | 1,75 | 1,50 | 1,75 | 1,88 |
 
-Mit allen fünf Kriterien (C1–C3): C1 1,86, C2 1,82, C3 1,76; 37 der 48 Antworten erreichen überall 2. Die Abzüge sitzen
+Mit allen fünf Kriterien (C1–C3): C1 1,86, C2 1,82, C3 1,76; 34 der 48 Antworten erreichen überall 2. Die Abzüge sitzen
 in wenigen Fragen: E06 (alle drei Strategien beantworten den Bitrise-Teil mit dem Abschnitt eines anderen
-CI-Dienstes), E04, E05, E13 (Teilantworten), E03 und E10 je bei einer Strategie.
+CI-Dienstes), E04 und E13 (Teilantworten bei allen drei), E05 (C1, C3), E03 (C3), E10 (C2), E16 (C3, unvollständig).
 
 **Closed-Book-Probelauf**: Die K0-Antworten nutzen den Prompt der Closed-Book-Prüfung ([ADR 0040](../adr/0040-closed-book-pruefung.md)).
 Sie treffen den Kernpunkt bei 5 von 16 Fragen (E06, E11, E13, E15, E16); E06 trifft nur Punkt 1 und ist im Übrigen
