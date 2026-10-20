@@ -308,7 +308,7 @@ CONTROL_CRITERIA = ["correctness", "completeness", "no_hallucination", "clarity"
 RUBRIC_MAX_SCORE = 2
 KEY_POINTS_MAX = 4  # key points per question; point 1 is the core point (D35)
 RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completeness 1 (D35)
-RUBRIC_RULES_VERSION = "2026-10-18"  # version of the rules in src/scoring_rules.py (D35, D37)
+RUBRIC_RULES_VERSION = "2026-10-20"  # version of the rules in src/scoring_rules.py (D35, D37, D43)
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
 

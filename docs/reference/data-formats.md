@@ -354,7 +354,7 @@ einer anderen Version lehnt `--mode summarise` ab); `points` = Markierungen der 
 `;` getrennt; übrige Spalten und Optionen nach [Evaluation](evaluation.md#regelbasierte-bewertung).
 ```
 code,rules_version,points,declines,core_wrong,other_error,grounded,hallucination,answers_question,direct,wordy
-Q001-A,2026-10-18,covered;missing,no,no,no,all,none,yes,yes,no
+Q001-A,2026-10-20,covered;missing,no,no,no,all,none,yes,yes,no
 ```
 
 **`scores.csv`** (abgeleitet von `--mode summarise` aus Bogen und Schlüssel, wird neu geschrieben; sortiert nach

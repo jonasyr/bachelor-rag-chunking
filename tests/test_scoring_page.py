@@ -253,6 +253,13 @@ def test_the_checks_carry_the_rules_of_adr_0037_as_help(scoring_page):
     assert "core point" in help_of["direct"]
 
 
+def test_the_checks_carry_the_clarifications_of_adr_0043_as_help(scoring_page):
+    at, _ = scoring_page
+    help_of = {g.key.rsplit("|", 1)[1]: g.help for g in at.button_group}
+    assert "even if it is" in help_of["direct"] and "wrong" in help_of["direct"]
+    assert "part of the answer" in help_of["declines"]
+
+
 @pytest.fixture
 def control_page(dirs):
     write_scoring_set(dirs[1] / "hard")
