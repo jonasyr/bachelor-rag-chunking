@@ -78,13 +78,13 @@ Antwort werden dann diese Prüffragen beantwortet:
 | Prüffrage | Frage | Optionen |
 |---|---|---|
 | Kernpunkt *n* (Spalte `points`: je Kernpunkt ein Eintrag, durch `;` getrennt) | Steht Kernpunkt *n* mit derselben Bedeutung in der Antwort, auch in anderen Worten? (nur teilweise = fehlt; eine Einschränkung in Klammern muss nicht enthalten sein) | `covered`, `missing` |
-| `declines` | Sagt die Antwort, dass die Passagen die Antwort nicht enthalten, und gibt keine? | `yes`, `no` |
+| `declines` | Sagt die Antwort, dass die Passagen die Antwort nicht enthalten, und gibt keine? (eine Teilantwort mit dem Hinweis, der Rest stehe nicht in den Passagen, ist keine Ablehnung: `no`, die fehlenden Teile sind fehlende Kernpunkte) | `yes`, `no` |
 | `core_wrong` | Gibt die Antwort die Kernaussage falsch wieder oder widerspricht ihr? | `yes`, `no` |
 | `other_error` | Ist eine andere Aussage sachlich falsch? | `yes`, `no` |
 | `grounded` | Wie viele Aussagen der Antwort sind durch die Passagen belegt? | `all`, `some`, `none` |
 | `hallucination` | Enthält die Antwort etwas, das weder Passagen noch Referenz decken? (`minor` = ändert die Antwort nicht, `substantive` = ändert sie oder widerspricht) | `none`, `minor`, `substantive` |
 | `answers_question` | Geht die Antwort auf das Gefragte ein? | `yes`, `no` |
-| `direct` | Steht die Kernaussage in den ersten zwei Sätzen? (auch wenn ein zweiter Teil der Frage später folgt) | `yes`, `no` |
+| `direct` | Steht die Kernaussage der Antwort in den ersten zwei Sätzen? (auch wenn sie falsch ist, das zählt unter Korrektheit, und auch wenn ein zweiter Teil der Frage später folgt; [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)) | `yes`, `no` |
 | `wordy` | Ist die Antwort wiederholend, aufgebläht oder verwirrend? | `yes`, `no` |
 
 | Kriterium | 2 | 1 | 0 |

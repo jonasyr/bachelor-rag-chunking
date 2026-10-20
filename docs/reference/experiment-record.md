@@ -138,9 +138,11 @@ eingefroren) und ihr Vergleich mit der Agentenbewertung.
   bekannten Katalogfragen ist erreichbar, aber nicht großzügig. Die Prüfung nach jedem Block lohnt sich.
 - Unklar in den Regeln: ob `direct` „ja“ ist, wenn die (falsche) Kernaussage der Antwort vorn steht. Der Agent wertete
   „nein“, wenn der Kernpunkt fehlt oder falsch ist, „ja“, wenn er nur teilweise vorn steht. Vor der echten Bewertung
-  in [Evaluation](evaluation.md#regelbasierte-bewertung) präzisieren.
+  in [Evaluation](evaluation.md#regelbasierte-bewertung) präzisieren. Entschieden 20.10.2026:
+  [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) (Kernaussage der Antwort; Regelversion
+  `2026-10-20`). Der Pilot wurde unter `2026-10-18` bewertet.
 - Teilantworten mit Hinweis „die Passagen enthalten den Rest nicht“ (E04, E13) wertete der Agent als Antwort, nicht als
-  `declines`; die Regel deckt das, sollte aber im Hilfetext stehen.
+  `declines`; die Regel deckt das, sollte aber im Hilfetext stehen (seit ADR 0043 dort).
 
 ## Historie: Vue.js-Korpus (bis 18.10.2026)
 

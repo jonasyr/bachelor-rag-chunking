@@ -59,8 +59,13 @@ HELP = {
         "illustrative example name is not a hallucination."
     ),
     "direct": (
-        "Yes when the core point comes in the first two sentences, even if a second part of the "
-        "question is answered later."
+        "Yes when the answer's own core point comes in the first two sentences, even if it is "
+        "wrong (that counts under the facts checks) or a second part of the question is answered "
+        "later."
+    ),
+    "declines": (
+        "No when it gives part of the answer and says the rest is not covered: the missing parts "
+        "count as missing key points."
     ),
 }
 OPTION_LABELS = {"minor": "Minor addition"}
@@ -244,6 +249,7 @@ def form(
             stored.get("declines"),
             f"{s.name}|{code}|declines",
             locked,
+            HELP["declines"],
         )
     }
     declines = answers["declines"] == "yes"

@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (18.10.2026; präzisiert [ADR 0035](0035-regelbasierte-bewertung.md))
+Angenommen (18.10.2026; präzisiert [ADR 0035](0035-regelbasierte-bewertung.md); präzisiert durch [ADR 0043](0043-praezisierung-direct-und-teilantworten.md))
 
 ## Kontext
 
