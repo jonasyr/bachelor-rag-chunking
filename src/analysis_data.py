@@ -32,6 +32,8 @@ from config import (
     KEY_POINTS_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
+    RAGAS_REPEAT_FILE_NAME,
+    RAGAS_SCORES_FILE,
     RETRIEVAL_SCORES_FILE,
     RETRIEVED_RESULTS_FILE,
     SCORES_CONTROL_FILE,
@@ -45,11 +47,13 @@ from config import (
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SCORES_HEADER
-from evaluate_answers import SCORES_HEADER
+from evaluate_answers import KEY_HEADER, SCORES_HEADER
 from evaluate_retrieval import SCORES_HEADER as RETRIEVAL_HEADER
 from freeze import is_main_catalogue, require_frozen
+from ragas_eval import RAGAS_HEADER
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import latest_run, require_run
+from scoring_rules import CHECKS_HEADER
 
 EXPERIMENT = ",".join(STRATEGY_IDS)
 VERDICT_GROUPS = {"miss": "dependent", "hit": "known"}
@@ -66,6 +70,10 @@ class AnalysisData:
     embedding: dict[str, dict] | None
     generation: dict[str, dict]
     notes: list[str]
+    # RAGAS (ADR 0047): a second, automatic view; None where its file is absent
+    ragas: pd.DataFrame | None = None
+    ragas_repeat: pd.DataFrame | None = None
+    answers_question: dict[tuple[str, str], int] | None = None  # (question, strategy) -> 1/0
 
 
 def main_paths() -> dict:
@@ -85,6 +93,9 @@ def main_paths() -> dict:
             "embedding_runs_file": EMBEDDING_RUNS_FILE,
             "chunk_files": {**CHUNK_FILES, **CONTROL_CHUNK_FILES},
             "closed_book_file": CLOSED_BOOK_FILE,
+            "ragas_file": RAGAS_SCORES_FILE,
+            "scoring_checks_file": SCORING_CHECKS_FILE,
+            "scoring_key_file": SCORING_KEY_FILE,
         },
         RETRIEVED_RESULTS_FILE.parent,
     )
@@ -106,6 +117,10 @@ def set_paths(set_dir: Path) -> dict:
             "retrieval_runs_file": runs,
             "generation_runs_file": runs,
             "closed_book_file": None,
+            "ragas_file": set_dir / RAGAS_SCORES_FILE.name,
+            "ragas_repeat_file": set_dir / RAGAS_REPEAT_FILE_NAME,
+            "scoring_checks_file": set_dir / SCORING_CHECKS_FILE.name,
+            "scoring_key_file": set_dir / SCORING_KEY_FILE.name,
         },
         set_dir,
     )
@@ -139,6 +154,15 @@ def _with_inputs(paths: dict, results_dir: Path) -> dict:
             results_dir / GENERATED_ANSWERS_FILE.name,
             results_dir / GENERATED_ANSWERS_CONTROL_FILE.name,
         ],
+        # ragas (both runs): answers, retrieved results, catalogue, chunks; on the main catalogue
+        # also scores.csv (see ragas_eval.run)
+        "ragas_inputs": [
+            results_dir / GENERATED_ANSWERS_FILE.name,
+            results_dir / RETRIEVED_RESULTS_FILE.name,
+            paths["questions_file"],
+            paths["ground_truth_file"],
+            *(chunks[k] for k in STRATEGY_IDS),
+        ],
     }
 
 
@@ -162,6 +186,44 @@ def _complete(frame: pd.DataFrame, qids: list[str], strategies: list[str], what:
     missing = [f"{q}/{s}" for q in qids for s in strategies if (q, s) not in pairs]
     if missing:
         raise ValueError(f"{what}: rows missing for {missing}")
+
+
+def _load_ragas(paths: dict, runs: Path, main: bool, qids: list[str], notes: list[str]):
+    """The RAGAS files that the paths name: each checked against its run record (`ragas`,
+    `ragas_repeat`); an absent file is None with a note. Only the first run is required."""
+    inputs = list(paths.get("ragas_inputs", []))
+    if main:
+        inputs.append(paths["scores_file"])
+    loaded = []
+    for key, step in (("ragas_file", "ragas"), ("ragas_repeat_file", "ragas_repeat")):
+        file = paths.get(key)
+        if file is None:
+            loaded.append(None)
+        elif not file.exists():
+            notes.append(f"{file.name} fehlt: RAGAS-Auswertung entfällt")
+            loaded.append(None)
+        else:
+            _checked(file, inputs, runs, step, EXPERIMENT, main, notes)
+            frame = pd.DataFrame(read_csv(file, RAGAS_HEADER))
+            _complete(frame, qids, list(STRATEGY_IDS), file.name)
+            loaded.append(frame)
+    return loaded
+
+
+def _load_answers_question(paths: dict, notes: list[str]) -> dict | None:
+    """`answers_question` per (question, strategy): the checks are keyed by blinded code, the
+    key maps the code back. yes = 1, no = 0."""
+    checks, key = paths.get("scoring_checks_file"), paths.get("scoring_key_file")
+    if checks is None or key is None:
+        return None
+    if not (checks.exists() and key.exists()):
+        notes.append("scoring_checks.csv oder scoring_key.csv fehlt: answers_question entfällt")
+        return None
+    by_code = {r["code"]: (r["question_id"], r["strategy"]) for r in read_csv(key, KEY_HEADER)}
+    values = {"yes": 1, "no": 0}
+    return {
+        by_code[r["code"]]: values[r["answers_question"]] for r in read_csv(checks, CHECKS_HEADER)
+    }
 
 
 def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
@@ -251,6 +313,9 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     if embedding is None:
         notes.append("Embedding-Läufe fehlen: Index- und Embedding-Kosten entfallen")
 
+    ragas, ragas_repeat = _load_ragas(paths, gen_runs, main, qids, notes)
+    answers_question = _load_answers_question(paths, notes)
+
     # the costs belong to the run that wrote the scored answers
     answers = [p for p in paths["answers_files"] if p.exists()]
     generate = require_run(gen_runs, "generate", EXPERIMENT, [], answers, outputs_required=False)
@@ -264,6 +329,9 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         embedding=embedding,
         generation=generate["by_strategy"],
         notes=notes,
+        ragas=ragas,
+        ragas_repeat=ragas_repeat,
+        answers_question=answers_question,
     )
 
 
