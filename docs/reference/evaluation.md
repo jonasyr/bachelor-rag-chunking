@@ -161,9 +161,10 @@ ist; die Werte fließen nie zurück ([ADR 0017](../adr/0017-fragenkatalog.md)).
   (`RAGAS_MAX_TOKENS`) und ein wechselndes Modell ab; dann wird nichts geschrieben. Mittel gelten über die Fragen mit Wert,
   Effektstärken über die Fragen mit Wert in allen Strategien.
 - **Übereinstimmung** (`ragas_agreement`, Tabelle `ragas_agreement.tex`): Spearmans ρ je Antwort zwischen Metrik und
-  Gegenstück, je Strategie mit p-Wert und über alle Strategien (`gesamt`, jede Frage dreifach, daher ohne p-Wert);
-  eine Frage ohne RAGAS-Wert entfällt im Paar, ist eine Seite konstant, steht „nicht bestimmbar“. Die Mittel je
-  Strategie stehen in `ragas.tex`, beschreibend ohne p-Werte ([ADR 0044](../adr/0044-statistische-auswertung.md)).
+  Gegenstück, je Strategie und über alle Strategien (`gesamt`, jede Frage dreifach), beschreibend ohne p-Werte
+  ([ADR 0047](../adr/0047-ragas-als-triangulation.md)); eine Frage ohne RAGAS-Wert entfällt im Paar, ist eine Seite
+  konstant, steht „nicht bestimmbar“. Die Mittel je Strategie stehen in `ragas.tex`, ebenfalls ohne p-Werte; neben
+  jedem r steht n′, die Zahl der Fragen mit Differenz ungleich 0 ([ADR 0044](../adr/0044-statistische-auswertung.md)).
 - **Stabilität:** Auf Pilot-Sets läuft `--repeat` ein zweites Mal. `ragas_stability` in `analysis.json` vergleicht beide
   Läufe je Metrik (Anteil gleicher Werte, mittlere absolute Differenz, ρ). Auf dem Pilot e2e waren die Werte des
   Context Recall bitgleich, die der Response Relevancy nur zu 60 % gleich, trotz Temperatur 0 und festem `seed`;

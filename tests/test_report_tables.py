@@ -320,7 +320,8 @@ def test_ragas_agreement_pairs_and_pooled_rho_without_p():
         "context_recall~recall",
     ]  # fmt: skip
     for per in agreement.values():
-        assert "p" not in per["pooled"] and set(per) == {"pooled", *C}
+        # descriptive throughout (ADR 0047, spec non-goals): no p-value, pooled or per strategy
+        assert all("p" not in c for c in per.values()) and set(per) == {"pooled", *C}
         assert per["pooled"]["n"] == len(QIDS) * 3
 
 
@@ -347,7 +348,11 @@ def test_ragas_tables_follow_the_iu_rules(tmp_path):
         for line in (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8").splitlines()
         if line.startswith("gesamt &")
     ]
-    assert len(pooled) == 5 and all(line.split(" & ")[2] == "--" for line in pooled)
+    agreement = (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8")
+    assert len(pooled) == 5 and "Spearmans ρ & n" in agreement and " & p & " not in agreement
+    effects = (tmp_path / "ragas.tex").read_text(encoding="utf-8")
+    # r rests on the differences not equal to 0; with heavy ties n' can be tiny, so it is shown
+    assert "n′ = " in effects
 
 
 def test_ragas_tables_skipped_without_ragas(tmp_path):

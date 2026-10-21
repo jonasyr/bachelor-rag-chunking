@@ -381,10 +381,13 @@ def _ragas_agreement(data: AnalysisData, qids: list[str], notes: list) -> dict |
             xs[s] = [values[metric][s][q] for q in kept]
             ys[s] = [float(other[s][q]) for q in kept]
         per = {s: stats.spearman(xs[s], ys[s]) for s in STRATEGY_IDS}
-        pooled = stats.spearman(
+        per["pooled"] = stats.spearman(
             [v for s in STRATEGY_IDS for v in xs[s]], [v for s in STRATEGY_IDS for v in ys[s]]
         )
-        out[f"{metric}~{column}"] = {"pooled": {k: v for k, v in pooled.items() if k != "p"}} | per
+        # descriptive (ADR 0047): rho and n only, no p-value, pooled or per strategy
+        out[f"{metric}~{column}"] = {
+            g: {k: v for k, v in per[g].items() if k != "p"} for g in ["pooled", *STRATEGY_IDS]
+        }
     return out
 
 
@@ -625,7 +628,7 @@ def _ragas_table(results: dict) -> str:
         )  # fmt: skip
     pair_names = list(next(iter(block["effects"].values()))["pairs"])
     if pair_names:
-        pair_header = ["Effekt r (Median-Differenz)", *(p.replace("-", "–") for p in pair_names)]
+        pair_header = ["Effekt r (Median-Diff.; n′)", *(p.replace("-", "–") for p in pair_names)]
         rows.append(r"\midrule")
         rows.append(" & ".join(latex_escape(c) for c in pair_header) + r" \\")
         for m in RAGAS_METRICS:
@@ -633,7 +636,8 @@ def _ragas_table(results: dict) -> str:
             rows.append(
                 [RAGAS_LABELS[m]]
                 + [
-                    f"{fmt_opt(pairs[p]['r'])} ({fmt_opt(pairs[p]['median_diff'])})"
+                    f"{fmt_opt(pairs[p]['r'])} ({fmt_opt(pairs[p]['median_diff'])}; "
+                    f"n′ = {pairs[p]['n_nonzero']})"
                     if p in pairs else DASH
                     for p in pair_names
                 ]
@@ -651,8 +655,9 @@ def _ragas_table(results: dict) -> str:
     note = (
         "Mittelwerte der RAGAS-Metriken von 0 bis 1 über die Fragen mit Wert. "
         f"{nan} Kendalls W und r über die Fragen mit Wert in allen Strategien (mindestens {n}), "
-        "deskriptiv, ohne p-Werte; Median-Differenz erste minus zweite Strategie. RAGAS ist eine "
-        "zweite Sicht neben der regelbasierten Bewertung."
+        "deskriptiv, ohne p-Werte; Median-Differenz erste minus zweite Strategie; n′ Fragen mit "
+        "Differenz ungleich 0, auf denen r beruht (bei vielen gleichen Werten klein). "
+        "RAGAS ist eine zweite Sicht neben der regelbasierten Bewertung."
     )
     return latex_table(
         "ragas", "RAGAS-Bewertung je Strategie", header, rows, "l" + "r" * (len(header) - 1), note
@@ -660,7 +665,7 @@ def _ragas_table(results: dict) -> str:
 
 
 def _ragas_agreement_table(results: dict) -> str:
-    header = ["Gruppe", "Spearmans ρ", "p", "n"]
+    header = ["Gruppe", "Spearmans ρ", "n"]
     rows: list[list[str] | str] = []
     for pair, per in results["ragas_agreement"].items():
         metric, column = pair.split("~")
@@ -669,16 +674,16 @@ def _ragas_agreement_table(results: dict) -> str:
         for group, c in per.items():
             shown = "gesamt" if group == "pooled" else group
             rho = fmt_opt(c["rho"]) if c["testable"] else NOT_DETERMINABLE
-            rows.append([shown, rho, fmt_p(c.get("p")), str(c["n"])])
+            rows.append([shown, rho, str(c["n"])])
     note = (
-        "Explorativ. Spearmans ρ je Antwort zwischen RAGAS-Metrik und Bewertung bzw. Retrieval "
-        "(Hauptregel), je Strategie und über alle Strategien (gesamt: jede Frage dreifach, daher "
-        "ohne p-Wert). Fragen ohne RAGAS-Wert entfallen im jeweiligen Paar; „nicht bestimmbar“: "
+        "Deskriptiv, ohne p-Werte. Spearmans ρ je Antwort zwischen RAGAS-Metrik und Bewertung "
+        "bzw. Retrieval (Hauptregel), je Strategie und über alle Strategien (gesamt: jede Frage "
+        "dreifach). Fragen ohne RAGAS-Wert entfallen im jeweiligen Paar; „nicht bestimmbar“: "
         "eine Seite ist konstant."
     )
     return latex_table(
         "ragas_agreement", "Übereinstimmung von RAGAS mit Bewertung und Retrieval", header, rows,
-        "lrrr", note,
+        "lrr", note,
     )  # fmt: skip
 
 

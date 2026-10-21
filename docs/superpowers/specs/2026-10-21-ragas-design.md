@@ -50,7 +50,7 @@ die Strategien und fließt nie zurück.
   mehr als einen `system_fingerprint`, oder ändert sich der Erstellungszeitpunkt des Modellobjekts zwischen Beginn
   und Ende, wird nichts geschrieben.
 - Lauf erst nach der regelbasierten Bewertung C1–C3; einmal ausgeführt, gespeichert, nie überschrieben (ADR 0047).
-- Pilot e2e: zwei gleiche Läufe mit echten API-Aufrufen (wenige Cent); der Vergleich beider Läufe ist die
+- Pilot e2e: zwei gleiche Läufe mit echten API-Aufrufen (Pilot: 2,02 USD je Lauf, nicht wenige Cent wie zuerst geschätzt); der Vergleich beider Läufe ist die
   Stabilitätszahl für die Arbeit. Der Hauptlauf bleibt ein Lauf.
 - Bericht: eine Tabelle mit den vier Mittelwerten je Strategie und Effektstärken (wie die Nebenmetriken, ADR 0044,
   ohne p-Werte) und eine Tabelle mit Spearmans ρ je Metrik und Gegenstück, beide in Kapitel 4.2.

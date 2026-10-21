@@ -219,7 +219,15 @@ def run(
         paths["documents_file"],
         paths["freeze_file"],
     )
-    require_run(runs_file, "generate", EXPERIMENT, [], [answers_file])  # answers are current
+    # the answers are the output of the latest generate run, over exactly these inputs, so the
+    # contexts below are the passages the answer model saw (spec, first anti-goal)
+    generate_inputs = [
+        paths["results_file"],
+        paths["questions_file"],
+        paths["ground_truth_file"],
+        *(chunk_files[k] for k in keys),
+    ]
+    require_run(runs_file, "generate", EXPERIMENT, generate_inputs, [answers_file])
     if latest_run(runs_file, "summarise", EXPERIMENT) is None and not main:
         print(
             f"note: {runs_file} has no `summarise` record (pilot set, scored under an older rule "

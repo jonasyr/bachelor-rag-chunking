@@ -230,6 +230,15 @@ def test_ragas_loaded_and_checked(paths, tmp_path):
         load(paths, main=False)  # stale: the record hashed another file
 
 
+def test_missing_repeat_drops_only_the_stability(paths, tmp_path):
+    """Without a second pilot run only the stability comparison is dropped, not RAGAS."""
+    _with_ragas(paths, tmp_path)
+    data = load(paths, main=False)
+    repeat_notes = [n for n in data.notes if "ragas_scores_repeat.csv" in n]
+    assert repeat_notes == ["ragas_scores_repeat.csv fehlt: Stabilitätsvergleich entfällt"]
+    assert data.ragas is not None
+
+
 def test_ragas_input_change_is_refused(paths, tmp_path):
     _with_ragas(paths, tmp_path)
     paths["ragas_inputs"][0].write_text(

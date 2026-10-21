@@ -136,8 +136,18 @@ def log(files, step, inputs=(), outputs=(), strategy=EXPERIMENT):
         f.write(json.dumps(record) + "\n")
 
 
+def generate_inputs(files):
+    """The inputs generate.py hashes: results, questions, ground truth and the chunk files."""
+    return [
+        files["results_file"],
+        files["questions_file"],
+        files["ground_truth_file"],
+        *files["chunk_files"].values(),
+    ]
+
+
 def record_upstream(files, summarise=True):
-    log(files, "generate", outputs=[files["answers_file"]])
+    log(files, "generate", inputs=generate_inputs(files), outputs=[files["answers_file"]])
     if summarise:
         log(files, "summarise", outputs=[files["scores_file"]])
 
@@ -225,6 +235,19 @@ def test_missing_chunk_is_refused_before_any_call(files):
     with pytest.raises(ValueError, match="C1_D001_0099"):
         go(files, scorer)
     assert scorer.calls == []
+    assert not files["out_file"].exists()
+
+
+def test_changed_chunk_after_generate_is_refused_before_any_call(files):
+    """RAGAS must judge the passages the answer model saw: a chunk text rewritten after the
+    generate run (same IDs) is refused before any API call (spec, first anti-goal)."""
+    record_upstream(files, summarise=False)
+    c1 = files["chunk_files"]["C1"]
+    c1.write_text(c1.read_text(encoding="utf-8").replace("C1 text", "C1 new"), encoding="utf-8")
+    scorer, created = FakeScorer(), FakeCreated()
+    with pytest.raises(RuntimeError, match=c1.name):
+        run(scorer, reporting_recorder(), created, files, main=False)
+    assert scorer.calls == [] and created.calls == 0
     assert not files["out_file"].exists()
 
 

@@ -200,7 +200,8 @@ def _load_ragas(paths: dict, runs: Path, main: bool, qids: list[str], notes: lis
         if file is None:
             loaded.append(None)
         elif not file.exists():
-            notes.append(f"{file.name} fehlt: RAGAS-Auswertung entfällt")
+            dropped = "Stabilitätsvergleich" if step == "ragas_repeat" else "RAGAS-Auswertung"
+            notes.append(f"{file.name} fehlt: {dropped} entfällt")
             loaded.append(None)
         else:
             _checked(file, inputs, runs, step, EXPERIMENT, main, notes)

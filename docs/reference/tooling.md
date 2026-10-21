@@ -37,8 +37,9 @@ Schritte brauchen keinen Schlüssel; fehlt er bei einem API-Aufruf, bricht der S
 `src/ragas_client.py` liest ihn für `ragas_eval.py`.
 
 Telemetrie: Chroma bleibt abgeschaltet ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)). RAGAS sendet
-sonst Nutzungsdaten an einen Server und legt eine Benutzerdatei an; `ragas_client.py` setzt deshalb vor dem ersten
-RAGAS-Import `RAGAS_DO_NOT_TRACK` (aus `config.RAGAS_DO_NOT_TRACK`, `true`). Tests dürfen kein Netz außer dem
+sonst bei jedem Aufruf Nutzungsdaten an einen Server; `ragas_client.py` setzt deshalb vor dem ersten RAGAS-Import
+`RAGAS_DO_NOT_TRACK` (aus `config.RAGAS_DO_NOT_TRACK`, `true`). Das unterbindet nur das Senden: RAGAS 0.4.3 legt
+trotzdem eine zufällige Kennung unter `~/.local/share/ragas/uuid.json` an (keine personenbezogenen Daten, kein Netz). Tests dürfen kein Netz außer dem
 `tiktoken`-Download erreichen ([AGENTS.md](../../AGENTS.md)).
 
 ### RAGAS-Pins
