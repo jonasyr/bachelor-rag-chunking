@@ -41,7 +41,9 @@ die Strategien und fließt nie zurück.
   Fragen je Antwort, wie bei Es et al., 2024).
 - NaN nach Definition der Metrik (z. B. Faithfulness ohne prüfbare Aussage bei einer ablehnenden Antwort, Context
   Recall ohne Zuordnung) ist ein gültiges Ergebnis: leere Zelle plus Grund, gezählt je Metrik und Strategie und in den
-  Tabellen genannt. Mittelwerte über die vorhandenen Werte; Kendalls W und paarweise r nur über Fragen mit Wert in
+  Tabellen genannt. RAGAS 0.4.3 gibt zu einem solchen NaN keinen Grund an (Faithfulness, Context Recall, Context
+  Precision; Fehler lösen dort eine Ausnahme aus); der Bewerter trägt darum je Metrik einen festen Grund ein, der die
+  Fälle der gepinnten Version nennt (Jonas, 21.10.2026). Response Relevancy gibt im nichtssagenden Fall 0, nicht NaN. Mittelwerte über die vorhandenen Werte; Kendalls W und paarweise r nur über Fragen mit Wert in
   allen drei Strategien; Spearmans ρ ohne das betroffene Paar.
 - Das Richtermodell wird wie das Antwortmodell überwacht (ADR 0033): meldet die API im Lauf mehr als ein Modell oder
   mehr als einen `system_fingerprint`, oder ändert sich der Erstellungszeitpunkt des Modellobjekts zwischen Beginn
@@ -68,7 +70,7 @@ die Strategien und fließt nie zurück.
   älteren Regelversion, ADR 0043/0044); das wird gemeldet, nicht verweigert.
 - Alles wird vor dem ersten API-Aufruf geprüft.
 - Alles oder nichts: Scheitert eine Antwort (Fehler nach den Wiederholungen des Clients, Wert außerhalb 0–1, NaN
-  ohne Grund aus der Metrik selbst, Wechsel des Richtermodells), wird nichts geschrieben. Ein NaN nach Definition der
+  einer Metrik ohne festen Grund, Wechsel des Richtermodells), wird nichts geschrieben. Ein NaN nach Definition der
   Metrik ist kein Fehler (siehe Entscheidungen).
 - Ausgabedatei existiert schon: Abbruch, wie bei `generate.py` (bewusst löschen, um neu zu laufen). Für den zweiten
   Pilotlauf ein eigener Ausgabename (siehe unten), kein Überschreiben.
