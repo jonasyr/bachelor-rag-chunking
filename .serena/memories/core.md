@@ -10,6 +10,9 @@ Workflow: branch → PR → Codex review (`AGENTS.md` § Code Review Rules, `.cl
 after Jonas approves. Repo is public — no personal data (matriculation number etc.).
 Commands: `AGENTS.md` (table) and `docs/reference/tooling.md`; run scripts from the repo root. `--help` only works
 where argparse exists: `snapshot.py`, `ingest.py`, `preprocess.py` run their step instead (snapshot replaces `data/raw/`).
+Tools: use Serena (project `bachelor-rag-chunking`) and codebase-memory for code work, also in subagents. The
+codebase-memory project name is the path form `home-jonas-Documents-Code-PaperLab-scientific-papers-thesis-thesis-semester-7-rag-chunking_jonas-code`;
+`bachelor-rag-chunking` there returns "function not found". Reindex: `index_repository` and `serena project index`.
 
 ## Memories
 - Step order and refusals, catalogue, closed-book screen, K0, embedding and corpus gotchas: `mem:pipeline`

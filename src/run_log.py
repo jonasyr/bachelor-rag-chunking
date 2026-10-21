@@ -80,6 +80,18 @@ def append_generation_run(
     return full
 
 
+def step_command(step: str, strategy: str) -> str:
+    """The command that writes the `step` record over `strategy`, for error messages."""
+    if step in ("scaffold", "summarise"):
+        control = " --control" if strategy == "K0" else ""
+        return f"src/evaluate_answers.py --mode {step}{control}"
+    if step == "summarise_control":
+        return "src/evaluate_answers.py --mode summarise --control"
+    if step in ("retrieve", "evaluate_retrieval") and strategy == "K1":
+        return f"src/{step}.py --control"
+    return f"src/{step}.py"
+
+
 def require_run(
     runs_file: Path,
     step: str,
@@ -96,7 +108,9 @@ def require_run(
     """
     record = latest_run(runs_file, step, strategy)
     if record is None:
-        raise RuntimeError(f"{runs_file} has no {step} run over {strategy}; run src/{step}.py")
+        raise RuntimeError(
+            f"{runs_file} has no {step} run over {strategy}; run {step_command(step, strategy)}"
+        )
     checks = [("inputs_sha256", f) for f in inputs]
     if outputs_required or "outputs_sha256" in record:
         checks += [("outputs_sha256", f) for f in outputs]
@@ -104,7 +118,7 @@ def require_run(
         if record.get(field, {}).get(path.name) != sha256_of(path):
             raise RuntimeError(
                 f"{path.name} differs from the latest {step} run of {record.get('date', '?')} "
-                f"({runs_file}); run src/{step}.py again"
+                f"({runs_file}); run {step_command(step, strategy)} again"
             )
     return record
 

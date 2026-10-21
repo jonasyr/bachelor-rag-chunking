@@ -144,6 +144,22 @@ eingefroren) und ihr Vergleich mit der Agentenbewertung.
 - Teilantworten mit Hinweis „die Passagen enthalten den Rest nicht“ (E04, E13) wertete der Agent als Antwort, nicht als
   `declines`; die Regel deckt das, sollte aber im Hilfetext stehen (seit ADR 0043 dort).
 
+## Probelauf Hauptlauf (21.10.2026)
+
+Befehlsfolge aus [Experiment durchführen](../how-to/run-the-experiment.md#hauptlauf-auf-einen-blick) in einer
+Wegwerfkopie des Repos, ohne API-Schlüssel (jeder API-Aufruf wäre gescheitert), die 16 Pilotfragen als Hauptkatalog,
+der Freeze-Datensatz direkt geschrieben (die strenge Prüfung von `catalogue.py freeze` decken die Tests ab).
+
+- `retrieve.py` und `retrieve.py --control` liefen aus den gespeicherten Fragevektoren ohne API-Aufruf; beide
+  Ergebnisdateien sind byteweise gleich mit denen des Pilots (`scripts/difficulty_probe.py`).
+- `generate.py` verweigert das Überschreiben vorhandener Antworten (ADR 0033); für die weiteren Schritte standen die
+  Pilotantworten mit ihrem `generate`-Eintrag.
+- `evaluate_retrieval.py` (beide), `evaluate_answers.py --mode scaffold` (48 verblindete Antworten) liefen durch;
+  `--mode scaffold --control` bricht vor `scores.csv` ab, `analyse.py` vor dem `summarise`-Eintrag (beides gewollt).
+  Die Bewertung selbst ist Handarbeit und war nicht Teil des Probelaufs; `analyse.py` ist auf dem Pilot-Set erprobt.
+- Gefunden und behoben: Fehlte ein Laufeintrag, nannten die Meldungen `src/summarise.py` statt
+  `evaluate_answers.py --mode summarise` (`run_log.step_command`).
+
 ## Historie: Vue.js-Korpus (bis 18.10.2026)
 
 Alle Abschnitte dieses Teils gelten für den Vue.js-Korpus ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md),
