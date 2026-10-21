@@ -273,6 +273,22 @@ LLM_MAX_TOKENS = 1024  # an answer cut off at this limit stops the run (D33)
 LLM_PRICE_INPUT_PER_MTOK = 0.10  # USD per 1M input tokens, OpenAI model page, accessed 17.10.2026
 LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date
 
+# RAGAS run (ADR 0047): judge model and settings are pinned; all four metrics use them.
+RAGAS_JUDGE_MODEL = "gpt-6-sol"
+RAGAS_REASONING_EFFORT = "none"  # the only effort at which the API accepts a temperature (D33)
+RAGAS_TEMPERATURE = 0.0
+RAGAS_SEED = 20261021  # best-effort deterministic sampling; fixed, never tuned
+RAGAS_STRICTNESS = 3  # answer-relevancy questions generated per answer
+RAGAS_METRICS = ("faithfulness", "response_relevancy", "context_precision", "context_recall")
+RAGAS_DECIMALS = 6
+RAGAS_SCORES_FILE = DATA_EVAL / "ragas_scores.csv"
+RAGAS_REPEAT_FILE_NAME = "ragas_scores_repeat.csv"
+RAGAS_JUDGE_PRICE_INPUT_PER_MTOK = 2.0  # USD per 1M input tokens, ADR 0033, accessed 17.10.2026
+RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK = 10.0  # USD per 1M output tokens, same source and date
+RAGAS_TIMEOUT_S = 120  # per request
+RAGAS_MAX_RETRIES = 5  # SDK retries per request
+RAGAS_CONCURRENCY = 8  # parallel scoring jobs
+
 # Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
 # the documented text.
 SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework
