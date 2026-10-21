@@ -19,6 +19,13 @@ from config import (
     LLM_REASONING_EFFORT,
     LLM_SEED,
     LLM_TEMPERATURE,
+    RAGAS_JUDGE_MODEL,
+    RAGAS_JUDGE_PRICE_INPUT_PER_MTOK,
+    RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK,
+    RAGAS_REASONING_EFFORT,
+    RAGAS_SEED,
+    RAGAS_STRICTNESS,
+    RAGAS_TEMPERATURE,
     SCORING_METHOD,
 )
 
@@ -80,6 +87,36 @@ def append_generation_run(
     return full
 
 
+def append_ragas_run(record: dict, runs_file: Path) -> dict:
+    """Append one JSON line of a RAGAS run (ADR 0047): the pinned judge settings, versions, date
+    and cost, judge and embeddings apart, from the tokens in `record`."""
+    judge = round(
+        (
+            record["judge_prompt_tokens"] * RAGAS_JUDGE_PRICE_INPUT_PER_MTOK
+            + record["judge_completion_tokens"] * RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK
+        )
+        / 1_000_000,
+        10,
+    )
+    full = {
+        "date": date.today().isoformat(),
+        "judge_model": RAGAS_JUDGE_MODEL,
+        "embedding_model": EMBEDDING_MODEL,
+        "reasoning_effort": RAGAS_REASONING_EFFORT,
+        "temperature": RAGAS_TEMPERATURE,
+        "seed": RAGAS_SEED,
+        "strictness": RAGAS_STRICTNESS,
+        "ragas_version": version("ragas"),
+        "openai_sdk": version("openai"),
+        **record,
+        "judge_cost_usd": judge,
+        "embedding_cost_usd": _cost(record["embedding_tokens"]),
+    }
+    full["cost_usd"] = round(full["judge_cost_usd"] + full["embedding_cost_usd"], 10)
+    _append(full, runs_file)
+    return full
+
+
 def step_command(step: str, strategy: str) -> str:
     """The command that writes the `step` record over `strategy`, for error messages."""
     if step in ("scaffold", "summarise"):
@@ -87,6 +124,10 @@ def step_command(step: str, strategy: str) -> str:
         return f"src/evaluate_answers.py --mode {step}{control}"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
+    if step == "ragas_repeat":
+        return "src/ragas_eval.py --repeat"
+    if step == "ragas":
+        return "src/ragas_eval.py"
     if step in ("retrieve", "evaluate_retrieval") and strategy == "K1":
         return f"src/{step}.py --control"
     return f"src/{step}.py"
