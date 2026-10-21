@@ -55,13 +55,13 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 
 ## Backlog
 
-Offene Arbeit außerhalb des Zeitplans, nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlauf).
+Offene Arbeit nach Priorität (Punkt 1 ist die Katalogzeile des Zeitplans); erledigte Punkte wandern in den [Verlauf](#verlauf).
 
 1. **Fragenkatalog** (kritischer Pfad): 48 Fragen in sechs Blöcken zu 8, nach jedem Block KI-Durchsicht und
    Closed-Book-Prüfung; Einfrieren bis 06.11. ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
 2. **Übungsbewertung Pilot**: Jonas bewertet die 9 Antworten in `data/pilot/e2e_jonas/`; danach Vergleich mit der
    Agentenbewertung im [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026).
-3. **Zwei kleine Code-Korrekturen**: Begründung der `noqa: F401`-Ausnahmen für Fixtures vereinheitlichen; doppelte
+3. **Zwei kleine Code-Korrekturen**: die `noqa: F811`-Ausnahmen in den Tests begründen (wie bei F401: „(fixture)“); doppelte
    Einträge in `relevant_doc_ids` beim Katalog-Check abweisen.
 4. **Zweitbewertung**: Vorschlag für die Einrichtung (wer, welche Stichprobe, Übereinstimmungsmaß), siehe
    [Offene Entscheidungen](#offene-entscheidungen).
