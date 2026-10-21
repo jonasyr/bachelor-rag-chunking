@@ -88,7 +88,7 @@ def make_data(*, verdicts=True, chunks=True, embedding=True, control=True) -> An
 
 def test_german_number_format():
     assert fmt_de(0.9375, 2) == "0,94"
-    assert fmt_de(-0.05, 2) == "-0,05"
+    assert fmt_de(-0.05, 2) == "\u22120,05"  # typographic minus
     assert fmt_de(1, 2) == "1,00"
     assert fmt_de(-0.001, 2) == "0,00"
 
@@ -118,12 +118,42 @@ def test_tests_table_has_no_pvalues_for_descriptive_metrics(tmp_path):
     results = build_results(make_data(), 0.05)
     write_tables(results, tmp_path)
     lines = (tmp_path / "tests.tex").read_text(encoding="utf-8").splitlines()
+    group, seen = None, set()
     for line in lines:
-        if line.startswith(("Hit@5", "P@5", "Kontext@5", "Korrektheit")):
+        if line.startswith(r"\multicolumn"):
+            group = line.split("{")[-1].split("}")[0]
+            seen.add(group)
+        elif (
+            group and group.startswith(("Hit@5", "P@5", "Kontext@5", "Korrektheit")) and "&" in line
+        ):
             cells = [c.strip(" \\") for c in line.split("&")]
-            # columns: Metrik, Vergleich, Statistik, p, p (Holm), Effekt, Median-Differenz
-            assert cells[3] == "--" and cells[4] == "--", line
-    assert any(line.startswith("Hit@5") for line in lines)
+            # columns: Vergleich, Statistik, p, p (Holm), Effekt, Median-Differenz
+            assert cells[2] == "--" and cells[3] == "--", line
+    assert any(g.startswith("Hit@5") for g in seen)
+
+
+def test_tables_follow_the_iu_rules(tmp_path):
+    """Short title without final period above, no centering, source line below (ZL S. 19)."""
+    paths = write_tables(build_results(make_data(), 0.05), tmp_path)
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        caption = next(line for line in text.splitlines() if line.startswith(r"\caption{"))
+        title = caption[len(r"\caption{") : caption.index("}")]
+        assert not title.endswith("."), path.name
+        assert len(title) <= 80, path.name  # one line in the list of tables
+        assert r"\centering" not in text
+        assert r"\source{Eigene Darstellung." in text.split(r"\end{tabular}")[1]
+
+
+def test_wide_tables_are_transposed(tmp_path):
+    """At most five data columns, so the tables fit the text width (paperlab check `rand`)."""
+    write_tables(build_results(make_data(), 0.05), tmp_path)
+    for name in ("answers.tex", "control_k0.tex"):
+        text = (tmp_path / name).read_text(encoding="utf-8")
+        align = text.split(r"\begin{tabular}{")[1].split("}")[0]
+        assert len(align) <= 5, (name, align)
+    breakdown = (tmp_path / "breakdown.tex").read_text(encoding="utf-8")
+    assert r"\cmidrule" in breakdown and "Fragetyp & " not in breakdown
 
 
 def test_descriptive_metrics_have_no_p_in_results():
@@ -145,7 +175,7 @@ def test_all_eight_tables_are_written(tmp_path):
 def test_captions_with_pvalues_say_explorativ(tmp_path):
     write_tables(build_results(make_data(), 0.05), tmp_path)
     for name in ("tests.tex", "correlation.tex"):
-        assert "explorativ" in (tmp_path / name).read_text(encoding="utf-8")
+        assert "explorativ" in (tmp_path / name).read_text(encoding="utf-8").lower()
 
 
 def test_outputs_are_byte_identical_on_rerun(tmp_path):
@@ -210,6 +240,14 @@ def test_pooled_spearman_has_no_pvalue(tmp_path):
     pooled = [
         line
         for line in (tmp_path / "correlation.tex").read_text(encoding="utf-8").splitlines()
-        if "& gesamt &" in line
+        if line.startswith("gesamt &")
     ]
-    assert pooled and all("& -- &" in line for line in pooled)
+    assert len(pooled) == 2 and all(line.split(" & ")[2] == "--" for line in pooled)
+
+
+def test_missing_effect_is_a_dash_not_r_equals_dash():
+    """A constant criterion (all answers 2) has no r; the cell shows a dash, not "r = --"."""
+    from report_tables import _r
+
+    assert _r(None) == "--"
+    assert _r(0.5) == "r = 0,50"

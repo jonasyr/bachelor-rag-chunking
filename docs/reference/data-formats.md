@@ -394,7 +394,7 @@ dieselbe Struktur nach `DIR/output/`, nie nach `output/`.
 
 | Pfad | Inhalt |
 |---|---|
-| `output/tables/*.tex` | acht Tabellen (`table`-Umgebung mit Beschriftung und Label `tab:<Name>`): `retrieval`, `retrieval_sensitivity`, `answers`, `tests`, `control_k0`, `correlation`, `efficiency`, `breakdown` (`report_tables.TABLE_NAMES`) |
+| `output/tables/*.tex` | acht Tabellen nach den IU-Regeln (`table`-Umgebung mit kurzem Titel ohne Schlusspunkt, Label `tab:<Name>`, darunter `\source{Eigene Darstellung. …}` mit den Anmerkungen; Ausrichtung aus der Klasse; negative Werte mit typografischem Minus): `retrieval`, `retrieval_sensitivity`, `answers`, `tests`, `control_k0`, `correlation`, `efficiency`, `breakdown` (`report_tables.TABLE_NAMES`) |
 | `output/figures/*.pdf` | acht Abbildungen in Endgröße: `recall`, `mrr`, `answers_distribution`, `heatmap`, `scatter_retrieval_answer`, `catalogue_composition`, `chunk_lengths`, `cost` (`report_figures.FIGURE_NAMES`, Inhalte: [Evaluation](evaluation.md#visualisierungen)) |
 | `output/analysis.json` | alle Kennzahlen und Testergebnisse, sortierte Schlüssel, Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet |
 

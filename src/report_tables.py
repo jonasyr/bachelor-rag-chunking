@@ -34,6 +34,7 @@ TABLE_NAMES = [
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
 ]  # fmt: skip
 DASH = "--"
+MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
 CRITERION_LABELS = {
     "correctness": "Korrektheit",
     "completeness": "Vollständigkeit",
@@ -68,7 +69,7 @@ def fmt_de(x: float, decimals: int) -> str:
     text = f"{x:.{decimals}f}"
     if float(text) == 0:
         text = text.lstrip("-")
-    return text.replace(".", ",")
+    return text.replace(".", ",").replace("-", MINUS)
 
 
 def fmt_opt(x: float | None, decimals: int = REPORT_DECIMALS) -> str:
@@ -88,26 +89,44 @@ def latex_escape(text: str) -> str:
 
 
 def latex_table(
-    name: str, caption: str, header: list[str], rows: list[list[str]], align: str
+    name: str,
+    title: str,
+    header: list[str] | str,
+    rows: list[list[str] | str],
+    align: str,
+    note: str = "",
 ) -> str:
-    def line(cells: list[str]) -> str:
+    """A table after the IU rules (ZL S. 19): short title above (no final period), source line
+    below (`\\source` of iupaper), alignment from the class. Cells are escaped; a header or row
+    given as a string is raw LaTeX (group headings, `\\cmidrule`)."""
+
+    def line(cells: list[str] | str) -> str:
+        if isinstance(cells, str):
+            return cells
         return " & ".join(latex_escape(c) for c in cells) + r" \\"
 
-    body = [line(header), r"\midrule", *(line(r) for r in rows)]
+    source = "Eigene Darstellung." + (f" {latex_escape(note)}" if note else "")
     lines = [
         r"\begin{table}[htbp]",
-        r"\centering",
-        rf"\caption{{{latex_escape(caption)}}}",
+        rf"\caption{{{latex_escape(title)}}}",
         rf"\label{{tab:{name}}}",
         rf"\begin{{tabular}}{{{align}}}",
         r"\toprule",
-        body[0],
-        *body[1:],
+        line(header),
+        r"\midrule",
+        *(line(r) for r in rows),
         r"\bottomrule",
         r"\end{tabular}",
+        rf"\source{{{source}}}",
         r"\end{table}",
     ]
     return "\n".join(lines) + "\n"
+
+
+def _group(label: str, columns: int, first: bool) -> str:
+    """A group heading across the table (italic), with a little space above all but the first."""
+    space = "" if first else r"\addlinespace" + "\n"
+    return rf"{space}\multicolumn{{{columns}}}{{@{{}}l}}{{\textit{{{latex_escape(label)}}}}} \\"
 
 
 # ---------------------------------------------------------------- computation
@@ -322,7 +341,7 @@ def _breakdown(data, qids, awide, rwide, notes) -> dict:
 # ---------------------------------------------------------------- tables
 
 
-def _retrieval_table(results: dict, rule: str, name: str, caption: str) -> str:
+def _retrieval_table(results: dict, rule: str, name: str, title: str, note: str) -> str:
     block = results["retrieval"][rule]
     header = ["Strategie", *RETRIEVAL_METRICS.values()]
     rows = []
@@ -334,107 +353,131 @@ def _retrieval_table(results: dict, rule: str, name: str, caption: str) -> str:
                 for col in RETRIEVAL_METRICS
             ]
         )
-    return latex_table(name, caption, header, rows, "l" + "r" * len(RETRIEVAL_METRICS))
+    align = "l" + "r" * len(RETRIEVAL_METRICS)
+    return latex_table(name, title, header, rows, align, note)
 
 
 def _answers_table(results: dict) -> str:
+    """Criteria as rows, strategies as columns: five labels side by side do not fit the page."""
     means = results["answers"]["means"]
-    header = ["Strategie", *CRITERION_LABELS.values(), "Gesamtwert", "Gesamtwert (vier Kriterien)"]
+    strategies = list(means)
+    lines = [(CRITERION_LABELS[c], c) for c in RUBRIC_CRITERIA]
+    lines += [("Gesamtwert", "total_score"), ("Gesamtwert (vier Kriterien)", "total_four")]
     rows = []
-    for s, m in means.items():
-        rows.append(
-            [s]
-            + [fmt_opt(m.get(c)) for c in RUBRIC_CRITERIA]
-            + [fmt_opt(m["total_score"]) if s != "K0" else DASH, fmt_opt(m["total_four"])]
-        )
-    caption = (
-        "Antwortqualität je Strategie (Mittelwerte der Bewertung 0 bis 2). K0 ohne Retrieval wird "
-        "ohne Quellenbezug bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 "
-        "mit C1 bis C3 vergleichbar."
+    for label, key in lines:
+        cells = []
+        for s in strategies:
+            hidden = s == "K0" and key == "total_score"  # K0 has no groundedness score
+            cells.append(DASH if hidden else fmt_opt(means[s].get(key)))
+        rows.append([label, *cells])
+    note = (
+        "Mittelwerte der Bewertung von 0 bis 2. K0 ohne Retrieval wird ohne Quellenbezug "
+        "bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 mit C1 bis C3 "
+        "vergleichbar."
     )
-    return latex_table("answers", caption, header, rows, "l" + "r" * 7)
+    return latex_table(
+        "answers", "Antwortqualität je Kriterium und Strategie", ["Kriterium", *strategies],
+        rows, "l" + "r" * len(strategies), note,
+    )  # fmt: skip
 
 
 def _tests_table(results: dict) -> str:
-    header = ["Metrik", "Vergleich", "Statistik", "p", "p (Holm)", "Effekt", "Median-Differenz"]
-    rows: list[list[str]] = []
+    """One group per metric (its name as heading), so the metric needs no column of its own."""
+    header = ["Vergleich", "Statistik", "p", "p (Holm)", "Effekt", "Median-Differenz"]
+    columns = len(header)
+    rows: list[list[str] | str] = []
+
+    def group(label: str) -> None:
+        rows.append(_group(label, columns, not rows))
+
     for r in results["confirmatory"].values():
-        label = r["label"]
+        group(r["label"])
         if not r["testable"]:
-            rows.append([label, "Friedman", "nicht testbar", DASH, DASH, DASH, DASH])
+            rows.append(["Friedman", "nicht testbar", DASH, DASH, DASH, DASH])
             continue
         rows.append(
-            [label, "Friedman", fmt_de(r["statistic"], REPORT_DECIMALS), fmt_p(r["p"]),
+            ["Friedman", fmt_de(r["statistic"], REPORT_DECIMALS), fmt_p(r["p"]),
              fmt_p(r["p_adj"]), "W = " + fmt_de(r["kendalls_w"], REPORT_DECIMALS), DASH]
         )  # fmt: skip
         for pair, w in r.get("pairs", {}).items():
-            name = pair.replace("-", "--")
+            name = pair.replace("-", "–")
             if not w["testable"]:
-                rows.append([label, name, "nicht testbar", DASH, DASH, DASH, DASH])
+                rows.append([name, "nicht testbar", DASH, DASH, DASH, DASH])
                 continue
             rows.append(
-                [label, name, fmt_de(w["statistic"], REPORT_DECIMALS), fmt_p(w["p"]),
+                [name, fmt_de(w["statistic"], REPORT_DECIMALS), fmt_p(w["p"]),
                  fmt_p(w["p_adj"]), "r = " + fmt_de(w["r"], REPORT_DECIMALS),
                  fmt_de(w["median_diff"], REPORT_DECIMALS)]
             )  # fmt: skip
     desc = results["descriptive_effects"]
     for block in (desc[ANALYSIS_RULE], desc["answers"]):
         for e in block.values():
-            rows.append([e["label"], "Friedman", DASH, DASH, DASH, _w(e["kendalls_w"]), DASH])
+            group(f"{e['label']} (deskriptiv)")
+            rows.append(["Friedman", DASH, DASH, DASH, _w(e["kendalls_w"]), DASH])
             for pair, v in e["pairs"].items():
                 rows.append(
-                    [e["label"], pair.replace("-", "--"), DASH, DASH, DASH,
-                     "r = " + fmt_opt(v["r"]), fmt_opt(v["median_diff"])]
+                    [pair.replace("-", "–"), DASH, DASH, DASH, _r(v["r"]),
+                     fmt_opt(v["median_diff"])]
                 )  # fmt: skip
-    caption = (
-        "Tests und Effektstärken der Strategien C1 bis C3, explorativ (Signifikanzniveau "
-        f"{fmt_de(results['alpha'], 2)}). Friedman-Test je Hauptmetrik mit Holm-Korrektur über die "
-        "Hauptmetriken; paarweise Wilcoxon-Tests nur bei signifikantem Gesamttest, Holm-korrigiert "
-        "über alle Paare. Übrige Maße deskriptiv, ohne p-Werte; Effekt: Kendalls W bzw. r, "
-        "Median-Differenz jeweils erste minus zweite Strategie."
+    note = (
+        f"Explorativ, Signifikanzniveau {fmt_de(results['alpha'], 2)}. Friedman-Test je "
+        "Hauptmetrik mit Holm-Korrektur über die Hauptmetriken; paarweise Wilcoxon-Tests nur bei "
+        "signifikantem Gesamttest, Holm-korrigiert über alle Paare. Übrige Maße deskriptiv, ohne "
+        "p-Werte. Effekt: Kendalls W bzw. r; Median-Differenz jeweils erste minus zweite "
+        "Strategie."
     )
-    return latex_table("tests", caption, header, rows, "llrrrrr")
+    return latex_table(
+        "tests", "Tests und Effektstärken der Strategien C1 bis C3", header, rows, "lrrrrr", note
+    )
 
 
 def _w(w: float | None) -> str:
     return DASH if w is None else "W = " + fmt_de(w, REPORT_DECIMALS)
 
 
+def _r(r: float | None) -> str:
+    return DASH if r is None else "r = " + fmt_de(r, REPORT_DECIMALS)
+
+
 def _k0_table(results: dict) -> str:
-    header = ["Strategie", *(CRITERION_LABELS[c] for c in CONTROL_CRITERIA),
-              "Gesamtwert (vier Kriterien)", "r", "Median-Differenz"]  # fmt: skip
-    rows = []
-    for s, c in results["control_k0"].items():
-        rows.append(
-            [f"{s} -- K0"]
-            + [fmt_de(c["diff"][k], REPORT_DECIMALS) for k in CONTROL_CRITERIA]
-            + [fmt_de(c["diff"]["total_four"], REPORT_DECIMALS), fmt_opt(c["r"]),
-               fmt_opt(c["median_diff"])]
-        )  # fmt: skip
-    caption = (
-        "Mittlere Differenz der Antwortqualität zwischen C1 bis C3 und der Kontrolle K0 ohne "
-        "Retrieval (Strategie minus K0), je Kriterium und im Gesamtwert über die vier gemeinsamen "
-        "Kriterien; Effektstärke r und Median-Differenz des Gesamtwerts. K0 ist Kontrolle, "
+    """Measures as rows, one column per difference strategy minus K0."""
+    control = results["control_k0"]
+    strategies = list(control)
+    lines = [(CRITERION_LABELS[k], lambda c, k=k: fmt_de(c["diff"][k], REPORT_DECIMALS))
+             for k in CONTROL_CRITERIA]  # fmt: skip
+    lines += [
+        ("Gesamtwert (vier Kriterien)", lambda c: fmt_de(c["diff"]["total_four"], REPORT_DECIMALS)),
+        ("Effektstärke r (Gesamtwert)", lambda c: fmt_opt(c["r"])),
+        ("Median-Differenz (Gesamtwert)", lambda c: fmt_opt(c["median_diff"])),
+    ]
+    rows = [[label, *(cell(control[s]) for s in strategies)] for label, cell in lines]
+    note = (
+        "Mittlere Differenz der Bewertung (Strategie minus K0, Kontrolle ohne Retrieval), "
         "deskriptiv, ohne p-Werte."
     )
-    return latex_table("control_k0", caption, header, rows, "l" + "r" * 7)
+    header = ["Maß", *(f"{s} {MINUS} K0" for s in strategies)]
+    return latex_table(
+        "control_k0", "Antwortqualität im Vergleich mit der Kontrolle K0", header, rows,
+        "l" + "r" * len(strategies), note,
+    )  # fmt: skip
 
 
 def _correlation_table(results: dict) -> str:
-    header = ["Metrik", "Gruppe", "Spearman rho", "p", "n"]
-    rows = []
+    header = ["Gruppe", "Spearmans ρ", "p", "n"]
+    rows: list[list[str] | str] = []
     for col, per in results["correlation"].items():
+        rows.append(_group(ANALYSIS_PRIMARY[col], len(header), not rows))
         for group, c in per.items():
             label = "gesamt" if group == "pooled" else group
-            rows.append(
-                [ANALYSIS_PRIMARY[col], label, fmt_opt(c["rho"]), fmt_p(c.get("p")), str(c["n"])]
-            )
-    caption = (
-        "Rangkorrelation (Spearman, explorativ) zwischen dem Retrieval je Frage (R@5 bzw. MRR, "
-        "Hauptregel) und dem Gesamtwert der Antwort, je Strategie und über alle Strategien "
-        "(gesamt: jede Frage dreifach, daher ohne p-Wert)."
+            rows.append([label, fmt_opt(c["rho"]), fmt_p(c.get("p")), str(c["n"])])
+    note = (
+        "Explorativ. Retrieval je Frage (Hauptregel) gegen den Gesamtwert der Antwort, je "
+        "Strategie und über alle Strategien (gesamt: jede Frage dreifach, daher ohne p-Wert)."
     )
-    return latex_table("correlation", caption, header, rows, "llrrr")
+    return latex_table(
+        "correlation", "Rangkorrelation zwischen Retrieval- und Antwortqualität", header, rows,
+        "lrrr", note,
+    )  # fmt: skip
 
 
 def _efficiency_table(results: dict) -> str:
@@ -458,36 +501,47 @@ def _efficiency_table(results: dict) -> str:
     rows = [
         [label, *(fmt_opt(eff[s].get(key), dec) for s in strategies)] for label, key, dec in lines
     ]
-    caption = (
-        "Aufwand und Kosten je Strategie neben Antwortqualität und R@5, ohne zusammengefasste "
-        "Kennzahl. Indexgröße und Embedding einmalig; Generierung je Antwort; K1 nur Retrieval, "
-        "K0 nur Generierung."
+    note = (
+        "Ohne zusammengefasste Kennzahl. Indexgröße und Embedding einmalig, Generierung je "
+        "Antwort; K1 nur Retrieval, K0 nur Generierung."
     )
     return latex_table(
-        "efficiency", caption, ["Kennzahl", *strategies], rows, "l" + "r" * len(strategies)
-    )
+        "efficiency", "Aufwand und Kosten je Strategie", ["Kennzahl", *strategies], rows,
+        "l" + "r" * len(strategies), note,
+    )  # fmt: skip
 
 
 def _breakdown_table(results: dict) -> str:
-    header = ["Aufteilung", "Gruppe", "n"]
-    for s in STRATEGY_IDS:
-        header += [f"{s} Gesamtwert", f"{s} R@5"]
-    rows = []
+    """Groups (question type, construction class, verdict) as headings; per strategy the answer
+    total and R@5 under a shared column heading."""
+    n = len(STRATEGY_IDS)
+    columns = 2 + 2 * n
+    spans = " & ".join(rf"\multicolumn{{2}}{{c}}{{{s}}}" for s in STRATEGY_IDS)
+    rules = "".join(rf"\cmidrule(lr){{{3 + 2 * i}-{4 + 2 * i}}}" for i in range(n))
+    header = (
+        rf"& & {spans} \\" + "\n" + rules + "\n"
+        + " & ".join(["Gruppe", "n", *(["Antwort", "R@5"] * n)]) + r" \\"
+    )  # fmt: skip
+    rows: list[list[str] | str] = []
     for group, levels in results["breakdown"].items():
+        rows.append(_group(GROUPS[group], columns, not rows))
         for level, v in levels.items():
             shown = VERDICT_LABELS.get(level, level) if group == "verdict" else level
-            row = [GROUPS[group], shown, str(v["n"])]
+            row = [shown, str(v["n"])]
             for s in STRATEGY_IDS:
                 row += [
                     fmt_de(v["total_score"][s], REPORT_DECIMALS),
                     fmt_de(v["recall"][s], REPORT_DECIMALS),
                 ]
             rows.append(row)
-    caption = (
-        "Gesamtwert der Antwort und R@5 (Hauptregel) je Fragetyp, Konstruktionsklasse und "
-        "Closed-book-Urteil. Rein deskriptiv: pro Gruppe zu wenige Fragen für Tests."
+    note = (
+        "Antwort: Gesamtwert der Antwort; R@5 nach der Hauptregel. Rein deskriptiv: je Gruppe zu "
+        "wenige Fragen für Tests."
     )
-    return latex_table("breakdown", caption, header, rows, "llr" + "r" * (2 * len(STRATEGY_IDS)))
+    return latex_table(
+        "breakdown", "Antwortqualität und R@5 je Fragegruppe", header, rows,
+        "lr" + "r" * (2 * n), note,
+    )  # fmt: skip
 
 
 def write_tables(results: dict, out_dir: Path) -> list[Path]:
@@ -497,15 +551,15 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
             results,
             ANALYSIS_RULE,
             "retrieval",
-            "Retrieval-Qualität je Strategie (Mittelwerte über alle Fragen, Hauptregel der "
-            "Relevanz); K1 ist die Kontrolle mit gleich langen Fenstern.",
+            "Retrieval-Qualität je Strategie (Hauptregel der Relevanz)",
+            "Mittelwerte über alle Fragen; K1 ist die Kontrolle mit gleich langen Fenstern.",
         ),
         "retrieval_sensitivity.tex": lambda: _retrieval_table(
             results,
             "sensitivity",
             "retrieval_sensitivity",
-            "Retrieval-Qualität je Strategie nach der Sensitivitätsregel der Relevanz "
-            "(Mittelwerte über alle Fragen).",
+            "Retrieval-Qualität je Strategie (Sensitivitätsregel der Relevanz)",
+            "Mittelwerte über alle Fragen.",
         ),
         "answers.tex": lambda: _answers_table(results),
         "tests.tex": lambda: _tests_table(results),
