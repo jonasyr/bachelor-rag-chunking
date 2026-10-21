@@ -106,3 +106,5 @@ Einfrieren vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.
   [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026)).
 - 20.10.2026: Auswertungsskripte (`analyse.py`): Testplan, Tabellen und Abbildungen
   ([ADR 0044](adr/0044-statistische-auswertung.md)).
+- 21.10.2026: Backlog angelegt; Ground-Truth-Prüfung weist doppelte `relevant_doc_ids` ab
+  ([Datenformate](reference/data-formats.md)).
