@@ -61,13 +61,11 @@ Offene Arbeit nach Priorität (Punkt 1 ist die Katalogzeile des Zeitplans); erle
    Closed-Book-Prüfung; Einfrieren bis 06.11. ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
 2. **Übungsbewertung Pilot**: Jonas bewertet die 9 Antworten in `data/pilot/e2e_jonas/`; danach Vergleich mit der
    Agentenbewertung im [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026).
-3. **Zwei kleine Code-Korrekturen**: die `noqa: F811`-Ausnahmen in den Tests begründen (wie bei F401: „(fixture)“); doppelte
-   Einträge in `relevant_doc_ids` beim Katalog-Check abweisen.
-4. **Zweitbewertung**: Vorschlag für die Einrichtung (wer, welche Stichprobe, Übereinstimmungsmaß), siehe
+3. **Zweitbewertung**: Vorschlag für die Einrichtung (wer, welche Stichprobe, Übereinstimmungsmaß), siehe
    [Offene Entscheidungen](#offene-entscheidungen).
-5. **RAGAS**: entscheiden, ob der optionale Abgleich läuft, nach der regelbasierten Bewertung
+4. **RAGAS**: entscheiden, ob der optionale Abgleich läuft, nach der regelbasierten Bewertung
    ([Evaluation](reference/evaluation.md#triangulation-optional)).
-6. **Demo-Dashboard** (niedrige Priorität): Ergebnisse interaktiv zeigen, nur falls Zeit bleibt.
+5. **Demo-Dashboard** (niedrige Priorität): Ergebnisse interaktiv zeigen, nur falls Zeit bleibt.
 
 ## Offene Entscheidungen
 

@@ -116,7 +116,11 @@ def relevant_sections(
         unknown = [sid for sid in ids if sid not in by_id]
         if unknown:
             raise ValueError(f"{qid}: unknown section IDs {unknown}")
-        listed = set(split_ids(truth[qid]["relevant_doc_ids"]))
+        docs = split_ids(truth[qid]["relevant_doc_ids"])
+        repeated = sorted({did for did in docs if docs.count(did) > 1})
+        if repeated:
+            raise ValueError(f"{qid}: duplicate document IDs {repeated}")
+        listed = set(docs)
         outside = sorted(listed - corpus_docs)
         if outside:
             raise ValueError(f"{qid}: relevant_doc_ids {outside} not in the corpus")
