@@ -1,6 +1,6 @@
 # Literaturbasis
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 21.10.2026. Übersicht: [Dokumentation](../README.md).
 
 
 Die 15 Quellen der ersten Tabelle ([ADR 0018](../adr/0018-literaturbasis.md)) sind im Exposé zitiert; nur ihre BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. Die Webquellen der folgenden Abschnitte sind dort noch nicht enthalten. Zitierstil: APA 7 / biblatex / biber ([ADR 0002](../adr/0002-zitierstil-apa.md)).
@@ -67,3 +67,17 @@ SHA-256 je Datei: `docs/corpus_snapshot.txt`; Umfang und Lizenz: [Korpus](corpus
 | Kurzname | Quelle (APA 7) | Belegt |
 |----------|----------------|--------|
 | `testerarmy2026e2e` | TesterArmy, Inc. (2026). *e2e* (Commit ef977f4856da009cac26d78d2e9bb14e5991ee41, 17.10.2026) [Software und Dokumentation, Apache-2.0]. GitHub. https://github.com/tester-army/e2e/tree/ef977f4856da009cac26d78d2e9bb14e5991ee41/docs | Korpus des Experiments: Dokumentation unter `docs/` auf dem festen Commit (`config.CORPUS_COMMIT`) |
+
+## Methodenquellen der Bewertung
+
+Grundlage von [ADR 0046](../adr/0046-zweitbewertung.md) (Übereinstimmungsmaße der Zweitbewertung) und
+[ADR 0047](../adr/0047-ragas-als-triangulation.md) (Richtermodell für RAGAS); geprüft am 21.10.2026. Für die Arbeit in
+die BibTeX-Datei (PaperLab) übernehmen; RAGAS selbst steht schon oben (`es2024ragas`).
+
+| Kurzname | Quelle (APA 7) | Belegt |
+|----------|----------------|--------|
+| `feinstein1990kappa` | Feinstein, A. R., & Cicchetti, D. V. (1990). High agreement but low kappa: I. The problems of two paradoxes. *Journal of Clinical Epidemiology, 43*(6), 543–549. | Kappa-Paradox bei hoher Prävalenz: darum kein Cohens Kappa |
+| `gwet2008ac1` | Gwet, K. L. (2008). Computing inter-rater reliability and its variance in the presence of high agreement. *British Journal of Mathematical and Statistical Psychology, 61*(1), 29–48. https://doi.org/10.1348/000711006X126600 | AC1, stabil bei hoher Übereinstimmung |
+| `gwet2014handbook` | Gwet, K. L. (2014). *Handbook of inter-rater reliability* (4. Aufl.). Advanced Analytics. | AC2 mit Gewichten für ordinale Skalen |
+| `hayes2007alpha` | Hayes, A. F., & Krippendorff, K. (2007). Answering the call for a standard reliability measure for coding data. *Communication Methods and Measures, 1*(1), 77–89. | Krippendorffs α (ordinal) als Vergleichsmaß |
+| `zheng2023judge` | Zheng, L., Chiang, W.-L., Sheng, Y., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. *Advances in Neural Information Processing Systems 36* (Datasets and Benchmarks Track). | Selbstbevorzugung des Richtermodells; LLM-Gegenprobe nur als Triangulation |

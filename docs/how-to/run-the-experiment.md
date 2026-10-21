@@ -90,7 +90,7 @@ ist im [Experiment-Protokoll](../reference/experiment-record.md#probelauf-hauptl
    Werte folgen aus den Regeln ([Evaluation](../reference/evaluation.md#regelbasierte-bewertung); `notes` frei, z. B.
    wenn eine Regel nicht passt). Von Hand eingetragene Werte nimmt `summarise` bei einem neuen Scaffold nicht an
    ([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)); das Lesepaket `data/evaluation/scoring_packet.md`
-   ist nur Lesekopie. Zweitbewertung: siehe [Evaluation](../reference/evaluation.md#zweitbewertung-empfohlen);
+   ist nur Lesekopie. Zweitbewertung: siehe [Evaluation](../reference/evaluation.md#zweitbewertung);
    `scoring_key.csv` nie öffnen; zum Schluss `uv run python src/evaluate_answers.py --mode summarise` (schreibt `scores.csv`).
    Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
    Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.

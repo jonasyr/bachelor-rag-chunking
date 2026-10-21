@@ -127,13 +127,16 @@ Die Bewertung von C1–C3 sieht die Strategie nicht; die drei Antworten einer Fr
 gemischter Reihenfolge (`config.SCORING_SEED`), die Zuordnung liegt in einem Schlüssel, den erst die Auswertung liest
 ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); Dateien: [Datenformate](data-formats.md)).
 
-## Triangulation (optional)
+## Triangulation
 
 Grundlage der Antwort-Evaluation ist die regelbasierte, referenzbasierte Bewertung oben
-([ADR 0007](../adr/0007-triangulation.md)). Ein automatisiertes Framework (RAGAS, in `pyproject.toml` deklariert)
-kommt optional hinzu, und erst nachdem die regelbasierte Bewertung abgeschlossen ist
-([ADR 0015](../adr/0015-tech-stack.md), [Plan](../plan.md)); Code dafür gibt es noch nicht. Wird es eingesetzt, ist es
-nie alleinige Grundlage, und seine Übereinstimmung mit der regelbasierten Bewertung wird berichtet. Begründung:
+([ADR 0007](../adr/0007-triangulation.md)). RAGAS kommt als feste zweite, automatische Sicht hinzu
+([ADR 0047](../adr/0047-ragas-als-triangulation.md)): Faithfulness, Response Relevancy, Context Precision und Context
+Recall (mit Referenz) auf allen 144 Antworten C1–C3, Richtermodell `gpt-6-sol` (nicht das Antwortmodell), erst nach
+`summarise`, einmal ausgeführt und gespeichert. Es ist nie alleinige Grundlage und fließt nie zurück; berichtet werden
+Mittel je Strategie und die Übereinstimmung (Spearmans ρ) mit dem Gegenstück: Faithfulness mit Quellenbezug und
+Halluzinationsfreiheit, Response Relevancy mit `answers_question`, Context Precision und Recall mit P@5 und R@5. Code
+dafür gibt es noch nicht. Begründung:
 [Forschungsdesign](../explanation/research-design.md#warum-die-evaluation-so-angelegt-ist).
 
 ## Effizienz/Kosten (abhängige Variable)
@@ -155,15 +158,18 @@ Umgesetzt: Die Kosten stehen neben den Qualitätswerten (Tabelle `efficiency.tex
 und Embedding getrennt), ohne Verhältniszahl ([ADR 0008](../adr/0008-kosten-als-variable.md),
 [ADR 0044](../adr/0044-statistische-auswertung.md)).
 
-## Zweitbewertung (empfohlen)
+## Zweitbewertung
 
 Mit denselben Prüffragen in der App, ohne Schlüssel ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
 [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)): eine Kopie des Sets als Ordner unter `data/pilot/`
 (z. B. `data/pilot/zweitbewertung`) mit `scoring_items.jsonl`, `key_points.csv` (die eingefrorenen Kernpunkte),
 `runs.jsonl` (mit dem `scaffold`- und `key_points`-Eintrag) und leerem `scoring_sheet.csv`, ohne `scoring_key.csv` und
-ohne `scoring_checks.csv`; die zweite Person bewertet dort 10–20 % der Antworten unabhängig. Einfache Übereinstimmung
-je Prüffrage und je Kriterium = gleiche Antworten / alle Antworten, oder durchschnittliche absolute Abweichung bei der
-0–2-Skala. Cohen's Kappa optional.
+ohne `scoring_checks.csv`; die zweite Person bewertet dort 12 Fragen × C1–C3 (36 Antworten) unabhängig, gezogen mit
+festem Seed vor der eigenen Bewertung ([ADR 0046](../adr/0046-zweitbewertung.md)). Übereinstimmung je Prüffrage und je
+Kriterium: einfache Übereinstimmung, Gwets AC1 (Prüffragen) bzw. AC2 (Kriterien 0–2, ordinal gewichtet) und
+Krippendorffs α (ordinal), jeweils mit Bootstrap-Konfidenzintervall. Kein Cohens Kappa: bei fast nur 2en ist es
+irreführend niedrig. Ohne zweite Person ersatzweise Intra-Rater und ein Sprachmodell als Gegenprobe (ADR 0046).
+Ziehung und Rechnung sind noch umzusetzen.
 
 ## Statistische Auswertung
 

@@ -24,10 +24,10 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | Datenanalyse | Pandas |
 | Diagramme | Matplotlib (PDF-Abbildungen der Auswertung, `src/report_figures.py`); Plotly deklariert, ungenutzt |
 | App/Dashboard | Streamlit (`app/catalogue_editor.py` mit den Seiten Catalogue und Scoring; später `app/streamlit_app.py`) |
-| Evaluation | eigene Skripte (regelbasierte Bewertung, [ADR 0035](../adr/0035-regelbasierte-bewertung.md)); RAGAS optional, nur nach der regelbasierten Bewertung |
+| Evaluation | eigene Skripte (regelbasierte Bewertung, [ADR 0035](../adr/0035-regelbasierte-bewertung.md)); RAGAS als feste Triangulation nach der regelbasierten Bewertung ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) |
 
-Pandas, Matplotlib und SciPy tragen die Auswertung (`src/analyse.py`); Plotly und RAGAS sind deklariert, aber nicht
-genutzt; Streamlit läuft für den Editor und die Bewertungsseite.
+Pandas, Matplotlib und SciPy tragen die Auswertung (`src/analyse.py`); Plotly und RAGAS sind deklariert, aber noch nicht
+genutzt (RAGAS-Code folgt, ADR 0047); Streamlit läuft für den Editor und die Bewertungsseite.
 
 `OPENAI_API_KEY` (aus der Umgebung oder `.env`) wird nur gelesen, wenn ein Schritt die API aufruft:
 `src/embedding_client.py` für `embed.py` und `retrieve.py` (bei neuen Fragevektoren, auch über
@@ -86,7 +86,7 @@ bachelor-rag-chunking/
     ├── README.md                            (Index der Dokumentation)
     ├── plan.md                              (Zeitplan, Stand, offene Entscheidungen)
     ├── explanation/  how-to/  reference/    (Diátaxis; reference/configuration.md = config.py)
-    ├── adr/                                 (Entscheidungen 0001–0045)
+    ├── adr/                                 (Entscheidungen 0001–0047)
     ├── superpowers/specs/  superpowers/plans/   (datierte Entwürfe und Umsetzungspläne; Momentaufnahmen)
     ├── corpus_snapshot.txt                  (Snapshot-Datensatz)
     └── corpus_manifest.csv                  (Korpusmanifest)

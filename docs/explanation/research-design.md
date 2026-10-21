@@ -222,9 +222,10 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   Kernpunkte werden aus der Referenzantwort vorbefüllt und von Jonas bestätigt
   ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)).
 - **Triangulation:** Die manuelle, referenzbasierte Bewertung ist primär, weil sie auf der eigenen Ground Truth beruht
-  und nicht zirkulär ist. Ein automatisiertes Framework (RAGAS) ist optional und kommt erst nach der regelbasierten
-  Bewertung; läuft es, ist die Übereinstimmung beider selbst ein Befund, und es ist nie alleinige Grundlage
-  ([ADR 0007](../adr/0007-triangulation.md)).
+  und nicht zirkulär ist. RAGAS kommt als feste zweite Sicht erst nach der regelbasierten
+  Bewertung, mit einem anderen Richtermodell als dem Antwortmodell; die Übereinstimmung beider ist selbst ein Befund,
+  und RAGAS ist nie alleinige Grundlage ([ADR 0007](../adr/0007-triangulation.md),
+  [ADR 0047](../adr/0047-ragas-als-triangulation.md)).
 - **Kosten:** Strategien unterscheiden sich im Aufwand; Qualität wird deshalb den Kosten gegenübergestellt
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
@@ -277,7 +278,7 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
   eingefrorenen Kernpunkten, blind bewertet ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
   [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md),
   [0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md));
-  eine Zweitbewertung wird empfohlen ([Evaluation](../reference/evaluation.md#zweitbewertung-empfohlen)).
+  eine zweite Person bewertet 36 Antworten blind ([ADR 0046](../adr/0046-zweitbewertung.md), [Evaluation](../reference/evaluation.md#zweitbewertung)).
 - **Kontrollen:** Das Closed-Book-Urteil fällt Jonas über Antworten auf seine eigenen Fragen, nicht blind
   ([ADR 0040](../adr/0040-closed-book-pruefung.md)); K0 wird nicht blind bewertet, und der Quellenbezug fehlt im
   Vergleich ([ADR 0041](../adr/0041-kontrolle-k0.md)). Die Diagnose für die Korpuswahl stammt von Agenten und beruht
