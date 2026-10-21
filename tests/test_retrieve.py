@@ -286,6 +286,7 @@ def test_a_ground_truth_row_with_an_extra_field_is_refused(setup):
         ('"D002;D003"', '""', "Q001: empty relevant_doc_ids"),
         ('"D002;D003"', '"D002;D003;D009"', r"Q001: relevant_doc_ids \['D009'\] not in the corpus"),
         ('"D002;D003"', '"D002"', "Q001: relevant_doc_ids must be exactly the documents"),
+        ('"D002;D003"', '"D002;D003;D002"', r"Q001: duplicate document IDs \['D002'\]"),
     ],
 )
 def test_incomplete_or_inconsistent_ground_truth_is_refused(setup, old, new, message):

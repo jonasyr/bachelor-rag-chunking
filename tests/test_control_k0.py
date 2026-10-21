@@ -25,7 +25,7 @@ from run_log import sha256_of
 
 
 @pytest.fixture
-def k0(files, tmp_path):  # noqa: F811
+def k0(files, tmp_path):  # noqa: F811 (fixture)
     """The files of a K0 set on top of the C1-C3 fixture: answers, a generation record over both
     answer files, frozen key points and a summarised C1-C3 (scores.csv)."""
     control = write_csv(
