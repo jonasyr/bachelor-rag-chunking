@@ -13,7 +13,7 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 Für den e2e-Korpus sind Schritt 1–3 (Snapshot, Chunks, Embeddings) erledigt und werden nicht wiederholt; der Hauptlauf
 beginnt mit dem eingefrorenen Katalog ([Fragenkatalog erstellen](build-the-question-catalogue.md), Schritt 6). Nach
 jedem Block die versionierten Dateien committen ([Datenformate](../reference/data-formats.md#versioniert-und-ignoriert));
-Retrieval-Ergebnisse und Fragevektoren sind ignoriert und bleiben nur lokal.
+auch Fragevektoren und Retrieval-Ergebnisse ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)).
 
 ```bash
 # 0. Katalog eingefroren: der Freeze-Commit existiert (retrieve.py und generate.py prüfen den Datensatz vor jedem
@@ -23,6 +23,9 @@ git log -1 --oneline -- data/evaluation/catalogue_freeze.json
 # 1. Retrieval C1–C3 und K1 (Fragevektoren: ein API-Aufruf, danach aus data/evaluation/query_embeddings.npz)
 uv run python src/retrieve.py
 uv run python src/retrieve.py --control
+git add data/evaluation/query_embeddings.npz data/evaluation/retrieved_results.csv \
+  data/evaluation/retrieved_results_control.csv
+git commit -m "chore(data): Retrieval des Hauptlaufs"
 
 # 2. Antworten C1–C3 und K0, genau einmal (überschreibt nie), sofort committen
 uv run python src/generate.py
@@ -36,7 +39,8 @@ uv run python src/evaluate_retrieval.py --control
 uv run python src/evaluate_answers.py --mode scaffold
 #    App, Seite „Scoring“: Kernpunkte prüfen und einfrieren, dann jede Antwort blind bewerten (Schritt 6 unten)
 uv run python src/evaluate_answers.py --mode summarise
-git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_key.csv data/evaluation/key_points.csv \
+git add data/evaluation/retrieval_scores.csv data/evaluation/retrieval_scores_control.csv \
+  data/evaluation/scoring_sheet.csv data/evaluation/scoring_key.csv data/evaluation/key_points.csv \
   data/evaluation/scoring_checks.csv data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): Bewertung C1–C3"
 

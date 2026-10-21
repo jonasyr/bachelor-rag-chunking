@@ -18,3 +18,4 @@ artefacts and run logs: `docs/reference/data-formats.md`; corpus rules: `docs/re
 - A corpus change renumbers doc IDs: remap annotations with `scripts/remap_pilot.py`, never by hand.
 - `pre-commit run --all-files` skips untracked files: `git add` new files first.
 - Analysis: src/analyse.py (ADR 0044) reads only result files with current run records; pilot sets via --set write DIR/output/; figures follow PaperLab rules, paperlab check validates them.
+- Main-run order and commit points: `docs/how-to/run-the-experiment.md#hauptlauf-auf-einen-blick`; main-run query vectors and retrieval results are versioned (ADR 0045), pilot vectors are not.

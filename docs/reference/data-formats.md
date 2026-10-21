@@ -434,7 +434,8 @@ Ergebnisse der Proben: [Experiment-Protokoll](experiment-record.md#pilotproben-a
 
 Einzige vollständige Liste der Datenartefakte nach `.gitignore`; alles, was hier nicht als ignoriert steht, ist
 versioniert, sobald es existiert. Ignoriert sind Dateien, die sich aus versionierten Daten neu erzeugen lassen;
-versioniert sind Primärdaten, die kein Lauf exakt wiederholt (Antworten, [ADR 0033](../adr/0033-antwortmodell.md)),
+versioniert sind Primärdaten, die kein Lauf exakt wiederholt (Antworten, [ADR 0033](../adr/0033-antwortmodell.md);
+Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs, [ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)),
 und alles, was Jonas schreibt oder entscheidet.
 
 | Pfad | Inhalt | Status |
@@ -447,7 +448,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `chroma_db/` (auch `*.chroma`) | Chroma-Index; entsteht beim ersten `embed.py` | ignoriert (ganzer Ordner, kein `.gitkeep`) |
 | `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | versioniert |
 | `data/evaluation/archive_vue/catalogue_plan.csv` | unbenutzter Vue-Plan ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) | versioniert |
-| `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse | ignoriert |
+| `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs | versioniert ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) |
 | `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | versioniert |
 | `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | versioniert |
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | versioniert |

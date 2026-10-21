@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0044 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0045 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -57,3 +57,4 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0042](0042-mdx-umwandlung.md) | MDX-Umwandlung: eigene Anker, Agent-Prompts und Video-Karten bleiben | Angenommen |
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen |
 | [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0009, 0012, 0013 |
+| [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen |
