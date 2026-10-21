@@ -26,14 +26,30 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | App/Dashboard | Streamlit (`app/catalogue_editor.py` mit den Seiten Catalogue und Scoring; später `app/streamlit_app.py`) |
 | Evaluation | eigene Skripte (regelbasierte Bewertung, [ADR 0035](../adr/0035-regelbasierte-bewertung.md)); RAGAS als feste Triangulation nach der regelbasierten Bewertung ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) |
 
-Pandas, Matplotlib und SciPy tragen die Auswertung (`src/analyse.py`); Plotly und RAGAS sind deklariert, aber noch nicht
-genutzt (RAGAS-Code folgt, ADR 0047); Streamlit läuft für den Editor und die Bewertungsseite.
+Pandas, Matplotlib und SciPy tragen die Auswertung (`src/analyse.py`); Plotly ist deklariert, aber noch nicht genutzt;
+RAGAS läuft in `src/ragas_eval.py` ([Pins](#ragas-pins)); Streamlit läuft für den Editor und die Bewertungsseite.
 
 `OPENAI_API_KEY` (aus der Umgebung oder `.env`) wird nur gelesen, wenn ein Schritt die API aufruft:
 `src/embedding_client.py` für `embed.py` und `retrieve.py` (bei neuen Fragevektoren, auch über
 `scripts/difficulty_probe.py`), `src/llm_client.py` für `generate.py` und `catalogue.py screen`, außerdem
 `scripts/corpus_probe/run_probes.py` und `question_probe.py answer` (auch über `probe_corpus.sh`). Tests und die übrigen
 Schritte brauchen keinen Schlüssel; fehlt er bei einem API-Aufruf, bricht der Schritt mit einer Meldung ab.
+`src/ragas_client.py` liest ihn für `ragas_eval.py`.
+
+Telemetrie: Chroma bleibt abgeschaltet ([ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md)). RAGAS sendet
+sonst bei jedem Aufruf Nutzungsdaten an einen Server; `ragas_client.py` setzt deshalb vor dem ersten RAGAS-Import
+`RAGAS_DO_NOT_TRACK` (aus `config.RAGAS_DO_NOT_TRACK`, `true`). Das unterbindet nur das Senden: RAGAS 0.4.3 legt
+trotzdem eine zufällige Kennung unter `~/.local/share/ragas/uuid.json` an (keine personenbezogenen Daten, kein Netz). Tests dürfen kein Netz außer dem
+`tiktoken`-Download erreichen ([AGENTS.md](../../AGENTS.md)).
+
+### RAGAS-Pins
+
+`ragas` 0.4.3 und `langchain-community` 0.4.1 sind in `pyproject.toml` exakt gepinnt. `ragas` bestimmt Prompts,
+Rechenweg und die NaN-Fälle der Metriken (die Begründungen in `config.RAGAS_NAN_REASONS` nennen Stellen im Code dieser
+Version), und `JudgeLLM` in `src/ragas_client.py` hängt an einer internen Methode; ein anderer Stand ändert die Werte
+oder bricht den Aufbau (ein Test prüft die Bindung an die Version). `langchain-community` 0.4.2 hat ein Modul
+entfernt, das `ragas` 0.4.3 noch importiert. Verfahren und Begründung der Einstellungen:
+[Evaluation](evaluation.md#triangulation).
 
 ## Repository-Struktur
 
@@ -100,7 +116,7 @@ welche ignoriert sind: [Versioniert und ignoriert](data-formats.md#versioniert-u
 Alle Schritte laufen aus der Repo-Wurzel (`uv run python src/<schritt>.py` bzw. `scripts/<skript>.py`); Reihenfolge:
 `README.md`. Stand der Umsetzung: [Plan](../plan.md#stand). `--help` zeigt die Optionen nur bei den Skripten mit
 argparse (`chunking.py`, `embed.py`, `retrieve.py`, `catalogue.py`, `generate.py`, `evaluate_retrieval.py`,
-`evaluate_answers.py`, `analyse.py`). `snapshot.py`, `ingest.py` und `preprocess.py` lesen keine Argumente: auch mit `--help`
+`evaluate_answers.py`, `ragas_eval.py`, `analyse.py`). `snapshot.py`, `ingest.py` und `preprocess.py` lesen keine Argumente: auch mit `--help`
 führen sie den Schritt aus, und `snapshot.py` klont das Korpus-Repository und ersetzt den Inhalt von
 `data/raw/e2e_docs_snapshot/`.
 
@@ -114,6 +130,7 @@ führen sie den Schritt aus, und `snapshot.py` klont das Korpus-Repository und e
 | `generate.py` | ohne Option alle Strategien C1–C3 und im selben Lauf die Kontrolle K0 ohne Retrieval (`generated_answers_control.csv`, [ADR 0041](../adr/0041-kontrolle-k0.md); K1 bekommt keine Antworten, [ADR 0026](../adr/0026-c3-vergleichbarkeit.md)); `--set DIR` ein Pilot-Set (z. B. `data/pilot/hard`); braucht `OPENAI_API_KEY`; überschreibt nie eine vorhandene `generated_answers.csv` oder `generated_answers_control.csv`, bricht vor dem ersten API-Aufruf ab, wenn die Ergebnisdatei nicht aus dem letzten Retrieval-Lauf über die aktuellen Fragen und Chunk-Dateien stammt, und ohne Schreiben bei abgeschnittener oder leerer Antwort, wechselndem Modell oder Fingerabdruck oder geänderter Erstellzeit des Modells hinter dem Alias; auf dem Hauptkatalog ohne passenden Freeze-Datensatz ([ADR 0033](../adr/0033-antwortmodell.md), [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) |
 | `evaluate_retrieval.py` | `--control` die Kontrolle K1; `--set DIR` ein Pilot-Set (Dateien und `runs.jsonl` im Set-Ordner); trägt einen Eintrag `evaluate_retrieval` ins Laufprotokoll ein ([Datenformate](data-formats.md#laufprotokoll)); k ist immer `config.TOP_K` ([ADR 0014](../adr/0014-temperatur-und-topk.md)); schreibt `retrieval_scores*.csv` und gibt die Mittel je Strategie, Fragetyp und Konstruktionsklasse für Haupt- und Sensitivitätsregel aus; bricht auf dem Hauptkatalog ohne passenden Freeze-Datensatz ab und wenn `is_relevant` nicht zur Ground Truth passt |
 | `evaluate_answers.py` | `--mode scaffold\|summarise` (Pflicht): `scaffold` schreibt aus `generated_answers.csv` Lesepaket, Bewertungsbogen, Schlüssel und Einträge der Bewertungsseite (`scoring_items.jsonl`, [ADR 0034](../adr/0034-bewertung-in-der-app.md)) der blinden Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md); nie über einen vorhandenen Bogen oder Schlüssel; nur, wenn Antworten und Chunk-Dateien die des letzten Generierungslaufs sind, [ADR 0033](../adr/0033-antwortmodell.md)); beide nur mit eingefrorenem Hauptkatalog ([ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md)) und nur, wenn jede Frage des Katalogs genau eine Zeile je Strategie C1–C3 hat; `summarise` prüft den Bogen gegen den Schlüssel und jede Bewertung (ganze Zahl 0–2), prüft mit `scoring_checks.csv` die eingefrorenen Kernpunkte und jede Bogenzeile gegen die aktuellen Regeln ([ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)), schreibt `scores.csv` mit `total_score` und gibt Mittel, Median und Standardabweichung je Strategie, Fragetyp und Konstruktionsklasse aus; `--set DIR` ein Pilot-Set (Dateien im Set-Ordner, Antworten aus `generate.py --set`), `--limit N` nur mit `--set`: die ersten N Fragen nach ID (in beiden Modi gleich angeben; der Hauptkatalog wird immer vollständig bewertet); `--control` dieselben Modi für die Kontrolle K0 (`src/control_k0.py`, [ADR 0041](../adr/0041-kontrolle-k0.md)): `scaffold` erst, wenn `scores.csv` existiert, für deren Fragen; `summarise` schreibt `scores_control.csv` und vergleicht K0 mit C1–C3 über `config.CONTROL_CRITERIA`, auch nach Closed-Book-Urteil; nicht mit `--limit` |
+| `ragas_eval.py` | ohne Option die Antworten C1–C3 des Hauptkatalogs nach `data/evaluation/ragas_scores.csv` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)); `--set DIR` ein Pilot-Set (Dateien und `runs.jsonl` im Set-Ordner); `--repeat` (nur mit Pilot-Set) ein zweiter Lauf nach `ragas_scores_repeat.csv`, setzt den passenden `ragas`-Eintrag voraus; braucht `OPENAI_API_KEY`; überschreibt nie, bricht vor dem ersten API-Aufruf ab, wenn der Katalog nicht eingefroren ist, `generated_answers.csv` nicht aus dem letzten `generate`-Lauf stammt oder (Hauptkatalog) der `summarise`-Eintrag fehlt, und ohne Schreiben bei ungültigem Wert, Fehler des Richters oder wechselndem Modell, Fingerabdruck oder Erstellzeit; Formate: [Datenformate](data-formats.md#ergebnisse), Verfahren: [Evaluation](evaluation.md#triangulation) |
 | `analyse.py` | ohne Option die Auswertung des Hauptkatalogs nach `output/` (nur bei eingefrorenem Katalog und aktuellen Laufeinträgen von `evaluate_retrieval`, `summarise`, `summarise_control`); `--set DIR` ein Pilot-Set, schreibt nach `DIR/output/` (fehlt einem Pilot ein Laufeintrag, mit Hinweis); gibt die Hinweise zu entfallenen Teilen aus; Verfahren: [Evaluation](evaluation.md#statistische-auswertung), [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `scripts/difficulty_probe.py` | für das Set `data/pilot/e2e`; die Vue-Sets laufen nur gegen einen wiederhergestellten Vue-Korpus: `[SET_DIR]`: Pilot-Set, relativ zur Repo-Wurzel (Standard `config.PILOT_DIR` = `data/pilot`); läuft C1–C3 und K1, schreibt die Ergebnisdateien des Sets; Sets: [Datenformate](data-formats.md#pilot-sets) |
 | `scripts/remap_pilot.py` | einmalig, historisch (Korpuswechsel innerhalb von Vue.js; gilt nicht für e2e): `OLD_DIR PILOT_DIR [PILOT_DIR …]` (Pfade relativ zum Arbeitsverzeichnis, also der Repo-Wurzel); bildet die Pilot-Ground-Truth über Pfad und Anker auf neue IDs ab und überschreibt sie ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md)) |

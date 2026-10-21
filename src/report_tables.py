@@ -22,6 +22,7 @@ from config import (
     BYTES_PER_MB,
     CONTROL_CRITERIA,
     JSON_DECIMALS,
+    RAGAS_METRICS,
     REPORT_COST_DECIMALS,
     REPORT_DECIMALS,
     REPORT_P_DECIMALS,
@@ -32,6 +33,7 @@ from config import (
 TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
+    "ragas.tex", "ragas_agreement.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -49,6 +51,28 @@ RETRIEVAL_METRICS = {  # column -> label
     "recall": "R@5",
     "context_tokens": "Kontext@5",
 }
+RAGAS_LABELS = {
+    "faithfulness": "Faithfulness",
+    "response_relevancy": "Response Relevancy",
+    "context_precision": "Context Precision",
+    "context_recall": "Context Recall",
+}
+# agreement pairs: (RAGAS metric, other measure, source of the other measure)
+RAGAS_PAIRS = [
+    ("faithfulness", "groundedness", "scores"),
+    ("faithfulness", "no_hallucination", "scores"),
+    ("response_relevancy", "answers_question", "checks"),
+    ("context_precision", "precision", "retrieval"),
+    ("context_recall", "recall", "retrieval"),
+]
+RAGAS_PAIR_LABELS = {
+    "groundedness": "Quellenbezug",
+    "no_hallucination": "Halluzinationsfreiheit",
+    "answers_question": "Frage beantwortet",
+    "precision": "P@5",
+    "recall": "R@5",
+}
+NOT_DETERMINABLE = "nicht bestimmbar"
 RETRIEVAL_STRATEGIES = [*STRATEGY_IDS, "K1"]
 VERDICT_LABELS = {
     "dependent": "abhängig (miss)",
@@ -272,10 +296,121 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
         correlation[col] = per
     results["correlation"] = correlation
 
+    results["ragas"] = _ragas_block(data, qids)
+    results["ragas_agreement"] = _ragas_agreement(data, qids, notes)
+    if results["ragas"] is not None and data.ragas_repeat is not None:
+        results["ragas_stability"] = _ragas_stability(data, qids)
     results["efficiency"] = _efficiency(data, main_means, answer_means, notes)
     results["breakdown"] = _breakdown(data, qids, awide, primary["recall"], notes)
     results["notes"] = notes
     return _plain(results)
+
+
+def _ragas_values(frame: pd.DataFrame, qids: list[str]) -> dict:
+    """metric -> strategy -> question -> value; an empty cell (metric-defined NaN) is None."""
+    out: dict = {m: {s: {} for s in STRATEGY_IDS} for m in RAGAS_METRICS}
+    for m in RAGAS_METRICS:
+        numbers = pd.to_numeric(frame[m], errors="coerce")
+        for q, s, v in zip(frame["question_id"], frame["strategy"], numbers, strict=True):
+            out[m][s][q] = None if math.isnan(v) else float(v)
+    return out
+
+
+def _ragas_block(data: AnalysisData, qids: list[str]) -> dict | None:
+    """Means over the questions with a value, NaN counts, and descriptive effect sizes over the
+    questions that are complete (a value for every strategy)."""
+    if data.ragas is None:
+        return None
+    values = _ragas_values(data.ragas, qids)
+    means = {
+        s: {
+            m: _mean(got) if (got := [v for v in values[m][s].values() if v is not None]) else None
+            for m in RAGAS_METRICS
+        }
+        for s in STRATEGY_IDS
+    }
+    nan_counts = {
+        s: {m: sum(v is None for v in values[m][s].values()) for m in RAGAS_METRICS}
+        for s in STRATEGY_IDS
+    }
+    effects = {}
+    for m in RAGAS_METRICS:
+        complete = [q for q in qids if all(values[m][s][q] is not None for s in STRATEGY_IDS)]
+        effects[m] = {
+            "label": RAGAS_LABELS[m],
+            **(_effects({s: [values[m][s][q] for q in complete] for s in STRATEGY_IDS})
+               if complete else {"kendalls_w": None, "n": 0, "pairs": {}}),
+        }  # fmt: skip
+    return {"means": means, "nan_counts": nan_counts, "effects": effects}
+
+
+def _other_measure(data: AnalysisData, source: str, column: str, qids: list[str]):
+    """strategy -> question -> value of the rule-based measure; None if its source is absent."""
+    if source == "checks":
+        if data.answers_question is None:
+            return None
+        return {s: {q: float(data.answers_question[(q, s)]) for q in qids} for s in STRATEGY_IDS}
+    frame = data.scores if source == "scores" else data.retrieval
+    if source == "retrieval":
+        frame = frame[frame["rule"] == ANALYSIS_RULE]
+    frame = _num(frame, [column])
+    return {
+        s: dict(zip(frame[frame["strategy"] == s]["question_id"],
+                    frame[frame["strategy"] == s][column], strict=True))
+        for s in STRATEGY_IDS
+    }  # fmt: skip
+
+
+def _ragas_agreement(data: AnalysisData, qids: list[str], notes: list) -> dict | None:
+    """Spearman's rho between a RAGAS metric and the rule-based measure, per strategy and pooled
+    (rho only: each question appears once per strategy). A question with a missing value on
+    either side is dropped from that pair."""
+    if data.ragas is None:
+        return None
+    values = _ragas_values(data.ragas, qids)
+    out: dict = {}
+    for metric, column, source in RAGAS_PAIRS:
+        other = _other_measure(data, source, column, qids)
+        if other is None:
+            notes.append(f"Übereinstimmung {metric}~{column} entfällt: {column} fehlt")
+            continue
+        xs: dict = {}
+        ys: dict = {}
+        for s in STRATEGY_IDS:
+            kept = [q for q in qids if values[metric][s][q] is not None and q in other[s]]
+            xs[s] = [values[metric][s][q] for q in kept]
+            ys[s] = [float(other[s][q]) for q in kept]
+        per = {s: stats.spearman(xs[s], ys[s]) for s in STRATEGY_IDS}
+        per["pooled"] = stats.spearman(
+            [v for s in STRATEGY_IDS for v in xs[s]], [v for s in STRATEGY_IDS for v in ys[s]]
+        )
+        # descriptive (ADR 0047): rho and n only, no p-value, pooled or per strategy
+        out[f"{metric}~{column}"] = {
+            g: {k: v for k, v in per[g].items() if k != "p"} for g in ["pooled", *STRATEGY_IDS]
+        }
+    return out
+
+
+def _ragas_stability(data: AnalysisData, qids: list[str]) -> dict:
+    """Run 1 against run 2 over the answers with a value in both: mean absolute difference,
+    Spearman's rho and the share of equal values (to the stored decimals)."""
+    first = _ragas_values(data.ragas, qids)
+    second = _ragas_values(data.ragas_repeat, qids)
+    out = {}
+    for m in RAGAS_METRICS:
+        pairs = [
+            (first[m][s][q], second[m][s][q])
+            for s in STRATEGY_IDS for q in qids
+            if first[m][s][q] is not None and second[m][s][q] is not None
+        ]  # fmt: skip
+        a, b = [p[0] for p in pairs], [p[1] for p in pairs]
+        out[m] = {
+            "n": len(pairs),
+            "mean_abs_diff": _mean([abs(x - y) for x, y in pairs]) if pairs else None,
+            "rho": stats.spearman(a, b)["rho"],
+            "share_equal": sum(x == y for x, y in pairs) / len(pairs) if pairs else None,
+        }
+    return out
 
 
 def _efficiency(data: AnalysisData, retrieval: dict, answers: dict, notes: list) -> dict | None:
@@ -480,6 +615,78 @@ def _correlation_table(results: dict) -> str:
     )  # fmt: skip
 
 
+def _ragas_table(results: dict) -> str:
+    """Means and Kendall's W per metric; below them, per metric, r (median difference) of the
+    pairs. Descriptive: RAGAS is a second view, no basis of a statement (ADR 0047)."""
+    block = results["ragas"]
+    header = ["Metrik", *STRATEGY_IDS, "Kendalls W"]
+    rows: list[list[str] | str] = []
+    for m in RAGAS_METRICS:
+        rows.append(
+            [RAGAS_LABELS[m], *(fmt_opt(block["means"][s][m]) for s in STRATEGY_IDS),
+             fmt_opt(block["effects"][m]["kendalls_w"])]
+        )  # fmt: skip
+    pair_names = list(next(iter(block["effects"].values()))["pairs"])
+    if pair_names:
+        pair_header = ["Effekt r (Median-Diff.; n′)", *(p.replace("-", "–") for p in pair_names)]
+        rows.append(r"\midrule")
+        rows.append(" & ".join(latex_escape(c) for c in pair_header) + r" \\")
+        for m in RAGAS_METRICS:
+            pairs = block["effects"][m]["pairs"]
+            rows.append(
+                [RAGAS_LABELS[m]]
+                + [
+                    f"{fmt_opt(pairs[p]['r'])} ({fmt_opt(pairs[p]['median_diff'])}; "
+                    f"n′ = {pairs[p]['n_nonzero']})"
+                    if p in pairs else DASH
+                    for p in pair_names
+                ]
+            )  # fmt: skip
+    counts = [
+        f"{RAGAS_LABELS[m]} {s}: {block['nan_counts'][s][m]}"
+        for m in RAGAS_METRICS for s in STRATEGY_IDS if block["nan_counts"][s][m]
+    ]  # fmt: skip
+    nan = (
+        "NaN der Metrik (je Metrik und Strategie): " + ", ".join(counts) + "."
+        if counts
+        else "Kein NaN der Metrik."
+    )
+    n = min(e["n"] for e in block["effects"].values())
+    note = (
+        "Mittelwerte der RAGAS-Metriken von 0 bis 1 über die Fragen mit Wert. "
+        f"{nan} Kendalls W und r über die Fragen mit Wert in allen Strategien (mindestens {n}), "
+        "deskriptiv, ohne p-Werte; Median-Differenz erste minus zweite Strategie; n′ Fragen mit "
+        "Differenz ungleich 0, auf denen r beruht (bei vielen gleichen Werten klein). "
+        "RAGAS ist eine zweite Sicht neben der regelbasierten Bewertung."
+    )
+    return latex_table(
+        "ragas", "RAGAS-Bewertung je Strategie", header, rows, "l" + "r" * (len(header) - 1), note
+    )
+
+
+def _ragas_agreement_table(results: dict) -> str:
+    header = ["Gruppe", "Spearmans ρ", "n"]
+    rows: list[list[str] | str] = []
+    for pair, per in results["ragas_agreement"].items():
+        metric, column = pair.split("~")
+        label = f"{RAGAS_LABELS[metric]} und {RAGAS_PAIR_LABELS[column]}"
+        rows.append(_group(label, len(header), not rows))
+        for group, c in per.items():
+            shown = "gesamt" if group == "pooled" else group
+            rho = fmt_opt(c["rho"]) if c["testable"] else NOT_DETERMINABLE
+            rows.append([shown, rho, str(c["n"])])
+    note = (
+        "Deskriptiv, ohne p-Werte. Spearmans ρ je Antwort zwischen RAGAS-Metrik und Bewertung "
+        "bzw. Retrieval (Hauptregel), je Strategie und über alle Strategien (gesamt: jede Frage "
+        "dreifach). Fragen ohne RAGAS-Wert entfallen im jeweiligen Paar; „nicht bestimmbar“: "
+        "eine Seite ist konstant."
+    )
+    return latex_table(
+        "ragas_agreement", "Übereinstimmung von RAGAS mit Bewertung und Retrieval", header, rows,
+        "lrr", note,
+    )  # fmt: skip
+
+
 def _efficiency_table(results: dict) -> str:
     eff = results["efficiency"]
     strategies = list(eff)
@@ -567,8 +774,13 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
         "correlation.tex": lambda: _correlation_table(results),
         "efficiency.tex": lambda: _efficiency_table(results),
         "breakdown.tex": lambda: _breakdown_table(results),
+        "ragas.tex": lambda: _ragas_table(results),
+        "ragas_agreement.tex": lambda: _ragas_agreement_table(results),
     }
-    skipped = {"control_k0.tex": "control_k0", "efficiency.tex": "efficiency"}
+    skipped = {
+        "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
+        "ragas.tex": "ragas", "ragas_agreement.tex": "ragas_agreement",
+    }  # fmt: skip
     written = []
     for name in TABLE_NAMES:
         if skipped.get(name) and results.get(skipped[name]) is None:

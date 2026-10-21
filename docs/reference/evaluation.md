@@ -135,9 +135,40 @@ Grundlage der Antwort-Evaluation ist die regelbasierte, referenzbasierte Bewertu
 Recall (mit Referenz) auf allen 144 Antworten C1–C3, Richtermodell `gpt-6-sol` (nicht das Antwortmodell), erst nach
 `summarise`, einmal ausgeführt und gespeichert. Es ist nie alleinige Grundlage und fließt nie zurück; berichtet werden
 Mittel je Strategie und die Übereinstimmung (Spearmans ρ) mit dem Gegenstück: Faithfulness mit Quellenbezug und
-Halluzinationsfreiheit, Response Relevancy mit `answers_question`, Context Precision und Recall mit P@5 und R@5. Code
-dafür gibt es noch nicht. Begründung:
-[Forschungsdesign](../explanation/research-design.md#warum-die-evaluation-so-angelegt-ist).
+Halluzinationsfreiheit, Response Relevancy mit `answers_question`, Context Precision und Recall mit P@5 und R@5.
+Begründung: [Forschungsdesign](../explanation/research-design.md#warum-die-evaluation-so-angelegt-ist).
+
+**Ablauf** (`src/ragas_eval.py`, Befehl: [Werkzeuge](tooling.md#skripte-und-optionen), Dateien:
+[Datenformate](data-formats.md#ergebnisse)): Je Frage und Strategie C1–C3 bekommt der Richter die Frage, die gespeicherte
+Antwort, die Chunk-Texte aus `sources` der Antwortzeile in dieser Reihenfolge (genau das, was das Antwortmodell sah) und
+die eingefrorene Referenz. K0 hat keinen Kontext und wird nicht bewertet. Vor dem ersten Aufruf wird geprüft, dass der
+Katalog eingefroren ist, die Antworten vom letzten `generate`-Lauf stammen und auf dem Hauptkatalog `summarise` gelaufen
+ist; die Werte fließen nie zurück ([ADR 0017](../adr/0017-fragenkatalog.md)).
+
+- **Richter:** `gpt-6-sol`, Temperatur 0, `reasoning_effort` `none`, fester `seed`
+  ([Konfiguration](configuration.md#ragas)). RAGAS 0.4.3 hält jedes Modell von gpt-5 bis gpt-19 für ein
+  Reasoning-Modell und würde die Temperatur auf 1,0 setzen; eine dünne Unterklasse in `src/ragas_client.py` behält die
+  konfigurierte Temperatur, aber nur bei `reasoning_effort` `none`, sonst gilt die Abbildung von RAGAS
+  ([Pins](tooling.md#ragas-pins)).
+- **Strictness 1:** Response Relevancy lässt den Richter aus der Antwort Fragen erzeugen und vergleicht deren Embeddings
+  mit der echten Frage. Bei Temperatur 0 ist der Prompt für jede der `strictness` Fragen derselbe, weitere Fragen
+  brächten also dieselbe Frage noch einmal und nur Kosten (Jonas, 21.10.2026).
+- **NaN:** Meldet eine Metrik selbst NaN, ist das gültig: leere Zelle, der Grund in `nan_reasons`, gezählt und im Lauf
+  berichtet. Liefert RAGAS 0.4.3 ein NaN ohne Grund, steht der feste Grund je Metrik aus `config.RAGAS_NAN_REASONS`
+  (keine Aussagen oder Urteile bei Faithfulness, keine Klassifikationen bei Context Recall, NaN als mittlere Präzision
+  bei Context Precision). Response Relevancy liefert 0,0 statt NaN, ein NaN dort wäre unerwartet, hat keinen Grund und
+  bricht den Lauf. Ebenso brechen ein Wert außerhalb 0–1, ein Fehler des Richters, eine abgeschnittene Ausgabe
+  (`RAGAS_MAX_TOKENS`) und ein wechselndes Modell ab; dann wird nichts geschrieben. Mittel gelten über die Fragen mit Wert,
+  Effektstärken über die Fragen mit Wert in allen Strategien.
+- **Übereinstimmung** (`ragas_agreement`, Tabelle `ragas_agreement.tex`): Spearmans ρ je Antwort zwischen Metrik und
+  Gegenstück, je Strategie und über alle Strategien (`gesamt`, jede Frage dreifach), beschreibend ohne p-Werte
+  ([ADR 0047](../adr/0047-ragas-als-triangulation.md)); eine Frage ohne RAGAS-Wert entfällt im Paar, ist eine Seite
+  konstant, steht „nicht bestimmbar“. Die Mittel je Strategie stehen in `ragas.tex`, ebenfalls ohne p-Werte; neben
+  jedem r steht n′, die Zahl der Fragen mit Differenz ungleich 0 ([ADR 0044](../adr/0044-statistische-auswertung.md)).
+- **Stabilität:** Auf Pilot-Sets läuft `--repeat` ein zweites Mal. `ragas_stability` in `analysis.json` vergleicht beide
+  Läufe je Metrik (Anteil gleicher Werte, mittlere absolute Differenz, ρ). Auf dem Pilot e2e waren die Werte des
+  Context Recall bitgleich, die der Response Relevancy nur zu 60 % gleich, trotz Temperatur 0 und festem `seed`;
+  Zahlen im [Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21102026). Der Hauptlauf läuft einmal.
 
 ## Effizienz/Kosten (abhängige Variable)
 

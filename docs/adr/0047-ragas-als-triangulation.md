@@ -3,7 +3,9 @@
 ## Status
 
 Angenommen (21.10.2026; konkretisiert [ADR 0007](0007-triangulation.md); ändert „optional RAGAS“ in
-[ADR 0015](0015-tech-stack.md)); Richtermodell und Metriken von Jonas entschieden.
+[ADR 0015](0015-tech-stack.md)); Richtermodell und Metriken von Jonas entschieden. Umgesetzt 21.10.2026; die
+Kosten liegen nach dem Pilot bei 2,02 USD je 48 Antworten, nicht im Cent-Bereich
+([Experiment-Protokoll](../reference/experiment-record.md#ragas-pilot-e2e-21102026)).
 
 ## Kontext
 

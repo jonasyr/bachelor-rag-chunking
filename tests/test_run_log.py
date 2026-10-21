@@ -32,3 +32,10 @@ def test_missing_run_names_the_real_command(tmp_path, step, strategy, command):
     with pytest.raises(RuntimeError) as error:
         require_run(runs, step, strategy, [], [])
     assert f"run {command}" in str(error.value)
+
+
+def test_step_command_names_the_ragas_runs():
+    from run_log import step_command
+
+    assert step_command("ragas", "C1,C2,C3") == "src/ragas_eval.py"
+    assert step_command("ragas_repeat", "C1,C2,C3") == "src/ragas_eval.py --repeat"

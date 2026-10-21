@@ -1,6 +1,7 @@
 import csv
 import hashlib
 import json
+import os
 
 import numpy as np
 import pytest
@@ -14,6 +15,9 @@ from config import QUESTION_CLASSES, QUESTION_TYPES
 from embedding_client import EmbeddingResult
 from preprocess import clean_markdown, section_spans
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
+
+# ragas posts telemetry unless this is set before its first import (ADR 0047; src/ragas_client.py).
+os.environ["RAGAS_DO_NOT_TRACK"] = "true"
 
 FAKE_DIMENSIONS = 16
 

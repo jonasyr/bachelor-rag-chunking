@@ -179,3 +179,126 @@ def test_set_pointing_at_main_catalogue_is_refused(paths, monkeypatch):
     monkeypatch.setattr(freeze, "QUESTIONS_FILE", paths["questions_file"])
     with pytest.raises(RuntimeError, match="not frozen"):
         load(paths, main=False)
+
+
+# ---------------------------------------------------------------- RAGAS (ADR 0047)
+
+
+def _ragas_rows(nan=False):
+    rows = []
+    for q in QIDS:
+        for i, s in enumerate(STRATEGIES):
+            rows.append({"question_id": q, "strategy": s, "faithfulness": f"0.{i + 5}00000",
+                         "response_relevancy": "0.800000", "context_precision": "0.500000",
+                         "context_recall": "" if nan and (q, s) == ("Q001", "C2") else "1.000000",
+                         "nan_reasons": "context_recall: no reference" if nan and
+                         (q, s) == ("Q001", "C2") else ""})  # fmt: skip
+    return rows
+
+
+def _with_ragas(paths, tmp_path, rows=None):
+    from ragas_eval import RAGAS_HEADER
+
+    paths["ragas_file"] = tmp_path / "ragas_scores.csv"
+    paths["ragas_repeat_file"] = tmp_path / "ragas_scores_repeat.csv"
+    source = tmp_path / "generated_answers.csv"
+    source.write_text("question_id,strategy,answer\n", encoding="utf-8")
+    paths["ragas_inputs"] = [source]
+    write_csv(paths["ragas_file"], RAGAS_HEADER, rows or _ragas_rows())
+    append_step_run(
+        "ragas", ",".join(STRATEGIES), paths["ragas_inputs"], [paths["ragas_file"]],
+        paths["generation_runs_file"],
+    )  # fmt: skip
+    return paths
+
+
+def test_ragas_loaded_and_checked(paths, tmp_path):
+    assert load(paths, main=False).ragas is None  # no keys: nothing to load
+    paths["ragas_file"] = tmp_path / "ragas_scores.csv"
+    paths["ragas_repeat_file"] = tmp_path / "ragas_scores_repeat.csv"
+    data = load(paths, main=False)
+    assert data.ragas is None and data.ragas_repeat is None
+    assert any("ragas_scores.csv fehlt" in n for n in data.notes)
+    _with_ragas(paths, tmp_path)
+    data = load(paths, main=False)
+    assert len(data.ragas) == len(QIDS) * len(STRATEGIES) and data.ragas_repeat is None
+    paths["ragas_file"].write_text(
+        paths["ragas_file"].read_text(encoding="utf-8").replace("0.500000", "0.400000", 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="ragas_scores.csv"):
+        load(paths, main=False)  # stale: the record hashed another file
+
+
+def test_missing_repeat_drops_only_the_stability(paths, tmp_path):
+    """Without a second pilot run only the stability comparison is dropped, not RAGAS."""
+    _with_ragas(paths, tmp_path)
+    data = load(paths, main=False)
+    repeat_notes = [n for n in data.notes if "ragas_scores_repeat.csv" in n]
+    assert repeat_notes == ["ragas_scores_repeat.csv fehlt: Stabilitätsvergleich entfällt"]
+    assert data.ragas is not None
+
+
+def test_ragas_input_change_is_refused(paths, tmp_path):
+    _with_ragas(paths, tmp_path)
+    paths["ragas_inputs"][0].write_text(
+        "question_id,strategy,answer\nQ001,C1,x\n", encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="generated_answers.csv"):
+        load(paths, main=False)
+
+
+def test_ragas_incomplete_grid_is_refused(paths, tmp_path):
+    _with_ragas(paths, tmp_path, _ragas_rows()[:-1])
+    with pytest.raises(ValueError, match="Q002/C3"):
+        load(paths, main=False)
+
+
+def _blinded(paths, tmp_path, answers):
+    from evaluate_answers import KEY_HEADER
+    from scoring_rules import CHECKS_HEADER
+
+    paths["scoring_checks_file"] = tmp_path / "scoring_checks.csv"
+    paths["scoring_key_file"] = tmp_path / "scoring_key.csv"
+    codes = {(q, s): f"A{n:02d}" for n, (q, s) in enumerate(sorted(answers), 1)}
+    # the codes are shuffled against the key order on purpose
+    write_csv(
+        paths["scoring_key_file"], KEY_HEADER,
+        [{"code": c, "question_id": q, "strategy": s} for (q, s), c in codes.items()],
+    )  # fmt: skip
+    rows = []
+    for key, value in reversed(list(answers.items())):
+        row = dict.fromkeys(CHECKS_HEADER, "no")
+        rows.append(row | {"code": codes[key], "rules_version": "1", "points": "covered",
+                           "answers_question": value})  # fmt: skip
+    write_csv(paths["scoring_checks_file"], CHECKS_HEADER, rows)
+
+
+def test_answers_question_is_unblinded(paths, tmp_path):
+    answers = {(q, s): "yes" for q in QIDS for s in STRATEGIES}
+    answers[("Q002", "C3")] = "no"
+    _blinded(paths, tmp_path, answers)
+    data = load(paths, main=False)
+    assert data.answers_question[("Q002", "C3")] == 0
+    assert data.answers_question[("Q001", "C3")] == 1
+    assert len(data.answers_question) == 6
+
+
+def test_answers_question_absent_is_noted(paths, tmp_path):
+    paths["scoring_checks_file"] = tmp_path / "scoring_checks.csv"
+    paths["scoring_key_file"] = tmp_path / "scoring_key.csv"
+    data = load(paths, main=False)
+    assert data.answers_question is None
+    assert any("answers_question" in n for n in data.notes)
+
+
+def test_ragas_repeat_is_loaded_with_its_own_record(paths, tmp_path):
+    from ragas_eval import RAGAS_HEADER
+
+    _with_ragas(paths, tmp_path)
+    write_csv(paths["ragas_repeat_file"], RAGAS_HEADER, _ragas_rows())
+    append_step_run(
+        "ragas_repeat", ",".join(STRATEGIES), paths["ragas_inputs"], [paths["ragas_repeat_file"]],
+        paths["generation_runs_file"],
+    )  # fmt: skip
+    assert len(load(paths, main=False).ragas_repeat) == 6

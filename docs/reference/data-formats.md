@@ -134,6 +134,8 @@ danach die gepinnten Einstellungen und enden mit `prompt_tokens`, `completion_to
 | `key_points` | `C1,C2,C3` | Einfrieren der Kernpunkte auf der Bewertungsseite (siehe `key_points.csv`) | `outputs_sha256` mit `key_points.csv` und `scoring_items.jsonl` |
 | `summarise` | `C1,C2,C3` | `evaluate_answers.py --mode summarise` (auch mit `--set`; Pilot-Sets von vor diesem Eintrag haben ihn nicht, `analyse.py --set` wertet sie mit Hinweis aus, [ADR 0044](../adr/0044-statistische-auswertung.md)) | `inputs_sha256` (Bogen, Schlüssel, `scoring_checks.csv`, `key_points.csv`), `outputs_sha256` mit `scores.csv` |
 | `summarise_control` | `K0` | `evaluate_answers.py --mode summarise --control` | `inputs_sha256` (Bogen, Prüfungen und Kernpunkte von K0, `scores.csv`), `outputs_sha256` mit `scores_control.csv` |
+| `ragas` | `C1,C2,C3` | `ragas_eval.py` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), nur nach einem erfolgreichen Lauf | siehe unten |
+| `ragas_repeat` | `C1,C2,C3` | `ragas_eval.py --repeat` (nur Pilot-Sets), nur nach einem erfolgreichen Lauf | wie `ragas`, `outputs_sha256` mit `ragas_scores_repeat.csv` |
 | `closed_book_screen` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten |
 
 `scoring` = `config.SCORING_METHOD` (`rules`): das Scaffold ist nur regelbasiert zu bewerten
@@ -169,6 +171,28 @@ Bisher gibt es keinen `generate`-Lauf des Hauptexperiments. Der einzige echte Ei
 ```json
 {"date":"…","model":"gpt-6-luna","reasoning_effort":"none","temperature":0.0,"seed":20261017,"max_completion_tokens":1024,"openai_sdk":"2.44.0","step":"generate","strategy":"C1,C2,C3","model_reported":"…","model_created":"…","system_fingerprint":"…","answers":144,"control_answers":48,"inputs_sha256":{"retrieved_results.csv":"…","questions.csv":"…","ground_truth.csv":"…","chunks_c1.jsonl":"…","chunks_c2.jsonl":"…","chunks_c3.jsonl":"…"},"outputs_sha256":{"generated_answers.csv":"…","generated_answers_control.csv":"…"},"by_strategy":{"C1":{"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0},"C2":{"…":"…"},"C3":{"…":"…"},"K0":{"…":"…"}},"prompt_tokens":0,"completion_tokens":0,"cost_usd":0.0}
 ```
+
+Felder der Einträge `ragas` und `ragas_repeat` (`run_log.ragas_record`, Reihenfolge wie geschrieben; Pilot-Beispiel in
+[Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21102026)):
+
+- `date`, `judge_model`, `embedding_model`, `reasoning_effort`, `temperature`, `seed`, `strictness`: die gepinnten
+  Einstellungen aus `config.py` ([Konfiguration](configuration.md#ragas)); `ragas_version`, `openai_sdk`: installierte
+  Versionen.
+- `step` (`ragas` oder `ragas_repeat`), `strategy` (`C1,C2,C3`), `rows` (Zahl der Zeilen der Ergebnisdatei).
+- `model_reported`: das Modell, das die API für alle Richteraufrufe gemeldet hat; `model_created`: Erstellungszeitpunkt
+  des Modellobjekts (ISO 8601, UTC), vor und nach dem Lauf gleich; `system_fingerprint`: die gemeldete
+  Backend-Konfiguration (`null`, wenn die API keine meldet). Meldet die API mehrere Modelle oder Fingerabdrücke, bricht
+  der Lauf ohne Schreiben ab ([ADR 0033](../adr/0033-antwortmodell.md)).
+- `nan_counts`: je Metrik die Zahl der Zeilen mit leerer Zelle (Gründe in `nan_reasons` der Ergebnisdatei).
+- `inputs_sha256`: `generated_answers.csv`, `retrieved_results.csv`, Fragen, Ground Truth und die drei Chunk-Dateien;
+  auf dem Hauptkatalog zusätzlich `scores.csv` (RAGAS läuft erst nach `summarise`). `outputs_sha256`: die
+  Ergebnisdatei des Schritts.
+- `judge_prompt_tokens`, `judge_completion_tokens`, `embedding_tokens` (die Embeddings der Response Relevancy, nur sie
+  gehen an das Embedding-Modell); `judge_cost_usd` (nach `RAGAS_JUDGE_PRICE_*`), `embedding_cost_usd`
+  (nach `EMBEDDING_PRICE_PER_MTOK`) und `cost_usd` (Summe) in USD.
+
+`ragas_eval.py --repeat` verlangt, dass der `ragas`-Eintrag zur aktuellen `ragas_scores.csv` passt; `analyse.py` prüft
+beide Dateien gegen ihren Eintrag (`analysis_data._load_ragas`).
 
 Der Eintrag `closed_book_screen` hat die gepinnten Einstellungen und `openai_sdk` wie `generate`, dann `answers` (Zahl
 der abgerechneten Antworten dieses Aufrufs), `model_reported` und `system_fingerprint` als **sortierte Listen** aller
@@ -386,6 +410,22 @@ question_id,strategy,correctness,completeness,no_hallucination,clarity,total_sco
 Q001,K0,1,0,2,2,1.25
 ```
 
+**`ragas_scores.csv`** (`ragas_eval.py`, [ADR 0047](../adr/0047-ragas-als-triangulation.md); schreibt die Datei einmal
+und nie über eine vorhandene; Pilot-Sets: `ragas_scores.csv` im Set-Ordner): eine Zeile je Frage und Strategie
+C1–C3 (K0 bekommt kein RAGAS), sortiert nach `question_id`, dann Strategie in der Reihenfolge `config.STRATEGY_IDS`. Die
+Spalten sind `config.RAGAS_METRICS` in dieser Reihenfolge, Werte von 0 bis 1 mit `config.RAGAS_DECIMALS` = 6
+Nachkommastellen. Eine Metrik, die selbst NaN meldet (Verfahren: [Evaluation](evaluation.md#triangulation)), steht als
+**leere Zelle**; `nan_reasons` nennt dann je leerer Zelle `<Metrik>: <Grund>`, mehrere durch `; ` getrennt, sonst leer.
+Ein leerer Wert ohne Grund, ein Wert außerhalb 0–1 oder eine fehlende Zeile bricht den Lauf ohne Schreiben ab.
+```
+question_id,strategy,faithfulness,response_relevancy,context_precision,context_recall,nan_reasons
+E01,C1,1.000000,0.776339,0.833333,1.000000,
+```
+
+**`ragas_scores_repeat.csv`** (`ragas_eval.py --repeat`, nur Pilot-Sets): gleiche Spalten, Zeilen und Sortierung; der
+zweite Lauf über dieselben Antworten, nur für die Stabilität der Werte. Er steht unter dem Schritt `ragas_repeat` im
+Laufprotokoll ([Laufprotokoll](#laufprotokoll)), das `ragas`-Protokoll bleibt das der ersten Datei.
+
 ## Auswertung (`output/`)
 
 `analyse.py` ([ADR 0044](../adr/0044-statistische-auswertung.md)) schreibt jedes Mal alle Dateien neu; Ordner und
@@ -394,7 +434,7 @@ dieselbe Struktur nach `DIR/output/`, nie nach `output/`.
 
 | Pfad | Inhalt |
 |---|---|
-| `output/tables/*.tex` | acht Tabellen nach den IU-Regeln (`table`-Umgebung mit kurzem Titel ohne Schlusspunkt, Label `tab:<Name>`, darunter `\source{Eigene Darstellung. …}` mit den Anmerkungen; Ausrichtung aus der Klasse; negative Werte mit typografischem Minus): `retrieval`, `retrieval_sensitivity`, `answers`, `tests`, `control_k0`, `correlation`, `efficiency`, `breakdown` (`report_tables.TABLE_NAMES`) |
+| `output/tables/*.tex` | zehn Tabellen nach den IU-Regeln (`table`-Umgebung mit kurzem Titel ohne Schlusspunkt, Label `tab:<Name>`, darunter `\source{Eigene Darstellung. …}` mit den Anmerkungen; Ausrichtung aus der Klasse; negative Werte mit typografischem Minus): `retrieval`, `retrieval_sensitivity`, `answers`, `tests`, `control_k0`, `correlation`, `efficiency`, `breakdown`, `ragas` (Mittel der vier RAGAS-Metriken je Strategie, Effektstärken), `ragas_agreement` (Spearmans ρ mit dem regelbasierten Gegenstück, [Evaluation](evaluation.md#triangulation)) (`report_tables.TABLE_NAMES`) |
 | `output/figures/*.pdf` | acht Abbildungen in Endgröße: `recall`, `mrr`, `answers_distribution`, `heatmap`, `scatter_retrieval_answer`, `catalogue_composition`, `chunk_lengths`, `cost` (`report_figures.FIGURE_NAMES`, Inhalte: [Evaluation](evaluation.md#visualisierungen)) |
 | `output/analysis.json` | alle Kennzahlen und Testergebnisse, sortierte Schlüssel, Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet |
 
@@ -404,7 +444,12 @@ Oberste Schlüssel von `analysis.json`: `n_questions`, `alpha`, `retrieval` (Mit
 `config.ANALYSIS_PRIMARY`), `descriptive_effects` (Effektstärken ohne p-Werte, getrennt nach Regel und `answers`),
 `control_k0` (K0 gegen C1–C3, `null` ohne K0-Bewertung), `correlation` (Spearmans ρ je Strategie und `pooled`, dieses ohne `p`),
 `efficiency` (Chunks, Längen, Kontext-Tokens, Indexgröße, Embedding- und Generierungskosten je Strategie),
-`breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil) und `notes` (entfallene Teile, Hinweise).
+`breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil) `ragas` (`means`, `nan_counts` und `effects` je Metrik, jeweils je Strategie; Kendalls W und r über die Fragen mit Wert in
+allen Strategien, ohne p-Werte), `ragas_agreement` (Schlüssel `<Metrik>~<Gegenstück>`, je Strategie und `pooled` mit `rho`,
+`n`, `testable`, ohne `p`; `rho` ist `null`, wenn eine Seite konstant ist), `ragas_stability` (je Metrik `n`,
+`mean_abs_diff`, `rho`, `share_equal`; nur wenn `ragas_scores_repeat.csv` vorliegt, also bei Pilot-Sets) und
+`notes` (entfallene Teile, Hinweise). Fehlt `ragas_scores.csv`, ist `ragas` `null`, `ragas_agreement` `null` und die
+beiden Tabellen entfallen mit Hinweis.
 
 ## Pilot-Sets
 
@@ -421,7 +466,7 @@ nicht. Welche Dateien versioniert sind: [Versioniert und ignoriert](#versioniert
 
 | Set | Fragen | vorhandene Dateien |
 |---|---|---|
-| `data/pilot/e2e/` | Pilot e2e: 16 Fragen `E01`–`E16` (je 4 `single`, `multi-section`, `detail`, `paraphrase`; `notes` = `pilot <Klasse>`), nur Abschnitte außerhalb des Stichprobenplans | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `generated_answers.csv`, `generated_answers_control.csv`, `key_points.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_checks.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv`, `scores_control.csv`; `runs.jsonl` mit `retrieve`, `generate` (mit K0), `scaffold` (C1–C3 und `K0`), `key_points` |
+| `data/pilot/e2e/` | Pilot e2e: 16 Fragen `E01`–`E16` (je 4 `single`, `multi-section`, `detail`, `paraphrase`; `notes` = `pilot <Klasse>`), nur Abschnitte außerhalb des Stichprobenplans | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `generated_answers.csv`, `generated_answers_control.csv`, `key_points.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_checks.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv`, `scores_control.csv`, `ragas_scores.csv`, `ragas_scores_repeat.csv`; `runs.jsonl` mit `retrieve`, `generate` (mit K0), `scaffold` (C1–C3 und `K0`), `key_points`, `ragas`, `ragas_repeat` |
 | `data/pilot/e2e_jonas/` | Übungskopie: die ersten 3 Fragen von `e2e` (9 Antworten, gleiche Codes), Kernpunkte von Jonas | `questions.csv`, `ground_truth.csv`, `generated_answers*.csv`, `key_points.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_packet.md`, `scoring_items.jsonl`; `runs.jsonl` (Kopie aus `e2e`, dazu `scaffold` mit `--limit 3` und `key_points`) |
 | `data/pilot/` | Probe 1 (Vue, historisch): 8 Fragen `P01`–`P08` (`difficulty`: 3 `easy`, 4 `medium`, 1 `hard`; `notes` = `pilot`) | `questions.csv`, `ground_truth.csv`, `query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `runs.jsonl` (nur `retrieve`) |
 | `data/pilot/hard/` | Probe 2: 16 schwere Fragen `H01`–`H16` (`notes` = `pilot <Art>`: `multi-section`, `detail`, `paraphrase`), Annotation blind vor jedem Retrieval (Hauptwerte; [ADR 0027](../adr/0027-blinde-annotation.md)) | wie `data/pilot/`, dazu `generated_answers.csv`, `scoring_sheet.csv`, `scoring_key.csv`, `scoring_packet.md`, `scoring_items.jsonl`, `key_points.csv`; `runs.jsonl` mit `retrieve`, `generate` (17.10.2026), `scaffold` (ohne `scoring`) und `key_points` (18.10.2026) |
@@ -451,6 +496,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs | versioniert ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) |
 | `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | versioniert |
 | `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | versioniert |
+| `data/evaluation/ragas_scores.csv` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt (die Pilot-Dateien `ragas_scores*.csv` sind ebenfalls versioniert) ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) | versioniert |
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | versioniert |
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | ignoriert |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien in den Pilot-Sets | ignoriert; alle übrigen Pilotdateien versioniert |

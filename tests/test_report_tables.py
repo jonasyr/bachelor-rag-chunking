@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 
 import pandas as pd
 import pytest
@@ -164,8 +165,8 @@ def test_descriptive_metrics_have_no_p_in_results():
     assert '"p"' not in flat_k0
 
 
-def test_all_eight_tables_are_written(tmp_path):
-    paths = write_tables(build_results(make_data(), 0.05), tmp_path)
+def test_all_ten_tables_are_written(tmp_path):
+    paths = write_tables(build_results(ragas_data(), 0.05), tmp_path)
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
         text = p.read_text(encoding="utf-8")
@@ -251,3 +252,148 @@ def test_missing_effect_is_a_dash_not_r_equals_dash():
 
     assert _r(None) == "--"
     assert _r(0.5) == "r = 0,50"
+
+
+# ---------------------------------------------------------------- RAGAS (ADR 0047)
+
+METRICS = ("faithfulness", "response_relevancy", "context_precision", "context_recall")
+
+
+def ragas_frame(nan=(), shift=0.0) -> pd.DataFrame:
+    """One row per question and strategy; `nan` lists (question, strategy, metric) left empty."""
+    rows = []
+    for i, q in enumerate(QIDS):
+        for s_i, s in enumerate(C):
+            row = {"question_id": q, "strategy": s, "nan_reasons": ""}
+            for m_i, m in enumerate(METRICS):
+                value = ((i * (m_i + 2) + s_i * 3) % 7) / 8 + shift
+                missing = (q, s, m) in nan
+                row[m] = "" if missing else f"{value:.6f}"
+                if missing:
+                    row["nan_reasons"] = f"{m}: Grund"
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def answers_question(constant=False) -> dict:
+    return {
+        (q, s): 1 if constant or (i + s_i) % 4 else 0
+        for i, q in enumerate(QIDS) for s_i, s in enumerate(C)
+    }  # fmt: skip
+
+
+def ragas_data(nan=(), constant=False, repeat=False):
+    return replace(
+        make_data(),
+        ragas=ragas_frame(nan),
+        ragas_repeat=ragas_frame(nan, shift=0.01) if repeat else None,
+        answers_question=answers_question(constant),
+    )
+
+
+def test_ragas_nan_handling():
+    nan = {("Q003", "C2", "faithfulness")}
+    results = build_results(ragas_data(nan), 0.05)
+    block = results["ragas"]
+    assert block["nan_counts"]["C2"]["faithfulness"] == 1
+    assert block["nan_counts"]["C1"]["faithfulness"] == 0
+    frame = ragas_frame(nan)
+    rest = pd.to_numeric(
+        frame[(frame["strategy"] == "C2") & (frame["question_id"] != "Q003")]["faithfulness"]
+    )
+    assert block["means"]["C2"]["faithfulness"] == pytest.approx(rest.mean(), abs=1e-6)
+    assert block["effects"]["faithfulness"]["n"] == len(QIDS) - 1  # complete questions only
+    assert block["effects"]["context_recall"]["n"] == len(QIDS)
+    full = build_results(ragas_data(), 0.05)["ragas_agreement"]
+    cut = results["ragas_agreement"]
+    pair = "faithfulness~groundedness"
+    assert cut[pair]["pooled"]["n"] == full[pair]["pooled"]["n"] - 1
+    assert cut[pair]["C2"]["n"] == len(QIDS) - 1 and cut[pair]["C1"]["n"] == len(QIDS)
+
+
+def test_ragas_agreement_pairs_and_pooled_rho_without_p():
+    results = build_results(ragas_data(), 0.05)
+    agreement = results["ragas_agreement"]
+    assert list(agreement) == [
+        "faithfulness~groundedness", "faithfulness~no_hallucination",
+        "response_relevancy~answers_question", "context_precision~precision",
+        "context_recall~recall",
+    ]  # fmt: skip
+    for per in agreement.values():
+        # descriptive throughout (ADR 0047, spec non-goals): no p-value, pooled or per strategy
+        assert all("p" not in c for c in per.values()) and set(per) == {"pooled", *C}
+        assert per["pooled"]["n"] == len(QIDS) * 3
+
+
+def test_ragas_tables_follow_the_iu_rules(tmp_path):
+    nan = {("Q003", "C2", "faithfulness")}
+    paths = write_tables(build_results(ragas_data(nan), 0.05), tmp_path)
+    names = {p.name for p in paths}
+    assert {"ragas.tex", "ragas_agreement.tex"} <= names
+    titles = {
+        "ragas.tex": "RAGAS-Bewertung je Strategie",
+        "ragas_agreement.tex": "Übereinstimmung von RAGAS mit Bewertung und Retrieval",
+    }
+    for name, title in titles.items():
+        text = (tmp_path / name).read_text(encoding="utf-8")
+        assert rf"\caption{{{title}}}" in text and r"\centering" not in text
+        tail = text.split(r"\end{tabular}")[1]
+        assert r"\source{Eigene Darstellung." in tail
+        align = text.split(r"\begin{tabular}{")[1].split("}")[0]
+        assert len(align) <= 5, (name, align)
+    note = (tmp_path / "ragas.tex").read_text(encoding="utf-8").split(r"\end{tabular}")[1]
+    assert "NaN" in note and "Faithfulness C2: 1" in note
+    pooled = [
+        line
+        for line in (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8").splitlines()
+        if line.startswith("gesamt &")
+    ]
+    agreement = (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8")
+    assert len(pooled) == 5 and "Spearmans ρ & n" in agreement and " & p & " not in agreement
+    effects = (tmp_path / "ragas.tex").read_text(encoding="utf-8")
+    # r rests on the differences not equal to 0; with heavy ties n' can be tiny, so it is shown
+    assert "n′ = " in effects
+
+
+def test_ragas_tables_skipped_without_ragas(tmp_path):
+    results = build_results(make_data(), 0.05)
+    assert results["ragas"] is None and results["ragas_agreement"] is None
+    names = {p.name for p in write_tables(results, tmp_path)}
+    assert "ragas.tex" not in names and "ragas_agreement.tex" not in names
+
+
+def test_ragas_agreement_without_checks_drops_that_pair():
+    results = build_results(replace(ragas_data(), answers_question=None), 0.05)
+    assert "response_relevancy~answers_question" not in results["ragas_agreement"]
+    assert any("answers_question" in n for n in results["notes"])
+
+
+def test_constant_side_is_not_determinable(tmp_path):
+    """All answers answer the question (pilot e2e: 48 of 48 yes): rho cannot be computed."""
+    results = build_results(ragas_data(constant=True), 0.05)
+    per = results["ragas_agreement"]["response_relevancy~answers_question"]
+    assert all(per[k]["rho"] is None and per[k]["testable"] is False for k in per)
+    write_tables(results, tmp_path)
+    text = (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8")
+    assert "nicht bestimmbar" in text and "nan" not in text.lower()
+
+
+def test_ragas_stability_from_repeat():
+    results = build_results(ragas_data(repeat=True), 0.05)
+    st = results["ragas_stability"]
+    assert set(st) == set(METRICS)
+    for m in METRICS:
+        assert st[m]["mean_abs_diff"] == pytest.approx(0.01, abs=1e-6)
+        assert st[m]["share_equal"] == 0.0 and st[m]["n"] == len(QIDS) * 3
+        assert st[m]["rho"] == pytest.approx(1.0)
+    assert "ragas_stability" not in build_results(ragas_data(), 0.05)
+
+
+def test_ragas_outputs_are_byte_identical_on_rerun(tmp_path):
+    outs = []
+    for run in ("a", "b"):
+        results = build_results(ragas_data({("Q001", "C1", "context_recall")}, repeat=True), 0.05)
+        write_tables(results, tmp_path / run)
+        write_json(results, tmp_path / run / "analysis.json")
+        outs.append({p.name: p.read_bytes() for p in (tmp_path / run).iterdir()})
+    assert outs[0] == outs[1]

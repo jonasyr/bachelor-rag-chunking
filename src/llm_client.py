@@ -50,8 +50,9 @@ def complete(messages: list[dict], client: Any = None) -> Completion:
     )
 
 
-def model_created(client: Any = None) -> int:
-    """Creation time (Unix seconds) of the model object behind config.LLM_MODEL; OpenAI offers
-    no dated snapshot of it, so this is the only version marker the API reports (ADR 0033)."""
+def model_created(client: Any = None, model: str = LLM_MODEL) -> int:
+    """Creation time (Unix seconds) of the model object behind `model` (default config.LLM_MODEL);
+    OpenAI offers no dated snapshot of it, so this is the only version marker the API reports
+    (ADR 0033)."""
     client = client or _openai_client()
-    return client.models.retrieve(LLM_MODEL).created
+    return client.models.retrieve(model).created
