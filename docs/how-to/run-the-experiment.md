@@ -16,8 +16,9 @@ jedem Block die versionierten Dateien committen ([Datenformate](../reference/dat
 Retrieval-Ergebnisse und Fragevektoren sind ignoriert und bleiben nur lokal.
 
 ```bash
-# 0. Katalog eingefroren? (sonst brechen 1 und 2 vor jedem API-Aufruf ab)
-uv run python src/catalogue.py check
+# 0. Katalog eingefroren: der Freeze-Commit existiert (retrieve.py und generate.py prüfen den Datensatz vor jedem
+#    API-Aufruf und brechen sonst ab)
+git log -1 --oneline -- data/evaluation/catalogue_freeze.json
 
 # 1. Retrieval C1–C3 und K1 (Fragevektoren: ein API-Aufruf, danach aus data/evaluation/query_embeddings.npz)
 uv run python src/retrieve.py
