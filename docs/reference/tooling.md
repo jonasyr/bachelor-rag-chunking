@@ -86,7 +86,7 @@ bachelor-rag-chunking/
     ├── README.md                            (Index der Dokumentation)
     ├── plan.md                              (Zeitplan, Stand, offene Entscheidungen)
     ├── explanation/  how-to/  reference/    (Diátaxis; reference/configuration.md = config.py)
-    ├── adr/                                 (Entscheidungen 0001–0044)
+    ├── adr/                                 (Entscheidungen 0001–0045)
     ├── superpowers/specs/  superpowers/plans/   (datierte Entwürfe und Umsetzungspläne; Momentaufnahmen)
     ├── corpus_snapshot.txt                  (Snapshot-Datensatz)
     └── corpus_manifest.csv                  (Korpusmanifest)

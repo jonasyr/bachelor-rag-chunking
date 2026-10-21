@@ -20,15 +20,11 @@ data/raw/e2e_docs_snapshot/*
 !data/raw/e2e_docs_snapshot/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-data/evaluation/retrieved_results.csv
-data/evaluation/retrieved_results_control.csv
-data/evaluation/retrieval_scores.csv
-data/evaluation/retrieval_scores_control.csv
+!data/processed/embedding_runs.jsonl
 data/evaluation/scores.csv
 data/evaluation/scores_control.csv
 data/evaluation/scoring_packet.md
 data/evaluation/scoring_items.jsonl
-data/evaluation/query_embeddings.npz
 
 # Chroma vector store
 chroma_db/

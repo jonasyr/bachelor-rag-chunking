@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0044 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0045 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -36,7 +36,7 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0021](0021-c3-grenzen.md) | C3: Untergrenze 50 Tokens, Verschmelzen vor dem Teilen | Angenommen; ergänzt durch 0026 (auch Begründung der Obergrenze) |
 | [0022](0022-h1-abschnitte-in-ground-truth.md) | H1-Abschnitte in der Ground Truth nur, wenn die ganze Seite die Antwort ist | Angenommen |
 | [0023](0023-embedding-modell.md) | Embedding-Modell: text-embedding-3-large mit 3.072 Dimensionen | Angenommen |
-| [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen |
+| [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen; Versionierung geändert durch 0045 |
 | [0025](0025-korpus-guide-api-styleguide.md) | Korpus: Guide, API-Referenz (Composition) und Style Guide auf `40aa88a` | Ersetzt durch 0038 |
 | [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen; Zahlen vom Vue-Korpus, K1-Wert korpusabhängig |
 | [0027](0027-blinde-annotation.md) | Relevanz-Annotation blind vor jedem Retrieval; nachträgliche Ergänzungen nur als Sensitivität | Angenommen; technisch umgesetzt durch 0030 |
@@ -57,3 +57,4 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0042](0042-mdx-umwandlung.md) | MDX-Umwandlung: eigene Anker, Agent-Prompts und Video-Karten bleiben | Angenommen |
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen |
 | [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0009, 0012, 0013 |
+| [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen |
