@@ -20,6 +20,7 @@ data/raw/e2e_docs_snapshot/*
 !data/raw/e2e_docs_snapshot/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/embedding_runs.jsonl
 data/evaluation/scores.csv
 data/evaluation/scores_control.csv
 data/evaluation/scoring_packet.md

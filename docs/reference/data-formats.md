@@ -443,7 +443,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `docs/corpus_snapshot.txt`, `docs/corpus_manifest.csv` | Snapshot-Datensatz, Korpusmanifest | versioniert |
 | `data/raw/e2e_docs_snapshot/` | Rohseiten des Snapshots | ignoriert; nur `.gitkeep` versioniert |
 | übrige Ordner in `data/raw/` (z. B. `vue_docs_snapshot/`) | alter Vue-Snapshot, nur lokal | ignoriert (`data/raw/*`) |
-| `data/processed/` | `documents.jsonl`, `sections.jsonl`, `section_index.md`, `chunks_*.jsonl`, `embeddings_*.npz`, `embedding_runs.jsonl` | ignoriert; nur `.gitkeep` versioniert |
+| `data/processed/` | `documents.jsonl`, `sections.jsonl`, `section_index.md`, `chunks_*.jsonl`, `embeddings_*.npz` | ignoriert; versioniert nur `.gitkeep` und das Laufprotokoll `embedding_runs.jsonl` ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) |
 | `data/processed/archive_vue_2026-10-18/` | Vue-Chunks, -Vektoren, -Laufprotokoll und alter Chroma-Index, nur lokal ([Experiment-Protokoll](experiment-record.md#embedding-e2e)) | ignoriert |
 | `chroma_db/` (auch `*.chroma`) | Chroma-Index; entsteht beim ersten `embed.py` | ignoriert (ganzer Ordner, kein `.gitkeep`) |
 | `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | versioniert |

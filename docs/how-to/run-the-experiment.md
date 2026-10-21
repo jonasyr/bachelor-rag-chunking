@@ -24,7 +24,7 @@ git log -1 --oneline -- data/evaluation/catalogue_freeze.json
 uv run python src/retrieve.py
 uv run python src/retrieve.py --control
 git add data/evaluation/query_embeddings.npz data/evaluation/retrieved_results.csv \
-  data/evaluation/retrieved_results_control.csv
+  data/evaluation/retrieved_results_control.csv data/processed/embedding_runs.jsonl
 git commit -m "chore(data): Retrieval des Hauptlaufs"
 
 # 2. Antworten C1–C3 und K0, genau einmal (überschreibt nie), sofort committen
@@ -40,6 +40,7 @@ uv run python src/evaluate_answers.py --mode scaffold
 #    App, Seite „Scoring“: Kernpunkte prüfen und einfrieren, dann jede Antwort blind bewerten (Schritt 6 unten)
 uv run python src/evaluate_answers.py --mode summarise
 git add data/evaluation/retrieval_scores.csv data/evaluation/retrieval_scores_control.csv \
+  data/processed/embedding_runs.jsonl \
   data/evaluation/scoring_sheet.csv data/evaluation/scoring_key.csv data/evaluation/key_points.csv \
   data/evaluation/scoring_checks.csv data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): Bewertung C1–C3"
