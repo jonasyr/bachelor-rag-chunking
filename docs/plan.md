@@ -12,8 +12,10 @@ und Stichprobenplan ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), (4b) Closed-B
 ([ADR 0040](adr/0040-closed-book-pruefung.md)), (4c) Kontrolle K0 ohne Retrieval
 ([ADR 0041](adr/0041-kontrolle-k0.md)). Alle Schritte der Pipeline sind umgesetzt und getestet, ebenso die Auswertungsskripte (`src/analyse.py`, erledigt
 20.10.2026, [ADR 0044](adr/0044-statistische-auswertung.md)); echte Läufe auf dem Katalog stehen aus. (5) Pilot auf e2e erledigt 20.10.2026 ([Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026);
-offen nur Jonas' Übungsbewertung von 3 Fragen). Nächster Schritt: Empfehlungen des Pilots entscheiden (Regel zu
-`direct` präzisieren), danach 48 Fragen in sechs Blöcken zu 8 schreiben und annotieren ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
+offen nur Jonas' Übungsbewertung von 3 Fragen); die Regel zu `direct` ist präzisiert
+([ADR 0043](adr/0043-praezisierung-direct-und-teilantworten.md)). Stand 21.10.2026: Der Hauptkatalog hat noch 0 von 48
+Fragen. Nächster Schritt: 48 Fragen in sechs Blöcken zu 8 schreiben und annotieren
+([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)); weitere Punkte im [Backlog](#backlog).
 Frühere Stände: [Verlauf](#verlauf).
 
 ## Zeitplan (13.10.–24.12.2026)
@@ -50,6 +52,22 @@ Skripte für `output/tables/` und `output/figures/` sowie für Einleitung, Grund
 Daten in der Tabelle bleiben bis zu seiner Entscheidung unverändert.
 
 Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Historie.
+
+## Backlog
+
+Offene Arbeit nach Priorität (Punkt 1 ist die Katalogzeile des Zeitplans); erledigte Punkte wandern in den [Verlauf](#verlauf).
+
+1. **Fragenkatalog** (kritischer Pfad): 48 Fragen in sechs Blöcken zu 8, nach jedem Block KI-Durchsicht und
+   Closed-Book-Prüfung; Einfrieren bis 06.11. ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
+2. **Übungsbewertung Pilot**: Jonas bewertet die 9 Antworten in `data/pilot/e2e_jonas/`; danach Vergleich mit der
+   Agentenbewertung im [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026).
+3. **Zwei kleine Code-Korrekturen**: die `noqa: F811`-Ausnahmen in den Tests begründen (wie bei F401: „(fixture)“); doppelte
+   Einträge in `relevant_doc_ids` beim Katalog-Check abweisen.
+4. **Zweitbewertung**: Vorschlag für die Einrichtung (wer, welche Stichprobe, Übereinstimmungsmaß), siehe
+   [Offene Entscheidungen](#offene-entscheidungen).
+5. **RAGAS**: entscheiden, ob der optionale Abgleich läuft, nach der regelbasierten Bewertung
+   ([Evaluation](reference/evaluation.md#triangulation-optional)).
+6. **Demo-Dashboard** (niedrige Priorität): Ergebnisse interaktiv zeigen, nur falls Zeit bleibt.
 
 ## Offene Entscheidungen
 
