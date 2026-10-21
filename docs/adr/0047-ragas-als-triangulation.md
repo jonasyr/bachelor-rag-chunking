@@ -12,8 +12,9 @@ Angenommen (21.10.2026; konkretisiert [ADR 0007](0007-triangulation.md); ändert
   [Evaluation](../reference/evaluation.md#triangulation), [Plan](../plan.md)).
 - Ein Modell, das seine eigenen Antworten bewertet, bevorzugt sie tendenziell (Zheng et al., 2023); die Antworten
   stammen von `gpt-6-luna` ([ADR 0033](0033-antwortmodell.md)).
-- LLM-Urteile sind auch bei `temperature = 0` nicht garantiert wiederholbar; die Arbeit darf daher nicht auf ihnen
-  aufbauen ([ADR 0035](0035-regelbasierte-bewertung.md)).
+- LLM-Ausgaben sind auch bei `temperature = 0` und festem `seed` nur nach Möglichkeit wiederholbar
+  ([ADR 0033](0033-antwortmodell.md)), und ein LLM als Bewerter ist nicht valide geprüft
+  ([ADR 0035](0035-regelbasierte-bewertung.md)); die Arbeit darf daher nicht allein auf seinen Urteilen aufbauen.
 - Im Lockfile steht `ragas` 0.4.3, in `pyproject.toml` nur `ragas>=0.1.0`.
 
 ## Entscheidung

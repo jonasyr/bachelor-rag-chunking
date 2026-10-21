@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war)
+Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war); konkretisiert durch [ADR 0046](0046-zweitbewertung.md) (Zweitbewertung) und [ADR 0047](0047-ragas-als-triangulation.md) (RAGAS)
 
 ## Kontext
 
