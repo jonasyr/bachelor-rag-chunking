@@ -1,6 +1,8 @@
 import json
 
-from run_log import append_step_run, sha256_of
+import pytest
+
+from run_log import append_step_run, require_run, sha256_of
 
 
 def test_append_step_run_records_hashes(tmp_path):
@@ -13,3 +15,20 @@ def test_append_step_run_records_hashes(tmp_path):
     assert record["inputs_sha256"] == {"in.csv": sha256_of(a)}
     assert record["outputs_sha256"] == {"out.csv": sha256_of(b)}
     assert json.loads(runs.read_text(encoding="utf-8")) == record
+
+
+@pytest.mark.parametrize(
+    ("step", "strategy", "command"),
+    [
+        ("summarise", "C1,C2,C3", "src/evaluate_answers.py --mode summarise"),
+        ("summarise_control", "K0", "src/evaluate_answers.py --mode summarise --control"),
+        ("evaluate_retrieval", "K1", "src/evaluate_retrieval.py --control"),
+        ("generate", "C1,C2,C3", "src/generate.py"),
+    ],
+)
+def test_missing_run_names_the_real_command(tmp_path, step, strategy, command):
+    runs = tmp_path / "runs.jsonl"
+    runs.write_text("", encoding="utf-8")
+    with pytest.raises(RuntimeError) as error:
+        require_run(runs, step, strategy, [], [])
+    assert f"run {command}" in str(error.value)

@@ -8,6 +8,60 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
 [ADR 0017](../adr/0017-fragenkatalog.md), [ADR 0027](../adr/0027-blinde-annotation.md)). Nur das Chunking variiert
 ([ADR 0006](../adr/0006-nur-chunking-variiert.md)). Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 
+## Hauptlauf auf einen Blick
+
+Für den e2e-Korpus sind Schritt 1–3 (Snapshot, Chunks, Embeddings) erledigt und werden nicht wiederholt; der Hauptlauf
+beginnt mit dem eingefrorenen Katalog ([Fragenkatalog erstellen](build-the-question-catalogue.md), Schritt 6). Nach
+jedem Block die versionierten Dateien committen ([Datenformate](../reference/data-formats.md#versioniert-und-ignoriert));
+Retrieval-Ergebnisse und Fragevektoren sind ignoriert und bleiben nur lokal.
+
+```bash
+# 0. Katalog eingefroren: der Freeze-Commit existiert (retrieve.py und generate.py prüfen den Datensatz vor jedem
+#    API-Aufruf und brechen sonst ab)
+git log -1 --oneline -- data/evaluation/catalogue_freeze.json
+
+# 1. Retrieval C1–C3 und K1 (Fragevektoren: ein API-Aufruf, danach aus data/evaluation/query_embeddings.npz)
+uv run python src/retrieve.py
+uv run python src/retrieve.py --control
+
+# 2. Antworten C1–C3 und K0, genau einmal (überschreibt nie), sofort committen
+uv run python src/generate.py
+git add data/evaluation/generated_answers.csv data/evaluation/generated_answers_control.csv \
+  data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Antworten des Hauptlaufs"
+
+# 3. Retrieval-Metriken und Bewertungsbogen C1–C3
+uv run python src/evaluate_retrieval.py
+uv run python src/evaluate_retrieval.py --control
+uv run python src/evaluate_answers.py --mode scaffold
+#    App, Seite „Scoring“: Kernpunkte prüfen und einfrieren, dann jede Antwort blind bewerten (Schritt 6 unten)
+uv run python src/evaluate_answers.py --mode summarise
+git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_key.csv data/evaluation/key_points.csv \
+  data/evaluation/scoring_checks.csv data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Bewertung C1–C3"
+
+# 4. Kontrolle K0 (erst nach scores.csv)
+uv run python src/evaluate_answers.py --mode scaffold --control
+#    App, Satz „Main catalogue: control K0“: jede Antwort prüfen
+uv run python src/evaluate_answers.py --mode summarise --control
+git add data/evaluation/scoring_items_control.jsonl data/evaluation/scoring_sheet_control.csv \
+  data/evaluation/scoring_checks_control.csv data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Bewertung K0"
+
+# 5. Auswertung für die Arbeit
+uv run python src/analyse.py
+git add output/tables output/figures output/analysis.json
+git commit -m "chore(data): Auswertung des Hauptlaufs"
+```
+
+Danach Branch, Pull Request und Submodul-Zeiger: [Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md).
+Bricht ein Schritt ab, nennt die Meldung den Befehl, der den fehlenden oder veralteten Laufeintrag schreibt.
+
+**Kosten** (geschätzt aus dem Pilot e2e, 16 Fragen, mal 3 für 48 Fragen): Generierung C1–C3 und K0 etwa 0,04 USD
+(Pilot 0,0128 USD), Fragevektoren unter 0,001 USD (Pilot 0,00006 USD); die Closed-Book-Prüfung beim Schreiben des
+Katalogs kostet je Durchgang etwa so viel wie K0 (Pilot 0,0006 USD für 16 Fragen). Der Probelauf dieser Befehlsfolge
+ist im [Experiment-Protokoll](../reference/experiment-record.md#probelauf-hauptlauf-21102026) festgehalten.
+
 ## Schritte
 
 1. Snapshot, Ingest, Preprocessing: siehe [Korpus-Snapshot erstellen](create-corpus-snapshot.md).
@@ -47,14 +101,9 @@ fertig und eingefroren ([Fragenkatalog erstellen](build-the-question-catalogue.m
    ```
 
 8. Auswertung für die Arbeit, als Letztes, wenn der Hauptkatalog eingefroren ist und alle Ergebnisdateien zu den
-   aktuellen Läufen gehören ([ADR 0044](../adr/0044-statistische-auswertung.md)): erst die Retrieval-Metriken neu
-   schreiben, damit sie einen Laufeintrag haben, dann auswerten.
-
-   ```bash
-   uv run python src/evaluate_retrieval.py
-   uv run python src/evaluate_retrieval.py --control
-   uv run python src/analyse.py
-   ```
+   aktuellen Läufen gehören ([ADR 0044](../adr/0044-statistische-auswertung.md)): `uv run python src/analyse.py`.
+   Die Retrieval-Metriken aus Schritt 6 haben schon ihren Laufeintrag; nur wenn sie älter sind als das letzte
+   Retrieval, `evaluate_retrieval.py` (und `--control`) erneut ausführen.
 
    `analyse.py` schreibt `output/tables/*.tex`, `output/figures/*.pdf` und `output/analysis.json` und bricht ab, wenn
    der Katalog nicht eingefroren ist oder eine Ergebnisdatei nicht zum letzten Laufeintrag passt (dann den Schritt
