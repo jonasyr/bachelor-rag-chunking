@@ -1,7 +1,7 @@
 # Architekturentscheidungen (ADR)
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0045 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0047 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -19,7 +19,7 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0004](0004-zeitraum-und-abgabe.md) | Bearbeitungszeitraum Juli–Dezember 2026, Abgabe 24.12.2026 | Angenommen |
 | [0005](0005-drei-chunking-strategien.md) | Drei Chunking-Strategien C1–C3, C4 optional | Angenommen; konkretisiert durch 0021, ergänzt durch 0026; C4-Bedingung präzisiert durch 0028 |
 | [0006](0006-nur-chunking-variiert.md) | Nur das Chunking variiert | Angenommen |
-| [0007](0007-triangulation.md) | Evaluation als Triangulation: manuell primär, RAGAS sekundär | Angenommen |
+| [0007](0007-triangulation.md) | Evaluation als Triangulation: manuell primär, RAGAS sekundär | Angenommen; konkretisiert durch 0046, 0047 |
 | [0008](0008-kosten-als-variable.md) | Kosten/Effizienz als eigene abhängige Variable | Angenommen; ergänzt durch 0044 |
 | [0009](0009-hypothesen.md) | Drei geschärfte Hypothesen H1–H3, explorativ | Angenommen; ergänzt durch 0044 |
 | [0010](0010-starke-baseline.md) | Fixed-size mit Overlap ist eine starke Baseline | Angenommen |
@@ -27,7 +27,7 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0012](0012-retrieval-metriken.md) | Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k) | Angenommen; ergänzt durch 0044 |
 | [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen; ergänzt durch 0032, 0035, 0044 |
 | [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen; umgesetzt in 0033 |
-| [0015](0015-tech-stack.md) | Tech-Stack | Angenommen; konkretisiert durch 0023, 0024 |
+| [0015](0015-tech-stack.md) | Tech-Stack | Angenommen; konkretisiert durch 0023, 0024; geändert durch 0047 |
 | [0016](0016-modell-neutralitaet.md) | Modell-Neutralität | Angenommen; Embedding-Modell und Versionen in 0023, Antwortmodell in 0033 |
 | [0017](0017-fragenkatalog.md) | Fragenkatalog: etwa 40 Fragen mit Referenzantworten | Angenommen; präzisiert durch 0027, 0029 und 0030; ergänzt durch 0022, 0040 |
 | [0018](0018-literaturbasis.md) | Literaturbasis: 15 verifizierte Quellen | Angenommen |
@@ -58,3 +58,5 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen |
 | [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0009, 0012, 0013 |
 | [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen |
+| [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007 |
+| [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007, ändert 0015 |

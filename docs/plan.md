@@ -28,10 +28,10 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 | 13.–19.10. | Korpus | **erledigt 18.10.:** Snapshot, `ingest.py`, `preprocess.py` (test-first), Korpusmanifest; am 18.10. Wechsel zu e2e beschlossen ([ADR 0038](adr/0038-korpus-e2e.md)) und Snapshot und Neuaufbau auf e2e abgeschlossen | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll |
 | 20.10.–02.11. | Pipeline | **erledigt:** Chunking C1–C3 und K1, Embedding, Chroma, Retrieval (13.10., auf e2e neu am 18.10.); Embedding-Modell, SDK und Chroma gepinnt (13.–14.10.); Generierung und GPT-Modell (17.10.); Kontrolle K0 (19.10.). Der Prototyp mit einer Frage ist durch die Pilotläufe auf Vue.js abgedeckt und wird auf e2e durch Schritt (5) ersetzt | lauffähige Pipeline, Modellversionen dokumentiert |
 | 20.10.–08.11. | Fragenkatalog (parallel) | Vorab Schritt (5): Pilot auf e2e (nicht aus dem Katalog) als Vortest von Prompt und Rubrik, **erledigt** 20.10.; der Vortest auf dem Vue-Set `hard` ist erledigt (18.10., zählt nicht). Dann 48 Fragen in sechs Blöcken zu 8 (zwei je Woche ab 20.10., Einfrieren 06.11.; Stichprobenplan gezogen 19.10. ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)) nach jedem Block), Referenzantworten, `relevant_section_ids` (blind annotiert, [ADR 0027](adr/0027-blinde-annotation.md)) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` |
-| 03.–09.11. | Auswertungsskripte | **erledigt 16.–17.10. und 20.10.:** Statistik, Tabellen und Abbildungen (`analyse.py`, `stats.py`, `report_tables.py`, `report_figures.py`, [ADR 0044](adr/0044-statistische-auswertung.md)); zuvor Relevanz per Token-Überlappung (`retrieve.py`/`relevance.py`); Recall/Precision/MRR/Hit@5, Kostenerfassung, Kontext-Tokens je Antwort (16.10.); regelbasierte Bewertung in der App (17.10., [ADR 0035](adr/0035-regelbasierte-bewertung.md)). RAGAS nur optional, nach der regelbasierten Bewertung | `evaluate_retrieval.py`, `evaluate_answers.py`, `analyse.py` getestet |
+| 03.–09.11. | Auswertungsskripte | **erledigt 16.–17.10. und 20.10.:** Statistik, Tabellen und Abbildungen (`analyse.py`, `stats.py`, `report_tables.py`, `report_figures.py`, [ADR 0044](adr/0044-statistische-auswertung.md)); zuvor Relevanz per Token-Überlappung (`retrieve.py`/`relevance.py`); Recall/Precision/MRR/Hit@5, Kostenerfassung, Kontext-Tokens je Antwort (16.10.); regelbasierte Bewertung in der App (17.10., [ADR 0035](adr/0035-regelbasierte-bewertung.md)). RAGAS fest nach der regelbasierten Bewertung ([ADR 0047](adr/0047-ragas-als-triangulation.md)) | `evaluate_retrieval.py`, `evaluate_answers.py`, `analyse.py` getestet |
 | **09.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)) | Commit-Hash im Experiment-Protokoll |
 | 10.–16.11. | Experimente | volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (ohne Retrieval, im selben Generierungslauf, [ADR 0041](adr/0041-kontrolle-k0.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) |
-| 17.–25.11. | Bewertung und Analyse | regelbasierte Rubrik-Bewertung (144 Antworten: 48 Fragen × C1–C3), danach 48 Antworten K0; optional RAGAS-Abgleich; Statistik, Abbildungen | `scores.csv`, `scores_control.csv`, `output/tables/`, `output/figures/` |
+| 17.–25.11. | Bewertung und Analyse | regelbasierte Rubrik-Bewertung (144 Antworten: 48 Fragen × C1–C3), danach 48 Antworten K0; Zweitbewertung von 36 Antworten ([ADR 0046](adr/0046-zweitbewertung.md)); RAGAS-Abgleich ([ADR 0047](adr/0047-ragas-als-triangulation.md)); Statistik, Abbildungen | `scores.csv`, `scores_control.csv`, `output/tables/`, `output/figures/` |
 | 26.11.–13.12. | Schreibphase | Methodik, Implementierung, Ergebnisse, Diskussion, Fazit (Grundlagen siehe Hinweis) | Rohfassung komplett |
 | 14.–20.12. | Überarbeitung | Sprache, Argumentation, roter Faden, `./paperlab check` | Endfassung |
 | 21.–23.12. | Puffer | Korrektorat, Formatierung, Zitation, `./paperlab final` | Abgabe-PDF |
@@ -61,16 +61,16 @@ Offene Arbeit nach Priorität (Punkt 1 ist die Katalogzeile des Zeitplans); erle
    Closed-Book-Prüfung; Einfrieren bis 06.11. ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
 2. **Übungsbewertung Pilot**: Jonas bewertet die 9 Antworten in `data/pilot/e2e_jonas/`; danach Vergleich mit der
    Agentenbewertung im [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026).
-3. **Zweitbewertung**: Vorschlag für die Einrichtung (wer, welche Stichprobe, Übereinstimmungsmaß), siehe
-   [Offene Entscheidungen](#offene-entscheidungen).
-4. **RAGAS**: entscheiden, ob der optionale Abgleich läuft, nach der regelbasierten Bewertung
-   ([Evaluation](reference/evaluation.md#triangulation-optional)).
+3. **Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md)): zweite Person finden (bis Mitte November, sonst
+   Ersatz nach ADR 0046); Ziehung der 12 Fragen und Übereinstimmungsrechnung umsetzen, Ziehung nach dem Einfrieren.
+4. **RAGAS** ([ADR 0047](adr/0047-ragas-als-triangulation.md)): Lauf mit `gpt-6-sol` und vier Metriken umsetzen und
+   auf dem Pilot erproben; der Hauptlauf folgt nach `summarise`.
 5. **Demo-Dashboard** (niedrige Priorität): Ergebnisse interaktiv zeigen, nur falls Zeit bleibt.
 
 ## Offene Entscheidungen
 
-- **Zweitbewertung:** Verfügbarkeit einer zweiten bewertenden Person klären (stärkt Konstruktvalidität). Eine
-  Zweitannotation der Relevanz (10–12 Fragen, blind, Übereinstimmungsmaß) ist vorgemerkt: später, falls Zeit bleibt.
+- **Zweitannotation der Relevanz:** 10–12 Fragen, blind; nach dem Einfrieren entscheiden, falls Zeit bleibt
+  ([ADR 0046](adr/0046-zweitbewertung.md)).
 - **C4 (semantisch):** läuft nur, wenn der Meilenstein 09.11. (Ground Truth eingefroren) planmäßig erreicht ist
   ([ADR 0028](adr/0028-c4-bedingung.md)).
 
@@ -79,8 +79,8 @@ Antwortmodell ([ADR 0033](adr/0033-antwortmodell.md)); Fragenkatalog mit 48 Frag
 ([ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md)), Quoten je Bereich und Stichprobenplan auf e2e
 ([ADR 0039](adr/0039-stichprobenplan-e2e.md)), Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)),
 Einfrieren vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.md)); Kontrolle K0
-([ADR 0041](adr/0041-kontrolle-k0.md)); RAGAS nur optional nach der regelbasierten Bewertung
-([Evaluation](reference/evaluation.md#triangulation-optional)).
+([ADR 0041](adr/0041-kontrolle-k0.md)); Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); RAGAS fest nach der regelbasierten Bewertung
+([ADR 0047](adr/0047-ragas-als-triangulation.md)).
 
 ## Verlauf
 
@@ -108,3 +108,5 @@ Einfrieren vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.
   ([ADR 0044](adr/0044-statistische-auswertung.md)).
 - 21.10.2026: Backlog angelegt; Ground-Truth-Prüfung weist doppelte `relevant_doc_ids` ab
   ([Datenformate](reference/data-formats.md)).
+- 21.10.2026: Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)) und RAGAS als feste Triangulation
+  ([ADR 0047](adr/0047-ragas-als-triangulation.md)) entschieden.
