@@ -8,7 +8,7 @@ Angenommen (21.10.2026; konkretisiert die Empfehlung aus [ADR 0007](0007-triangu
 
 ## Kontext
 
-- Jonas bewertet alle 144 Antworten C1–C3 allein, regelbasiert und blind
+- Jonas bewertet alle 144 Antworten C1–C3 allein, blind ([ADR 0032](0032-blinde-rubrik-bewertung.md)) und regelbasiert
   ([ADR 0035](0035-regelbasierte-bewertung.md), [ADR 0036](0036-regelbasierte-bewertung-verpflichtend.md)), dazu die
   48 K0-Antworten regelbasiert, aber nicht blind ([ADR 0041](0041-kontrolle-k0.md)). Ohne
   zweite Bewertung bleibt offen, wie stark die Werte von der bewertenden Person abhängen.

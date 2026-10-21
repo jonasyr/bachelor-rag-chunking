@@ -47,7 +47,7 @@ bleibt unverändert. Hängt eine Regel an einem abgelösten Korpus, wird sie „
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten (Lesepaket, Bogen, Schlüssel) | Angenommen; ergänzt durch 0034, 0035 |
 | [0033](0033-antwortmodell.md) | Antwortmodell `gpt-6-luna` (Effort `none`, Temperatur 0), Antworten einmal erzeugen | Angenommen; ergänzt durch 0041 |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung als Seite der App, blinde Einträge `scoring_items.jsonl` | Angenommen; ergänzt durch 0035 |
-| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037, 0043; für K0 ergänzt durch 0041 |
+| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037, 0043; für K0 ergänzt durch 0041; Intra-Rater geregelt durch 0046 |
 | [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |
 | [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen; präzisiert durch 0043 |
 | [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen; ersetzt 0001, 0025; Stichprobenplan 0039; Beurteilung festgelegt durch 0040; K0 umgesetzt durch 0041; MDX-Umwandlung ergänzt durch 0042 |
