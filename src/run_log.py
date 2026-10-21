@@ -88,8 +88,20 @@ def append_generation_run(
 
 
 def append_ragas_run(record: dict, runs_file: Path) -> dict:
-    """Append one JSON line of a RAGAS run (ADR 0047): the pinned judge settings, versions, date
-    and cost, judge and embeddings apart, from the tokens in `record`."""
+    """Build and append the record of a RAGAS run (see `ragas_record`)."""
+    full = ragas_record(record)
+    _append(full, runs_file)
+    return full
+
+
+def append_record(record: dict, runs_file: Path) -> None:
+    """Append a record that was built beforehand."""
+    _append(record, runs_file)
+
+
+def ragas_record(record: dict) -> dict:
+    """The record of a RAGAS run (ADR 0047): the pinned judge settings, versions, date and cost,
+    judge and embeddings apart, from the tokens in `record`. Nothing is written."""
     judge = round(
         (
             record["judge_prompt_tokens"] * RAGAS_JUDGE_PRICE_INPUT_PER_MTOK
@@ -113,7 +125,6 @@ def append_ragas_run(record: dict, runs_file: Path) -> dict:
         "embedding_cost_usd": _cost(record["embedding_tokens"]),
     }
     full["cost_usd"] = round(full["judge_cost_usd"] + full["embedding_cost_usd"], 10)
-    _append(full, runs_file)
     return full
 
 

@@ -4,13 +4,22 @@ import json
 import pytest
 
 import freeze
+import run_log
 from config import (
     RAGAS_METRICS,
     RAGAS_REPEAT_FILE_NAME,
     STRATEGY_IDS,
 )
 from ragas_client import ApiRecorder
-from ragas_eval import RAGAS_HEADER, Sample, build_samples, run, set_paths, validated
+from ragas_eval import (
+    RAGAS_HEADER,
+    Sample,
+    build_samples,
+    main_paths,
+    run,
+    set_paths,
+    validated,
+)
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 from run_log import latest_run, sha256_of
 
@@ -133,12 +142,29 @@ def record_upstream(files, summarise=True):
         log(files, "summarise", outputs=[files["scores_file"]])
 
 
+def reporting_recorder():
+    recorder = ApiRecorder()
+    recorder.models = {"gpt-6-sol-x"}
+    return recorder
+
+
+def freeze_catalogue(files, monkeypatch):
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
+    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
+    names = [
+        files[k] for k in ("questions_file", "ground_truth_file", "sections_file", "documents_file")
+    ]
+    files["freeze_file"].write_text(
+        json.dumps({"date": "2026-10-01", "sha256": {f.name: sha256_of(f) for f in names}})
+    )
+
+
 def go(files, scorer=None, recorder=None, created=None, main=True, record=True, **kw):
     if record:
         record_upstream(files, summarise=main)
     return run(
         scorer or FakeScorer(),
-        recorder or ApiRecorder(),
+        recorder or reporting_recorder(),
         created or FakeCreated(),
         files,
         main,
@@ -202,25 +228,27 @@ def test_missing_chunk_is_refused_before_any_call(files):
     assert not files["out_file"].exists()
 
 
-@pytest.mark.parametrize("case", ["not_frozen", "no_summarise", "stale_answers"])
-def test_main_requires_freeze_summarise_and_current_answers(files, monkeypatch, case):
-    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
-    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
-    if case != "not_frozen":
-        names = [
-            files[k]
-            for k in ("questions_file", "ground_truth_file", "sections_file", "documents_file")
-        ]
-        files["freeze_file"].write_text(
-            json.dumps({"date": "2026-10-01", "sha256": {f.name: sha256_of(f) for f in names}})
-        )
+@pytest.mark.parametrize(
+    ("case", "message"),
+    [
+        ("not_frozen", "not frozen"),
+        ("no_summarise", "no summarise run"),
+        ("stale_answers", "latest generate run"),
+    ],
+)
+def test_main_requires_freeze_summarise_and_current_answers(files, monkeypatch, case, message):
+    if case == "not_frozen":
+        monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
+        monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
+    else:
+        freeze_catalogue(files, monkeypatch)
     scorer = FakeScorer()
     record_upstream(files, summarise=case != "no_summarise")
     if case == "stale_answers":
         with files["answers_file"].open("a", encoding="utf-8") as f:
             f.write("Q002,C1,late,C1_D001_0001,1,1\n")
-    with pytest.raises(RuntimeError):
-        run(scorer, ApiRecorder(), FakeCreated(), files, True)
+    with pytest.raises(RuntimeError, match=message):
+        run(scorer, reporting_recorder(), FakeCreated(), files, True)
     assert scorer.calls == []
     assert not files["out_file"].exists()
 
@@ -253,27 +281,27 @@ def test_nan_with_reason_is_stored_and_counted(files):
 
 
 @pytest.mark.parametrize(
-    "bad",
+    ("bad", "message"),
     [
-        {"faithfulness": (1.2, "")},
-        {"faithfulness": (None, "")},
-        {"faithfulness": (float("nan"), "")},
-        "missing",
-        "raises",
+        ({"faithfulness": (1.2, "")}, "outside 0-1"),
+        ({"faithfulness": (None, "")}, "without a reason"),
+        ({"faithfulness": (float("nan"), "")}, "without a reason"),
+        ("missing", "returned the metrics"),
+        ("raises", "judge unavailable"),
     ],
 )
-def test_invalid_value_writes_nothing(files, bad):
+def test_invalid_value_writes_nothing(files, bad, message):
     if bad == "raises":
         scorer = FakeScorer(fail=True)
     elif bad == "missing":
-        scorer = FakeScorer()
-        inner = scorer.__call__
-        scorer = lambda samples: [  # noqa: E731
-            {k: v for k, v in d.items() if k != "faithfulness"} for d in inner(samples)
-        ]
+        inner = FakeScorer()
+
+        def scorer(samples):
+            return [{k: v for k, v in d.items() if k != "faithfulness"} for d in inner(samples)]
+
     else:
         scorer = FakeScorer({("Q002", "C3"): bad})
-    with pytest.raises(Exception):  # noqa: B017
+    with pytest.raises(RuntimeError, match=message):
         go(files, scorer)
     assert not files["out_file"].exists()
     assert [r for r in records(files) if r["step"] == "ragas"] == []
@@ -340,18 +368,60 @@ def test_repeat_only_for_pilot_sets_and_logged_apart(files):
     }
 
 
-def test_set_on_main_catalogue_gets_no_pilot_exception(files, monkeypatch, tmp_path):
-    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
-    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
-    paths = set_paths(tmp_path)
-    assert paths["questions_file"] == files["questions_file"]
+def test_set_on_main_catalogue_gets_no_pilot_exception(files, monkeypatch):
+    freeze_catalogue(files, monkeypatch)
+    record_upstream(files, summarise=False)  # frozen, current answers, no summarise record
     scorer = FakeScorer()
-    record_upstream(files, summarise=False)  # no summarise, not frozen
-    with pytest.raises(RuntimeError):
-        run(scorer, ApiRecorder(), FakeCreated(), files, False)
+    with pytest.raises(RuntimeError, match="no summarise run"):
+        run(scorer, reporting_recorder(), FakeCreated(), files, False)  # main=False
     assert scorer.calls == []
     with pytest.raises(RuntimeError, match="repeat"):
-        run(scorer, ApiRecorder(), FakeCreated(), files, False, repeat=True)
+        run(scorer, reporting_recorder(), FakeCreated(), files, False, repeat=True)
+
+
+def test_set_paths_of_the_main_catalogue_are_the_main_paths(files, monkeypatch, tmp_path):
+    assert set_paths(tmp_path)["runs_file"] == tmp_path / "runs.jsonl"
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
+    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
+    assert set_paths(tmp_path) == main_paths()
+
+
+def test_source_from_another_strategy_is_refused(files):
+    rows = read(files["answers_file"])
+    rows[0]["sources"] = chunk_id("C2", 1)  # a C1 row naming a C2 chunk
+    write_csv(files["answers_file"], ANSWER_HEADER, [list(r.values()) for r in rows])
+    with pytest.raises(ValueError, match="C2_D001_0001"):
+        build_samples(
+            files["answers_file"],
+            files["questions_file"],
+            files["ground_truth_file"],
+            files["chunk_files"],
+        )
+
+
+def test_record_failure_leaves_no_output(files, monkeypatch):
+    def broken(name):
+        raise RuntimeError("no version")
+
+    monkeypatch.setattr(run_log, "version", broken)
+    with pytest.raises(RuntimeError, match="no version"):
+        go(files)
+    assert not files["out_file"].exists()
+
+
+def test_no_reported_model_writes_nothing(files):
+    with pytest.raises(RuntimeError, match="no judge model reported"):
+        go(files, recorder=ApiRecorder())
+    assert not files["out_file"].exists()
+
+
+def test_repeat_needs_the_first_run(files):
+    scorer = FakeScorer()
+    record_upstream(files, summarise=False)
+    with pytest.raises(RuntimeError, match="no ragas run"):
+        run(scorer, reporting_recorder(), FakeCreated(), files, False, repeat=True)
+    assert scorer.calls == []
+    assert not files["repeat_file"].exists()
 
 
 def test_validated_accepts_a_clean_sample():

@@ -50,7 +50,7 @@ from embed import load_jsonl
 from freeze import is_main_catalogue, require_frozen
 from generate import ANSWERS_HEADER, created_iso
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import append_ragas_run, latest_run, require_run, sha256_of
+from run_log import append_record, latest_run, ragas_record, require_run, sha256_of
 
 # ragas_client is imported only inside main(): it imports nothing from here, but the real scorer
 # (make_scorer) takes its types from this module.
@@ -95,10 +95,12 @@ def build_samples(
             ground_truth_file, "ground truth", GROUND_TRUTH_HEADER, GROUND_TRUTH_HEADER
         )
     }
-    chunks = {
-        c["chunk_id"]: c["text"]
+    chunks = {  # per strategy: a C1 answer may only name C1 chunks
+        key: {
+            c["chunk_id"]: c["text"]
+            for c in load_jsonl(chunk_files[key], "run src/chunking.py first")
+        }
         for key in STRATEGY_IDS
-        for c in load_jsonl(chunk_files[key], "run src/chunking.py first")
     }
     rows = read_rows(
         answers_file,
@@ -133,11 +135,11 @@ def build_samples(
             ids = [s for s in row["sources"].split(ID_SEPARATOR) if s]
             if not ids:
                 raise ValueError(f"{answers_file.name}: {qid}/{strategy} has no sources")
-            missing = [i for i in ids if i not in chunks]
+            missing = [i for i in ids if i not in chunks[strategy]]
             if missing:
                 raise ValueError(
                     f"{answers_file.name}: {qid}/{strategy} names chunks {missing} that the "
-                    "chunk files do not hold"
+                    f"{strategy} chunk file does not hold"
                 )
             samples.append(
                 Sample(
@@ -145,7 +147,7 @@ def build_samples(
                     strategy=strategy,
                     user_input=questions[qid],
                     response=row["answer"],
-                    retrieved_contexts=tuple(chunks[i] for i in ids),
+                    retrieved_contexts=tuple(chunks[strategy][i] for i in ids),
                     reference=references[qid],
                 )
             )
@@ -200,6 +202,8 @@ def run(
     main = main or is_main_catalogue(paths["questions_file"], paths["ground_truth_file"])
     if repeat and main:
         raise RuntimeError("--repeat is for pilot sets only; the main run happens once (ADR 0047)")
+    if repeat:  # the repeat compares with the first run, which must be the current file
+        require_run(paths["runs_file"], "ragas", EXPERIMENT, [], [paths["out_file"]])
     step = "ragas_repeat" if repeat else "ragas"
     out_file: Path = paths["repeat_file"] if repeat else paths["out_file"]
     runs_file: Path = paths["runs_file"]
@@ -256,6 +260,11 @@ def run(
             }
         )
     recorder.check()
+    if not recorder.models:
+        raise RuntimeError(
+            "no judge model reported by the API for the scored samples; nothing was written "
+            "(ADR 0033)"
+        )
     created_after = model_created()
     if created_after != created_before:
         raise RuntimeError(
@@ -264,7 +273,6 @@ def run(
             "written (ADR 0033)"
         )
 
-    write_csv(out_file, RAGAS_HEADER, rows)
     inputs = [
         answers_file,
         paths["results_file"],
@@ -274,7 +282,8 @@ def run(
     ]
     if main:
         inputs.append(scores_file)
-    append_ragas_run(
+    # the complete record is built before anything is written; only the output hash follows
+    record = ragas_record(
         {
             "step": step,
             "strategy": EXPERIMENT,
@@ -284,13 +293,13 @@ def run(
             "rows": len(rows),
             "nan_counts": nan_counts,
             "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
-            "outputs_sha256": {out_file.name: sha256_of(out_file)},
             "judge_prompt_tokens": recorder.chat_prompt_tokens,
             "judge_completion_tokens": recorder.chat_completion_tokens,
             "embedding_tokens": recorder.embedding_tokens,
-        },
-        runs_file,
+        }
     )
+    write_csv(out_file, RAGAS_HEADER, rows)
+    append_record(record | {"outputs_sha256": {out_file.name: sha256_of(out_file)}}, runs_file)
     return len(rows)
 
 
@@ -312,7 +321,10 @@ def main_paths() -> dict:
 
 
 def set_paths(set_dir: Path) -> dict:
-    """A pilot set: its own files and run log; the chunk files are the shared processed corpus."""
+    """A pilot set: its own files and run log; the chunk files are the shared processed corpus.
+    A set that resolves to the main catalogue gets the main paths (and so the main run log)."""
+    if is_main_catalogue(set_dir / QUESTIONS_FILE.name, set_dir / GROUND_TRUTH_FILE.name):
+        return main_paths()
     return main_paths() | {
         "answers_file": set_dir / GENERATED_ANSWERS_FILE.name,
         "results_file": set_dir / RETRIEVED_RESULTS_FILE.name,
