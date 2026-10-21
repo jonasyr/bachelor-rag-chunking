@@ -129,7 +129,8 @@ def test_make_scorer_builds_the_four_metrics():
     assert isinstance(metrics["response_relevancy"], AnswerRelevancy)
     assert isinstance(metrics["context_precision"], ContextPrecisionWithReference)
     assert isinstance(metrics["context_recall"], ContextRecall)
-    assert metrics["response_relevancy"].strictness == RAGAS_STRICTNESS == 3
+    # one question: at temperature 0 and a fixed seed, more would repeat the same prompt (Jonas)
+    assert metrics["response_relevancy"].strictness == RAGAS_STRICTNESS == 1
     for metric in metrics.values():
         assert metric.llm.model == RAGAS_JUDGE_MODEL
         args = metric.llm.model_args

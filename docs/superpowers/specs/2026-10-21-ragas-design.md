@@ -37,8 +37,9 @@ die Strategien und fließt nie zurück.
 - Richtermodell `gpt-6-sol` (nicht das Antwortmodell `gpt-6-luna`), `temperature = 0`, fester `seed`,
   `reasoning_effort = "none"` wie beim Antwortmodell (ADR 0033); Embeddings für Response Relevancy:
   `text-embedding-3-large` (ADR 0023).
-- Die vier Metriken oben (ADR 0047); Response Relevancy mit dem RAGAS-Standard `strictness = 3` (drei erzeugte
-  Fragen je Antwort, wie bei Es et al., 2024).
+- Die vier Metriken oben (ADR 0047); Response Relevancy mit `strictness = 1` statt des RAGAS-Standards 3: bei
+  `temperature = 0` und festem Seed stellt RAGAS dreimal denselben Prompt, die drei Fragen wären gleich (Review von
+  Task 3; Jonas, 21.10.2026, ändert seine frühere Wahl von 3).
 - NaN nach Definition der Metrik (z. B. Faithfulness ohne prüfbare Aussage bei einer ablehnenden Antwort, Context
   Recall ohne Zuordnung) ist ein gültiges Ergebnis: leere Zelle plus Grund, gezählt je Metrik und Strategie und in den
   Tabellen genannt. RAGAS 0.4.3 gibt zu einem solchen NaN keinen Grund an (Faithfulness, Context Recall, Context
