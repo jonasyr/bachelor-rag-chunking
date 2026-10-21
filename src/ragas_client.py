@@ -19,6 +19,7 @@ from config import (
     RAGAS_CONCURRENCY,
     RAGAS_JUDGE_MODEL,
     RAGAS_MAX_RETRIES,
+    RAGAS_MAX_TOKENS,
     RAGAS_NAN_REASONS,
     RAGAS_REASONING_EFFORT,
     RAGAS_SEED,
@@ -95,10 +96,48 @@ def async_client(
     )
 
 
+def _judge_class():
+    from ragas.llms.base import InstructorLLM
+
+    class JudgeLLM(InstructorLLM):
+        """InstructorLLM that keeps the configured temperature for the pinned judge.
+
+        ragas 0.4.3 (llms/base.py, `_map_openai_params`, lines ~826-885) treats every gpt-5..gpt-19
+        model as a reasoning model and forces `temperature = 1.0` and drops `top_p`. With
+        `reasoning_effort == "none"` the API accepts the temperature (ADR 0033, D33), so only that
+        case is restored here; everything else is the parent's mapping. Tied to ragas 0.4.3, see
+        `test_subclass_tied_to_pinned_ragas`.
+        """
+
+        def _map_openai_params(self) -> dict[str, Any]:
+            mapped = super()._map_openai_params()
+            if (
+                self.model_args.get("reasoning_effort") == "none"
+                and "temperature" in self.model_args
+            ):
+                mapped["temperature"] = self.model_args["temperature"]
+            return mapped
+
+    return JudgeLLM
+
+
+def _judge(client: AsyncOpenAI):
+    from ragas.llms.base import InstructorModelArgs, _get_instructor_client
+
+    return _judge_class()(
+        client=_get_instructor_client(client, "openai"),
+        model=RAGAS_JUDGE_MODEL,
+        provider="openai",
+        model_args=InstructorModelArgs(max_tokens=RAGAS_MAX_TOKENS),
+        temperature=RAGAS_TEMPERATURE,
+        seed=RAGAS_SEED,
+        reasoning_effort=RAGAS_REASONING_EFFORT,
+    )
+
+
 def build_metrics(client: AsyncOpenAI) -> dict[str, Any]:
     """The four RAGAS metrics (collections API), all on the pinned judge, keyed by config name."""
     from ragas.embeddings.base import embedding_factory
-    from ragas.llms import llm_factory
     from ragas.metrics.collections import (
         AnswerRelevancy,
         ContextPrecisionWithReference,
@@ -106,13 +145,7 @@ def build_metrics(client: AsyncOpenAI) -> dict[str, Any]:
         Faithfulness,
     )
 
-    llm = llm_factory(
-        RAGAS_JUDGE_MODEL,
-        client=client,
-        temperature=RAGAS_TEMPERATURE,
-        seed=RAGAS_SEED,
-        reasoning_effort=RAGAS_REASONING_EFFORT,
-    )
+    llm = _judge(client)
     embeddings = embedding_factory(provider="openai", model=EMBEDDING_MODEL, client=client)
     return {
         "faithfulness": Faithfulness(llm=llm),

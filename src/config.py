@@ -288,6 +288,7 @@ RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK = 10.0  # USD per 1M output tokens, same sourc
 RAGAS_TIMEOUT_S = 120  # per request
 RAGAS_MAX_RETRIES = 5  # SDK retries per request
 RAGAS_CONCURRENCY = 8  # parallel scoring jobs
+RAGAS_MAX_TOKENS = 4096  # max_completion_tokens of a judge call; a truncated output is an error
 # Reason stored when RAGAS returns a bare NaN (no reason in the result), per metric. The texts name
 # the cases of the pinned ragas 0.4.3 (ADR 0047). response_relevancy returns 0.0 instead of NaN; a
 # NaN there is unexpected and has no entry, so the run refuses it.

@@ -99,6 +99,7 @@ import ragas_client  # noqa: E402
 from config import (  # noqa: E402
     EMBEDDING_MODEL,
     RAGAS_JUDGE_MODEL,
+    RAGAS_MAX_TOKENS,
     RAGAS_METRICS,
     RAGAS_NAN_REASONS,
     RAGAS_REASONING_EFFORT,
@@ -278,18 +279,42 @@ def captured_request_body() -> dict:
 
 def test_seed_and_reasoning_effort_reach_the_request():
     body = captured_request_body()
+    assert body["max_completion_tokens"] == RAGAS_MAX_TOKENS == 4096
     assert body["model"] == RAGAS_JUDGE_MODEL
     assert body["seed"] == RAGAS_SEED
     assert body["reasoning_effort"] == RAGAS_REASONING_EFFORT
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ragas 0.4.3 llms/base.py _map_provider_params forces temperature=1.0 and drops top_p "
-    "for gpt-5+ models; the pinned temperature 0 never reaches the API (reported, ADR 0047)",
-)
 def test_temperature_reaches_the_request():
     assert captured_request_body()["temperature"] == RAGAS_TEMPERATURE
+
+
+def test_temperature_is_kept_only_with_reasoning_effort_none():
+    judge = ragas_client.build_metrics(mock_client())["faithfulness"].llm
+    judge.model_args["reasoning_effort"] = "low"
+    assert judge._map_provider_params()["temperature"] == 1.0  # ragas' own rule applies
+
+
+def test_subclass_tied_to_pinned_ragas():
+    import ragas
+
+    # JudgeLLM overrides ragas 0.4.3 InstructorLLM._map_openai_params; recheck it on a version bump
+    assert ragas.__version__ == "0.4.3"
+
+
+def test_truncated_judge_output_is_an_error():
+    def handler(request):
+        body = chat_body('{"x"')
+        body["choices"][0]["finish_reason"] = "length"
+        return httpx.Response(200, json=body)
+
+    class Out(BaseModel):
+        x: int
+
+    llm = ragas_client.build_metrics(mock_client(handler))["faithfulness"].llm
+    with pytest.raises(Exception) as caught:  # instructor: IncompleteOutputException
+        asyncio.run(llm.agenerate("hi", Out))
+    assert type(caught.value).__name__ == "IncompleteOutputException"
 
 
 def test_main_wires_the_scorer_without_network(monkeypatch):
