@@ -1,10 +1,25 @@
 import asyncio
+import json
 from types import SimpleNamespace
 
 import httpx
 import pytest
+from pydantic import BaseModel
 
+import ragas_client
+from config import (
+    EMBEDDING_MODEL,
+    RAGAS_JUDGE_MODEL,
+    RAGAS_MAX_TOKENS,
+    RAGAS_METRICS,
+    RAGAS_NAN_REASONS,
+    RAGAS_REASONING_EFFORT,
+    RAGAS_SEED,
+    RAGAS_STRICTNESS,
+    RAGAS_TEMPERATURE,
+)
 from ragas_client import ApiRecorder, async_client
+from ragas_eval import Sample
 
 
 def _handler(request: httpx.Request) -> httpx.Response:
@@ -89,33 +104,15 @@ def test_model_created_takes_the_model():
     assert retrieved == ["gpt-6-sol"]
 
 
-# --- the real scorer (Task 3) -------------------------------------------------------------
-
-import json  # noqa: E402
-
-from pydantic import BaseModel  # noqa: E402
-
-import ragas_client  # noqa: E402
-from config import (  # noqa: E402
-    EMBEDDING_MODEL,
-    RAGAS_JUDGE_MODEL,
-    RAGAS_MAX_TOKENS,
-    RAGAS_METRICS,
-    RAGAS_NAN_REASONS,
-    RAGAS_REASONING_EFFORT,
-    RAGAS_SEED,
-    RAGAS_STRICTNESS,
-    RAGAS_TEMPERATURE,
-)
-from ragas_eval import Sample  # noqa: E402
+# --- the real scorer (Task 3) ------------------------------------------------------------
 
 
 def sample(n: int) -> Sample:
     return Sample(f"Q{n}", "C1", f"question {n}", f"answer {n}", ("chunk a", "chunk b"), f"ref {n}")
 
 
-def mock_client(handler=_handler):
-    return async_client(ApiRecorder(), httpx.MockTransport(handler))
+def mock_client(handler=_handler, recorder=None):
+    return async_client(recorder or ApiRecorder(), httpx.MockTransport(handler))
 
 
 def test_make_scorer_builds_the_four_metrics():
@@ -262,7 +259,7 @@ def chat_body(content):
     }
 
 
-def captured_request_body() -> dict:
+def captured_request_body(recorder=None) -> dict:
     bodies = []
 
     def handler(request):
@@ -272,9 +269,28 @@ def captured_request_body() -> dict:
     class Out(BaseModel):
         x: int
 
-    metric = ragas_client.build_metrics(mock_client(handler))["faithfulness"]
+    metric = ragas_client.build_metrics(mock_client(handler, recorder))["faithfulness"]
     assert asyncio.run(metric.llm.agenerate("hi", Out)).x == 1
     return bodies[0]
+
+
+def test_the_recorder_sees_the_judge_call():
+    recorder = ApiRecorder()
+    captured_request_body(recorder)
+    assert recorder.models == {"gpt-6-sol"}
+    assert recorder.chat_prompt_tokens == 1
+    assert recorder.chat_completion_tokens == 1
+
+
+def test_ragas_telemetry_is_off(monkeypatch):
+    import requests
+    from ragas import _analytics
+
+    posts = []
+    monkeypatch.setattr(requests, "post", lambda *a, **k: posts.append((a, k)))
+    assert _analytics.do_not_track() is True
+    captured_request_body()  # builds the metrics (embedding_factory) and runs one agenerate
+    assert posts == []
 
 
 def test_seed_and_reasoning_effort_reach_the_request():

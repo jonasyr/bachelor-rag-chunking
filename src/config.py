@@ -288,14 +288,17 @@ RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK = 10.0  # USD per 1M output tokens, same sourc
 RAGAS_TIMEOUT_S = 120  # per request
 RAGAS_MAX_RETRIES = 5  # SDK retries per request
 RAGAS_CONCURRENCY = 8  # parallel scoring jobs
+RAGAS_DO_NOT_TRACK = True  # ragas telemetry off (it posts to a server and writes a user file)
 RAGAS_MAX_TOKENS = 4096  # max_completion_tokens of a judge call; a truncated output is an error
 # Reason stored when RAGAS returns a bare NaN (no reason in the result), per metric. The texts name
 # the cases of the pinned ragas 0.4.3 (ADR 0047). response_relevancy returns 0.0 instead of NaN; a
 # NaN there is unexpected and has no entry, so the run refuses it.
 RAGAS_NAN_REASONS = {
-    "faithfulness": "no statements or no verdicts (ragas 0.4.3, faithfulness/metric.py:121,130)",
+    "faithfulness": (
+        "no statements or no verdicts (ragas 0.4.3, faithfulness/metric.py:121,151,161)"
+    ),
     "context_recall": "no classifications (ragas 0.4.3, context_recall/metric.py:123)",
-    "context_precision": "no verdicts (ragas 0.4.3, context_precision/metric.py:130,250)",
+    "context_precision": "NaN average precision (ragas 0.4.3, context_precision/metric.py:130)",
 }
 
 # Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with

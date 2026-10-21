@@ -17,6 +17,7 @@ from openai import AsyncOpenAI
 from config import (
     EMBEDDING_MODEL,
     RAGAS_CONCURRENCY,
+    RAGAS_DO_NOT_TRACK,
     RAGAS_JUDGE_MODEL,
     RAGAS_MAX_RETRIES,
     RAGAS_MAX_TOKENS,
@@ -27,6 +28,9 @@ from config import (
     RAGAS_TEMPERATURE,
     RAGAS_TIMEOUT_S,
 )
+
+# ragas reads this once (lru_cache) at its first `track` call, so it is set before any ragas import.
+os.environ["RAGAS_DO_NOT_TRACK"] = "true" if RAGAS_DO_NOT_TRACK else "false"
 
 if TYPE_CHECKING:
     from ragas_eval import MetricValue, Sample, Scorer
