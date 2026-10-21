@@ -53,7 +53,12 @@ git add data/evaluation/scoring_items_control.jsonl data/evaluation/scoring_shee
   data/evaluation/scoring_checks_control.csv data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): Bewertung K0"
 
-# 5. Auswertung für die Arbeit
+# 5. RAGAS (erst nach summarise; ruft die API, einmal, überschreibt nie)
+uv run python src/ragas_eval.py
+git add data/evaluation/ragas_scores.csv data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): RAGAS des Hauptlaufs"
+
+# 6. Auswertung für die Arbeit
 uv run python src/analyse.py
 git add output/tables output/figures output/analysis.json
 git commit -m "chore(data): Auswertung des Hauptlaufs"
@@ -64,7 +69,9 @@ Bricht ein Schritt ab, nennt die Meldung den Befehl, der den fehlenden oder vera
 
 **Kosten** (geschätzt aus dem Pilot e2e, 16 Fragen, mal 3 für 48 Fragen): Generierung C1–C3 und K0 etwa 0,04 USD
 (Pilot 0,0128 USD), Fragevektoren unter 0,001 USD (Pilot 0,00006 USD); die Closed-Book-Prüfung beim Schreiben des
-Katalogs kostet je Durchgang etwa so viel wie K0 (Pilot 0,0006 USD für 16 Fragen). Der Probelauf dieser Befehlsfolge
+Katalogs kostet je Durchgang etwa so viel wie K0 (Pilot 0,0006 USD für 16 Fragen). RAGAS: etwa 6 USD für 144 Antworten,
+Grundlage ist der Pilot (2,02 USD je Lauf für 48 Antworten, mal 3); es ist eine Schätzung, kein Messwert
+([Experiment-Protokoll](../reference/experiment-record.md#ragas-pilot-e2e-21102026)). Der Probelauf dieser Befehlsfolge
 ist im [Experiment-Protokoll](../reference/experiment-record.md#probelauf-hauptlauf-21102026) festgehalten.
 
 ## Schritte

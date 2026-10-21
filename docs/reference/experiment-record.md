@@ -1,6 +1,6 @@
 # Experiment-Protokoll
 
-> Seitentyp: Nachschlagen (reference). Stand: 20.10.2026. Übersicht: [Dokumentation](../README.md).
+> Seitentyp: Nachschlagen (reference). Stand: 21.10.2026. Übersicht: [Dokumentation](../README.md).
 
 Messwerte aller Läufe (Chunking, Embedding, Stichprobenplan, Pilot e2e, Pilotproben, Vortest) mit Datum; wird mit jedem Lauf
 fortgeschrieben und ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus:
@@ -159,6 +159,61 @@ der Freeze-Datensatz direkt geschrieben (die strenge Prüfung von `catalogue.py 
   Die Bewertung selbst ist Handarbeit und war nicht Teil des Probelaufs; `analyse.py` ist auf dem Pilot-Set erprobt.
 - Gefunden und behoben: Fehlte ein Laufeintrag, nannten die Meldungen `src/summarise.py` statt
   `evaluate_answers.py --mode summarise` (`run_log.step_command`).
+
+## RAGAS-Pilot e2e (21.10.2026)
+
+Zwei Läufe von `ragas_eval.py --set data/pilot/e2e` (und `--repeat`) über die 48 Antworten C1–C3 des Pilots e2e
+(16 Fragen); Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ergebnisse).
+Richter `gpt-6-sol` (Modellobjekt erstellt 14.09.2026, kein Fingerabdruck gemeldet), Temperatur 0, `reasoning_effort`
+`none`, `seed` 20261021, Strictness 1, `ragas` 0.4.3. Der Pilot zählt nicht zur Auswertung; die Werte sind Erprobung.
+
+| Lauf | Zeilen | NaN | Richter-Tokens (Eingabe / Ausgabe) | Embedding-Tokens | Kosten (USD) |
+|---|---:|---:|---:|---:|---:|
+| `ragas` | 48 | 0 | 779.606 / 46.299 | 2.471 | 2,02 |
+| `ragas_repeat` | 48 | 0 | 779.722 / 46.777 | 2.486 | 2,03 |
+| zusammen | 96 | 0 | 1.559.328 / 93.076 | 4.957 | 4,05 |
+
+Kein Wert fehlt; die Embeddings kosten je Lauf unter 0,001 USD, der Rest ist der Richter.
+
+**Mittel je Strategie** (Lauf `ragas`, 16 Fragen je Strategie):
+
+| Strategie | Faithfulness | Response Relevancy | Context Precision | Context Recall |
+|---|---:|---:|---:|---:|
+| C1 | 0,98 | 0,73 | 0,76 | 0,97 |
+| C2 | 0,94 | 0,72 | 0,78 | 0,85 |
+| C3 | 0,96 | 0,71 | 0,75 | 0,83 |
+
+**Übereinstimmung** mit dem Gegenstück (Spearmans ρ je Antwort; `ragas_agreement`):
+
+| Paar | gesamt (n = 48) | C1 | C2 | C3 |
+|---|---:|---:|---:|---:|
+| Faithfulness ~ Quellenbezug | 0,43 | −0,07 | 0,62 | 0,62 |
+| Faithfulness ~ Halluzinationsfreiheit | 0,35 | −0,07 | 0,62 | 0,36 |
+| Response Relevancy ~ Frage beantwortet | nicht bestimmbar | nicht bestimmbar | nicht bestimmbar | nicht bestimmbar |
+| Context Precision ~ P@5 | 0,11 | −0,21 | 0,10 | 0,41 |
+| Context Recall ~ R@5 | 0,90 | 0,73 | 0,90 | 1,00 |
+
+Bei Response Relevancy ~ Frage beantwortet ist eine Seite konstant (alle Antworten bestehen die Prüffrage), ρ ist dann
+nicht definiert. Context Precision stimmt kaum mit P@5 überein, Context Recall dagegen eng mit R@5. Das liegt nahe an
+der Messung: RAGAS beurteilt die Relevanz eines Chunks mit dem LLM, P@5 per Tokenüberlappung mit der annotierten Stelle
+([Evaluation](evaluation.md#relevanz-eines-chunks)); beim Recall zählt dagegen, ob die Referenz im Kontext steht, was
+beide ähnlich erfassen. Das ist eine Deutung der Pilotwerte (16 Fragen), nicht geprüft.
+
+**Stabilität** (Lauf 2 gegen Lauf 1, je Metrik 48 Paare; `ragas_stability`; mittlere absolute Differenz mit drei
+Nachkommastellen, weil sie sonst auf 0,00 oder 0,01 fällt):
+
+| Metrik | gleiche Werte | mittlere abs. Differenz | ρ |
+|---|---:|---:|---:|
+| Faithfulness | 0,90 | 0,013 | 0,80 |
+| Response Relevancy | 0,60 | 0,018 | 0,88 |
+| Context Precision | 0,94 | 0,007 | 0,98 |
+| Context Recall | 1,00 | 0,000 | 1,00 |
+
+Trotz Temperatur 0 und festem `seed` sind die Werte nicht bitgleich wiederholbar ([ADR 0047](../adr/0047-ragas-als-triangulation.md));
+am wenigsten stabil ist Response Relevancy, deren Embeddings zusätzlich in den Wert eingehen.
+
+Gefunden beim Aufbau: RAGAS 0.4.3 sendet an `gpt-6-sol` Temperatur 1,0 (behoben durch die Unterklasse), und seine
+Telemetrie sendet an einen Server (abgeschaltet), siehe [Werkzeuge](tooling.md#ragas-pins).
 
 ## Historie: Vue.js-Korpus (bis 18.10.2026)
 

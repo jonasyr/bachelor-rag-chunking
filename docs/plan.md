@@ -63,8 +63,8 @@ Offene Arbeit nach Priorität (Punkt 1 ist die Katalogzeile des Zeitplans); erle
    Agentenbewertung im [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026).
 3. **Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md)): zweite Person finden (bis Mitte November, sonst
    Ersatz nach ADR 0046); Ziehung der 12 Fragen und Übereinstimmungsrechnung umsetzen, Ziehung nach dem Einfrieren.
-4. **RAGAS** ([ADR 0047](adr/0047-ragas-als-triangulation.md)): Lauf mit `gpt-6-sol` und vier Metriken umsetzen und
-   auf dem Pilot erproben; der Hauptlauf folgt nach `summarise`.
+4. **RAGAS** ([ADR 0047](adr/0047-ragas-als-triangulation.md)): Code und Pilot erledigt 21.10.
+   ([Experiment-Protokoll](reference/experiment-record.md#ragas-pilot-e2e-21102026)); Hauptlauf nach `summarise`.
 5. **Demo-Dashboard** (niedrige Priorität): Ergebnisse interaktiv zeigen, nur falls Zeit bleibt.
 
 ## Offene Entscheidungen
@@ -110,3 +110,5 @@ Einfrieren vor dem Retrieval ([ADR 0030](adr/0030-einfrieren-des-fragenkatalogs.
   ([Datenformate](reference/data-formats.md)).
 - 21.10.2026: Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)) und RAGAS als feste Triangulation
   ([ADR 0047](adr/0047-ragas-als-triangulation.md)) entschieden.
+- 21.10.2026: RAGAS-Lauf (`src/ragas_eval.py`) umgesetzt und auf dem Pilot e2e erprobt, zwei Läufe, 4,05 USD
+  ([Experiment-Protokoll](reference/experiment-record.md#ragas-pilot-e2e-21102026)).

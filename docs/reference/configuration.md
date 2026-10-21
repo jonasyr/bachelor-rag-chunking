@@ -192,6 +192,30 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_HISTOGRAM_BINS` | `20` | Klassen der Chunk-Längen-Histogramme | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 
+## RAGAS
+
+Richter und Einstellungen sind für alle vier Metriken gleich und gepinnt ([ADR 0047](../adr/0047-ragas-als-triangulation.md));
+Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ergebnisse).
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `RAGAS_JUDGE_MODEL` | `"gpt-6-sol"` | Richtermodell, nicht das Antwortmodell | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md), [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_TEMPERATURE` | `0.0` | Temperatur der Richteraufrufe (RAGAS 0.4.3 würde 1,0 senden, siehe [Werkzeuge](tooling.md#ragas-pins)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_SEED` | `20261021` | fester `seed` jeder Richteranfrage (nur „best effort“); fest, nie getunt | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_STRICTNESS` | `1` | Zahl der Fragen, die Response Relevancy je Antwort erzeugt; bei Temperatur 0 wiederholt jede weitere denselben Prompt | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_METRICS` | `("faithfulness", "response_relevancy", "context_precision", "context_recall")` | die vier Metriken = Spalten von `ragas_scores.csv` (Context Precision und Recall mit Referenz) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_DECIMALS` | `6` | Nachkommastellen der Werte in `ragas_scores*.csv` | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_SCORES_FILE` | `data/evaluation/ragas_scores.csv` | Ergebnisdatei des Hauptlaufs | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_REPEAT_FILE_NAME` | `"ragas_scores_repeat.csv"` | Name der Wiederholungsdatei neben der Ergebnisdatei (`--repeat`, nur Pilot-Sets) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_JUDGE_PRICE_INPUT_PER_MTOK`, `RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK` | `2.0`, `10.0` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens des Richters (abgerufen 17.10.2026); Grundlage von `judge_cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `RAGAS_TIMEOUT_S` | `120` | Zeitgrenze je Anfrage in Sekunden | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_MAX_RETRIES` | `5` | Wiederholungen je Anfrage im SDK | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_CONCURRENCY` | `8` | gleichzeitige Bewertungsaufträge (eine Antwort mit einer Metrik) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_DO_NOT_TRACK` | `True` | schaltet die Telemetrie von RAGAS ab (siehe [Werkzeuge](tooling.md#skripte-und-optionen)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+
 ## Korpusauswahl
 
 Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus-selection.md).
