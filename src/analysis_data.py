@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 
+import agreement
 import closed_book
 from atomic_csv import read_csv
 from config import (
@@ -40,20 +41,24 @@ from config import (
     SCORES_FILE,
     SCORING_CHECKS_CONTROL_FILE,
     SCORING_CHECKS_FILE,
+    SCORING_ITEMS_FILE,
     SCORING_KEY_FILE,
     SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
+    SECOND_RATER_DIR,
+    SECOND_RATER_DIR_NAME,
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SCORES_HEADER
-from evaluate_answers import KEY_HEADER, SCORES_HEADER
+from evaluate_answers import KEY_HEADER, SCORES_HEADER, SHEET_HEADER
 from evaluate_retrieval import SCORES_HEADER as RETRIEVAL_HEADER
 from freeze import is_main_catalogue, require_frozen
 from ragas_eval import RAGAS_HEADER
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import latest_run, require_run
-from scoring_rules import CHECKS_HEADER
+from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
+from second_rater import CLOSE_STEP
 
 EXPERIMENT = ",".join(STRATEGY_IDS)
 VERDICT_GROUPS = {"miss": "dependent", "hit": "known"}
@@ -74,6 +79,9 @@ class AnalysisData:
     ragas: pd.DataFrame | None = None
     ragas_repeat: pd.DataFrame | None = None
     answers_question: dict[tuple[str, str], int] | None = None  # (question, strategy) -> 1/0
+    # the closed second rating (ADR 0046): R2's "checks" and "sheet" rows and "paired" with the
+    # first rating (agreement.pair); None where it is absent or not closed
+    second_rating: dict | None = None
 
 
 def main_paths() -> dict:
@@ -96,6 +104,10 @@ def main_paths() -> dict:
             "ragas_file": RAGAS_SCORES_FILE,
             "scoring_checks_file": SCORING_CHECKS_FILE,
             "scoring_key_file": SCORING_KEY_FILE,
+            "scoring_items_file": SCORING_ITEMS_FILE,
+            "scoring_sheet_file": SCORING_SHEET_FILE,
+            "key_points_file": KEY_POINTS_FILE,
+            "second_rater_dir": SECOND_RATER_DIR,
         },
         RETRIEVED_RESULTS_FILE.parent,
     )
@@ -121,6 +133,10 @@ def set_paths(set_dir: Path) -> dict:
             "ragas_repeat_file": set_dir / RAGAS_REPEAT_FILE_NAME,
             "scoring_checks_file": set_dir / SCORING_CHECKS_FILE.name,
             "scoring_key_file": set_dir / SCORING_KEY_FILE.name,
+            "scoring_items_file": set_dir / SCORING_ITEMS_FILE.name,
+            "scoring_sheet_file": set_dir / SCORING_SHEET_FILE.name,
+            "key_points_file": set_dir / KEY_POINTS_FILE.name,
+            "second_rater_dir": set_dir / SECOND_RATER_DIR_NAME,
         },
         set_dir,
     )
@@ -234,6 +250,48 @@ def _load_answers_question(paths: dict, notes: list[str]) -> dict | None:
     return result
 
 
+def _read_items(path: Path) -> list[dict]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [json.loads(line) for line in lines if line.strip()]
+
+
+def _load_second_rating(paths: dict, notes: list[str]) -> dict | None:
+    """R2's closed rating (ADR 0046), paired with Jonas' own. Its files must be those the close
+    record hashed (changed after close -> RuntimeError); its items and key points must equal
+    Jonas' (ValueError). Absent or not closed: None with a note."""
+    folder = paths.get("second_rater_dir")
+    runs = None if folder is None else folder / PILOT_RUNS_FILE_NAME
+    if runs is None or latest_run(runs, CLOSE_STEP, EXPERIMENT) is None:
+        notes.append(
+            "Zweitbewertung fehlt oder ist nicht abgeschlossen: Tabelle agreement entfällt"
+        )
+        return None
+    items, points = folder / SCORING_ITEMS_FILE.name, folder / KEY_POINTS_FILE.name
+    checks, sheet = folder / SCORING_CHECKS_FILE.name, folder / SCORING_SHEET_FILE.name
+    require_run(runs, CLOSE_STEP, EXPERIMENT, [items, points], [checks, sheet])
+    own = {k: paths.get(k) for k in ("scoring_items_file", "key_points_file")}
+    own_checks, own_sheet = paths.get("scoring_checks_file"), paths.get("scoring_sheet_file")
+    missing = [p for p in (*own.values(), own_checks, own_sheet) if p is None or not p.exists()]
+    if missing:
+        raise RuntimeError(
+            f"the second rating needs the first rating's files: {missing[0]} missing"
+        )
+    agreement.require_same_inputs(
+        _read_items(own["scoring_items_file"]),
+        _read_items(items),
+        read_csv(own["key_points_file"], KEY_POINTS_HEADER),
+        read_csv(points, KEY_POINTS_HEADER),
+    )
+    second = {"checks": read_csv(checks, CHECKS_HEADER), "sheet": read_csv(sheet, SHEET_HEADER)}
+    paired = agreement.pair(
+        read_csv(own_checks, CHECKS_HEADER),
+        read_csv(own_sheet, SHEET_HEADER),
+        second["checks"],
+        second["sheet"],
+    )
+    return second | {"paired": paired}
+
+
 def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     notes: list[str] = []
     # a set that resolves to the main catalogue gets no pilot exceptions
@@ -323,6 +381,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
 
     ragas, ragas_repeat = _load_ragas(paths, gen_runs, main, qids, notes)
     answers_question = _load_answers_question(paths, notes)
+    second_rating = _load_second_rating(paths, notes)
 
     # the costs belong to the run that wrote the scored answers
     answers = [p for p in paths["answers_files"] if p.exists()]
@@ -340,6 +399,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         ragas=ragas,
         ragas_repeat=ragas_repeat,
         answers_question=answers_question,
+        second_rating=second_rating,
     )
 
 

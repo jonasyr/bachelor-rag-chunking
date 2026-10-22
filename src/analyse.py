@@ -12,10 +12,19 @@ import argparse
 import sys
 from pathlib import Path
 
+import agreement
 import analysis_data
 import report_figures
 import report_tables
-from config import ANALYSIS_ALPHA, ANALYSIS_FILE, FIGURES_DIR, OUTPUT_DIR, TABLES_DIR
+from atomic_csv import write_csv
+from config import (
+    ANALYSIS_ALPHA,
+    ANALYSIS_FILE,
+    FIGURES_DIR,
+    OUTPUT_DIR,
+    SECOND_RATER_DISAGREEMENTS_FILE_NAME,
+    TABLES_DIR,
+)
 
 
 def run(data: analysis_data.AnalysisData, out_dir: Path) -> dict:
@@ -26,6 +35,12 @@ def run(data: analysis_data.AnalysisData, out_dir: Path) -> dict:
     report_figures.write_figures(data, results, figures)  # appends skip notes to results
     report_tables.write_tables(results, tables)
     report_tables.write_json(results, out_dir / ANALYSIS_FILE.relative_to(OUTPUT_DIR))
+    if data.second_rating is not None:  # for the discussion with R2; no strategy in it
+        write_csv(
+            out_dir / SECOND_RATER_DISAGREEMENTS_FILE_NAME,
+            agreement.DISAGREEMENTS_HEADER,
+            agreement.disagreements(data.second_rating["paired"]),
+        )
     return results
 
 

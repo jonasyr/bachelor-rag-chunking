@@ -1,11 +1,12 @@
 import json
+import re
 from dataclasses import replace
 
 import pandas as pd
 import pytest
 
 from analysis_data import AnalysisData
-from config import CONTROL_CRITERIA, RUBRIC_CRITERIA
+from config import CONTROL_CRITERIA, RUBRIC_CRITERIA, RUBRIC_RULES_VERSION
 from report_tables import (
     TABLE_NAMES,
     build_results,
@@ -16,6 +17,7 @@ from report_tables import (
     write_tables,
 )
 
+RULES = RUBRIC_RULES_VERSION
 QIDS = [f"Q{i:03d}" for i in range(1, 13)]
 C = ["C1", "C2", "C3"]
 
@@ -175,7 +177,8 @@ def test_descriptive_metrics_have_no_p_in_results():
 
 
 def test_all_tables_are_written(tmp_path):
-    paths = write_tables(build_results(ragas_data(), 0.05), tmp_path)
+    paths = write_tables(build_results(agreement_data(), 0.05), tmp_path)
+    assert len(TABLE_NAMES) == 13
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
         text = p.read_text(encoding="utf-8")
@@ -413,3 +416,72 @@ def test_ragas_outputs_are_byte_identical_on_rerun(tmp_path):
         write_json(results, tmp_path / run / "analysis.json")
         outs.append({p.name: p.read_bytes() for p in (tmp_path / run).iterdir()})
     assert outs[0] == outs[1]
+
+
+# ---------------------------------------------------------------- agreement (ADR 0046)
+
+
+def agreement_data(constant=False):
+    import agreement
+    from scoring_rules import CHECKS
+
+    codes = [f"{q}-{s}" for q in QIDS for s in "ABC"]
+    base = {c: v[0] for c, v in CHECKS.items()}
+    first_checks, second_checks, sheet = [], [], []
+    for i, code in enumerate(codes):
+        row = {"code": code, "rules_version": RULES, "points": "covered;missing"} | base
+        other = dict(row)
+        if not constant and i % 4 == 0:
+            other["direct"] = "no" if row["direct"] == "yes" else "yes"
+            other["grounded"] = "none"
+        first_checks.append(row)
+        second_checks.append(other)
+        sheet.append(
+            {"code": code, "question_id": code.split("-")[0], "notes": ""}
+            | {c: str((i + k) % 3) for k, c in enumerate(RUBRIC_CRITERIA)}
+        )
+    other_sheet = [dict(r) for r in sheet]
+    if not constant:
+        for r in other_sheet[::5]:
+            r["clarity"] = str((int(r["clarity"]) + 1) % 3)
+    paired = agreement.pair(first_checks, sheet, second_checks, other_sheet)
+    second = {"checks": second_checks, "sheet": other_sheet, "paired": paired}
+    return replace(ragas_data(), second_rating=second)
+
+
+def test_agreement_table_iu_rules(tmp_path, monkeypatch):
+    import agreement
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 100)
+    write_tables(build_results(agreement_data(), 0.05), tmp_path)
+    text = (tmp_path / "agreement.tex").read_text(encoding="utf-8")
+    caption = next(line for line in text.splitlines() if line.startswith(r"\caption{"))
+    assert "Übereinstimmung der Erst- und Zweitbewertung" in caption and not caption.endswith(".}")
+    assert r"\label{tab:agreement}" in text and r"\hline" not in text
+    assert r"\source{Eigene Darstellung." in text.split(r"\end{tabular}")[1]
+    assert re.search(r"\d,\d\d", text) and not re.search(r"\d\.\d", text)  # decimal comma
+    for word in ("Prüffragen", "Kernpunkte", "Kriterien", "AC1", "AC2", "ordinal", "Bootstrap"):
+        assert word in text
+    assert "100 Wiederholungen" in text
+    align = text.split(r"\begin{tabular}{")[1].split("}")[0]
+    assert len(align) <= 5
+
+
+def test_agreement_table_marks_undefined_alpha(tmp_path, monkeypatch):
+    import agreement
+    from report_tables import NOT_DETERMINABLE
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 50)
+    results = build_results(agreement_data(constant=True), 0.05)
+    row = next(r for r in results["agreement"]["rows"] if r["label"] == "declines")
+    assert row["alpha"] is None and row["ac"] == 1.0
+    write_tables(results, tmp_path)
+    text = (tmp_path / "agreement.tex").read_text(encoding="utf-8")
+    assert NOT_DETERMINABLE in text
+
+
+def test_agreement_skipped_without_second_rating(tmp_path):
+    results = build_results(make_data(), 0.05)
+    assert results["agreement"] is None
+    paths = write_tables(results, tmp_path)
+    assert "agreement.tex" not in {p.name for p in paths}

@@ -452,6 +452,9 @@ AGREEMENT_SEED = 20261022  # seed of the agreement bootstrap
 SECOND_RATER_QUESTIONS = (
     12  # questions the second rater scores (x C1-C3); a quarter of the catalogue
 )
+SECOND_RATER_DISAGREEMENTS_FILE_NAME = (
+    "second_rater_disagreements.csv"  # list for discussion, in output/
+)
 SECOND_RATER_SEED = 20261022  # seed of the stratified draw
 SECOND_RATER_MAX_DRAWS = 100_000  # rejection-sampling attempts before the draw aborts
 SECOND_RATER_PSEUDONYM = "R2"  # the only name of the second rater in files, run records and output
