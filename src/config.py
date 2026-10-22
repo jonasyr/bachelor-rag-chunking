@@ -442,3 +442,10 @@ CORPUS_QUESTIONS_MIN_WORDS = 60  # prose words (3+ letters, outside code) a draw
 CORPUS_QUESTIONS_PER_PAGE = 2  # drawn sections per page at most
 CORPUS_QUESTIONS_SECTION_CHARS = 5000  # section text shown to the question writer and open-book run
 CORPUS_QUESTIONS_JUDGE_SEEDS = {1: 7, 2: 8}  # order of the blinded answers per judge batch
+
+# ---------------------------------------------------------------------------
+# Second rating (D46)
+# ---------------------------------------------------------------------------
+AGREEMENT_BOOTSTRAP_REPS = 2000  # cluster bootstrap over questions for the agreement CIs
+AGREEMENT_CI_LEVEL = 0.95  # percentile interval
+AGREEMENT_SEED = 20261022  # seed of the agreement bootstrap

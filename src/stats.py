@@ -2,12 +2,14 @@
 
 Pure functions. Inputs map a strategy to its per-question values, all lists in the same question
 order (paired by question). A constant or otherwise untestable metric is reported with
-``testable = False`` and without a p-value; nothing here returns NaN.
+``testable = False`` and without a p-value; nothing here returns NaN. Agreement measures of the
+second rating (D46): Gwet's AC1/AC2, Krippendorff's alpha and a cluster bootstrap over questions.
 """
 
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from itertools import combinations
 
 import numpy as np
@@ -155,3 +157,109 @@ def spearman(x: list[float], y: list[float]) -> dict:
     if rho is None or p is None:
         return untestable
     return {"rho": rho, "p": p, "n": n, "testable": True}
+
+
+def ordinal_weights(q: int) -> list[list[float]]:
+    """Gwet's ordinal weights ``w[k][l] = 1 - M(|k - l|) / M(q - 1)``, ``M(d) = d (d + 1) / 2``."""
+
+    def m(d: int) -> float:
+        return d * (d + 1) / 2
+
+    top = m(q - 1)
+    return [[1.0 - m(abs(k - c)) / top if top else 1.0 for c in range(q)] for k in range(q)]
+
+
+def gwet_ac(
+    pairs: list[tuple[int, int]], q: int, weights: list[list[float]] | None = None
+) -> float:
+    """Gwet's AC1 (``weights=None``, identity) or AC2 (weighted) for two raters, categories 0..q-1.
+
+    ``pa`` is the mean weight of the rating pairs,
+    ``pe = sum(w) / (q (q - 1)) * sum(pi_k (1 - pi_k))`` with ``pi_k`` the share of
+    all ratings in category k. ``pe == 1`` (one category only) gives 1.0 when ``pa == 1``; no
+    pairs gives 1.0 as well, so nothing here returns NaN.
+    """
+    if weights is None:
+        weights = [[1.0 if k == c else 0.0 for c in range(q)] for k in range(q)]
+    if not pairs:
+        return 1.0
+    n = len(pairs)
+    pa = sum(weights[a][b] for a, b in pairs) / n
+    pi = [sum((a == k) + (b == k) for a, b in pairs) / (2 * n) for k in range(q)]
+    total_w = sum(sum(row) for row in weights)
+    pe = total_w / (q * (q - 1)) * sum(p * (1 - p) for p in pi) if q > 1 else 1.0
+    if math.isclose(pe, 1.0):
+        return 1.0 if math.isclose(pa, 1.0) else 0.0
+    return (pa - pe) / (1 - pe)
+
+
+def krippendorff_alpha(units: list[list[int | None]], metric: str) -> float | None:
+    """Krippendorff's alpha from the coincidence matrix; any number of raters, ``None`` = missing.
+
+    Only units with at least two values are pairable. ``metric`` is ``"nominal"`` or ``"ordinal"``
+    (``delta^2(c, k) = (sum_{g=c..k} n_g - (n_c + n_k) / 2)^2`` over the sorted category values).
+    Returns ``None`` when the expected disagreement is 0 (alpha undefined).
+    """
+    if metric not in ("nominal", "ordinal"):
+        raise ValueError(f"unknown metric: {metric}")
+    coincidence: dict[tuple[int, int], float] = {}
+    for unit in units:
+        values = [v for v in unit if v is not None]
+        m = len(values)
+        if m < 2:
+            continue
+        for i, c in enumerate(values):
+            for j, k in enumerate(values):
+                if i != j:
+                    coincidence[(c, k)] = coincidence.get((c, k), 0.0) + 1.0 / (m - 1)
+    marginal: dict[int, float] = {}
+    for (c, _k), o in coincidence.items():
+        marginal[c] = marginal.get(c, 0.0) + o
+    n = sum(marginal.values())
+    cats = sorted(marginal)
+
+    def delta2(c: int, k: int) -> float:
+        if c == k:
+            return 0.0
+        if metric == "nominal":
+            return 1.0
+        within = sum(marginal[g] for g in cats if c <= g <= k or k <= g <= c)
+        return (within - (marginal[c] + marginal[k]) / 2) ** 2
+
+    if n <= 1:
+        return None
+    expected = sum(marginal[c] * marginal[k] * delta2(c, k) for c in cats for k in cats)
+    if expected == 0:
+        return None
+    observed = sum(o * delta2(c, k) for (c, k), o in coincidence.items())
+    return 1.0 - (n - 1) * observed / expected
+
+
+def cluster_bootstrap_ci(
+    clusters: list[list],
+    statistic: Callable[[list], float | None],
+    reps: int,
+    level: float,
+    seed: int,
+) -> dict:
+    """Percentile bootstrap CI resampling whole clusters (questions) with replacement.
+
+    ``statistic`` receives the resampled list of clusters. Resamples where it returns ``None`` are
+    dropped and counted; with none left, ``low`` and ``high`` are ``None``.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(clusters)
+    values: list[float] = []
+    dropped = 0
+    for _ in range(reps):
+        idx = rng.integers(0, n, size=n) if n else []
+        value = statistic([clusters[i] for i in idx])
+        if value is None:
+            dropped += 1
+        else:
+            values.append(value)
+    if not values:
+        return {"low": None, "high": None, "dropped": dropped}
+    tail = (1 - level) / 2 * 100
+    low, high = np.percentile(values, [tail, 100 - tail])
+    return {"low": float(low), "high": float(high), "dropped": dropped}
