@@ -119,12 +119,28 @@ def rater_sets() -> list[ScoringSet]:
     return sets
 
 
+def single_rater_set() -> list[ScoringSet]:
+    """What R2 sees: the main second-rater set, else the only pilot one, else nothing."""
+    sets = rater_sets()
+    if sets and sets[0].name == "Second rater":
+        return sets[:1]
+    return sets if len(sets) == 1 else []
+
+
+def app_pages(rater: str | None) -> list[tuple[str, str]]:
+    """The app's pages as (file, title): R2 mode gets the scoring page only."""
+    scoring_page = ("scoring_page.py", "Scoring")
+    if rater == SECOND_RATER_PSEUDONYM:
+        return [scoring_page]
+    return [("catalogue_page.py", "Catalogue"), scoring_page]
+
+
 def scoring_sets() -> list[ScoringSet]:
     """The main run and every pilot folder that holds an item file, each followed by its K0 set
     (ADR 0041) when that exists, then the second rater's sets. In R2 mode (`rater_mode`) only
     the second rater's sets, so nothing else is reachable."""
     if rater_mode() == SECOND_RATER_PSEUDONYM:
-        return rater_sets()
+        return single_rater_set()
     sets = []
     if SCORING_ITEMS_FILE.exists():
         sets.append(
@@ -247,6 +263,8 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
     """Replace one question's key points (point 1 = core point); refused after the freeze."""
     if s.control:
         raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
+    if s.rater:
+        raise PermissionError(f"{s.name}: the second rater's key points come from the export")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen")
     known = {q["question_id"] for q in questions(items)}
@@ -275,6 +293,8 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     file) once every question has some (ADR 0035)."""
     if s.control:
         raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
+    if s.rater:
+        raise PermissionError(f"{s.name}: the second rater's key points come from the export")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen already")
     points = load_key_points(s)

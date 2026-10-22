@@ -13,16 +13,14 @@ sys.path.insert(0, str(APP_DIR))
 import streamlit as st  # noqa: E402
 from ui_theme import CSS, palette_css  # noqa: E402
 
-from config import SECOND_RATER_PSEUDONYM  # noqa: E402
-from scoring_store import rater_mode  # noqa: E402
+from scoring_store import app_pages, rater_mode  # noqa: E402
 
 st.set_page_config(layout="wide")
 st.markdown(CSS + palette_css(), unsafe_allow_html=True)
-if rater_mode() == SECOND_RATER_PSEUDONYM:  # second rater (ADR 0046): the scoring page only
-    pages = [st.Page("scoring_page.py", title="Scoring", default=True)]
-else:
-    pages = [
-        st.Page("catalogue_page.py", title="Catalogue", default=True),
-        st.Page("scoring_page.py", title="Scoring"),
+# second rater (ADR 0046): in R2 mode the scoring page only
+st.navigation(
+    [
+        st.Page(file, title=title, default=n == 0)
+        for n, (file, title) in enumerate(app_pages(rater_mode()))
     ]
-st.navigation(pages).run()
+).run()

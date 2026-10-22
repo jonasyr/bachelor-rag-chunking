@@ -280,14 +280,16 @@ def run_export(p: dict, pilot: bool) -> Path:
     return out
 
 
-if __name__ == "__main__":
+def main(argv: list[str] | None = None) -> None:
     import argparse
 
     ap = argparse.ArgumentParser(description="Second rating by R2 (ADR 0046).")
     ap.add_argument("--mode", choices=["draw", "export", "close"], required=True)
     ap.add_argument("--set", type=Path, metavar="DIR", help="a pilot set instead of the main run")
-    ap.add_argument("--questions", type=int, metavar="N", help="pilot sets only: sample size")
-    args = ap.parse_args()
+    ap.add_argument("--questions", type=int, metavar="N", help="draw, pilot sets only: sample size")
+    args = ap.parse_args(argv)
+    if args.questions is not None and args.mode != "draw":
+        ap.error("--questions is for --mode draw only")
     if args.questions is not None and not args.set:
         ap.error(
             "--questions needs --set: the main run always draws "
@@ -295,11 +297,15 @@ if __name__ == "__main__":
         )
     if args.mode == "close":
         raise NotImplementedError("--mode close is not implemented yet")
-    if args.set and args.questions is None:
-        ap.error("--set needs --questions N for the sample size")
+    if args.mode == "draw" and args.set and args.questions is None:
+        ap.error("--mode draw with --set needs --questions N for the sample size")
     files = paths(args.set)
     if args.mode == "export":
         print(f"R2 set -> {run_export(files, pilot=bool(args.set))}")
-        raise SystemExit(0)
+        return
     sample = run_draw(files, args.questions or SECOND_RATER_QUESTIONS, pilot=bool(args.set))
     print(f"{len(sample)} questions -> {files['sample_file']}")
+
+
+if __name__ == "__main__":
+    main()

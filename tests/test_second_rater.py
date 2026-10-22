@@ -8,7 +8,7 @@ from conftest import valid_rows, write_catalogue, write_scoring_set
 import freeze
 import scoring_store
 import second_rater
-from atomic_csv import read_csv
+from atomic_csv import read_csv, write_csv
 from config import QUESTION_CLASSES, RUBRIC_CRITERIA
 from evaluate_answers import SHEET_HEADER
 from run_log import append_step_run, latest_run, sha256_of
@@ -180,8 +180,6 @@ def scaffolded(tmp_path):
     scoring_store.save_key_points(mine, items, "H01", ["Core one"])
     scoring_store.save_key_points(mine, items, "H02", ["Core two", "Second two"])
     scoring_store.freeze_key_points(mine, items)
-    from atomic_csv import write_csv
-
     write_csv(
         p["sample_file"],
         second_rater.SAMPLE_HEADER,
@@ -247,8 +245,6 @@ def test_export_refuses_existing_values(scaffolded):
     out = second_rater.run_export(scaffolded, pilot=False)
     rows = read_csv(out / "scoring_sheet.csv", SHEET_HEADER)
     rows[0]["correctness"] = "2"
-    from atomic_csv import write_csv
-
     write_csv(out / "scoring_sheet.csv", SHEET_HEADER, rows)
     with pytest.raises(FileExistsError):
         second_rater.run_export(scaffolded, pilot=False)
@@ -261,3 +257,26 @@ def test_export_refuses_incomplete_question(scaffolded):
     scaffolded["items_file"].write_text("".join(x for x in lines if x != drop), encoding="utf-8")
     with pytest.raises(RuntimeError):
         second_rater.run_export(scaffolded, pilot=False)
+
+
+def test_cli_export_with_set_reaches_run_export(set_dir, monkeypatch, capsys):
+    seen = {}
+    monkeypatch.setattr(
+        second_rater, "run_export", lambda p, pilot: seen.update(p=p, pilot=pilot) or set_dir
+    )
+    second_rater.main(["--mode", "export", "--set", str(set_dir)])
+    assert seen["pilot"] is True and seen["p"]["dir"] == set_dir / "second_rater"
+    assert "R2 set" in capsys.readouterr().out
+
+
+def test_cli_draw_with_set_needs_questions(set_dir):
+    with pytest.raises(SystemExit):
+        second_rater.main(["--mode", "draw", "--set", str(set_dir)])
+    second_rater.main(["--mode", "draw", "--set", str(set_dir), "--questions", "8"])
+    assert (set_dir / "second_rater_sample.csv").exists()
+
+
+@pytest.mark.parametrize("mode", ["export", "close"])
+def test_cli_questions_only_for_draw(set_dir, mode):
+    with pytest.raises(SystemExit):
+        second_rater.main(["--mode", mode, "--set", str(set_dir), "--questions", "8"])
