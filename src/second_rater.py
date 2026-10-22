@@ -17,7 +17,12 @@
                the draw (checked against its run record), the item file and frozen key points; the
                main run is refused once scores.csv exists or the R2 folder holds values (pilot sets:
                scores.csv only warns). Run record `second_rater_export`.
---mode close   Not yet implemented.
+--mode close   Close R2's rating: every code needs checks and a sheet row, the key points must be
+               the frozen ones and every score must follow from its checks under the current rules
+               (evaluate_answers.check_derived); the item file must be the exported one. Appends
+               the record `second_rater_close` (rater R2, rules version, checksums of items and
+               key points as inputs, of checks and sheet as outputs) to the R2 run log, which makes
+               the set read-only in the app. A closed rating cannot be closed again.
 
 --questions N (pilot sets only) sets the number of questions; the main catalogue always draws
 config.SECOND_RATER_QUESTIONS.
@@ -41,6 +46,7 @@ from config import (
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RUBRIC_CRITERIA,
+    RUBRIC_RULES_VERSION,
     SCORES_FILE,
     SCORING_CHECKS_FILE,
     SCORING_ITEMS_FILE,
@@ -48,19 +54,21 @@ from config import (
     SECOND_RATER_DIR,
     SECOND_RATER_DIR_NAME,
     SECOND_RATER_MAX_DRAWS,
+    SECOND_RATER_PSEUDONYM,
     SECOND_RATER_QUESTIONS,
     SECOND_RATER_SAMPLE_FILE,
     SECOND_RATER_SEED,
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
-from evaluate_answers import SHEET_HEADER
+from evaluate_answers import SHEET_HEADER, check_derived
 from freeze import require_frozen
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import (
     append_key_points_run,
     append_scaffold_run,
     append_step_run,
+    latest_run,
     require_run,
     sha256_of,
 )
@@ -68,6 +76,7 @@ from run_log import (
 SAMPLE_HEADER = ["question_id", "type", "difficulty"]
 DRAW_STEP = "second_rater_draw"
 EXPORT_STEP = "second_rater_export"
+CLOSE_STEP = "second_rater_close"
 STRATEGY = ",".join(STRATEGY_IDS)
 
 
@@ -230,6 +239,10 @@ def run_export(p: dict, pilot: bool) -> Path:
     out = p["dir"]
     sheet_file, checks_file = out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name
     present = own_values(sheet_file, checks_file)
+    if (out / SCORES_FILE.name).exists():
+        present.append(SCORES_FILE.name)
+    if latest_run(out / PILOT_RUNS_FILE_NAME, CLOSE_STEP, STRATEGY) is not None:
+        present.append("close record")
     if present:
         raise FileExistsError(f"{out} already holds values ({', '.join(present)}); not overwritten")
     sampled = {r["question_id"] for r in read_csv(p["sample_file"], SAMPLE_HEADER)}
@@ -280,6 +293,29 @@ def run_export(p: dict, pilot: bool) -> Path:
     return out
 
 
+def run_close(p: dict) -> dict:
+    """Check R2's finished rating and log the close record; return it."""
+    out = p["dir"]
+    items, points = out / SCORING_ITEMS_FILE.name, out / KEY_POINTS_FILE.name
+    sheet, checks = out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name
+    runs = out / PILOT_RUNS_FILE_NAME
+    for f in (items, points, sheet, runs):
+        if not f.exists():
+            raise RuntimeError(f"{f} not found; export R2's set first")
+    if latest_run(runs, CLOSE_STEP, STRATEGY) is not None:
+        raise RuntimeError(f"the second rating in {out} is closed already")
+    require_run(runs, "scaffold", STRATEGY, [], [items])  # the exported item file, unchanged
+    check_derived(sheet, checks, points, runs)  # every code has checks; scores follow from them
+    return append_step_run(
+        CLOSE_STEP,
+        STRATEGY,
+        [items, points],
+        [checks, sheet],
+        runs,
+        extra={"rater": SECOND_RATER_PSEUDONYM, "rules_version": RUBRIC_RULES_VERSION},
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     import argparse
 
@@ -295,11 +331,12 @@ def main(argv: list[str] | None = None) -> None:
             "--questions needs --set: the main run always draws "
             f"{SECOND_RATER_QUESTIONS} questions"
         )
-    if args.mode == "close":
-        raise NotImplementedError("--mode close is not implemented yet")
     if args.mode == "draw" and args.set and args.questions is None:
         ap.error("--mode draw with --set needs --questions N for the sample size")
     files = paths(args.set)
+    if args.mode == "close":
+        print(f"R2 rating closed -> {run_close(files)['outputs_sha256']}")
+        return
     if args.mode == "export":
         print(f"R2 set -> {run_export(files, pilot=bool(args.set))}")
         return

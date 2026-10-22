@@ -356,7 +356,9 @@ def main() -> None:
         st.error(str(error))
         return
     locked = scoring.is_read_only(s)
-    if locked:
+    if locked and s.rater:
+        st.info("The second rating was closed, so it is read-only.")
+    elif locked:
         st.info(
             f"The scores of this set were summarised ({s.scores_file.name} exists), so it is "
             "read-only."

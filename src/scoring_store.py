@@ -334,14 +334,21 @@ def require_frozen_key_points(s: ScoringSet) -> None:
         )
 
 
+def is_closed(s: ScoringSet) -> bool:
+    """A second rater's set closed by `second_rater.py --mode close` (ADR 0046)."""
+    return s.rater and latest_run(s.runs_file, "second_rater_close", STRATEGY) is not None
+
+
 def is_read_only(s: ScoringSet) -> bool:
-    return s.scores_file.exists()
+    return s.scores_file.exists() or is_closed(s)
 
 
 def save_score(s: ScoringSet, code: str, checks: dict, notes: str) -> dict[str, int]:
     """Validate the checks, derive the five scores (ADR 0035) and write checks file and sheet
     atomically with only this code's rows changed; returns the derived values."""
     if is_read_only(s):
+        if is_closed(s):
+            raise PermissionError("the second rating was closed: read-only")
         raise PermissionError(f"{s.scores_file} exists: the scores were unblinded, read-only")
     require_frozen_key_points(s)
     rows = _sheet(s)

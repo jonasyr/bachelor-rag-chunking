@@ -280,3 +280,109 @@ def test_cli_draw_with_set_needs_questions(set_dir):
 def test_cli_questions_only_for_draw(set_dir, mode):
     with pytest.raises(SystemExit):
         second_rater.main(["--mode", mode, "--set", str(set_dir), "--questions", "8"])
+
+
+GOOD = {
+    "points": ["covered"],
+    "declines": "no",
+    "core_wrong": "no",
+    "other_error": "no",
+    "grounded": "all",
+    "hallucination": "none",
+    "answers_question": "yes",
+    "direct": "yes",
+    "wordy": "no",
+}
+
+
+@pytest.fixture
+def exported(scaffolded):
+    out = second_rater.run_export(scaffolded, pilot=False)
+    return scaffolded, scoring_store._rater_set("Second rater", out)
+
+
+def score_all(r2, skip=()):
+    for code in (i["code"] for i in scoring_store.load_items(r2)):
+        if code not in skip:
+            scoring_store.save_score(r2, code, GOOD, "")
+
+
+def test_close_refuses_incomplete(exported):
+    p, r2 = exported
+    score_all(r2, skip=("H01-C",))
+    with pytest.raises(ValueError, match="H01-C"):
+        second_rater.run_close(p)
+    assert latest_run(r2.runs_file, "second_rater_close", "C1,C2,C3") is None
+
+
+def test_close_refuses_hand_edited_score(exported):
+    p, r2 = exported
+    score_all(r2)
+    rows = read_csv(r2.sheet_file, SHEET_HEADER)
+    rows[0]["correctness"] = "0"
+    write_csv(r2.sheet_file, SHEET_HEADER, rows)
+    with pytest.raises(ValueError, match="correctness"):
+        second_rater.run_close(p)
+
+
+def test_close_refuses_changed_items(exported):
+    p, r2 = exported
+    score_all(r2)
+    with r2.items_file.open("a", encoding="utf-8") as f:
+        f.write("\n")
+    with pytest.raises(RuntimeError, match="differs"):
+        second_rater.run_close(p)
+
+
+def test_close_writes_record_and_locks(exported):
+    p, r2 = exported
+    score_all(r2)
+    assert not scoring_store.is_read_only(r2)
+    record = second_rater.run_close(p)
+    assert record["rater"] == "R2" and record["rules_version"]
+    assert not {"name", "rater_name", "email"} & set(record)
+    assert record["outputs_sha256"] == {
+        "scoring_checks.csv": sha256_of(r2.checks_file),
+        "scoring_sheet.csv": sha256_of(r2.sheet_file),
+    }
+    assert set(record["inputs_sha256"]) == {"scoring_items.jsonl", "key_points.csv"}
+    assert latest_run(r2.runs_file, "second_rater_close", "C1,C2,C3") == record
+    assert scoring_store.is_read_only(r2)
+
+
+def test_save_score_refused_after_close(exported):
+    p, r2 = exported
+    score_all(r2)
+    second_rater.run_close(p)
+    with pytest.raises(PermissionError, match="closed"):
+        scoring_store.save_score(r2, "H01-A", GOOD, "")
+
+
+def test_close_twice_refused(exported):
+    p, r2 = exported
+    score_all(r2)
+    second_rater.run_close(p)
+    with pytest.raises(RuntimeError, match="closed already"):
+        second_rater.run_close(p)
+
+
+def test_export_never_rewrites_a_closed_set(exported):
+    p, r2 = exported
+    score_all(r2)
+    second_rater.run_close(p)
+    with pytest.raises(FileExistsError):
+        second_rater.run_export(p, pilot=True)
+
+
+def test_export_refuses_stray_scores_file(exported):
+    p, r2 = exported
+    r2.scores_file.write_text("question_id,strategy\n", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        second_rater.run_export(p, pilot=True)
+
+
+def test_cli_close_with_set(exported):
+    p, r2 = exported
+    score_all(r2)
+    second_rater.main(["--mode", "close", "--set", str(p["sample_file"].parent)])
+    assert scoring_store.is_read_only(r2)

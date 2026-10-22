@@ -345,3 +345,37 @@ def test_unfrozen_r2_set_offers_no_key_point_editing(dirs, monkeypatch):
     assert not at.exception
     assert at.error
     assert all(b.key != "kp_save" for b in at.button)
+
+
+def test_closed_r2_set_is_read_only_and_says_closed(dirs, monkeypatch):
+    import second_rater
+
+    write_scoring_set(dirs[0] / "second_rater")
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", dirs[0] / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    (r2,) = scoring.scoring_sets()
+    plain = dataclasses.replace(r2, rater=False)
+    items = scoring.load_items(plain)
+    scoring.save_key_points(plain, items, "H01", ["Core one"])
+    scoring.save_key_points(plain, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(plain, items)
+    for i in items:
+        good = {
+            "points": ["covered"] * (1 if i["code"].startswith("H01") else 2),
+            "declines": "no",
+            "core_wrong": "no",
+            "other_error": "no",
+            "grounded": "all",
+            "hallucination": "none",
+            "answers_question": "yes",
+            "direct": "yes",
+            "wordy": "no",
+        }
+        scoring.save_score(r2, i["code"], good, "")
+    p = second_rater.paths(None) | {"dir": dirs[0] / "second_rater"}
+    second_rater.run_close(p)
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert any("closed" in i.value for i in at.info)
+    assert not any("summarised" in i.value for i in at.info)
