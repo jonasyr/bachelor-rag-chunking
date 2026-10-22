@@ -18,7 +18,8 @@ Commit (Entscheidung im privaten Repo PaperLab: `docs/adr/0007-thesis-code-als-s
    `git -C code switch main && git -C code pull`, dann `git add code && git commit -m "chore(thesis): Code auf <hash>"`.
 5. In der Arbeit direkt einbinden, ohne Kopie: `\input{code/output/tables/…}`, `\includegraphics{code/output/figures/…}`.
    Die Tabellen bringen Titel, Label und Quellenzeile selbst mit. Das Kapitel 4 der Arbeit bindet beides schon über
-   `\ergebnistabelle` und `\ergebnisabbildung` ein (`sections/04_ergebnisse.tex`, Platzhalter, solange eine Datei fehlt).
+   `\ergebnistabelle` und `\ergebnisabbildung` ein (`sections/04_ergebnisse.tex`, Platzhalter, solange eine Datei fehlt);
+   ergänzende Tabellen und Abbildungen stehen in Anhang B (`sections/99_anhang.tex`).
    Die Abbildungen haben Endgröße (17 cm): ohne Skalieren einbinden, den Titel mit `\caption` darüber setzen und
    darunter `\source{Eigene Darstellung.}`. `./paperlab check` prüft sie (u. a. Schrift, Ausrichtung, Abstände) und
    meldet ein veraltetes PDF, wenn dort etwas neuer ist.

@@ -163,7 +163,8 @@ ist; die Werte fließen nie zurück ([ADR 0017](../adr/0017-fragenkatalog.md)).
 - **Übereinstimmung** (`ragas_agreement`, Tabelle `ragas_agreement.tex`): Spearmans ρ je Antwort zwischen Metrik und
   Gegenstück, je Strategie und über alle Strategien (`gesamt`, jede Frage dreifach), beschreibend ohne p-Werte
   ([ADR 0047](../adr/0047-ragas-als-triangulation.md)); eine Frage ohne RAGAS-Wert entfällt im Paar, ist eine Seite
-  konstant, steht „nicht bestimmbar“. Die Mittel je Strategie stehen in `ragas.tex`, ebenfalls ohne p-Werte; neben
+  konstant, steht „nicht bestimmbar“ (in keiner Gruppe bestimmbar: eine Zeile für das ganze Paar). Die Mittel je
+  Strategie und Kendalls W stehen in `ragas.tex`, die paarweisen r in `ragas_effects.tex`, beide ohne p-Werte; neben
   jedem r steht n′, die Zahl der Fragen mit Differenz ungleich 0 ([ADR 0044](../adr/0044-statistische-auswertung.md)).
 - **Stabilität:** Auf Pilot-Sets läuft `--repeat` ein zweites Mal. `ragas_stability` in `analysis.json` vergleicht beide
   Läufe je Metrik (Anteil gleicher Werte, mittlere absolute Differenz, ρ). Auf dem Pilot e2e waren die Werte des
@@ -211,7 +212,8 @@ Rechnung in `src/stats.py`, Tabellen in `src/report_tables.py`, Abbildungen in `
 **Beschreibend** (Mittel, Median, Effektstärken, keine p-Werte): alle Retrieval-Metriken außer R@5 und MRR, beide
 Relevanzregeln (Hauptregel `config.ANALYSIS_RULE`, Sensitivitätsregel), die fünf Kriterien der Rubrik, K0 gegen C1–C3
 über `config.CONTROL_CRITERIA` und die Aufteilung nach Fragetyp, Konstruktionsklasse und Closed-Book-Urteil (je
-Strategie, mit R@5 und Gesamtwert).
+Strategie, mit R@5 und Gesamtwert). Die Tests stehen in `tests.tex`, die beschreibenden Effektstärken in
+`tests_descriptive.tex`.
 
 **Konfirmatorisch** (Plan vor dem Hauptlauf festgelegt, `config.ANALYSIS_PRIMARY`):
 
