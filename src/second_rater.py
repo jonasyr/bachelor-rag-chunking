@@ -305,6 +305,15 @@ def run_close(p: dict) -> dict:
     if latest_run(runs, CLOSE_STEP, STRATEGY) is not None:
         raise RuntimeError(f"the second rating in {out} is closed already")
     require_run(runs, "scaffold", STRATEGY, [], [items])  # the exported item file, unchanged
+    lines = items.read_text(encoding="utf-8").splitlines()
+    exported = [json.loads(line)["code"] for line in lines if line.strip()]
+    rated = [r["code"] for r in read_csv(sheet, SHEET_HEADER)]
+    if rated != exported:
+        missing = [c for c in exported if c not in rated]
+        raise ValueError(
+            f"{sheet} must list the {len(exported)} exported answers in their order"
+            + (f"; missing: {', '.join(missing)}" if missing else "")
+        )
     check_derived(sheet, checks, points, runs)  # every code has checks; scores follow from them
     return append_step_run(
         CLOSE_STEP,

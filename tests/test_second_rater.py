@@ -12,6 +12,7 @@ from atomic_csv import read_csv, write_csv
 from config import QUESTION_CLASSES, RUBRIC_CRITERIA
 from evaluate_answers import SHEET_HEADER
 from run_log import append_step_run, latest_run, sha256_of
+from scoring_rules import CHECKS_HEADER
 
 
 @pytest.fixture
@@ -311,6 +312,19 @@ def test_close_refuses_incomplete(exported):
     p, r2 = exported
     score_all(r2, skip=("H01-C",))
     with pytest.raises(ValueError, match="H01-C"):
+        second_rater.run_close(p)
+    assert latest_run(r2.runs_file, "second_rater_close", "C1,C2,C3") is None
+
+
+def test_close_refuses_rows_missing_from_sheet(exported):
+    p, r2 = exported
+    score_all(r2)
+    sheet = read_csv(r2.sheet_file, SHEET_HEADER)
+    dropped = sheet.pop()["code"]
+    write_csv(r2.sheet_file, SHEET_HEADER, sheet)
+    checks = [r for r in read_csv(r2.checks_file, CHECKS_HEADER) if r["code"] != dropped]
+    write_csv(r2.checks_file, CHECKS_HEADER, checks)
+    with pytest.raises(ValueError, match=dropped):
         second_rater.run_close(p)
     assert latest_run(r2.runs_file, "second_rater_close", "C1,C2,C3") is None
 

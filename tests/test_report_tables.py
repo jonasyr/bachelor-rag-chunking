@@ -221,6 +221,14 @@ def test_missing_inputs_skip_tables_with_note(tmp_path):
     assert "breakdown.tex" in names  # type and class remain
 
 
+def test_skipped_tables_remove_stale_files(tmp_path):
+    for name in ("control_k0.tex", "agreement.tex"):
+        (tmp_path / name).write_text("stale", encoding="utf-8")
+    write_tables(build_results(make_data(control=False), 0.05), tmp_path)
+    assert not (tmp_path / "control_k0.tex").exists()
+    assert not (tmp_path / "agreement.tex").exists()
+
+
 def test_gating_pairs_only_for_significant_metric():
     results = build_results(make_data(), 0.05)
     for r in results["confirmatory"].values():

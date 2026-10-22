@@ -136,6 +136,17 @@ def test_rows_alpha_not_determinable_when_constant():
     assert rows["declines"]["alpha_ci"] == {"low": None, "high": None}
 
 
+def test_rows_criterion_levels_follow_the_rubric_maximum(monkeypatch):
+    monkeypatch.setattr(agreement, "RUBRIC_MAX_SCORE", 3)
+    first_checks, first_sheet = rating()
+    second_checks, _ = rating()
+    second_sheet = [sheet_row(c, correctness="3") for c in CODES]
+    rows = {r["label"]: r for r in agreement.rows(
+        agreement.pair(first_checks, first_sheet, second_checks, second_sheet)
+    )}  # fmt: skip
+    assert rows["correctness"]["agreement"] == 0.0
+
+
 def test_rows_bootstrap_is_deterministic(paired):
     assert agreement.rows(paired) == agreement.rows(paired)
 

@@ -890,9 +890,10 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:
-        if skipped.get(name) and results.get(skipped[name]) is None:
-            continue
         path = out_dir / name
+        if skipped.get(name) and results.get(skipped[name]) is None:
+            path.unlink(missing_ok=True)  # no stale table from an earlier run
+            continue
         path.write_text(tables[name](), encoding="utf-8")
         written.append(path)
     return written

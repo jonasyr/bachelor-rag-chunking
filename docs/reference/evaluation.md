@@ -208,10 +208,12 @@ Entscheidung: [ADR 0046](../adr/0046-zweitbewertung.md); Befehle: `src/second_ra
    Scoring und nur den R2-Satz; die Kernpunkte sind dort nicht bearbeitbar. R2 sieht das Repo nicht, und bis R2
    abgeschlossen hat, pusht Jonas seine `scoring_checks.csv` und `scoring_sheet.csv` nicht (Regel, nicht technisch
    erzwungen).
-4. **Abschluss** (`--mode close`): prüft Vollständigkeit, eingefrorene Kernpunkte und dass jeder Wert aus seinen
-   Prüfantworten folgt, schreibt den Eintrag `second_rater_close` und macht den Satz schreibgeschützt.
+4. **Abschluss** (`--mode close`): prüft Vollständigkeit (der Bewertungsbogen nennt alle exportierten Antworten in
+   ihrer Reihenfolge), eingefrorene Kernpunkte und dass jeder Wert aus seinen Prüfantworten folgt, schreibt den
+   Eintrag `second_rater_close` und macht den Satz schreibgeschützt.
 5. **Auswertung** in `analyse.py`: nur eine abgeschlossene Zweitbewertung, deren Dateien noch zum Eintrag passen;
    verglichen Code für Code mit Jonas' Prüfantworten und Werten (gleiche Regelversion, gleiche Items und Kernpunkte).
+   Fehlt sie, entfernt der Lauf `agreement.tex` und `second_rater_disagreements.csv` eines früheren Laufs.
 
 Übereinstimmung je Prüffrage, für die Kernpunkt-Markierungen (gepoolt) und je Kriterium: einfache Übereinstimmung,
 Gwets AC1 (Ja/Nein-Prüffragen, Kernpunkte) bzw. AC2 mit ordinalen Gewichten (`grounded` none < some < all,

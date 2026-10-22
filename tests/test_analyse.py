@@ -41,3 +41,12 @@ def test_run_without_second_rating_writes_no_disagreements(paths, monkeypatch, t
     analyse.main(["--set", str(tmp_path)])
     assert not (tmp_path / "output" / "second_rater_disagreements.csv").exists()
     assert not (tmp_path / "output" / "tables" / "agreement.tex").exists()
+
+
+def test_run_without_second_rating_removes_stale_disagreements(paths, monkeypatch, tmp_path):  # noqa: F811 (fixture)
+    monkeypatch.setattr(analyse.analysis_data, "set_paths", lambda set_dir: paths)
+    stale = tmp_path / "output" / "second_rater_disagreements.csv"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("stale", encoding="utf-8")
+    analyse.main(["--set", str(tmp_path)])
+    assert not stale.exists()

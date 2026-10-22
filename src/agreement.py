@@ -14,6 +14,7 @@ from config import (
     AGREEMENT_CI_LEVEL,
     AGREEMENT_SEED,
     RUBRIC_CRITERIA,
+    RUBRIC_MAX_SCORE,
 )
 from scoring_rules import CHECKS, POINT_MARKS, YES_NO, from_row
 
@@ -21,7 +22,6 @@ ORDERED_CHECKS = {  # low -> high
     "grounded": ("none", "some", "all"),
     "hallucination": ("substantive", "minor", "none"),
 }
-CRITERION_LEVELS = 3  # criteria are scored 0-2
 DISAGREEMENTS_HEADER = ["code", "question_id", "field", "first", "second"]
 GROUP_CHECKS, GROUP_POINTS, GROUP_CRITERIA = "Prüffragen", "Kernpunkte", "Kriterien"
 POINTS_LABEL = "Kernpunkte"
@@ -110,7 +110,7 @@ def _units(paired: list[dict]) -> list[tuple[str, str, list, list, bool]]:
     out.append((GROUP_POINTS, POINTS_LABEL, points, POINT_MARKS_ORDER, False))
     for name in RUBRIC_CRITERIA:
         values = [(p["question_id"], *p["criteria"][name]) for p in paired]
-        out.append((GROUP_CRITERIA, name, values, tuple(range(CRITERION_LEVELS)), True))
+        out.append((GROUP_CRITERIA, name, values, tuple(range(RUBRIC_MAX_SCORE + 1)), True))
     return out
 
 
