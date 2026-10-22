@@ -6,8 +6,7 @@ Facts live in `docs/` — start at `docs/README.md`; research design `docs/expla
 (ADRs outrank it and the exposé: paragraph "Was gilt bei Widersprüchen").
 
 Status (what is done, next step): `docs/plan.md#stand` — never restate it here.
-Workflow: branch → PR → Codex review (`AGENTS.md` § Code Review Rules, `.claude/agents/codex-reviewer.md`) → merge
-after Jonas approves. Repo is public — no personal data (matriculation number etc.).
+Workflow and review rules: `AGENTS.md`. Repo is public — no personal data.
 Commands: `AGENTS.md` (table) and `docs/reference/tooling.md`; run scripts from the repo root. `--help` only works
 where argparse exists: `snapshot.py`, `ingest.py`, `preprocess.py` run their step instead (snapshot replaces `data/raw/`).
 Tools: use Serena (project `bachelor-rag-chunking`) and codebase-memory for code work, also in subagents. The
@@ -15,9 +14,9 @@ codebase-memory project name is the path form `home-jonas-Documents-Code-PaperLa
 `bachelor-rag-chunking` there returns "function not found". Reindex: `index_repository` and `serena project index`.
 
 ## Memories
-- Step order and refusals, catalogue, closed-book screen, K0, embedding and corpus gotchas: `mem:pipeline`
+- Step order, refusals, catalogue, closed-book screen, MDX/embedding/corpus gotchas, analysis: `mem:pipeline`
 - C1/C2/C3 and the controls K1/K0 (ADR 0021, 0026, 0041): `mem:chunking`
-- Metrics, rule-based scoring, K0 scoring guards: `mem:evaluation`
+- Scoring guards, K0, RAGAS and second-rater pointers: `mem:evaluation`
 - Research question, hypotheses, literature pointers: `mem:research`
 - Where decisions live and how to add one: `mem:decisions`
 - Stack and model pinning: `mem:tech_stack`
