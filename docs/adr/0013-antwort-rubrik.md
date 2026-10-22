@@ -4,7 +4,8 @@
 
 Angenommen (D13 im Leitfaden; Quelle: Exposé/Baseline, übernommen; blinde Bewertung ergänzt durch
 [ADR 0032](0032-blinde-rubrik-bewertung.md); Stufen operationalisiert durch [ADR 0035](0035-regelbasierte-bewertung.md);
-ergänzt durch [ADR 0044](0044-statistische-auswertung.md))
+ergänzt durch [ADR 0044](0044-statistische-auswertung.md)); die optionale Normierung auf 0–100 ist nicht umgesetzt,
+der Gesamtwert bleibt auf 0–2 (`total_score`)
 
 ## Kontext
 

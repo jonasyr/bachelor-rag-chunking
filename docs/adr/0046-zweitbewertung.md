@@ -4,7 +4,8 @@
 
 Angenommen (21.10.2026; konkretisiert die Empfehlung aus [ADR 0007](0007-triangulation.md) und
 [Evaluation](../reference/evaluation.md#zweitbewertung)); Person, Stichprobe und Relevanz von Jonas entschieden, das
-Übereinstimmungsmaß ist ein Vorschlag von Claude.
+Übereinstimmungsmaß ist ein Vorschlag von Claude. Ergänzt am 22.10.2026 um den
+[Datenschutz der zweiten Person](#nachtrag-22102026-datenschutz-der-zweiten-person) (Jonas).
 
 ## Kontext
 
@@ -41,6 +42,20 @@ Die Zweitannotation der Relevanz (`relevant_section_ids`) bleibt vorgemerkt und 
 - Negativ: Etwa 1,5–2 Stunden Arbeit für die zweite Person; bei 12 Fragen bleiben die Konfidenzintervalle breit.
   Ziehung und Übereinstimmungsrechnung sind noch umzusetzen (Parameter in `src/config.py`).
 - Neutral: K0 bekommt keine Zweitbewertung; seine Werte sind ohne Auszüge nicht blind ([ADR 0041](0041-kontrolle-k0.md)).
+
+## Nachtrag 22.10.2026: Datenschutz der zweiten Person
+
+Von Jonas entschieden; ändert die Entscheidung oben nicht.
+
+- Das Repo ist öffentlich. Die zweite Person erscheint darin nur über ihre Rolle („zweite bewertende Person“), in
+  Dateien unter einem Pseudonym (z. B. `R2`); ihr Name und ihre Kontaktdaten stehen in keiner Datei, keinem Commit,
+  keinem Log und keiner Ausgabe.
+- Vor der Bewertung stimmt sie mündlich zu, dass ihre pseudonymen Werte in der Arbeit und im Repo ausgewertet werden;
+  Jonas vermerkt die Zustimmung außerhalb des Repos.
+- Ihre Werte liegen nur unter `data/evaluation/` (Dateien und Format legt die Umsetzung fest). Auf ihren Wunsch
+  werden sie aus dem aktuellen Stand entfernt (die Git-Historie bleibt); die Arbeit berichtet dann das
+  Ersatzverfahren.
+- In der Danksagung erscheint sie nur mit ihrem Einverständnis.
 
 ## Literatur
 

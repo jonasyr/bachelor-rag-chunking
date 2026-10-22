@@ -3,7 +3,9 @@
 ## Status
 
 Angenommen (D9 im Leitfaden; Quelle: Chat, ersetzt die alten H1–H3 der Baseline; ergänzt durch
-[ADR 0044](0044-statistische-auswertung.md))
+[ADR 0044](0044-statistische-auswertung.md), der die deskriptive Auswertung um einen vorab festgelegten Testplan
+ergänzt); Darstellung in der Arbeit (Jonas, 22.10.2026): H1–H3 bleiben Leitannahmen, die Tests aus ADR 0044 stehen vor
+dem Hauptlauf fest, alle p-Werte gelten als explorativ; keine Hypothese gilt als konfirmatorisch bestätigt
 
 ## Kontext
 
