@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (19.10.2026; ersetzt die Ankerregel von [ADR 0019](0019-korpus-ausschnitt.md); ergänzt [ADR 0038](0038-korpus-e2e.md))
+Angenommen (19.10.2026; ersetzt die Ankerregel von [ADR 0019](0019-korpus-ausschnitt.md); ändert die Bereinigungsregel
+von [ADR 0038](0038-korpus-e2e.md): Agent-Prompts und Video-Karten bleiben erhalten)
 
 ## Kontext
 

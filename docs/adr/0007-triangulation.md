@@ -2,7 +2,10 @@
 
 ## Status
 
-Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war); konkretisiert durch [ADR 0046](0046-zweitbewertung.md) (Zweitbewertung) und [ADR 0047](0047-ragas-als-triangulation.md) (RAGAS)
+Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war); Zweitbewertung
+konkretisiert durch [ADR 0046](0046-zweitbewertung.md) (12 Fragen × C1–C3, 25 %); RAGAS konkretisiert und Metriken
+geändert durch [ADR 0047](0047-ragas-als-triangulation.md) (Faithfulness, Response Relevancy, Context Precision, Context
+Recall statt „Kontextrelevanz“)
 
 ## Kontext
 

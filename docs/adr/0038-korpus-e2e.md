@@ -6,11 +6,12 @@ Angenommen (18.10.2026; ersetzt [ADR 0001](0001-korpus-vuejs.md), [ADR 0025](002
 den Vue-spezifischen Ausschnitt von [ADR 0019](0019-korpus-ausschnitt.md); macht
 [ADR 0020](0020-playground-urls-kuerzen.md) gegenstandslos; Umsetzung in eigenen Pull Requests, Stand in
 [plan.md](../plan.md#stand); Stichprobenplan: [ADR 0039](0039-stichprobenplan-e2e.md); wer den Kernpunkt beurteilt:
-[ADR 0040](0040-closed-book-pruefung.md); K0: [ADR 0041](0041-kontrolle-k0.md); MDX-Umwandlung:
+[ADR 0040](0040-closed-book-pruefung.md); K0: [ADR 0041](0041-kontrolle-k0.md); Bereinigungsregel geändert durch
 [ADR 0042](0042-mdx-umwandlung.md) (Agent-Prompts und Video-Karten bleiben entgegen der Entscheidung erhalten, Anker
 selbst berechnet)); Seiten-, Token- und Abschnittszahlen in Kontext und Konsequenzen: Auswahlmessung vor der Bereinigung
 (`to_docs.py`, Tokens = Zeichen / 4, [Korpusauswahl](../reference/corpus-selection.md)); der gebaute Korpus steht in
-[Korpus](../reference/corpus.md)
+[Korpus](../reference/corpus.md). Hinweis: der Betreuer ist inzwischen informiert
+([Forschungsdesign](../explanation/research-design.md#validität-und-grenzen))
 
 ## Kontext
 

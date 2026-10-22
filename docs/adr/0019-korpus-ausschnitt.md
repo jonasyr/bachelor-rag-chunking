@@ -2,16 +2,17 @@
 
 ## Status
 
-Angenommen (13.10.2026); Ausschnitt und Commit ersetzt durch [ADR 0025](0025-korpus-guide-api-styleguide.md)
-(14.10.2026) und den Korpus e2e ([ADR 0038](0038-korpus-e2e.md), 18.10.2026); mit dem Korpus e2e entfällt die Regel „nur
-Composition API“ (`options-api`-Blöcke entfernen, [ADR 0038](0038-korpus-e2e.md)), die Benennung aus expliziten
-`{#…}`-Ankern ersetzt [ADR 0042](0042-mdx-umwandlung.md) (Anker der Website, selbst berechnet); weiter gelten
-`section_id = {doc_id}#{anchor}`, die Relevanzregel (jede Überlappung) mit Sensitivitätsprüfung und die Token-Zählung
-mit `tiktoken` 0.13.0 und `cl100k_base`; Abschnitte um H1 ergänzt durch
-[ADR 0022](0022-h1-abschnitte-in-ground-truth.md); Sensitivitätsregel (Mindestüberlappung) geändert durch
-[ADR 0026](0026-c3-vergleichbarkeit.md); Playground-URLs ergänzt durch [ADR 0020](0020-playground-urls-kuerzen.md),
-gegenstandslos durch [ADR 0038](0038-korpus-e2e.md) (ursprünglich: konkretisiert [ADR 0001](0001-korpus-vuejs.md),
-ersetzt den Vorschlag der vier Unterordner in [Korpus](../reference/corpus.md))
+Teilweise ersetzt: Ausschnitt und Commit durch [ADR 0025](0025-korpus-guide-api-styleguide.md) (14.10.2026) und den
+Korpus e2e ([ADR 0038](0038-korpus-e2e.md), 18.10.2026), die Ankerregel durch [ADR 0042](0042-mdx-umwandlung.md)
+(19.10.2026). Vorher angenommen (13.10.2026). Die Regel „nur Composition API“ (`options-api`-Blöcke entfernen) ist auf
+e2e als „eine Fassung“ verallgemeinert ([ADR 0038](0038-korpus-e2e.md)); statt der expliziten `{#…}`-Anker gelten nach
+[ADR 0042](0042-mdx-umwandlung.md) die Anker der Website, selbst berechnet. Weiter gelten `section_id =
+{doc_id}#{anchor}`, die Relevanzregel (jede Überlappung) mit Sensitivitätsprüfung und die Token-Zählung mit `tiktoken`
+0.13.0 und `cl100k_base`; Abschnitte um H1 ergänzt durch [ADR 0022](0022-h1-abschnitte-in-ground-truth.md);
+Sensitivitätsregel (Mindestüberlappung) geändert durch [ADR 0026](0026-c3-vergleichbarkeit.md); Playground-URLs ergänzt
+durch [ADR 0020](0020-playground-urls-kuerzen.md), gegenstandslos durch [ADR 0038](0038-korpus-e2e.md). Ursprünglich
+konkretisierte sie [ADR 0001](0001-korpus-vuejs.md) und ersetzte den Vorschlag der vier Unterordner im damaligen
+Leitfaden §5.2
 
 ## Kontext
 
@@ -40,4 +41,4 @@ Alle Werte stehen in [`src/config.py`](../../src/config.py).
 - Schlecht: Etwa doppelt so viele Tokens wie die vier Unterordner; mehr Chunks und Embedding-Kosten (absolut gering) sowie mehr Aufwand bei der Ground Truth.
 - Schlecht: „Jede Überlappung“ ist großzügig und begünstigt C2 bei Precision@k; die Sensitivitätsprüfung macht diesen Effekt sichtbar und wird in der Arbeit diskutiert.
 - Neutral: Das Entfernen der Options-API-Blöcke ist ein Eingriff in den Korpus und wird in der Methodik als Bereinigungsschritt dokumentiert.
-- Neutral: Die exakte Token-Zahl nach dem Preprocessing steht im [Korpusmanifest](../corpus_manifest.csv) und im [Experiment-Protokoll](../reference/experiment-record.md); der Plan vom 13.08.2026 nannte rund 106k Tokens, eine grobe Vorabmessung ergab bis zu 150k (abhängig von der Bereinigung).
+- Neutral: Die exakte Token-Zahl nach dem Preprocessing steht im [Korpusmanifest](../corpus_manifest.csv) und im [Experiment-Protokoll (Vue.js)](../reference/experiment-record-vue.md); der Plan vom 13.08.2026 nannte rund 106k Tokens, eine grobe Vorabmessung ergab bis zu 150k (abhängig von der Bereinigung).

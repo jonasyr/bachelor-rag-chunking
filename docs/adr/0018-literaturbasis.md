@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (D18 im Leitfaden; Quelle: Chat, konkretisiert die Baseline)
+Angenommen (D18 im Leitfaden; Quelle: Chat, konkretisiert die Baseline); die Literaturbasis ist seitdem um Web- und
+Methodenquellen erweitert, aktueller Stand in [Literatur](../reference/literature.md)
 
 ## Kontext
 

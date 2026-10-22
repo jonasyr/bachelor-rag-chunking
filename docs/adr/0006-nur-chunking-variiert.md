@@ -2,7 +2,9 @@
 
 ## Status
 
-Angenommen (D6 im Leitfaden; Quelle: Exposé, übernommen)
+Angenommen (D6 im Leitfaden; Quelle: Exposé, übernommen); die Kontrollen K1 ([ADR 0026](0026-c3-vergleichbarkeit.md),
+nur Retrieval) und K0 ([ADR 0038](0038-korpus-e2e.md), [ADR 0041](0041-kontrolle-k0.md), ohne Retrieval) sind keine
+Strategien; K0 ist die beabsichtigte Ausnahme ohne Retrieval, verglichen werden weiter nur C1–C3
 
 ## Kontext
 

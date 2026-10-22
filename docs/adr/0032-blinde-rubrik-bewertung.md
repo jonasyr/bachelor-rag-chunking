@@ -2,7 +2,11 @@
 
 ## Status
 
-Angenommen (16.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md); in der App umgesetzt: [ADR 0034](0034-bewertung-in-der-app.md); regelbasiert: [ADR 0035](0035-regelbasierte-bewertung.md))
+Angenommen (16.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md); in der App umgesetzt:
+[ADR 0034](0034-bewertung-in-der-app.md); regelbasiert: [ADR 0035](0035-regelbasierte-bewertung.md)). Hinweis (Jonas,
+22.10.2026): die Reihenfolge mischt `random.Random(SCORING_SEED)`; das ist nicht über Python-Versionen garantiert, gilt
+aber, weil Schlüssel und Bogen gespeichert und nie neu erzeugt werden ([Nachtrag ADR
+0046](0046-zweitbewertung.md#nachtrag-22102026-zufallszahlen))
 
 ## Kontext
 
