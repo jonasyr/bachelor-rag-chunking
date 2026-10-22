@@ -33,7 +33,7 @@ from config import (
 TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
-    "ragas.tex", "ragas_agreement.tex",
+    "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -517,16 +517,12 @@ def _answers_table(results: dict) -> str:
 
 
 def _tests_table(results: dict) -> str:
-    """One group per metric (its name as heading), so the metric needs no column of its own."""
+    """The confirmatory tests, one group per metric (its name as heading), so the metric needs no
+    column of its own. The descriptive effects are in `_tests_descriptive_table`."""
     header = ["Vergleich", "Statistik", "p", "p (Holm)", "Effekt", "Median-Differenz"]
-    columns = len(header)
     rows: list[list[str] | str] = []
-
-    def group(label: str) -> None:
-        rows.append(_group(label, columns, not rows))
-
     for r in results["confirmatory"].values():
-        group(r["label"])
+        rows.append(_group(r["label"], len(header), not rows))
         if not r["testable"]:
             rows.append(["Friedman", "nicht testbar", DASH, DASH, DASH, DASH])
             continue
@@ -544,26 +540,40 @@ def _tests_table(results: dict) -> str:
                  fmt_p(w["p_adj"]), "r = " + fmt_de(w["r"], REPORT_DECIMALS),
                  fmt_de(w["median_diff"], REPORT_DECIMALS)]
             )  # fmt: skip
-    desc = results["descriptive_effects"]
-    for block in (desc[ANALYSIS_RULE], desc["answers"]):
-        for e in block.values():
-            group(f"{e['label']} (deskriptiv)")
-            rows.append(["Friedman", DASH, DASH, DASH, _w(e["kendalls_w"]), DASH])
-            for pair, v in e["pairs"].items():
-                rows.append(
-                    [pair.replace("-", "–"), DASH, DASH, DASH, _r(v["r"]),
-                     fmt_opt(v["median_diff"])]
-                )  # fmt: skip
     note = (
         f"Explorativ, Signifikanzniveau {fmt_de(results['alpha'], 2)}. Friedman-Test je "
         "Hauptmetrik mit Holm-Korrektur über die Hauptmetriken; paarweise Wilcoxon-Tests nur bei "
-        "signifikantem Gesamttest, Holm-korrigiert über alle Paare. Übrige Maße deskriptiv, ohne "
-        "p-Werte. Effekt: Kendalls W bzw. r; Median-Differenz jeweils erste minus zweite "
-        "Strategie."
+        "signifikantem Gesamttest, Holm-korrigiert über alle Paare. Effekt: Kendalls W bzw. r; "
+        "Median-Differenz jeweils erste minus zweite Strategie. Übrige Maße deskriptiv in einer "
+        "eigenen Tabelle."
     )
     return latex_table(
         "tests", "Tests und Effektstärken der Strategien C1 bis C3", header, rows, "lrrrrr", note
     )
+
+
+def _tests_descriptive_table(results: dict) -> str:
+    """Kendall's W and pairwise r of the measures without a test; no columns for statistic and
+    p-values, which would only hold dashes."""
+    header = ["Vergleich", "Effekt", "Median-Differenz"]
+    rows: list[list[str] | str] = []
+    desc = results["descriptive_effects"]
+    for block in (desc[ANALYSIS_RULE], desc["answers"]):
+        for key, e in block.items():
+            unit = " (Tokens)" if key == "context_tokens" else ""
+            rows.append(_group(f"{e['label']}{unit}", len(header), not rows))
+            rows.append(["Friedman", _w(e["kendalls_w"]), DASH])
+            for pair, v in e["pairs"].items():
+                rows.append([pair.replace("-", "–"), _r(v["r"]), fmt_opt(v["median_diff"])])
+    note = (
+        "Deskriptiv, ohne p-Werte: Maße ohne Test (Retrieval nach der Hauptregel, Kriterien der "
+        "Antwort). Effekt: Kendalls W bzw. r; Median-Differenz jeweils erste minus zweite "
+        "Strategie, bei Kontext@5 in Tokens."
+    )
+    return latex_table(
+        "tests_descriptive", "Deskriptive Effektstärken der Strategien C1 bis C3", header, rows,
+        "lrr", note,
+    )  # fmt: skip
 
 
 def _w(w: float | None) -> str:
@@ -616,8 +626,8 @@ def _correlation_table(results: dict) -> str:
 
 
 def _ragas_table(results: dict) -> str:
-    """Means and Kendall's W per metric; below them, per metric, r (median difference) of the
-    pairs. Descriptive: RAGAS is a second view, no basis of a statement (ADR 0047)."""
+    """Means and Kendall's W per metric; the pairwise effects are in `_ragas_effects_table`.
+    Descriptive: RAGAS is a second view, no basis of a statement (ADR 0047)."""
     block = results["ragas"]
     header = ["Metrik", *STRATEGY_IDS, "Kendalls W"]
     rows: list[list[str] | str] = []
@@ -626,22 +636,6 @@ def _ragas_table(results: dict) -> str:
             [RAGAS_LABELS[m], *(fmt_opt(block["means"][s][m]) for s in STRATEGY_IDS),
              fmt_opt(block["effects"][m]["kendalls_w"])]
         )  # fmt: skip
-    pair_names = list(next(iter(block["effects"].values()))["pairs"])
-    if pair_names:
-        pair_header = ["Effekt r (Median-Diff.; n′)", *(p.replace("-", "–") for p in pair_names)]
-        rows.append(r"\midrule")
-        rows.append(" & ".join(latex_escape(c) for c in pair_header) + r" \\")
-        for m in RAGAS_METRICS:
-            pairs = block["effects"][m]["pairs"]
-            rows.append(
-                [RAGAS_LABELS[m]]
-                + [
-                    f"{fmt_opt(pairs[p]['r'])} ({fmt_opt(pairs[p]['median_diff'])}; "
-                    f"n′ = {pairs[p]['n_nonzero']})"
-                    if p in pairs else DASH
-                    for p in pair_names
-                ]
-            )  # fmt: skip
     counts = [
         f"{RAGAS_LABELS[m]} {s}: {block['nan_counts'][s][m]}"
         for m in RAGAS_METRICS for s in STRATEGY_IDS if block["nan_counts"][s][m]
@@ -654,14 +648,40 @@ def _ragas_table(results: dict) -> str:
     n = min(e["n"] for e in block["effects"].values())
     note = (
         "Mittelwerte der RAGAS-Metriken von 0 bis 1 über die Fragen mit Wert. "
-        f"{nan} Kendalls W und r über die Fragen mit Wert in allen Strategien (mindestens {n}), "
-        "deskriptiv, ohne p-Werte; Median-Differenz erste minus zweite Strategie; n′ Fragen mit "
-        "Differenz ungleich 0, auf denen r beruht (bei vielen gleichen Werten klein). "
-        "RAGAS ist eine zweite Sicht neben der regelbasierten Bewertung."
+        f"{nan} Kendalls W über die Fragen mit Wert in allen Strategien (mindestens {n}), "
+        "deskriptiv, ohne p-Werte. RAGAS ist eine zweite Sicht neben der regelbasierten Bewertung."
     )
     return latex_table(
         "ragas", "RAGAS-Bewertung je Strategie", header, rows, "l" + "r" * (len(header) - 1), note
     )
+
+
+def _ragas_effects_table(results: dict) -> str:
+    """Per metric and pair r, median difference and n′ (the questions r rests on)."""
+    effects = results["ragas"]["effects"]
+    pair_names = list(dict.fromkeys(p for e in effects.values() for p in e["pairs"]))
+    header = ["Metrik", *(p.replace("-", "–") for p in pair_names)]
+    rows: list[list[str] | str] = []
+    for m in RAGAS_METRICS:
+        pairs = effects[m]["pairs"]
+        rows.append(
+            [RAGAS_LABELS[m]]
+            + [
+                f"{fmt_opt(pairs[p]['r'])} ({fmt_opt(pairs[p]['median_diff'])}; "
+                f"n′ = {pairs[p]['n_nonzero']})"
+                if p in pairs else DASH
+                for p in pair_names
+            ]
+        )  # fmt: skip
+    note = (
+        "Deskriptiv, ohne p-Werte. Je Paar Effektstärke r (Median-Differenz erste minus zweite "
+        "Strategie; n′ Fragen mit Differenz ungleich 0, auf denen r beruht, bei vielen gleichen "
+        "Werten klein)."
+    )
+    return latex_table(
+        "ragas_effects", "Paarweise Effekte der RAGAS-Metriken", header, rows,
+        "l" + "r" * len(pair_names), note,
+    )  # fmt: skip
 
 
 def _ragas_agreement_table(results: dict) -> str:
@@ -671,6 +691,9 @@ def _ragas_agreement_table(results: dict) -> str:
         metric, column = pair.split("~")
         label = f"{RAGAS_LABELS[metric]} und {RAGAS_PAIR_LABELS[column]}"
         rows.append(_group(label, len(header), not rows))
+        if not any(c["testable"] for c in per.values()):
+            rows.append(["gesamt und je Strategie", NOT_DETERMINABLE, str(per["pooled"]["n"])])
+            continue
         for group, c in per.items():
             shown = "gesamt" if group == "pooled" else group
             rho = fmt_opt(c["rho"]) if c["testable"] else NOT_DETERMINABLE
@@ -770,16 +793,19 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
         ),
         "answers.tex": lambda: _answers_table(results),
         "tests.tex": lambda: _tests_table(results),
+        "tests_descriptive.tex": lambda: _tests_descriptive_table(results),
         "control_k0.tex": lambda: _k0_table(results),
         "correlation.tex": lambda: _correlation_table(results),
         "efficiency.tex": lambda: _efficiency_table(results),
         "breakdown.tex": lambda: _breakdown_table(results),
         "ragas.tex": lambda: _ragas_table(results),
+        "ragas_effects.tex": lambda: _ragas_effects_table(results),
         "ragas_agreement.tex": lambda: _ragas_agreement_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
-        "ragas.tex": "ragas", "ragas_agreement.tex": "ragas_agreement",
+        "ragas.tex": "ragas", "ragas_effects.tex": "ragas",
+        "ragas_agreement.tex": "ragas_agreement",
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:

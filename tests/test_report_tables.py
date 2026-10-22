@@ -115,22 +115,31 @@ def test_results_are_json_serialisable():
     assert "Vorab-Hinweis" in results["notes"]
 
 
+def test_tests_table_holds_only_the_confirmatory_tests(tmp_path):
+    """The descriptive effects have their own (appendix) table, so tests.tex stays short."""
+    write_tables(build_results(make_data(), 0.05), tmp_path)
+    tests = (tmp_path / "tests.tex").read_text(encoding="utf-8")
+    assert "deskriptiv" not in tests.split(r"\end{tabular}")[0]
+    for label in ("R@5", "MRR", "Gesamtwert"):
+        assert rf"{{{label}}}" in tests
+    desc = (tmp_path / "tests_descriptive.tex").read_text(encoding="utf-8")
+    assert r"\caption{Deskriptive Effektstärken der Strategien C1 bis C3}" in desc
+    assert r"\label{tab:tests_descriptive}" in desc
+    # Kontext@5 differs in tokens, not in score points
+    assert "Kontext@5 (Tokens)" in desc
+
+
 def test_tests_table_has_no_pvalues_for_descriptive_metrics(tmp_path):
     results = build_results(make_data(), 0.05)
     write_tables(results, tmp_path)
-    lines = (tmp_path / "tests.tex").read_text(encoding="utf-8").splitlines()
-    group, seen = None, set()
-    for line in lines:
-        if line.startswith(r"\multicolumn"):
-            group = line.split("{")[-1].split("}")[0]
-            seen.add(group)
-        elif (
-            group and group.startswith(("Hit@5", "P@5", "Kontext@5", "Korrektheit")) and "&" in line
-        ):
-            cells = [c.strip(" \\") for c in line.split("&")]
-            # columns: Vergleich, Statistik, p, p (Holm), Effekt, Median-Differenz
-            assert cells[2] == "--" and cells[3] == "--", line
-    assert any(g.startswith("Hit@5") for g in seen)
+    text = (tmp_path / "tests_descriptive.tex").read_text(encoding="utf-8")
+    # no test, so no columns for statistic and p-values that would only hold dashes
+    assert "Vergleich & Effekt & Median-Differenz" in text and "p (Holm)" not in text
+    align = text.split(r"\begin{tabular}{")[1].split("}")[0]
+    assert align == "lrr"
+    groups = [line.split("{")[-1].split("}")[0] for line in text.splitlines()
+              if line.startswith(r"\multicolumn")]  # fmt: skip
+    assert any(g.startswith("Hit@5") for g in groups)
 
 
 def test_tables_follow_the_iu_rules(tmp_path):
@@ -165,7 +174,7 @@ def test_descriptive_metrics_have_no_p_in_results():
     assert '"p"' not in flat_k0
 
 
-def test_all_ten_tables_are_written(tmp_path):
+def test_all_tables_are_written(tmp_path):
     paths = write_tables(build_results(ragas_data(), 0.05), tmp_path)
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
@@ -329,9 +338,10 @@ def test_ragas_tables_follow_the_iu_rules(tmp_path):
     nan = {("Q003", "C2", "faithfulness")}
     paths = write_tables(build_results(ragas_data(nan), 0.05), tmp_path)
     names = {p.name for p in paths}
-    assert {"ragas.tex", "ragas_agreement.tex"} <= names
+    assert {"ragas.tex", "ragas_effects.tex", "ragas_agreement.tex"} <= names
     titles = {
         "ragas.tex": "RAGAS-Bewertung je Strategie",
+        "ragas_effects.tex": "Paarweise Effekte der RAGAS-Metriken",
         "ragas_agreement.tex": "Übereinstimmung von RAGAS mit Bewertung und Retrieval",
     }
     for name, title in titles.items():
@@ -350,16 +360,18 @@ def test_ragas_tables_follow_the_iu_rules(tmp_path):
     ]
     agreement = (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8")
     assert len(pooled) == 5 and "Spearmans ρ & n" in agreement and " & p & " not in agreement
-    effects = (tmp_path / "ragas.tex").read_text(encoding="utf-8")
+    means = (tmp_path / "ragas.tex").read_text(encoding="utf-8")
+    assert "n′" not in means and "Kendalls W" in means  # pairwise block moved out
+    effects = (tmp_path / "ragas_effects.tex").read_text(encoding="utf-8")
     # r rests on the differences not equal to 0; with heavy ties n' can be tiny, so it is shown
-    assert "n′ = " in effects
+    assert "n′ = " in effects and "C1–C2" in effects
 
 
 def test_ragas_tables_skipped_without_ragas(tmp_path):
     results = build_results(make_data(), 0.05)
     assert results["ragas"] is None and results["ragas_agreement"] is None
     names = {p.name for p in write_tables(results, tmp_path)}
-    assert "ragas.tex" not in names and "ragas_agreement.tex" not in names
+    assert not {"ragas.tex", "ragas_effects.tex", "ragas_agreement.tex"} & names
 
 
 def test_ragas_agreement_without_checks_drops_that_pair():
@@ -376,6 +388,10 @@ def test_constant_side_is_not_determinable(tmp_path):
     write_tables(results, tmp_path)
     text = (tmp_path / "ragas_agreement.tex").read_text(encoding="utf-8")
     assert "nicht bestimmbar" in text and "nan" not in text.lower()
+    # a pair that no group can determine collapses into one row instead of one per group
+    block = text.split("Response Relevancy und")[1].split(r"\multicolumn")[0]
+    rows = [line for line in block.splitlines() if "&" in line]
+    assert rows == [rf"gesamt und je Strategie & nicht bestimmbar & {len(QIDS) * 3} \\"]
 
 
 def test_ragas_stability_from_repeat():
