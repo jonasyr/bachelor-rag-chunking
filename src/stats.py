@@ -171,25 +171,29 @@ def ordinal_weights(q: int) -> list[list[float]]:
 
 def gwet_ac(
     pairs: list[tuple[int, int]], q: int, weights: list[list[float]] | None = None
-) -> float:
+) -> float | None:
     """Gwet's AC1 (``weights=None``, identity) or AC2 (weighted) for two raters, categories 0..q-1.
 
     ``pa`` is the mean weight of the rating pairs,
     ``pe = sum(w) / (q (q - 1)) * sum(pi_k (1 - pi_k))`` with ``pi_k`` the share of
-    all ratings in category k. ``pe == 1`` (one category only) gives 1.0 when ``pa == 1``; no
-    pairs gives 1.0 as well, so nothing here returns NaN.
+    all ratings in category k. ``pe == 1`` (one category only) gives 1.0 when ``pa == 1``. No pairs
+    give ``None`` (undefined); ratings outside ``range(q)`` raise ``ValueError``.
     """
     if weights is None:
         weights = [[1.0 if k == c else 0.0 for c in range(q)] for k in range(q)]
+    if any(not 0 <= v < q for pair in pairs for v in pair):
+        raise ValueError(f"rating outside range({q})")
     if not pairs:
-        return 1.0
+        return None
     n = len(pairs)
     pa = sum(weights[a][b] for a, b in pairs) / n
     pi = [sum((a == k) + (b == k) for a, b in pairs) / (2 * n) for k in range(q)]
     total_w = sum(sum(row) for row in weights)
     pe = total_w / (q * (q - 1)) * sum(p * (1 - p) for p in pi) if q > 1 else 1.0
     if math.isclose(pe, 1.0):
-        return 1.0 if math.isclose(pa, 1.0) else 0.0
+        if not math.isclose(pa, 1.0):
+            raise ValueError("pe == 1 but pa != 1: invalid weights")
+        return 1.0
     return (pa - pe) / (1 - pe)
 
 

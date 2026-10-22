@@ -183,6 +183,7 @@ def test_ac2_ordinal_counts_near_miss_partly():
     pairs = [(2, 2)] * 8 + [(2, 1), (1, 2)]
     w = stats.ordinal_weights(3)
     assert stats.gwet_ac(pairs, 3, w) > stats.gwet_ac(pairs, 3)
+    assert stats.gwet_ac(pairs, 3, w) == pytest.approx((28 / 30 - 0.17) / 0.83)
 
 
 def test_ac_perfect_agreement_single_category_is_one():
@@ -226,3 +227,35 @@ def test_cluster_bootstrap_is_deterministic_and_counts_dropped():
     a = stats.cluster_bootstrap_ci(clusters, stat, 200, 0.95, 7)
     assert a == stats.cluster_bootstrap_ci(clusters, stat, 200, 0.95, 7)
     assert a["dropped"] > 0 and a["low"] == a["high"] == 0.5
+
+
+def test_ac_without_pairs_is_undefined_and_dropped_in_bootstrap():
+    assert stats.gwet_ac([], 2) is None
+    res = stats.cluster_bootstrap_ci(
+        [[(1, 1)], []],
+        lambda cs: stats.gwet_ac([p for c in cs for p in c], 2),
+        200,
+        0.95,
+        7,
+    )
+    assert res["dropped"] > 0
+
+
+def test_ac_rejects_ratings_outside_categories():
+    with pytest.raises(ValueError):
+        stats.gwet_ac([(0, -1)], 2)
+    with pytest.raises(ValueError):
+        stats.gwet_ac([(0, 2)], 2)
+
+
+def test_cluster_bootstrap_varying_statistic_gets_full_resamples():
+    clusters = [[1.0], [2.0], [3.0], [10.0]]
+    sizes = []
+
+    def stat(cs):
+        sizes.append(len(cs))
+        return sum(v for c in cs for v in c) / len(cs)
+
+    res = stats.cluster_bootstrap_ci(clusters, stat, 100, 0.95, 3)
+    assert res["low"] < res["high"] and res["dropped"] == 0
+    assert sizes == [4] * 100
