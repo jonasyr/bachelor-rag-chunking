@@ -13,11 +13,16 @@ sys.path.insert(0, str(APP_DIR))
 import streamlit as st  # noqa: E402
 from ui_theme import CSS, palette_css  # noqa: E402
 
+from config import SECOND_RATER_PSEUDONYM  # noqa: E402
+from scoring_store import rater_mode  # noqa: E402
+
 st.set_page_config(layout="wide")
 st.markdown(CSS + palette_css(), unsafe_allow_html=True)
-st.navigation(
-    [
+if rater_mode() == SECOND_RATER_PSEUDONYM:  # second rater (ADR 0046): the scoring page only
+    pages = [st.Page("scoring_page.py", title="Scoring", default=True)]
+else:
+    pages = [
         st.Page("catalogue_page.py", title="Catalogue", default=True),
         st.Page("scoring_page.py", title="Scoring"),
     ]
-).run()
+st.navigation(pages).run()

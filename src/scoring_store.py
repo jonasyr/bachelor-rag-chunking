@@ -9,6 +9,7 @@ from config, read at call time, so the page and its tests share them.
 """
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,6 +34,10 @@ from config import (
     SCORING_ITEMS_FILE,
     SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
+    SECOND_RATER_DIR,
+    SECOND_RATER_DIR_NAME,
+    SECOND_RATER_ENV,
+    SECOND_RATER_PSEUDONYM,
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SHEET_HEADER
@@ -53,6 +58,7 @@ class ScoringSet:
     runs_file: Path
     control: bool = False  # the control K0 (ADR 0041): K0 rules, four criteria
     freeze_items_file: Path | None = None  # K0: the C1-C3 item file its key points were frozen on
+    rater: bool = False  # the second rater's set (ADR 0046): frozen key points, no K0 set
 
 
 def criteria(s: ScoringSet) -> list[str]:
@@ -82,9 +88,43 @@ def _control_set(base: ScoringSet) -> ScoringSet | None:
     )
 
 
+def rater_mode() -> str | None:
+    """The rater named by the environment (config.SECOND_RATER_ENV), if any."""
+    return os.environ.get(SECOND_RATER_ENV)
+
+
+def _rater_set(name: str, folder: Path) -> ScoringSet:
+    return ScoringSet(
+        name,
+        folder / SCORING_ITEMS_FILE.name,
+        folder / SCORING_SHEET_FILE.name,
+        folder / SCORES_FILE.name,
+        folder / KEY_POINTS_FILE.name,
+        folder / SCORING_CHECKS_FILE.name,
+        folder / PILOT_RUNS_FILE_NAME,
+        rater=True,
+    )
+
+
+def rater_sets() -> list[ScoringSet]:
+    """The second rater's sets: the main one and one per pilot folder `second_rater/`."""
+    sets = []
+    if (SECOND_RATER_DIR / SCORING_ITEMS_FILE.name).exists():
+        sets.append(_rater_set("Second rater", SECOND_RATER_DIR))
+    for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
+        if items.parent.name == SECOND_RATER_DIR_NAME:
+            rel = items.parent.parent.relative_to(PILOT_DIR).as_posix()
+            name = "Pilot: second rater" if rel == "." else f"Pilot: {rel}: second rater"
+            sets.append(_rater_set(name, items.parent))
+    return sets
+
+
 def scoring_sets() -> list[ScoringSet]:
     """The main run and every pilot folder that holds an item file, each followed by its K0 set
-    (ADR 0041) when that exists."""
+    (ADR 0041) when that exists, then the second rater's sets. In R2 mode (`rater_mode`) only
+    the second rater's sets, so nothing else is reachable."""
+    if rater_mode() == SECOND_RATER_PSEUDONYM:
+        return rater_sets()
     sets = []
     if SCORING_ITEMS_FILE.exists():
         sets.append(
@@ -100,6 +140,8 @@ def scoring_sets() -> list[ScoringSet]:
         )
     for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
         folder = items.parent
+        if folder.name == SECOND_RATER_DIR_NAME:
+            continue  # listed below as a second rater set
         rel = folder.relative_to(PILOT_DIR).as_posix()
         name = "Pilot" if rel == "." else f"Pilot: {rel}"
         sets.append(
@@ -119,7 +161,7 @@ def scoring_sets() -> list[ScoringSet]:
         control = _control_set(s)
         if control is not None:
             with_control.append(control)
-    return with_control
+    return with_control + rater_sets()
 
 
 def _sheet(s: ScoringSet) -> list[dict]:

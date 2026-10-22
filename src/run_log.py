@@ -135,6 +135,8 @@ def step_command(step: str, strategy: str) -> str:
         return f"src/evaluate_answers.py --mode {step}{control}"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
+    if step.startswith("second_rater_"):
+        return f"src/second_rater.py --mode {step.removeprefix('second_rater_')}"
     if step == "ragas_repeat":
         return "src/ragas_eval.py --repeat"
     if step == "ragas":

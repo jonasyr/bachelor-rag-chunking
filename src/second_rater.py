@@ -10,7 +10,13 @@
                checks whether the sheet or the checks already hold own values.
                The main catalogue must be frozen and free of own values, and an existing sample is
                never overwritten. With --set DIR (pilot set) the guard on own values only warns.
---mode export  Not yet implemented.
+--mode export  Write R2's set to data/evaluation/second_rater/ (pilot: DIR/second_rater/): the items
+               of the drawn questions (lines copied unchanged, same codes and order),
+               their frozen key points, an empty scoring sheet and a run log that makes the app
+               accept the set as scaffolded and frozen. Never the key and never own checks. Needs
+               the draw (checked against its run record), the item file and frozen key points; the
+               main run is refused once scores.csv exists or the R2 folder holds values (pilot sets:
+               scores.csv only warns). Run record `second_rater_export`.
 --mode close   Not yet implemented.
 
 --questions N (pilot sets only) sets the number of questions; the main catalogue always draws
@@ -18,12 +24,14 @@ config.SECOND_RATER_QUESTIONS.
 """
 
 import csv
+import json
 import random
 import sys
 from collections import Counter
 from pathlib import Path
 
-from atomic_csv import write_csv
+import scoring_store
+from atomic_csv import read_csv, write_csv
 from config import (
     CATALOGUE_FREEZE_FILE,
     DOCUMENTS_FILE,
@@ -46,12 +54,21 @@ from config import (
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
+from evaluate_answers import SHEET_HEADER
 from freeze import require_frozen
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import append_step_run
+from run_log import (
+    append_key_points_run,
+    append_scaffold_run,
+    append_step_run,
+    require_run,
+    sha256_of,
+)
 
 SAMPLE_HEADER = ["question_id", "type", "difficulty"]
 DRAW_STEP = "second_rater_draw"
+EXPORT_STEP = "second_rater_export"
+STRATEGY = ",".join(STRATEGY_IDS)
 
 
 def targets(counts: dict[str, int], n: int, rng: random.Random) -> dict[str, int]:
@@ -185,6 +202,84 @@ def run_draw(p: dict, n: int, pilot: bool) -> list[dict]:
     return rows
 
 
+def run_export(p: dict, pilot: bool) -> Path:
+    """Write R2's set from the drawn questions; return its folder. Main run: every guard aborts;
+    pilot set: a present scores.csv only warns."""
+    for key in ("sample_file", "items_file"):
+        if not p[key].exists():
+            raise RuntimeError(f"{p[key]} not found; run the draw and the scaffold first")
+    require_run(p["runs_file"], DRAW_STEP, STRATEGY, [], [p["sample_file"]])
+    mine = scoring_store.ScoringSet(
+        "own",
+        p["items_file"],
+        p["sheet_file"],
+        p["scores_file"],
+        p["key_points_file"],
+        p["checks_file"],
+        p["runs_file"],
+    )
+    try:
+        scoring_store.require_frozen_key_points(mine)
+    except PermissionError as error:
+        raise RuntimeError(f"{error}; freeze the key points in the app first") from None
+    if p["scores_file"].exists():
+        message = f"{p['scores_file']} exists: the scores were unblinded already (ADR 0046)"
+        if not pilot:
+            raise RuntimeError(message)
+        print(f"warning: {message}", file=sys.stderr)
+    out = p["dir"]
+    sheet_file, checks_file = out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name
+    present = own_values(sheet_file, checks_file)
+    if present:
+        raise FileExistsError(f"{out} already holds values ({', '.join(present)}); not overwritten")
+    sampled = {r["question_id"] for r in read_csv(p["sample_file"], SAMPLE_HEADER)}
+    lines = [
+        line
+        for line in p["items_file"].read_text(encoding="utf-8").splitlines(keepends=True)
+        if line.strip() and json.loads(line)["question_id"] in sampled
+    ]
+    items = [json.loads(line) for line in lines]
+    for qid in sorted(sampled):
+        n = sum(i["question_id"] == qid for i in items)
+        if n != len(STRATEGY_IDS):
+            raise RuntimeError(
+                f"{qid} has {n} items in {p['items_file']}, expected {len(STRATEGY_IDS)}"
+            )
+    points = [
+        r
+        for r in read_csv(p["key_points_file"], scoring_store.KEY_POINTS_HEADER)
+        if r["question_id"] in sampled
+    ]
+    out.mkdir(parents=True, exist_ok=True)
+    items_out, points_out = out / SCORING_ITEMS_FILE.name, out / KEY_POINTS_FILE.name
+    items_out.write_text("".join(lines), encoding="utf-8")
+    write_csv(points_out, scoring_store.KEY_POINTS_HEADER, points)
+    write_csv(
+        sheet_file,
+        SHEET_HEADER,
+        [
+            {"code": i["code"], "question_id": i["question_id"]}
+            | dict.fromkeys([*RUBRIC_CRITERIA, "notes"], "")
+            for i in items
+        ],
+    )
+    runs_out = out / PILOT_RUNS_FILE_NAME
+    runs_out.unlink(missing_ok=True)  # no values yet: a repeated export starts the log afresh
+    items_sha = sha256_of(items_out)
+    append_scaffold_run(STRATEGY, len(items), {items_out.name: items_sha}, runs_out)
+    append_key_points_run(
+        STRATEGY, {points_out.name: sha256_of(points_out), items_out.name: items_sha}, runs_out
+    )
+    append_step_run(
+        EXPORT_STEP,
+        STRATEGY,
+        [p["sample_file"], p["items_file"], p["key_points_file"]],
+        [items_out, points_out],
+        p["runs_file"],
+    )
+    return out
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -198,10 +293,13 @@ if __name__ == "__main__":
             "--questions needs --set: the main run always draws "
             f"{SECOND_RATER_QUESTIONS} questions"
         )
-    if args.mode != "draw":
-        raise NotImplementedError(f"--mode {args.mode} is not implemented yet")
+    if args.mode == "close":
+        raise NotImplementedError("--mode close is not implemented yet")
     if args.set and args.questions is None:
         ap.error("--set needs --questions N for the sample size")
     files = paths(args.set)
+    if args.mode == "export":
+        print(f"R2 set -> {run_export(files, pilot=bool(args.set))}")
+        raise SystemExit(0)
     sample = run_draw(files, args.questions or SECOND_RATER_QUESTIONS, pilot=bool(args.set))
     print(f"{len(sample)} questions -> {files['sample_file']}")

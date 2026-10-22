@@ -100,7 +100,13 @@ def sidebar(s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict]) -
         rows += [f"| {q} | {d} of {n} |" for q, d, n in scoring.by_question(items, scores)]
         st.markdown("\n".join(rows))
         if done == total:
-            st.caption(SUMMARISE_CONTROL if s.control else SUMMARISE)
+            st.caption(
+                "Everything is scored."
+                if s.rater
+                else SUMMARISE_CONTROL
+                if s.control
+                else SUMMARISE
+            )
 
 
 def page(text: str) -> None:

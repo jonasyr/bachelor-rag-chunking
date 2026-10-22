@@ -295,3 +295,30 @@ def test_control_page_saves_four_scores(control_page):
     assert not at.exception
     (s,) = (s for s in scoring.scoring_sets() if s.control)
     assert scoring.load_scores(s)[code]["values"] == dict.fromkeys(CONTROL_CRITERIA, 2)
+
+
+def test_r2_mode_shows_only_the_second_rater_scoring_page(
+    dirs, corpus_files, tmp_path, monkeypatch
+):
+    docs, sections = corpus_files
+    monkeypatch.setattr(store, "DOCUMENTS_FILE", docs)
+    monkeypatch.setattr(store, "SECTIONS_FILE", sections)
+    monkeypatch.setattr(store, "CATALOGUE_PLAN_FILE", tmp_path / "missing_plan.csv")
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", dirs[0] / "second_rater")
+    write_scoring_set(dirs[0])  # Jonas' own main set must stay out of sight
+    write_scoring_set(dirs[1] / "hard")
+    write_scoring_set(dirs[0] / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    (s,) = scoring.scoring_sets()
+    items = scoring.load_items(s)
+    scoring.save_key_points(s, items, "H01", ["Core one"])
+    scoring.save_key_points(s, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(s, items)
+    at = AppTest.from_file(str(APP / "catalogue_editor.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert at.selectbox(key="scoring_set").options == ["Second rater"]
+    assert "H01, answer B" in title(at)
+    at.switch_page("catalogue_page.py").run()  # not registered in R2 mode: still the scoring page
+    assert "H01, answer B" in title(at)
+    assert not at.get("data_editor")

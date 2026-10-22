@@ -36,6 +36,8 @@ def dirs(tmp_path, monkeypatch):
     monkeypatch.setattr(scoring, "SCORING_SHEET_FILE", main / "scoring_sheet.csv")
     monkeypatch.setattr(scoring, "SCORES_FILE", main / "scores.csv")
     monkeypatch.setattr(scoring, "PILOT_DIR", pilot)
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", main / "second_rater")
+    monkeypatch.delenv("SCORING_RATER", raising=False)
     monkeypatch.setattr(scoring, "KEY_POINTS_FILE", main / "key_points.csv")
     monkeypatch.setattr(scoring, "SCORING_CHECKS_FILE", main / "scoring_checks.csv")
     monkeypatch.setattr(scoring, "GENERATION_RUNS_FILE", main / "generation_runs.jsonl")
@@ -465,3 +467,40 @@ def test_control_save_refuses_changed_key_points(frozen):
     )
     with pytest.raises(PermissionError, match="frozen"):
         scoring.save_score(s, "H01-K0", k0_checks(), "")
+
+
+def test_scoring_sets_lists_second_rater(dirs):
+    main, pilot = dirs
+    write_scoring_set(main)
+    write_scoring_set(main / "second_rater")
+    write_scoring_set(pilot / "hard")
+    write_scoring_set(pilot / "hard" / "second_rater")
+    names = [s.name for s in scoring.scoring_sets()]
+    assert names == ["Main catalogue", "Pilot: hard", "Second rater", "Pilot: hard: second rater"]
+    r2 = scoring.scoring_sets()[2]
+    assert r2.rater and r2.items_file == main / "second_rater" / "scoring_items.jsonl"
+
+
+def test_second_rater_set_has_no_control_set(dirs):
+    main, _ = dirs
+    write_scoring_set(main / "second_rater")
+    write_control_set(main / "second_rater")
+    assert [s.name for s in scoring.scoring_sets()] == ["Second rater"]
+
+
+def test_rater_mode_shows_only_r2(dirs, monkeypatch):
+    main, pilot = dirs
+    write_scoring_set(main)
+    write_scoring_set(main / "second_rater")
+    write_scoring_set(pilot / "hard")
+    write_scoring_set(pilot / "hard" / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    assert scoring.rater_mode() == "R2"
+    assert [s.name for s in scoring.scoring_sets()] == ["Second rater", "Pilot: hard: second rater"]
+
+
+def test_other_rater_value_does_not_restrict(dirs, monkeypatch):
+    main, _ = dirs
+    write_scoring_set(main)
+    monkeypatch.setenv("SCORING_RATER", "someone")
+    assert [s.name for s in scoring.scoring_sets()] == ["Main catalogue"]

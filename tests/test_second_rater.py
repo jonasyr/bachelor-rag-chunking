@@ -3,13 +3,15 @@ import json
 from collections import Counter
 
 import pytest
-from conftest import valid_rows, write_catalogue
+from conftest import valid_rows, write_catalogue, write_scoring_set
 
 import freeze
+import scoring_store
 import second_rater
 from atomic_csv import read_csv
 from config import QUESTION_CLASSES, RUBRIC_CRITERIA
-from run_log import latest_run, sha256_of
+from evaluate_answers import SHEET_HEADER
+from run_log import append_step_run, latest_run, sha256_of
 
 
 @pytest.fixture
@@ -157,3 +159,105 @@ def test_draw_run_record_is_json_line(set_dir):
     second_rater.run_draw(p, 8, pilot=True)
     lines = p["runs_file"].read_text(encoding="utf-8").splitlines()
     assert json.loads(lines[-1])["step"] == "second_rater_draw"
+
+
+@pytest.fixture
+def scaffolded(tmp_path):
+    """A pilot set with items for H01 and H02, frozen key points and a draw of H01 only."""
+    folder = tmp_path / "pilot_set"
+    write_scoring_set(folder)
+    p = second_rater.paths(folder)
+    mine = scoring_store.ScoringSet(
+        "own",
+        p["items_file"],
+        p["sheet_file"],
+        p["scores_file"],
+        p["key_points_file"],
+        p["checks_file"],
+        p["runs_file"],
+    )
+    items = scoring_store.load_items(mine)
+    scoring_store.save_key_points(mine, items, "H01", ["Core one"])
+    scoring_store.save_key_points(mine, items, "H02", ["Core two", "Second two"])
+    scoring_store.freeze_key_points(mine, items)
+    from atomic_csv import write_csv
+
+    write_csv(
+        p["sample_file"],
+        second_rater.SAMPLE_HEADER,
+        [{"question_id": "H01", "type": "factual", "difficulty": "hard"}],
+    )
+    append_step_run("second_rater_draw", "C1,C2,C3", [], [p["sample_file"]], p["runs_file"])
+    return p
+
+
+def test_export_writes_blind_subset(scaffolded):
+    out = second_rater.run_export(scaffolded, pilot=False)
+    names = {f.name for f in out.iterdir()}
+    assert names == {"scoring_items.jsonl", "key_points.csv", "scoring_sheet.csv", "runs.jsonl"}
+    original = scaffolded["items_file"].read_text(encoding="utf-8").splitlines(keepends=True)
+    kept = (out / "scoring_items.jsonl").read_text(encoding="utf-8").splitlines(keepends=True)
+    assert kept == [line for line in original if json.loads(line)["question_id"] == "H01"]
+    rows = read_csv(out / "scoring_sheet.csv", SHEET_HEADER)
+    assert [r["code"] for r in rows] == [json.loads(line)["code"] for line in kept]
+    assert all(set(r) == set(SHEET_HEADER) and not r["correctness"] for r in rows)
+    points = read_csv(out / "key_points.csv", ["question_id", "point", "text"])
+    assert {r["question_id"] for r in points} == {"H01"}
+    assert latest_run(scaffolded["runs_file"], "second_rater_export", "C1,C2,C3")
+
+
+def test_export_set_is_frozen_for_the_app(scaffolded, monkeypatch):
+    out = second_rater.run_export(scaffolded, pilot=False)
+    monkeypatch.setattr(scoring_store, "PILOT_DIR", out.parent.parent)
+    (r2,) = (s for s in scoring_store.scoring_sets() if s.rater)
+    assert scoring_store.is_frozen(r2)
+    scoring_store.require_frozen_key_points(r2)
+
+
+def test_export_refuses_without_frozen_key_points(scaffolded):
+    scaffolded["key_points_file"].write_text("question_id,point,text\nH01,1,changed\n")
+    with pytest.raises(RuntimeError, match="frozen"):
+        second_rater.run_export(scaffolded, pilot=False)
+
+
+def test_export_refuses_changed_sample(scaffolded):
+    with scaffolded["sample_file"].open("a", encoding="utf-8") as f:
+        f.write("H02,factual,hard\n")
+    with pytest.raises(RuntimeError, match="differs"):
+        second_rater.run_export(scaffolded, pilot=False)
+
+
+def test_export_refuses_without_draw(scaffolded):
+    scaffolded["sample_file"].unlink()
+    with pytest.raises(RuntimeError, match="draw"):
+        second_rater.run_export(scaffolded, pilot=False)
+
+
+def test_export_refuses_when_scores_exist_main(scaffolded, capsys):
+    scaffolded["scores_file"].write_text("question_id,strategy\n")
+    with pytest.raises(RuntimeError, match="unblinded"):
+        second_rater.run_export(scaffolded, pilot=False)
+    assert not scaffolded["dir"].exists()
+    out = second_rater.run_export(scaffolded, pilot=True)
+    assert out.exists()
+    assert "warning" in capsys.readouterr().err.lower()
+
+
+def test_export_refuses_existing_values(scaffolded):
+    out = second_rater.run_export(scaffolded, pilot=False)
+    rows = read_csv(out / "scoring_sheet.csv", SHEET_HEADER)
+    rows[0]["correctness"] = "2"
+    from atomic_csv import write_csv
+
+    write_csv(out / "scoring_sheet.csv", SHEET_HEADER, rows)
+    with pytest.raises(FileExistsError):
+        second_rater.run_export(scaffolded, pilot=False)
+    assert read_csv(out / "scoring_sheet.csv", SHEET_HEADER)[0]["correctness"] == "2"
+
+
+def test_export_refuses_incomplete_question(scaffolded):
+    lines = scaffolded["items_file"].read_text(encoding="utf-8").splitlines(keepends=True)
+    drop = next(line for line in lines if json.loads(line)["question_id"] == "H01")
+    scaffolded["items_file"].write_text("".join(x for x in lines if x != drop), encoding="utf-8")
+    with pytest.raises(RuntimeError):
+        second_rater.run_export(scaffolded, pilot=False)
