@@ -292,6 +292,17 @@ def class_findings(corpus: Corpus, question: dict, truth: dict, sections: list[d
     return found
 
 
+def h1_findings(question: dict, sections: list[dict]) -> list[str]:
+    """H1 sections (a whole page) listed without a reason in `notes` (ADR 0022)."""
+    if question.get("notes", "").strip():
+        return []
+    return [
+        f"{s['section_id']} is a whole page (H1); give the reason in notes (ADR 0022)"
+        for s in sections
+        if s["level"] == 1
+    ]
+
+
 @dataclass
 class Report:
     """Result of the coverage check: errors always fail, findings only in strict mode."""
@@ -404,6 +415,7 @@ def check(
         report.findings += [
             f"{qid}: {m}" for m in class_findings(corpus, q, truth[qid], relevant[qid])
         ]
+        report.findings += [f"{qid}: {m}" for m in h1_findings(q, relevant[qid])]
 
     types = Counter(q["type"] for q in questions)
     classes = Counter(q["difficulty"] for q in questions)

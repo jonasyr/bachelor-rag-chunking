@@ -54,8 +54,9 @@ mit `src/catalogue.py check` geprüft und mit `src/catalogue.py freeze` eingefro
 - Referenzantworten und relevante Abschnitte stehen fest, bevor irgendein Retrieval auf den Fragen läuft; spätere
   Ergänzungen nur als gekennzeichnete Sensitivitätsanalyse ([ADR 0017](../adr/0017-fragenkatalog.md),
   [ADR 0027](../adr/0027-blinde-annotation.md)).
-- H2/H3-Abschnitte annotieren, einen H1-Abschnitt nur, wenn die ganze Seite die Antwort ist
-  ([ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md)).
+- H2/H3-Abschnitte annotieren, einen H1-Abschnitt nur, wenn die ganze Seite die Antwort ist, mit Begründung in `notes`
+  ([ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md)); `catalogue.py check` meldet einen H1-Abschnitt ohne
+  Begründung, das Einfrieren lehnt ihn ab.
 - Relevante Abschnitte im ganzen Korpus suchen, auch im Tab Reference, nicht nur auf der naheliegenden Seite.
 - Schwere Fragen haben einen festen Anteil: umgesetzt durch die Konstruktionsklassen oben (36 von 48 nicht `single`,
   [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md)).
