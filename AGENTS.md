@@ -17,7 +17,8 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 | Install | `uv sync` (then `cp .env.example .env`, add `OPENAI_API_KEY`) |
 | Lint/format | `uvx pre-commit run --all-files` (ruff + checks; also runs on commit after `pre-commit install`) |
 | Test | `uv run pytest` (`tests/`; corpus integration tests skip until the snapshot exists, e.g. in CI) |
-| Run | `uv run python src/<step>.py` — order: `README.md` (snapshot → ingest → preprocess → …), options: `docs/reference/tooling.md` |
+| Run | `uv run python src/<step>.py` — order: `docs/how-to/run-the-experiment.md`, options: `docs/reference/tooling.md` |
+| App (catalogue, scoring) | `uv run streamlit run app/catalogue_editor.py --server.address localhost` |
 
 ## Conventions
 
@@ -72,6 +73,7 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 - `docs/how-to/`, `docs/reference/`, `docs/explanation/` — tasks, exact facts (formats, metrics, prompts), research design
 - `docs/reference/configuration.md` — every key of `src/config.py` (meaning, ADR)
 - `docs/plan.md` — status (`#stand`), schedule (to 24.12.2026) and open decisions
-- `docs/adr/` — decisions D1–D47
+- `docs/adr/` — decisions, one file each; index: `docs/adr/README.md`
+- `docs/superpowers/` — historical specs and plans (not maintained; `docs/superpowers/README.md`)
 - `.serena/memories/` — agent working notes; `core` is the entry point, each memory links into `docs/`
 - `.claude/agents/codex-reviewer.md` — stand-in for Codex's GitHub review (rubric + the Code Review Rules above)
