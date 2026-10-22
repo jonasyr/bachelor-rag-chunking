@@ -21,7 +21,7 @@ from ui_theme import SCORING_CSS  # noqa: E402
 
 import scoring_rules as rules  # noqa: E402
 import scoring_store as scoring  # noqa: E402
-from config import KEY_POINTS_MAX  # noqa: E402
+from config import KEY_POINTS_MAX, SECOND_RATER_PSEUDONYM  # noqa: E402
 
 STEPS = ["Key points", "Score"]
 LABELS = {
@@ -100,7 +100,13 @@ def sidebar(s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict]) -
         rows += [f"| {q} | {d} of {n} |" for q, d, n in scoring.by_question(items, scores)]
         st.markdown("\n".join(rows))
         if done == total:
-            st.caption(SUMMARISE_CONTROL if s.control else SUMMARISE)
+            st.caption(
+                "Everything is scored."
+                if s.rater
+                else SUMMARISE_CONTROL
+                if s.control
+                else SUMMARISE
+            )
 
 
 def page(text: str) -> None:
@@ -329,6 +335,12 @@ def form(
 def main() -> None:
     st.markdown(SCORING_CSS, unsafe_allow_html=True)
     sets = scoring.scoring_sets()
+    if not sets and scoring.rater_mode() == SECOND_RATER_PSEUDONYM:
+        st.info(
+            "No single second rater set found: ask for the export "
+            "(`src/second_rater.py --mode export`), and keep one pilot second-rater set at most."
+        )
+        return
     if not sets:
         st.info(
             "Nothing to score yet. Run `uv run python src/evaluate_answers.py --mode scaffold` "
@@ -344,12 +356,20 @@ def main() -> None:
         st.error(str(error))
         return
     locked = scoring.is_read_only(s)
-    if locked:
+    if locked and s.rater:
+        st.info("The second rating was closed, so it is read-only.")
+    elif locked:
         st.info(
             f"The scores of this set were summarised ({s.scores_file.name} exists), so it is "
             "read-only."
         )
     frozen = scoring.is_frozen(s)
+    if s.rater and not frozen:  # the export freezes the key points; R2 can never edit them
+        st.error(
+            f"The key points of {s.name} are not frozen for this item file; the set must be "
+            "exported again (`src/second_rater.py --mode export`)."
+        )
+        return
     step_key = f"scoring_step|{s.name}"
     if not frozen:  # no Score step without a freeze for the current scaffold
         st.session_state[step_key] = "Key points"

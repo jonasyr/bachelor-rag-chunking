@@ -44,6 +44,7 @@ chroma_db/
 data/pilot/**/query_embeddings.npz
 data/pilot/**/scoring_packet.md
 data/pilot/**/scoring_items.jsonl
+!data/pilot/**/second_rater/scoring_items.jsonl
 data/pilot/**/scores.csv
 data/pilot/**/scores_control.csv
 

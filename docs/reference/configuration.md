@@ -216,6 +216,24 @@ Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](da
 | `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 
+## Zweitbewertung
+
+[ADR 0046](../adr/0046-zweitbewertung.md); Verfahren: [Evaluation](evaluation.md#zweitbewertung).
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `SECOND_RATER_QUESTIONS` | `12` | gezogene Fragen im Hauptkatalog (× C1–C3 = 36 Antworten) | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_SEED` | `20261022` | Seed der geschichteten Ziehung; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_MAX_DRAWS` | `100000` | Versuche, bis eine Ziehung beide Schichtungen trifft; sonst Abbruch | Design 22.10.2026 |
+| `SECOND_RATER_PSEUDONYM` | `"R2"` | einziger Name der zweiten Person in Dateien, Einträgen und Ausgaben | [ADR 0046](../adr/0046-zweitbewertung.md) (Nachtrag Datenschutz) |
+| `SECOND_RATER_DIR_NAME`, `SECOND_RATER_DIR` | `second_rater`, `data/evaluation/second_rater` | Ordner des R2-Satzes (im Pilot-Set `DIR/second_rater`) | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_SAMPLE_FILE` | `data/evaluation/second_rater_sample.csv` | gezogene Fragen | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2-Modus der App | Design 22.10.2026 |
+| `SECOND_RATER_DISAGREEMENTS_FILE_NAME` | `second_rater_disagreements.csv` | Abweichungsliste in `output/` | Design 22.10.2026 |
+| `AGREEMENT_BOOTSTRAP_REPS` | `2000` | Bootstrap-Wiederholungen über Fragen für die Intervalle | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `AGREEMENT_CI_LEVEL` | `0.95` | Niveau des Perzentil-Intervalls | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `AGREEMENT_SEED` | `20261022` | Seed des Bootstraps; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md) |
+
 ## Korpusauswahl
 
 Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus-selection.md).

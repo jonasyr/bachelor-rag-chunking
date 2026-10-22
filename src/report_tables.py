@@ -14,9 +14,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import agreement
 import stats
 from analysis_data import AnalysisData
 from config import (
+    AGREEMENT_CI_LEVEL,
     ANALYSIS_PRIMARY,
     ANALYSIS_RULE,
     BYTES_PER_MB,
@@ -34,6 +36,7 @@ TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
     "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
+    "agreement.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -73,6 +76,16 @@ RAGAS_PAIR_LABELS = {
     "recall": "R@5",
 }
 NOT_DETERMINABLE = "nicht bestimmbar"
+CHECK_LABELS = {  # the eight checks of scoring_rules.CHECKS
+    "declines": "Ablehnung",
+    "core_wrong": "Kernaussage falsch",
+    "other_error": "Anderer Fehler",
+    "grounded": "Durch Passagen gestützt",
+    "hallucination": "Halluzination",
+    "answers_question": "Frage beantwortet",
+    "direct": "Direkt",
+    "wordy": "Wortreich",
+}
 RETRIEVAL_STRATEGIES = [*STRATEGY_IDS, "K1"]
 VERDICT_LABELS = {
     "dependent": "abhängig (miss)",
@@ -302,8 +315,23 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
         results["ragas_stability"] = _ragas_stability(data, qids)
     results["efficiency"] = _efficiency(data, main_means, answer_means, notes)
     results["breakdown"] = _breakdown(data, qids, awide, primary["recall"], notes)
+    results["agreement"] = _agreement(data)
     results["notes"] = notes
     return _plain(results)
+
+
+def _agreement(data: AnalysisData) -> dict | None:
+    """Agreement of the first and the second rating (ADR 0046); None without a closed one."""
+    if data.second_rating is None:
+        return None
+    paired = data.second_rating["paired"]
+    return {
+        "rows": agreement.rows(paired),
+        "n_codes": len(paired),
+        "n_questions": len({p["question_id"] for p in paired}),
+        "reps": agreement.AGREEMENT_BOOTSTRAP_REPS,
+        "level": AGREEMENT_CI_LEVEL,
+    }
 
 
 def _ragas_values(frame: pd.DataFrame, qids: list[str]) -> dict:
@@ -710,6 +738,58 @@ def _ragas_agreement_table(results: dict) -> str:
     )  # fmt: skip
 
 
+def _with_interval(value: float | None, ci: dict) -> str:
+    if value is None:
+        return NOT_DETERMINABLE
+    if ci["low"] is None:
+        return fmt_de(value, REPORT_DECIMALS)
+    low, high = (fmt_de(ci[k], REPORT_DECIMALS) for k in ("low", "high"))
+    return f"{fmt_de(value, REPORT_DECIMALS)} [{low}; {high}]"
+
+
+def _agreement_table(results: dict) -> str:
+    block = results["agreement"]
+    header = ["Merkmal", "n", "Übereinstimmung", "AC1/AC2 [KI]", "α [KI]"]
+    rows: list[list[str] | str] = []
+    group = None
+    for r in block["rows"]:
+        if r["group"] != group:
+            group = r["group"]
+            rows.append(_group(group, len(header), not rows))
+        label = CHECK_LABELS.get(r["label"]) or CRITERION_LABELS.get(r["label"]) or r["label"]
+        rows.append(
+            [
+                f"{label} ({r['measure']})", str(r["n"]), fmt_de(r["agreement"], REPORT_DECIMALS),
+                _with_interval(r["ac"], r["ac_ci"]), _with_interval(r["alpha"], r["alpha_ci"]),
+            ]
+        )  # fmt: skip
+    dropped = max(r["dropped"] for r in block["rows"])
+    level = round(block["level"] * 100)
+    note = (
+        f"Erst- und Zweitbewertung derselben {block['n_codes']} Antworten ({block['n_questions']} "
+        "Fragen, je C1 bis C3). n: Antworten, bei den Kernpunkten alle Kernpunkt-Markierungen. "
+        "AC1: Gwets Koeffizient für Ja/Nein-Prüffragen und Kernpunkte, AC2: mit ordinalen "
+        "Gewichten für „Durch Passagen gestützt“, „Halluzination“ und die Kriterien. α: "
+        "Krippendorffs Alpha, "
+        f"ordinal. Intervalle: Perzentil-Bootstrap über die Fragen ({block['reps']} "
+        f"Wiederholungen, {level} %-Niveau)."
+        + (
+            f" Bei α blieben bis zu {dropped} Stichproben unberücksichtigt, in denen α nicht "
+            "bestimmbar war."
+            if dropped
+            else ""
+        )
+        + (
+            f" „{NOT_DETERMINABLE}“: beide Personen vergaben nur eine Kategorie."
+            if any(r["alpha"] is None for r in block["rows"])
+            else ""
+        )
+    )
+    return latex_table(
+        "agreement", "Übereinstimmung der Erst- und Zweitbewertung", header, rows, "lrrrr", note
+    )
+
+
 def _efficiency_table(results: dict) -> str:
     eff = results["efficiency"]
     strategies = list(eff)
@@ -801,17 +881,19 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
         "ragas.tex": lambda: _ragas_table(results),
         "ragas_effects.tex": lambda: _ragas_effects_table(results),
         "ragas_agreement.tex": lambda: _ragas_agreement_table(results),
+        "agreement.tex": lambda: _agreement_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
         "ragas.tex": "ragas", "ragas_effects.tex": "ragas",
-        "ragas_agreement.tex": "ragas_agreement",
+        "ragas_agreement.tex": "ragas_agreement", "agreement.tex": "agreement",
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:
-        if skipped.get(name) and results.get(skipped[name]) is None:
-            continue
         path = out_dir / name
+        if skipped.get(name) and results.get(skipped[name]) is None:
+            path.unlink(missing_ok=True)  # no stale table from an earlier run
+            continue
         path.write_text(tables[name](), encoding="utf-8")
         written.append(path)
     return written

@@ -1,3 +1,4 @@
+import dataclasses
 from pathlib import Path
 
 import pytest
@@ -295,3 +296,86 @@ def test_control_page_saves_four_scores(control_page):
     assert not at.exception
     (s,) = (s for s in scoring.scoring_sets() if s.control)
     assert scoring.load_scores(s)[code]["values"] == dict.fromkeys(CONTROL_CRITERIA, 2)
+
+
+def test_r2_mode_shows_only_the_second_rater_scoring_page(
+    dirs, corpus_files, tmp_path, monkeypatch
+):
+    docs, sections = corpus_files
+    monkeypatch.setattr(store, "DOCUMENTS_FILE", docs)
+    monkeypatch.setattr(store, "SECTIONS_FILE", sections)
+    monkeypatch.setattr(store, "CATALOGUE_PLAN_FILE", tmp_path / "missing_plan.csv")
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", dirs[0] / "second_rater")
+    write_scoring_set(dirs[0])  # Jonas' own main set must stay out of sight
+    write_scoring_set(dirs[1] / "hard")
+    write_scoring_set(dirs[0] / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    (r2,) = scoring.scoring_sets()
+    s = dataclasses.replace(r2, rater=False)  # the export freezes; only a plain set can here
+    items = scoring.load_items(s)
+    scoring.save_key_points(s, items, "H01", ["Core one"])
+    scoring.save_key_points(s, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(s, items)
+    at = AppTest.from_file(str(APP / "catalogue_editor.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert at.selectbox(key="scoring_set").options == ["Second rater"]
+    assert "H01, answer B" in title(at)
+    at.switch_page("catalogue_page.py").run()  # not registered in R2 mode: still the scoring page
+    assert "H01, answer B" in title(at)
+    assert not at.get("data_editor")
+
+
+def test_r2_mode_without_a_single_set_says_so(dirs, monkeypatch):
+    write_scoring_set(dirs[1] / "a" / "second_rater")
+    write_scoring_set(dirs[1] / "b" / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert any("second rater" in i.value.lower() for i in at.info)
+
+
+def test_unfrozen_r2_set_offers_no_key_point_editing(dirs, monkeypatch):
+    write_scoring_set(dirs[0] / "second_rater")  # scaffolded, but never frozen
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", dirs[0] / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert at.error
+    assert all(b.key != "kp_save" for b in at.button)
+
+
+def test_closed_r2_set_is_read_only_and_says_closed(dirs, monkeypatch):
+    import second_rater
+
+    write_scoring_set(dirs[0] / "second_rater")
+    monkeypatch.setattr(scoring, "SECOND_RATER_DIR", dirs[0] / "second_rater")
+    monkeypatch.setenv("SCORING_RATER", "R2")
+    (r2,) = scoring.scoring_sets()
+    plain = dataclasses.replace(r2, rater=False)
+    items = scoring.load_items(plain)
+    scoring.save_key_points(plain, items, "H01", ["Core one"])
+    scoring.save_key_points(plain, items, "H02", ["Core two", "Second two"])
+    scoring.freeze_key_points(plain, items)
+    for i in items:
+        good = {
+            "points": ["covered"] * (1 if i["code"].startswith("H01") else 2),
+            "declines": "no",
+            "core_wrong": "no",
+            "other_error": "no",
+            "grounded": "all",
+            "hallucination": "none",
+            "answers_question": "yes",
+            "direct": "yes",
+            "wordy": "no",
+        }
+        scoring.save_score(r2, i["code"], good, "")
+    p = second_rater.paths(None) | {"dir": dirs[0] / "second_rater"}
+    second_rater.run_close(p)
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert any("closed" in i.value for i in at.info)
+    assert not any("summarised" in i.value for i in at.info)

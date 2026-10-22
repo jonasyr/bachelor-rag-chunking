@@ -9,6 +9,7 @@ from config, read at call time, so the page and its tests share them.
 """
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,6 +34,10 @@ from config import (
     SCORING_ITEMS_FILE,
     SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
+    SECOND_RATER_DIR,
+    SECOND_RATER_DIR_NAME,
+    SECOND_RATER_ENV,
+    SECOND_RATER_PSEUDONYM,
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SHEET_HEADER
@@ -53,6 +58,7 @@ class ScoringSet:
     runs_file: Path
     control: bool = False  # the control K0 (ADR 0041): K0 rules, four criteria
     freeze_items_file: Path | None = None  # K0: the C1-C3 item file its key points were frozen on
+    rater: bool = False  # the second rater's set (ADR 0046): frozen key points, no K0 set
 
 
 def criteria(s: ScoringSet) -> list[str]:
@@ -82,9 +88,66 @@ def _control_set(base: ScoringSet) -> ScoringSet | None:
     )
 
 
+def rater_mode() -> str | None:
+    """The rater named by the environment (config.SECOND_RATER_ENV), if any. Any other set value
+    raises, so a typo never falls back to the full app with the own sets (blinding, ADR 0046)."""
+    value = os.environ.get(SECOND_RATER_ENV)
+    if value is not None and value != SECOND_RATER_PSEUDONYM:
+        raise ValueError(
+            f"{SECOND_RATER_ENV}={value!r}: set it to {SECOND_RATER_PSEUDONYM} for the second "
+            "rater or leave it unset"
+        )
+    return value
+
+
+def _rater_set(name: str, folder: Path) -> ScoringSet:
+    return ScoringSet(
+        name,
+        folder / SCORING_ITEMS_FILE.name,
+        folder / SCORING_SHEET_FILE.name,
+        folder / SCORES_FILE.name,
+        folder / KEY_POINTS_FILE.name,
+        folder / SCORING_CHECKS_FILE.name,
+        folder / PILOT_RUNS_FILE_NAME,
+        rater=True,
+    )
+
+
+def rater_sets() -> list[ScoringSet]:
+    """The second rater's sets: the main one and one per pilot folder `second_rater/`."""
+    sets = []
+    if (SECOND_RATER_DIR / SCORING_ITEMS_FILE.name).exists():
+        sets.append(_rater_set("Second rater", SECOND_RATER_DIR))
+    for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
+        if items.parent.name == SECOND_RATER_DIR_NAME:
+            rel = items.parent.parent.relative_to(PILOT_DIR).as_posix()
+            name = "Pilot: second rater" if rel == "." else f"Pilot: {rel}: second rater"
+            sets.append(_rater_set(name, items.parent))
+    return sets
+
+
+def single_rater_set() -> list[ScoringSet]:
+    """What R2 sees: the main second-rater set, else the only pilot one, else nothing."""
+    sets = rater_sets()
+    if sets and sets[0].name == "Second rater":
+        return sets[:1]
+    return sets if len(sets) == 1 else []
+
+
+def app_pages(rater: str | None) -> list[tuple[str, str]]:
+    """The app's pages as (file, title): R2 mode gets the scoring page only."""
+    scoring_page = ("scoring_page.py", "Scoring")
+    if rater == SECOND_RATER_PSEUDONYM:
+        return [scoring_page]
+    return [("catalogue_page.py", "Catalogue"), scoring_page]
+
+
 def scoring_sets() -> list[ScoringSet]:
     """The main run and every pilot folder that holds an item file, each followed by its K0 set
-    (ADR 0041) when that exists."""
+    (ADR 0041) when that exists, then the second rater's sets. In R2 mode (`rater_mode`) only
+    the second rater's sets, so nothing else is reachable."""
+    if rater_mode() == SECOND_RATER_PSEUDONYM:
+        return single_rater_set()
     sets = []
     if SCORING_ITEMS_FILE.exists():
         sets.append(
@@ -100,6 +163,8 @@ def scoring_sets() -> list[ScoringSet]:
         )
     for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
         folder = items.parent
+        if folder.name == SECOND_RATER_DIR_NAME:
+            continue  # listed below as a second rater set
         rel = folder.relative_to(PILOT_DIR).as_posix()
         name = "Pilot" if rel == "." else f"Pilot: {rel}"
         sets.append(
@@ -119,7 +184,7 @@ def scoring_sets() -> list[ScoringSet]:
         control = _control_set(s)
         if control is not None:
             with_control.append(control)
-    return with_control
+    return with_control + rater_sets()
 
 
 def _sheet(s: ScoringSet) -> list[dict]:
@@ -205,6 +270,8 @@ def save_key_points(s: ScoringSet, items: list[dict], question_id: str, points: 
     """Replace one question's key points (point 1 = core point); refused after the freeze."""
     if s.control:
         raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
+    if s.rater:
+        raise PermissionError(f"{s.name}: the second rater's key points come from the export")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen")
     known = {q["question_id"] for q in questions(items)}
@@ -233,6 +300,8 @@ def freeze_key_points(s: ScoringSet, items: list[dict]) -> None:
     file) once every question has some (ADR 0035)."""
     if s.control:
         raise PermissionError(f"{s.name} uses the frozen key points of its C1-C3 set")
+    if s.rater:
+        raise PermissionError(f"{s.name}: the second rater's key points come from the export")
     if is_frozen(s):
         raise PermissionError(f"the key points of {s.name} are frozen already")
     points = load_key_points(s)
@@ -272,14 +341,21 @@ def require_frozen_key_points(s: ScoringSet) -> None:
         )
 
 
+def is_closed(s: ScoringSet) -> bool:
+    """A second rater's set closed by `second_rater.py --mode close` (ADR 0046)."""
+    return s.rater and latest_run(s.runs_file, "second_rater_close", STRATEGY) is not None
+
+
 def is_read_only(s: ScoringSet) -> bool:
-    return s.scores_file.exists()
+    return s.scores_file.exists() or is_closed(s)
 
 
 def save_score(s: ScoringSet, code: str, checks: dict, notes: str) -> dict[str, int]:
     """Validate the checks, derive the five scores (ADR 0035) and write checks file and sheet
     atomically with only this code's rows changed; returns the derived values."""
     if is_read_only(s):
+        if is_closed(s):
+            raise PermissionError("the second rating was closed: read-only")
         raise PermissionError(f"{s.scores_file} exists: the scores were unblinded, read-only")
     require_frozen_key_points(s)
     rows = _sheet(s)

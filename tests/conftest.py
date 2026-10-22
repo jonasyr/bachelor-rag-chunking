@@ -98,6 +98,15 @@ def test_area_minimums(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def second_rater_isolation(tmp_path, monkeypatch):
+    """Tests never see a real data/evaluation/second_rater/ nor an R2 mode from the shell."""
+    import scoring_store
+
+    monkeypatch.setattr(scoring_store, "SECOND_RATER_DIR", tmp_path / "no_second_rater")
+    monkeypatch.delenv("SCORING_RATER", raising=False)
+
+
+@pytest.fixture(autouse=True)
 def closed_book_file(tmp_path, monkeypatch):
     """Tests never read data/evaluation/closed_book_screen.csv; check and freeze default to this."""
     path = tmp_path / "closed_book_screen.csv"

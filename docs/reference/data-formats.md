@@ -136,6 +136,8 @@ danach die gepinnten Einstellungen und enden mit `prompt_tokens`, `completion_to
 | `summarise_control` | `K0` | `evaluate_answers.py --mode summarise --control` | `inputs_sha256` (Bogen, Prüfungen und Kernpunkte von K0, `scores.csv`), `outputs_sha256` mit `scores_control.csv` |
 | `ragas` | `C1,C2,C3` | `ragas_eval.py` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), nur nach einem erfolgreichen Lauf | siehe unten |
 | `ragas_repeat` | `C1,C2,C3` | `ragas_eval.py --repeat` (nur Pilot-Sets), nur nach einem erfolgreichen Lauf | wie `ragas`, `outputs_sha256` mit `ragas_scores_repeat.csv` |
+| `second_rater_draw` | `C1,C2,C3` | `second_rater.py --mode draw` ([ADR 0046](../adr/0046-zweitbewertung.md)) | `seed`, `questions` (Zahl), `inputs_sha256` mit `questions.csv`, `outputs_sha256` mit `second_rater_sample.csv` |
+| `second_rater_export` | `C1,C2,C3` | `second_rater.py --mode export` | `inputs_sha256` (Ziehung, `scoring_items.jsonl`, `key_points.csv`), `outputs_sha256` mit Items und Kernpunkten im R2-Ordner |
 | `closed_book_screen` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten |
 
 `scoring` = `config.SCORING_METHOD` (`rules`): das Scaffold ist nur regelbasiert zu bewerten
@@ -426,6 +428,33 @@ E01,C1,1.000000,0.776339,0.833333,1.000000,
 zweite Lauf über dieselben Antworten, nur für die Stabilität der Werte. Er steht unter dem Schritt `ragas_repeat` im
 Laufprotokoll ([Laufprotokoll](#laufprotokoll)), das `ragas`-Protokoll bleibt das der ersten Datei.
 
+## Zweitbewertung
+
+[ADR 0046](../adr/0046-zweitbewertung.md), Verfahren: [Evaluation](evaluation.md#zweitbewertung). Im Pilot-Set liegen
+die Dateien im Set-Ordner (`DIR/second_rater_sample.csv`, `DIR/second_rater/`, Einträge in `DIR/runs.jsonl`).
+
+**`second_rater_sample.csv`** (`data/evaluation/`, `second_rater.py --mode draw`): die gezogenen Fragen, sortiert nach
+`question_id`.
+```
+question_id,type,difficulty
+Q004,factual,detail
+```
+
+**`second_rater/`** (`data/evaluation/second_rater/`, `--mode export`): der Bewertungssatz der zweiten Person (nur das
+Pseudonym R2): `scoring_items.jsonl` (die Zeilen der gezogenen Fragen aus Jonas' Item-Datei, unverändert),
+`key_points.csv` (die eingefrorenen Kernpunkte dieser Fragen), `scoring_sheet.csv` (Format wie oben, anfangs leer),
+`runs.jsonl` (`scaffold`- und `key_points`-Eintrag für die App, danach `second_rater_close`); die App schreibt
+`scoring_checks.csv` dazu. Kein Schlüssel, keine Prüfantworten von Jonas. Eintrag `second_rater_close` (nur in diesem
+`runs.jsonl`): `rater` (`R2`), `rules_version`, `inputs_sha256` (Items, Kernpunkte), `outputs_sha256`
+(`scoring_checks.csv`, `scoring_sheet.csv`).
+
+**`second_rater_disagreements.csv`** (`output/`, im Set `DIR/output/`; `analyse.py`, nur mit abgeschlossener
+Zweitbewertung): je abweichender Prüffrage, Kernpunkt-Markierung oder Kriterium eine Zeile, ohne Strategie.
+```
+code,question_id,field,first,second
+Q004-B,Q004,direct,yes,no
+```
+
 ## Auswertung (`output/`)
 
 `analyse.py` ([ADR 0044](../adr/0044-statistische-auswertung.md)) schreibt jedes Mal alle Dateien neu; Ordner und
@@ -434,7 +463,7 @@ dieselbe Struktur nach `DIR/output/`, nie nach `output/`.
 
 | Pfad | Inhalt |
 |---|---|
-| `output/tables/*.tex` | zwölf Tabellen nach den IU-Regeln (`table`-Umgebung mit kurzem Titel ohne Schlusspunkt, Label `tab:<Name>`, darunter `\source{Eigene Darstellung. …}` mit den Anmerkungen; Ausrichtung aus der Klasse; negative Werte mit typografischem Minus): `retrieval`, `retrieval_sensitivity`, `answers`, `tests` (nur die konfirmatorischen Tests), `tests_descriptive` (W und r der Maße ohne Test), `control_k0`, `correlation`, `efficiency`, `breakdown`, `ragas` (Mittel der vier RAGAS-Metriken je Strategie, Kendalls W), `ragas_effects` (paarweise r, Median-Differenz und n′), `ragas_agreement` (Spearmans ρ mit dem regelbasierten Gegenstück, [Evaluation](evaluation.md#triangulation)) (`report_tables.TABLE_NAMES`) |
+| `output/tables/*.tex` | dreizehn Tabellen nach den IU-Regeln (`table`-Umgebung mit kurzem Titel ohne Schlusspunkt, Label `tab:<Name>`, darunter `\source{Eigene Darstellung. …}` mit den Anmerkungen; Ausrichtung aus der Klasse; negative Werte mit typografischem Minus): `retrieval`, `retrieval_sensitivity`, `answers`, `tests` (nur die konfirmatorischen Tests), `tests_descriptive` (W und r der Maße ohne Test), `control_k0`, `correlation`, `efficiency`, `breakdown`, `ragas` (Mittel der vier RAGAS-Metriken je Strategie, Kendalls W), `ragas_effects` (paarweise r, Median-Differenz und n′), `ragas_agreement` (Spearmans ρ mit dem regelbasierten Gegenstück, [Evaluation](evaluation.md#triangulation)), `agreement` (Erst- gegen Zweitbewertung, [Evaluation](evaluation.md#zweitbewertung); entfällt ohne abgeschlossene Zweitbewertung) (`report_tables.TABLE_NAMES`) |
 | `output/figures/*.pdf` | acht Abbildungen in Endgröße: `recall`, `mrr`, `answers_distribution`, `heatmap`, `scatter_retrieval_answer`, `catalogue_composition`, `chunk_lengths`, `cost` (`report_figures.FIGURE_NAMES`, Inhalte: [Evaluation](evaluation.md#visualisierungen)) |
 | `output/analysis.json` | alle Kennzahlen und Testergebnisse, sortierte Schlüssel, Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet |
 
@@ -447,7 +476,9 @@ Oberste Schlüssel von `analysis.json`: `n_questions`, `alpha`, `retrieval` (Mit
 `breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil), `ragas` (`means`, `nan_counts` und `effects` je Metrik, jeweils je Strategie; Kendalls W und r über die Fragen mit Wert in
 allen Strategien, ohne p-Werte), `ragas_agreement` (Schlüssel `<Metrik>~<Gegenstück>`, je Strategie und `pooled` mit `rho`,
 `n`, `testable`, ohne `p`; `rho` ist `null`, wenn eine Seite konstant ist), `ragas_stability` (je Metrik `n`,
-`mean_abs_diff`, `rho`, `share_equal`; nur wenn `ragas_scores_repeat.csv` vorliegt, also bei Pilot-Sets) und
+`mean_abs_diff`, `rho`, `share_equal`; nur wenn `ragas_scores_repeat.csv` vorliegt, also bei Pilot-Sets), `agreement`
+(`rows` je Prüffrage, Kernpunkte und Kriterium mit `n`, `agreement`, `measure`, `ac`, `ac_ci`, `alpha`, `alpha_ci`,
+`dropped`, dazu `n_codes`, `n_questions`, `reps`; `null` ohne abgeschlossene Zweitbewertung) und
 `notes` (entfallene Teile, Hinweise). Fehlt `ragas_scores.csv`, ist `ragas` `null`, `ragas_agreement` `null` und die
 beiden Tabellen entfallen mit Hinweis.
 
@@ -497,9 +528,10 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | versioniert |
 | `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | versioniert |
 | `data/evaluation/ragas_scores.csv` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt (die Pilot-Dateien `ragas_scores*.csv` sind ebenfalls versioniert) ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) | versioniert |
+| `data/evaluation/second_rater_sample.csv`, `data/evaluation/second_rater/` (alle Dateien), `output/second_rater_disagreements.csv` | Zweitbewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar; auch in Pilot-Sets versioniert) | versioniert |
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | versioniert |
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | ignoriert |
-| `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien in den Pilot-Sets | ignoriert; alle übrigen Pilotdateien versioniert |
+| `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien in den Pilot-Sets | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl`; alle übrigen Pilotdateien versioniert |
 | `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`) | ignoriert |
 | `output/tables/*.tex`, `output/analysis.json` | Tabellen und Kennzahlen der Auswertung | versioniert (nicht in `.gitignore`) |
 | `output/figures/*.pdf` | Abbildungen der Auswertung | versioniert (Ausnahme von `*.pdf`) |

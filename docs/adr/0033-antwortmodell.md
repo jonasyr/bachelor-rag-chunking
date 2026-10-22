@@ -4,7 +4,8 @@
 
 Angenommen (17.10.2026; konkretisiert [ADR 0016](0016-modell-neutralitaet.md), setzt
 [ADR 0014](0014-temperatur-und-topk.md) um; ergänzt durch [ADR 0041](0041-kontrolle-k0.md) (K0 im selben Lauf)); Korpus
-seit [ADR 0038](0038-korpus-e2e.md) e2e: die Konsequenz, der Wissensstand umfasse Vue.js, betrifft nur den Vue-Korpus
+seit [ADR 0038](0038-korpus-e2e.md) e2e: die Konsequenz, der Wissensstand umfasse Vue.js, betrifft nur den Vue-Korpus. Belege am 22.10.2026 am Volltext präzisiert
+([Nachtrag](#nachtrag-22102026-belege-am-volltext-geprüft)); die Entscheidung bleibt.
 
 ## Kontext
 
@@ -77,3 +78,15 @@ vor dem Hauptlauf.
   ([Forschungsdesign](../explanation/research-design.md#validität-und-grenzen)).
 - Neutral: Der Wissensstand Mai 2026 umfasst Vue.js; Antworten aus Modellwissen statt aus den Passagen bestraft die
   Rubrik über Quellenbezug und Halluzinationsfreiheit ([ADR 0013](0013-antwort-rubrik.md)).
+
+## Nachtrag 22.10.2026: Belege am Volltext geprüft
+
+Ändert die Entscheidung nicht; präzisiert, was die Quellen im Kontext tragen.
+
+- `renze2024temperature`: Renze und Guven (2024) haben auch in der Findings-Fassung zwei Autoren. Die Studie prüft nur
+  Multiple-Choice-Problemlösen (Mathematik, Naturwissenschaft, Recht, Medizin u. a.); dort hat die Temperatur zwischen
+  0,0 und 1,0 keinen signifikanten Effekt. Für offene Faktenfragen mit Kontext ist das eine Übertragung, keine Messung.
+- `lee2026noisybench`: Lee et al. (2026) ist ein nicht begutachteter Preprint (arXiv v1). Er zeigt, dass
+  Reasoning-Modelle gegen störende Passagen nicht robust sind und längeres Reasoning mit geringerer Genauigkeit
+  einhergeht (korrelativ); einen Vergleich mit abgeschaltetem Reasoning enthält er nicht. „Nur Abstract geprüft“ oben
+  ist damit überholt.

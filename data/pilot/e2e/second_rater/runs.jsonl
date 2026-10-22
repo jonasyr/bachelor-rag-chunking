@@ -1,0 +1,2 @@
+{"date": "2026-10-22", "step": "scaffold", "strategy": "C1,C2,C3", "scoring": "rules", "codes": 12, "outputs_sha256": {"scoring_items.jsonl": "9b3e59b58571c71675de1a1f2920ecd436b2a0a9a952390a8c9dfd9bf95a8f12"}}
+{"date": "2026-10-22", "step": "key_points", "strategy": "C1,C2,C3", "outputs_sha256": {"key_points.csv": "c3f1dabbda37b2df04993bfb5f24b668518524476fa61128e324dba4310942e3", "scoring_items.jsonl": "9b3e59b58571c71675de1a1f2920ecd436b2a0a9a952390a8c9dfd9bf95a8f12"}}

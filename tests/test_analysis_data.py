@@ -320,3 +320,160 @@ def test_ragas_repeat_is_loaded_with_its_own_record(paths, tmp_path):
         paths["generation_runs_file"],
     )  # fmt: skip
     assert len(load(paths, main=False).ragas_repeat) == 6
+
+
+# ---------------------------------------------------------------- second rating (ADR 0046)
+
+R2_CODES = ["Q001-A", "Q001-B", "Q001-C", "Q002-A", "Q002-B", "Q002-C"]
+R2_STRATEGY = ",".join(STRATEGIES)
+
+
+def _checks_rows(**edits):
+    from config import RUBRIC_RULES_VERSION
+
+    base = {
+        "rules_version": RUBRIC_RULES_VERSION, "points": "covered;missing", "declines": "no",
+        "core_wrong": "no", "other_error": "no", "grounded": "all", "hallucination": "none",
+        "answers_question": "yes", "direct": "yes", "wordy": "no",
+    }  # fmt: skip
+    return [{"code": c} | base | edits for c in R2_CODES]
+
+
+def _sheet_rows():
+    from config import RUBRIC_CRITERIA
+
+    return [
+        {"code": c, "question_id": c.split("-")[0], "notes": ""}
+        | dict.fromkeys(RUBRIC_CRITERIA, "2")
+        for c in R2_CODES
+    ]
+
+
+@pytest.fixture
+def second(paths, tmp_path):
+    """Jonas' own files and a closed R2 folder next to the main paths of the fixture."""
+    from evaluate_answers import SHEET_HEADER
+    from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
+
+    items = [
+        {"code": c, "question_id": c.split("-")[0], "answer": f"Answer {c}."} for c in R2_CODES
+    ]
+    points = [
+        {"question_id": q, "point": str(i), "text": f"Point {q} {i}"} for q in QIDS for i in (1, 2)
+    ]
+    own = tmp_path / "own"
+    own.mkdir()
+    (own / "scoring_items.jsonl").write_text(
+        "".join(json.dumps(i) + "\n" for i in items), encoding="utf-8"
+    )
+    write_csv(own / "key_points.csv", KEY_POINTS_HEADER, points)
+    write_csv(own / "scoring_checks.csv", CHECKS_HEADER, _checks_rows())
+    write_csv(own / "scoring_sheet.csv", SHEET_HEADER, _sheet_rows())
+    r2 = tmp_path / "second_rater"
+    r2.mkdir()
+    (r2 / "scoring_items.jsonl").write_text(
+        "".join(json.dumps(i) + "\n" for i in items), encoding="utf-8"
+    )
+    write_csv(r2 / "key_points.csv", KEY_POINTS_HEADER, points)  # re-serialised, not copied
+    write_csv(r2 / "scoring_checks.csv", CHECKS_HEADER, _checks_rows(direct="no"))
+    write_csv(r2 / "scoring_sheet.csv", SHEET_HEADER, _sheet_rows())
+    append_step_run(
+        "second_rater_close", R2_STRATEGY, [r2 / "scoring_items.jsonl", r2 / "key_points.csv"],
+        [r2 / "scoring_checks.csv", r2 / "scoring_sheet.csv"], r2 / "runs.jsonl",
+        extra={"rater": "R2"},
+    )  # fmt: skip
+    paths |= {
+        "second_rater_dir": r2,
+        "scoring_items_file": own / "scoring_items.jsonl",
+        "scoring_sheet_file": own / "scoring_sheet.csv",
+        "scoring_checks_file": own / "scoring_checks.csv",
+        "key_points_file": own / "key_points.csv",
+    }
+    return paths
+
+
+def test_analysis_loads_closed_second_rating(second):
+    data = load(second, main=False)
+    assert data.second_rating is not None
+    assert len(data.second_rating["checks"]) == len(R2_CODES)
+    assert len(data.second_rating["sheet"]) == len(R2_CODES)
+    paired = data.second_rating["paired"]
+    assert [p["code"] for p in paired] == R2_CODES
+    assert paired[0]["checks"]["direct"] == ("yes", "no")
+    assert not any("Zweitbewertung" in n for n in data.notes)
+
+
+def test_analysis_without_r2_notes_it(paths, tmp_path):
+    data = load(paths, main=False)
+    assert data.second_rating is None
+    assert any("Zweitbewertung fehlt oder ist nicht abgeschlossen" in n for n in data.notes)
+
+
+def test_analysis_with_unclosed_r2_notes_it(second):
+    (second["second_rater_dir"] / "runs.jsonl").unlink()
+    data = load(second, main=False)
+    assert data.second_rating is None
+    assert any("nicht abgeschlossen" in n for n in data.notes)
+
+
+def test_analysis_refuses_r2_changed_after_close(second):
+    sheet = second["second_rater_dir"] / "scoring_sheet.csv"
+    sheet.write_text(sheet.read_text(encoding="utf-8").replace("2", "1", 1), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        load(second, main=False)
+
+
+def test_analysis_refuses_r2_checks_changed_after_close(second):
+    checks = second["second_rater_dir"] / "scoring_checks.csv"
+    checks.write_text(
+        checks.read_text(encoding="utf-8").replace(",no,", ",yes,", 1), encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="scoring_checks.csv"):
+        load(second, main=False)
+
+
+def test_analysis_refuses_r2_with_other_items(second):
+    # the close record covers the changed file, so only the comparison with Jonas' items catches it
+    r2 = second["second_rater_dir"]
+    items = r2 / "scoring_items.jsonl"
+    items.write_text(
+        items.read_text(encoding="utf-8").replace("Answer Q001-A", "Other"), encoding="utf-8"
+    )
+    runs = r2 / "runs.jsonl"
+    runs.unlink()
+    append_step_run(
+        "second_rater_close", R2_STRATEGY, [items, r2 / "key_points.csv"],
+        [r2 / "scoring_checks.csv", r2 / "scoring_sheet.csv"], runs, extra={"rater": "R2"},
+    )  # fmt: skip
+    with pytest.raises(ValueError, match="Q001-A"):
+        load(second, main=False)
+
+
+def test_analysis_refuses_r2_with_other_key_points(second):
+    r2 = second["second_rater_dir"]
+    kp = r2 / "key_points.csv"
+    kp.write_text(
+        kp.read_text(encoding="utf-8").replace("Point Q001 1", "Changed"), encoding="utf-8"
+    )
+    runs = r2 / "runs.jsonl"
+    runs.unlink()
+    append_step_run(
+        "second_rater_close", R2_STRATEGY, [r2 / "scoring_items.jsonl", kp],
+        [r2 / "scoring_checks.csv", r2 / "scoring_sheet.csv"], runs, extra={"rater": "R2"},
+    )  # fmt: skip
+    with pytest.raises(ValueError, match="Q001"):
+        load(second, main=False)
+
+
+def test_key_points_are_compared_as_rows_not_hashes(second):
+    # R2's file differs in bytes (line endings) but not in rows
+    kp = second["second_rater_dir"] / "key_points.csv"
+    kp.write_bytes(kp.read_bytes().replace(b"\n", b"\r\n"))
+    r2 = second["second_rater_dir"]
+    (r2 / "runs.jsonl").unlink()
+    append_step_run(
+        "second_rater_close", R2_STRATEGY, [r2 / "scoring_items.jsonl", kp],
+        [r2 / "scoring_checks.csv", r2 / "scoring_sheet.csv"], r2 / "runs.jsonl",
+        extra={"rater": "R2"},
+    )  # fmt: skip
+    assert load(second, main=False).second_rating is not None

@@ -135,6 +135,8 @@ def step_command(step: str, strategy: str) -> str:
         return f"src/evaluate_answers.py --mode {step}{control}"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
+    if step.startswith("second_rater_"):
+        return f"src/second_rater.py --mode {step.removeprefix('second_rater_')}"
     if step == "ragas_repeat":
         return "src/ragas_eval.py --repeat"
     if step == "ragas":
@@ -213,16 +215,22 @@ def append_key_points_run(strategy: str, outputs: dict[str, str], runs_file: Pat
 
 
 def append_step_run(
-    step: str, strategy: str, inputs: list[Path], outputs: list[Path], runs_file: Path
+    step: str,
+    strategy: str,
+    inputs: list[Path],
+    outputs: list[Path],
+    runs_file: Path,
+    extra: dict | None = None,
 ) -> dict:
     """Log a local step (no API) with the checksums of its inputs and outputs, so a later step
-    can check it builds on exactly these files (`require_run`)."""
+    can check it builds on exactly these files (`require_run`); `extra` adds step fields."""
     full = {
         "date": date.today().isoformat(),
         "step": step,
         "strategy": strategy,
         "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
         "outputs_sha256": {f.name: sha256_of(f) for f in outputs},
+        **(extra or {}),
     }
     _append(full, runs_file)
     return full

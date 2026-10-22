@@ -1,0 +1,14 @@
+question_id,point,text
+E04,1,"Return a blocked verdict with STEP_BUDGET_EXHAUSTED, STEP_TIMEOUT or CANCELLED."
+E04,2,"Use them only when the budget is spent, the deadline passed or the test was cancelled."
+E04,3,The runner refuses any other use with MODEL_OUTPUT_INVALID.
+E04,4,A passed verdict that carries a code is also refused with MODEL_OUTPUT_INVALID.
+E08,1,"lightpanda serve requests no sub-resources by default, so iframes are not loaded."
+E08,2,Add 'iframe' to the provider's loadResources option (--load-resources on the server).
+E08,3,Queries and fills inside the frame then work.
+E08,4,A listener in the host page on an element the frame created still does not fire.
+E09,1,After 8 steps.
+E09,2,Or after 10 minutes.
+E15,1,"No: the agent doesn't see an element with the inert attribute or anything under it, so it never aims at a control behind an open drawer."
+E15,2,Locators still find inert content (as in Playwright).
+E15,3,toBeVisible still passes on inert content (as in Playwright).

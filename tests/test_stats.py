@@ -159,3 +159,103 @@ def test_holm_over_testable_metrics_only_and_pairs_flagged():
     assert "p_adj" not in result["const"] and result["const"]["significant"] is False
     pairs = result["rising"]["pairs"]
     assert all("significant" in pair for pair in pairs.values())
+
+
+def test_ac1_binary_hand_example():
+    # 10 units: 7 both 1, 1 both 0, one (1,0), one (0,1): pa=0.8, pi=0.8/0.2, pe=0.32
+    pairs = [(1, 1)] * 7 + [(0, 0)] + [(1, 0), (0, 1)]
+    assert stats.gwet_ac(pairs, 2) == pytest.approx(12 / 17)
+
+
+def test_ac2_identity_weights_equal_ac1():
+    pairs = [(0, 0), (1, 2), (2, 2), (2, 1), (2, 2), (0, 1)]
+    identity = [[1.0 if k == m else 0.0 for m in range(3)] for k in range(3)]
+    assert stats.gwet_ac(pairs, 3, identity) == pytest.approx(stats.gwet_ac(pairs, 3))
+
+
+def test_ordinal_weights_three_levels():
+    expected = [[1, 2 / 3, 0], [2 / 3, 1, 2 / 3], [0, 2 / 3, 1]]
+    for row, want in zip(stats.ordinal_weights(3), expected, strict=True):
+        assert row == pytest.approx(want)
+
+
+def test_ac2_ordinal_counts_near_miss_partly():
+    pairs = [(2, 2)] * 8 + [(2, 1), (1, 2)]
+    w = stats.ordinal_weights(3)
+    assert stats.gwet_ac(pairs, 3, w) > stats.gwet_ac(pairs, 3)
+    assert stats.gwet_ac(pairs, 3, w) == pytest.approx((28 / 30 - 0.17) / 0.83)
+
+
+def test_ac_perfect_agreement_single_category_is_one():
+    assert stats.gwet_ac([(1, 1)] * 5, 2) == 1.0
+
+
+# Krippendorff (2011), Computing Krippendorff's alpha-reliability: 4 observers, 12 units
+KRIPP_2011 = [
+    [1, 1, None, 1],
+    [2, 2, 3, 2],
+    [3, 3, 3, 3],
+    [3, 3, 3, 3],
+    [2, 2, 2, 2],
+    [1, 2, 3, 4],
+    [4, 4, 4, 4],
+    [1, 1, 2, 1],
+    [2, 2, 2, 2],
+    [None, 5, 5, 5],
+    [None, None, 1, 1],
+    [None, 3, None, None],
+]
+
+
+def test_alpha_reference_example():
+    assert stats.krippendorff_alpha(KRIPP_2011, "nominal") == pytest.approx(0.743, abs=5e-4)
+    assert stats.krippendorff_alpha(KRIPP_2011, "ordinal") == pytest.approx(0.815, abs=5e-4)
+
+
+def test_alpha_binary_hand_example():
+    units = [[1, 1]] * 7 + [[0, 0]] + [[1, 0], [0, 1]]
+    assert stats.krippendorff_alpha(units, "nominal") == pytest.approx(1 - 0.2 / (128 / 380))
+
+
+def test_alpha_undefined_without_variation():
+    assert stats.krippendorff_alpha([[2, 2]] * 4, "ordinal") is None
+
+
+def test_cluster_bootstrap_is_deterministic_and_counts_dropped():
+    clusters = [[(1, 1)], [(0, 0)], [(1, 0)], [(1, 1)]]
+    stat = lambda units: None if len({u for c in units for u in c}) == 1 else 0.5  # noqa: E731
+    a = stats.cluster_bootstrap_ci(clusters, stat, 200, 0.95, 7)
+    assert a == stats.cluster_bootstrap_ci(clusters, stat, 200, 0.95, 7)
+    assert a["dropped"] > 0 and a["low"] == a["high"] == 0.5
+
+
+def test_ac_without_pairs_is_undefined_and_dropped_in_bootstrap():
+    assert stats.gwet_ac([], 2) is None
+    res = stats.cluster_bootstrap_ci(
+        [[(1, 1)], []],
+        lambda cs: stats.gwet_ac([p for c in cs for p in c], 2),
+        200,
+        0.95,
+        7,
+    )
+    assert res["dropped"] > 0
+
+
+def test_ac_rejects_ratings_outside_categories():
+    with pytest.raises(ValueError):
+        stats.gwet_ac([(0, -1)], 2)
+    with pytest.raises(ValueError):
+        stats.gwet_ac([(0, 2)], 2)
+
+
+def test_cluster_bootstrap_varying_statistic_gets_full_resamples():
+    clusters = [[1.0], [2.0], [3.0], [10.0]]
+    sizes = []
+
+    def stat(cs):
+        sizes.append(len(cs))
+        return sum(v for c in cs for v in c) / len(cs)
+
+    res = stats.cluster_bootstrap_ci(clusters, stat, 100, 0.95, 3)
+    assert res["low"] < res["high"] and res["dropped"] == 0
+    assert sizes == [4] * 100
