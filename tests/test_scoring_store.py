@@ -534,8 +534,9 @@ def test_second_rater_key_points_are_never_editable(dirs):
         scoring.freeze_key_points(r2, items)
 
 
-def test_other_rater_value_does_not_restrict(dirs, monkeypatch):
-    main, _ = dirs
-    write_scoring_set(main)
-    monkeypatch.setenv("SCORING_RATER", "someone")
-    assert [s.name for s in scoring.scoring_sets()] == ["Main catalogue"]
+@pytest.mark.parametrize("value", ["r2", "R2 ", "1", "", "someone"])
+def test_unknown_rater_value_fails_closed(monkeypatch, value):
+    # a mistyped SCORING_RATER must never fall back to the full app with Jonas' own sets
+    monkeypatch.setenv("SCORING_RATER", value)
+    with pytest.raises(ValueError, match="SCORING_RATER"):
+        scoring.rater_mode()

@@ -89,8 +89,15 @@ def _control_set(base: ScoringSet) -> ScoringSet | None:
 
 
 def rater_mode() -> str | None:
-    """The rater named by the environment (config.SECOND_RATER_ENV), if any."""
-    return os.environ.get(SECOND_RATER_ENV)
+    """The rater named by the environment (config.SECOND_RATER_ENV), if any. Any other set value
+    raises, so a typo never falls back to the full app with the own sets (blinding, ADR 0046)."""
+    value = os.environ.get(SECOND_RATER_ENV)
+    if value is not None and value != SECOND_RATER_PSEUDONYM:
+        raise ValueError(
+            f"{SECOND_RATER_ENV}={value!r}: set it to {SECOND_RATER_PSEUDONYM} for the second "
+            "rater or leave it unset"
+        )
+    return value
 
 
 def _rater_set(name: str, folder: Path) -> ScoringSet:
