@@ -1,7 +1,8 @@
 # Korpusauswahl (Lückentext-Probe und Closed-Book-Fragen)
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Entscheidung: [ADR 0038](../adr/0038-korpus-e2e.md).
-> Übersicht: [Dokumentation](../README.md).
+*[Doku-Index](../README.md) · Referenz · Verwandt: [ADR 0038](../adr/0038-korpus-e2e.md), [Korpus](corpus.md), [Vorregistrierung](../../data/corpus_probe/preregistration.md)*
+
+Stand: 22.10.2026 (Messung 17.–19.10.2026). Entscheidung: [ADR 0038](../adr/0038-korpus-e2e.md).
 
 Einmalige Diagnose, mit der der Korpus gewählt wurde; kein Teil des Experiments. Frage: Welche Dokumentation kennt
 das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) noch nicht?
@@ -42,7 +43,8 @@ das Antwortmodell (`config.LLM_MODEL` = `gpt-6-luna`, Wissensstand 18.05.2026) n
    eine realistische Frage mit Referenzantwort (je Korpus 4 × faktisch, prozedural, konzeptuell, Grenze, Vergleich;
    Prompt unten). Das Antwortmodell beantwortete jede Frage ohne Kontext und mit dem Abschnitt; ein weiterer Agent
    beurteilte alle Antworten blind (gemischt, ohne Angabe der Bedingung): `correct`, `partial`, `wrong`, `abstain`.
-   Retrieval-abhängig = mit Abschnitt `correct`, ohne nicht `correct` (Wilson-Intervall). Die Fragen sind Diagnose,
+   Retrieval-abhängig = Anteil der mit Abschnitt `correct` beantworteten Fragen, die ohne Abschnitt nicht `correct`
+   sind (Nenner: nur die mit Abschnitt richtigen; Wilson-Intervall, `question_probe.summary`). Die Fragen sind Diagnose,
    kein Teil des Fragenkatalogs. Urteilslauf 1: die fünf Korpora gemeinsam, Lauf 2: Angular allein (auf Wunsch für die
    Mail an den Betreuer nachgereicht); Seeds in `config.CORPUS_QUESTIONS_JUDGE_SEEDS`, beide Reihenfolgen aus den
    abgelegten Antworten reproduzierbar.
@@ -117,9 +119,12 @@ und rund 0,01 USD (Closed-Book-Fragen). Vollständige Werte: [`data/corpus_probe
 
 Rangfolge nach der vorab festgelegten Wertung (0–100). Stufen U/S/St/Q/Sb/P (je 0–4) = Unbekanntheit, Markdown-Sauberkeit,
 Struktur, Dokumentationsqualität, Stabilität, Passung. Tokens = Zeichen / 4 nach `to_docs.py`; ADR 0038 und die
-Pipeline zählen dagegen tiktoken-Tokens nach dem Preprocessing (Vue 177.951 hier gegen 166.000, e2e 228.266 gegen
-250.380 in [corpus.md](corpus.md)). Sterne = GitHub-Sterne,
-Commits = Docs-Commits in den 30 Tagen vor der Messung (Stand 17./18.10.2026). CB = Closed-Book-Fragen ohne
+Pipeline zählen dagegen tiktoken-Tokens nach dem Preprocessing (Vue 177.951 hier gegen 165.723 im
+[Experiment-Protokoll: Vue.js](experiment-record-vue.md#snapshot-vuejs-bis-18102026), e2e 228.266 gegen 250.380 in
+[Korpus](corpus.md#quelle-und-ausschnitt)). Seiten = alle `.md`/`.mdx` nach `to_docs.py` (e2e 61: die 60 Seiten der
+Navigation und `docs/images/examples/README.md`). Sterne = GitHub-Sterne aus `candidates.csv` (Messzeitpunkt; die
+[Spitzengruppe](#spitzengruppe-im-vergleich) zeigt den Stand von `gh api` am 18.10.2026), Commits = Docs-Commits in den
+30 Tagen vor der Messung (Stand 17./18.10.2026). Lizenzen: [Lizenzen](#lizenzen). CB = Closed-Book-Fragen ohne
 Dokumentation richtig (nur für sechs Korpora gemessen). Vue und Angular sind bekannte Vergleiche, keine Kandidaten
 (Ausschlusskriterium 1). Sightmap (#16) ist durch Kriterium 5 ausgeschlossen (79.174 < 80.000 Tokens) und wurde
 irrtümlich mitgewertet: `summarise.py` wendet die Token-Grenze nur auf den Pool der Sensitivität an. Ohne Sightmap
@@ -190,7 +195,6 @@ GitHub-Daten vom 18.10.2026 (`gh api`).
 |---|---|---|---|---|---|
 | Repository | `tester-army/e2e` | `enroute-sh/enroute` | `TanStack/charts` | `reflex-dev/xy` | `strands-agents/box` |
 | Art | KI-gestützter End-to-End-Testläufer (TypeScript) | Git auf Objektspeicher | Diagrammbibliothek | Python-Diagrammbibliothek | Sandbox für KI-Agenten |
-| Lizenz | Apache-2.0 | Apache-2.0 | MIT | Apache-2.0 | Apache-2.0 |
 | Angelegt | 22.07.2026 | 24.08.2026 | 28.07.2026 | 09.07.2026 | 02.10.2026 |
 | Letztes Release (18.10.) | e2e@0.21.2 (16.10.) | v0.3.0 (14.10.) | v1.1.0 (09.10.) | v0.0.8 (13.10.) | v0.1.0 (07.10.) |
 | Sterne / Forks | 11.109 / 558 | 258 / 9 | 842 / 53 | 1.879 / 76 | 432 / 25 |
@@ -202,19 +206,33 @@ GitHub-Daten vom 18.10.2026 (`gh api`).
 | Qualitativ | 3/3/4/4/2 | 4/4/4/3/4 | 3/2/3/3/4 | 3/3/2/2/1 | 3/4/4/4/4 |
 | Format | Mintlify-MDX | Markdown | Markdown | Markdown mit Demo-Blöcken | Markdown |
 
+### Closed-Book-Fragen
+
+Je 20 Fragen (Schritt 8), Daten in `questions/<name>.json`:
+
+| Korpus | ohne Doku richtig | mit Abschnitt richtig | retrieval-abhängig, Anteil der mit Abschnitt richtigen (95-%-Konfidenzintervall) |
+|---|---|---|---|
+| Vue.js | 15 | 20 | 25 % (11–47) |
+| Angular | 10 (nie „weiß nicht“) | 20 | 50 % (30–70) |
+| xy | 3 | 20 | 85 % (64–95) |
+| TanStack Charts | 1 | 19 | 95 % = 18/19 (75–99) |
+| e2e | 1 (13 × „weiß nicht“) | 19 | 95 % = 18/19 (75–99) |
+| Enroute | 0 (15 × „weiß nicht“) | 20 | 100 % (84–100) |
+
+Auf Fragenebene trennen sich die bekannten Frameworks klar von den neuen Projekten; Enroute, e2e und TanStack Charts
+sind bei 20 Fragen nicht unterscheidbar.
+
 ### Entscheidungsweg
 
 1. Pilot `data/pilot/hard` (Vue): Antwortqualität an der Obergrenze; ohne Retrieval 14 von 16 Pilotfragen
-   vollständig beantwortet (Beobachtung im Pilot, kein abgelegtes Artefakt; Quelle: [plan.md](../plan.md#stand),
-   Kontext von [ADR 0038](../adr/0038-korpus-e2e.md)).
+   vollständig beantwortet (Beobachtung im Pilot, kein abgelegtes Artefakt; [ADR 0038](../adr/0038-korpus-e2e.md),
+   Kontext).
 2. Lückentext-Probe über 24 Dokumentationen: Vue und Angular bekannt, die neuen Projekte 20,2–50,4 % Lücke; die Wertung
    wählte Enroute (Bericht an Jonas, 18.10.2026).
 3. Einwand: Enroute hat einen Maintainer und drei Commits; gesucht war ein ähnlich geeignetes, real genutztes Projekt.
-4. Closed-Book-Fragen für die Spitzengruppe und Vue, auf Wunsch für die Mail an den Betreuer auch Angular: Vue 15/20,
-   Angular 10/20, die neuen Projekte 0–3/20.
-5. Vorgabe von Jonas: möglichst viel Inhalt in der Wissensbasis. Gewählt e2e: gleich retrieval-abhängig wie Enroute,
-   knapp dreimal so groß, real genutzt; Aufwand MDX-Bereinigung ohne Inhaltsverlust. Enroute bleibt Reserve
-   ([ADR 0038](../adr/0038-korpus-e2e.md)).
+4. [Closed-Book-Fragen](#closed-book-fragen) für die Spitzengruppe und Vue, auf Wunsch für die Mail an den Betreuer
+   auch Angular: Vue 15/20, Angular 10/20, die neuen Projekte 0–3/20.
+5. Gewählt: e2e, Enroute bleibt Reserve; Begründung: [ADR 0038](../adr/0038-korpus-e2e.md).
 
 ### MDX-Probe (e2e)
 
@@ -222,31 +240,51 @@ Probelauf mit sieben Regeln am 18.10.2026 (nicht der spätere Preprocessing-Code
 `CardGroup`, 104/43) und Einbettungen (`Video`, `SetupPrompt`) entfernt; `Note`/`Warning`/`Tip` als Text; Titel von
 `Accordion`/`Tab`/`Step` als fette Zeile, Inhalt bleibt; `CodeGroup` (70) ausgepackt. Danach rund 50 Tags außerhalb
 von Code, fast alle Platzhalter (`<NAME>`) oder TypeScript-Generics im Text. Einziger Inhaltsverlust wäre
-`<ModelProvider>` (8 Einbindungen): Datenliste von rund 60 Modellanbietern (Name, Paket, Import, Umgebungsvariablen)
-in `snippets/model-provider.jsx`; das Preprocessing soll sie als Tabelle ausgeben.
+`<ModelProvider>` (8 Einbindungen): Datenliste von 51 Modellanbietern (Name, Paket, Import, Umgebungsvariablen)
+in `snippets/model-provider.jsx`; das Preprocessing gibt sie als Tabelle aus ([Korpus](corpus.md#aufbereitung-mdx--markdown)).
 
-### Closed-Book-Fragen
+## Lizenzen
 
-Je 20 Fragen, Daten in `questions/<name>.json`:
+`data/corpus_probe/` zitiert einzelne Sätze der 24 Dokumentationen (`results/`, `misses/`, `questions/`). Lizenz je
+Dokumentation, geprüft am 22.10.2026 am gepinnten Commit aus `candidates.csv` (`gh api repos/<repo>/license?ref=<commit>`):
+Keiner der Docs-Ordner hat eine eigene Lizenzdatei, es gilt die des Repositorys; Fußzeilen der Docs-Websites sind nur
+bei Angular geprüft. Alle Lizenzen erlauben die Weitergabe mit Urheber- und Lizenzhinweis. Reihenfolge wie
+[Alle Kandidaten](#alle-kandidaten).
 
-| Korpus | ohne Doku richtig | mit Abschnitt richtig | retrieval-abhängig (95-%-Konfidenzintervall) |
+| # | Projekt | Lizenz (SPDX) | Quelle |
 |---|---|---|---|
-| Vue.js | 15 | 20 | 25 % (11–47) |
-| Angular | 10 (nie „weiß nicht“) | 20 | 50 % (30–70) |
-| xy | 3 | 20 | 85 % (64–95) |
-| TanStack Charts | 1 | 19 | 95 % (75–99) |
-| e2e | 1 (13 × „weiß nicht“) | 19 | 95 % (75–99) |
-| Enroute | 0 (15 × „weiß nicht“) | 20 | 100 % (84–100) |
-
-Auf Fragenebene trennen sich die bekannten Frameworks klar von den neuen Projekten; Enroute, e2e und TanStack Charts
-sind bei 20 Fragen nicht unterscheidbar. Gewählt wurde e2e ([ADR 0038](../adr/0038-korpus-e2e.md)): gleich
-retrieval-abhängig wie Enroute, aber rund 228.000 statt 81.000 Tokens und real genutzt (11.100 Sterne, 56
-Mitwirkende); Vorgabe war möglichst viel Inhalt in der Wissensbasis.
+| 1 | Enroute | Apache-2.0 | [`LICENSE`](https://github.com/enroute-sh/enroute/blob/bc0dc6efce9cbbce9a5368e594a9b28f18a12d40/LICENSE) |
+| 2 | xy | Apache-2.0 | [`LICENSE`](https://github.com/reflex-dev/xy/blob/7a75a983c3d9ea203495a879dbfd427df7fd0913/LICENSE) |
+| 3 | django-ox | BSD-3-Clause | [`LICENSE`](https://github.com/oxpull/django-ox/blob/8429abcd6c48e0647f7963a333f7350248864268/LICENSE) |
+| 4 | Social SDK | MIT | [`LICENSE`](https://github.com/opencoredev/social-sdk/blob/af61377586735dc51f6737a62c6d4ab2e05dd1b4/LICENSE) |
+| 5 | Strands Box | Apache-2.0 | [`LICENSE`](https://github.com/strands-agents/box/blob/069c39cfd29f830aaadd2a1af362753a57c7b202/LICENSE) |
+| 6 | e2e | Apache-2.0 | [`LICENSE`](https://github.com/tester-army/e2e/blob/ef977f4856da009cac26d78d2e9bb14e5991ee41/LICENSE) |
+| 7 | TanStack Charts | MIT | [`LICENSE`](https://github.com/TanStack/charts/blob/f8f8ed7a326471e61faa0129688679f3eca9e388/LICENSE) |
+| 8 | Vela | Apache-2.0 | [`LICENSE`](https://github.com/LuxAlgo/Vela/blob/850fa1f431e2065e9b0074c4b0555a48a2999eaf/LICENSE) |
+| 9 | Vue.js | CC-BY-4.0 | [`LICENSE`](https://github.com/vuejs/docs/blob/40aa88af0094f7bab4aaf786e55c748a6a251d88/LICENSE) (Inhalte außer Bildern) |
+| 10 | better-drizzle | Apache-2.0 | [`LICENSE`](https://github.com/almeidazs/better-drizzle/blob/0174cbd718d4ad4f79864078b9e4bae6b43c20b2/LICENSE) |
+| 11 | Angular Native | MIT | [`LICENSE`](https://github.com/ng-native/ng-native/blob/1ec3d699517a2b2a60da825f5c0a53454bb36d14/LICENSE) |
+| 12 | microcharts | MIT | [`LICENSE`](https://github.com/ganapativs/microcharts/blob/378d4fe2207bc1e1c8e7bd3b2957765fe005505c/LICENSE) |
+| 13 | Lattice | MIT | [`LICENSE.md`](https://github.com/lattice-php/lattice/blob/9c83c070a1ac9e99927d588c93e0ceab68387976/LICENSE.md) |
+| 14 | Nimbus | MIT | [`LICENSE`](https://github.com/cloudflare/nimbus/blob/0474e07d662796c1b5fe4ced400e8d10637664b3/LICENSE) |
+| 15 | gori | Apache-2.0 | [`LICENSE`](https://github.com/hahwul/gori/blob/bd2142ebc2b92621b3b048f96016f336a6f86aae/LICENSE) |
+| 16 | Sightmap | MIT | [`LICENSE`](https://github.com/sightmap/sightmap/blob/e229565648f34a9af4a8deca79d5afe23cd8ac6c/LICENSE) |
+| 17 | Blume | MIT | [`LICENSE`](https://github.com/haydenbleasel/blume/blob/8d84df343070bcc23b7982ba70493679bd714a96/LICENSE) |
+| 18 | Angular | CC-BY-4.0 | Fußzeile von angular.dev ([`footer.component.html`](https://github.com/angular/angular/blob/5d69bf4f4ae8f99c46d0d6481ec0709cb4be69d9/adev/src/app/core/layout/footer/footer.component.html)); der Code steht unter MIT ([`LICENSE`](https://github.com/angular/angular/blob/5d69bf4f4ae8f99c46d0d6481ec0709cb4be69d9/LICENSE)) |
+| 19 | pgContext | Apache-2.0 | [`LICENSE`](https://github.com/Evokoa/pgContext/blob/aa91710e69bd6882a37f1c859d2f56d0e8a30ab9/LICENSE) |
+| 20 | Shipyard | MIT | [`LICENSE`](https://github.com/cosscom/shipyard/blob/2928a430dbc12b22ffb955f4e3a4a0f6499842dc/LICENSE) |
+| 21 | nub | MIT | [`LICENSE`](https://github.com/nubjs/nub/blob/02466954c428871e91f4de5733e713c498f80720/LICENSE) |
+| 22 | Decionis agent-safe-pipeline | Apache-2.0 | [`LICENSE`](https://github.com/decionis/agent-safe-pipeline/blob/fc08a17c0542e68eeaa42d11c3df6b29710eef49/LICENSE) (Text der Apache License 2.0; GitHub meldet `NOASSERTION`) |
+| 23 | Zuke | MIT | [`LICENSE`](https://github.com/zuke-build/zuke/blob/010554576b560180eaf8c4f0f6597de75c28d775/LICENSE) |
+| 24 | NVX | MIT | [`LICENSE`](https://github.com/microsoft/nvx/blob/e67a06f4015a0d5d50f5c8e0070a781035785b60/LICENSE) |
 
 ## Grenzen
 
 - Die Lückentext-Probe misst Einzelfakten; die Closed-Book-Fragen (20 je Korpus, breite Intervalle) und später die
   Prüfung jeder Katalogfrage bestätigen das auf Fragenebene ([ADR 0038](../adr/0038-korpus-e2e.md)).
+- Die [Vorregistrierung](../../data/corpus_probe/preregistration.md) trägt das Datum 18.10.2026 und wurde lokal vor
+  der Messung der neuen Kandidaten festgelegt, aber erst zusammen mit den Ergebnissen und ADR 0038 versioniert (Commit
+  `4115ffc`); die Git-Historie belegt die Reihenfolge daher nicht.
 - Die Fehltreffer klassifizierten Agenten, nicht eine Person; Strukturkennzahlen beruhen auf Pfad- und
   Musterheuristiken, Tokens sind Zeichen / 4.
 - Die Stichprobe der aufgezeichneten Läufe hing von Pythons Hash-Seed ab (Reihenfolge einer Menge vor dem Mischen).

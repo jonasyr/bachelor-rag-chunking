@@ -1,6 +1,6 @@
 # Zweitbewertung (ADR 0046) — Design
 
-Stand 22.10.2026; Entscheidungen von Jonas im Gespräch vom 22.10.2026, Entwurf noch nicht freigegeben; Rückfragen des Builder-Checks am 22.10.2026 von Jonas beantwortet.
+Stand 22.10.2026; Entscheidungen von Jonas im Gespräch vom 22.10.2026, freigegeben 22.10.2026, umgesetzt in PR #40; Rückfragen des Builder-Checks am 22.10.2026 von Jonas beantwortet.
 
 ## Zweck
 

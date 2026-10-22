@@ -1532,7 +1532,7 @@ Make these exact edits (German, like the surrounding text):
    - Type table: column "Anzahl" → 12/12/12/6/6; add a column `Wert` with `factual`, `procedural`, `conceptual`,
      `comparative`, `limitation`; replace the comparative example by
      `What is the difference between ref() and reactive()?`.
-   - Replace "Die erlaubten Werte von `type` und `difficulty` sind noch offen ([Plan](../plan.md))." by a table of
+   - Replace "Die erlaubten Werte von `type` und `difficulty` sind noch offen ([Plan](../../plan.md))." by a table of
      the four construction classes (value, rule, count 12) exactly as in ADR 0029, the area floors (API ≥ 12, Style
      Guide ≥ 3) and the sentence "Geprüft mit `src/catalogue.py check`; Ablauf:
      [Fragenkatalog erstellen](../how-to/build-the-question-catalogue.md)."

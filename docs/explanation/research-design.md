@@ -1,6 +1,6 @@
 # Forschungsdesign
 
-> Seitentyp: Hintergrund (explanation). Übersicht: [Dokumentation](../README.md).
+*[Doku-Index](../README.md) · Hintergrund · Verwandt: [Evaluation](../reference/evaluation.md), [ADRs](../adr/README.md), [Plan](../plan.md)*
 
 Diese Seite erklärt, was die Arbeit untersucht und warum sie so angelegt ist. Sie legt nichts fest.
 
@@ -33,10 +33,11 @@ Sie gliedern die Auswertung, sind aber keine angemeldeten Forschungsfragen.
 
 1. Welche Chunking-Strategien eignen sich für die Aufbereitung technischer Projektdokumentation im Kontext eines
    RAG-Systems?
-2. Wie unterscheiden sich die Strategien hinsichtlich der Retrieval-Qualität (Recall@k, Precision@k, MRR; dazu Hit@k,
-   [ADR 0012](../adr/0012-retrieval-metriken.md))?
+2. Wie unterscheiden sich die Strategien hinsichtlich der Retrieval-Qualität (Recall@k, Precision@k, MRR)? Die
+   Auswertung ergänzt Hit@k ([ADR 0012](../adr/0012-retrieval-metriken.md)).
 3. Wie wirken sie sich auf die Antwortqualität aus (Korrektheit, Vollständigkeit, Quellenbezug,
-   Halluzinationsfreiheit, Verständlichkeit; die fünf Kriterien der Rubrik, [ADR 0013](../adr/0013-antwort-rubrik.md))?
+   Halluzinationsfreiheit)? Die Rubrik ergänzt Verständlichkeit als fünftes Kriterium
+   ([ADR 0013](../adr/0013-antwort-rubrik.md)).
 4. Welche Trade-offs ergeben sich zwischen Chunk-Größe, Kontextabdeckung, Redundanz, Retrieval-Präzision, Kosten und
    Antwortqualität?
 5. Welche Empfehlungen lassen sich für die Gestaltung von RAG-Systemen auf technischer Dokumentation ableiten?
@@ -64,17 +65,19 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
 
 1. **Anderer Korpus:** e2e ([ADR 0038](../adr/0038-korpus-e2e.md); ursprünglich Vue.js) statt der bereits informell
    untersuchten FastAPI/Supabase/Stripe-Dokumentation.
-2. **Andere Domäne:** entwicklerorientierte Dokumentation eines Testframeworks; kontrollierte Chunking-Vergleiche gibt
-   es bislang vor allem für spezialisierte Fachdomänen (unternehmensinterne technische Dokumente, klinische
-   Entscheidungsunterstützung).
+2. **Andere Domäne und Dokumentart:** entwicklerorientierte Prosa-Dokumentation eines Testframeworks (Leitfäden und
+   Referenzseiten in Markdown/MDX). Kontrollierte Chunking-Vergleiche gibt es bislang vor allem für spezialisierte
+   Fachdomänen (unternehmensinterne technische Dokumente, klinische Entscheidungsunterstützung) und für strukturierte
+   API-Spezifikationen (OpenAPI, Pesl et al., 2026; siehe [Verwandte Arbeiten](#verwandte-arbeiten)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1
    und K0.
 
-### Hypothesen (aus dem Exposé, explorativ)
+### Hypothesen (aus dem Exposé)
 
-Wortlaut aus dem Exposé; Entscheidung, sie explorativ und deskriptiv auszuwerten:
-[ADR 0009](../adr/0009-hypothesen.md).
+Wortlaut aus dem Exposé; Entscheidung: [ADR 0009](../adr/0009-hypothesen.md) (mit
+[Nachtrag](../adr/0009-hypothesen.md#nachtrag-22102026-darstellung-in-der-arbeit)), Auswertungsart geändert durch
+[ADR 0044](../adr/0044-statistische-auswertung.md).
 
 - **H1 (starke Baseline):** Strukturbasiertes Chunking übertrifft größenbasiertes ohne Überlappung hinsichtlich der
   Retrieval-Qualität, nicht aber durchgängig größenbasiertes mit Überlappung, da diese den Informationsverlust an
@@ -85,22 +88,29 @@ Wortlaut aus dem Exposé; Entscheidung, sie explorativ und deskriptiv auszuwerte
   Chunking insbesondere konzeptuelle, abschnittsübergreifende Fragen begünstigt, während größenbasierte Verfahren für
   eng umgrenzte faktische Fragen ausreichen.
 
-Die Hypothesen werden nicht inferenzstatistisch bestätigt, sondern dienen als Leitannahmen für die deskriptive
-Auswertung.
+H1–H3 bleiben Leitannahmen, die die Auswertung gliedern. Ein vor dem Hauptlauf festgelegter Testplan prüft drei
+primäre Metriken konfirmatorisch; alle übrigen p-Werte sind explorativ
+([Statistik](#warum-die-evaluation-so-angelegt-ist)).
 
 ### Warum das Thema nicht trivial ist
 
-Die Annahme „strukturiert schlägt naiv offensichtlich“ ist empirisch nicht gesichert: Qu, Bao & Tu (2025) zeigen,
+Die Annahme „strukturiert schlägt naiv offensichtlich“ ist empirisch nicht gesichert: Qu, Tu & Bao (2025) zeigen,
 dass semantisch oder strukturell motiviertes Chunking größenbasiertes Chunking nicht konsistent übertrifft und der
 Mehraufwand oft nicht gerechtfertigt ist ([ADR 0010](../adr/0010-starke-baseline.md)). Der Erkenntnisgewinn liegt
 daher nicht in „wer gewinnt“, sondern in Effektgröße, Kosten, Metrik-Abhängigkeit, der Entkopplung von Retrieval und
 Antwort und der Wechselwirkung mit dem Fragetyp.
 
-### Verwandte Arbeiten (Hinweis)
+### Verwandte Arbeiten
+
+Nächste verwandte Arbeit ist Pesl et al. (2026, IEEE Transactions on Services Computing): ein Chunking-Vergleich auf
+OpenAPI-Dokumentation, in dem strukturbasiertes Chunking je Endpunkt das Token-Chunking übertrifft. Davon grenzt sich
+die Arbeit über die Dokumentart ab: Prosa-Leitfäden und Referenzseiten statt strukturierter API-Spezifikationen. Ob
+Pesl et al. auch die Antwortqualität messen oder nur das Retrieval, ist noch am Volltext zu prüfen
+([Backlog](../plan.md#backlog)); davon hängt ab, wie scharf die Abgrenzung über die Methodik (Säule 3) ausfällt.
 
 Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup ist keine zitierfähige wissenschaftliche Quelle, wird
 aber im Kapitel „Verwandte Arbeiten“ kurz als informeller Vorläufer eingeordnet; das unterstreicht die Abgrenzung
-(siehe [ADR 0011](../adr/0011-forschungsluecke.md)).
+([ADR 0011](../adr/0011-forschungsluecke.md)). Quellen und ihre Rolle: [Literaturbasis](../reference/literature.md).
 
 ## Korpus: Begründung der Wahl
 
@@ -131,7 +141,10 @@ K0). Parameterwerte stehen nur in `src/config.py`, erklärt in [Konfiguration](.
 **Warum diese drei.** C1 ist die naive, reproduzierbare Untergrenze. C2 ist die Variante, die in der Praxis oft
 genügt; sie als starke Baseline ernst zu nehmen, schützt die Arbeit gegen den Vorwurf der Trivialität (H1). C3 nutzt
 die Markdown-Struktur, die technische Dokumentation ohnehin mitbringt, und ist die Strategie, deren Mehrwert in Frage
-steht. C4 bringt eine weitere Modellabhängigkeit und kommt nur, wenn der Zeitplan es zulässt.
+steht. C4 bringt eine weitere Modellabhängigkeit und kommt nur, wenn der Meilenstein 09.11.2026 (Ground Truth
+eingefroren) planmäßig erreicht ist; auch dann wird es nur beschreibend berichtet, außerhalb von Testplan,
+Zweitbewertung und RAGAS ([ADR 0028](../adr/0028-c4-bedingung.md),
+[Nachtrag](../adr/0028-c4-bedingung.md#nachtrag-22102026-c4-nur-deskriptiv)).
 
 **Warum die Kontrolle K1.** C3 unterscheidet sich von C1/C2 nicht nur in der Struktur, sondern auch in der Größe:
 Seine Chunks sind im Mittel kleiner, und bei konstantem top-k erhält das Sprachmodell weniger Kontext. Ohne Kontrolle
@@ -226,6 +239,26 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   Bewertung, mit einem anderen Richtermodell als dem Antwortmodell; die Übereinstimmung beider ist selbst ein Befund,
   und RAGAS ist nie alleinige Grundlage ([ADR 0007](../adr/0007-triangulation.md),
   [ADR 0047](../adr/0047-ragas-als-triangulation.md)).
+- **Zweitbewertung:** Bewertet nur eine Person, bleibt offen, wie stark die Werte von ihr abhängen. Eine zweite Person
+  bewertet deshalb 12 Fragen × C1–C3 = 36 der 144 Antworten blind, mit denselben Prüffragen und eingefrorenen
+  Kernpunkten. Die 12 Fragen werden nach dem Einfrieren und vor der eigenen Bewertung gezogen, so dass keine Auswahl
+  nach Ergebnissen möglich ist. Gemessen wird mit Gwets AC1 bzw. AC2 statt Cohens κ: Bei so vielen Höchstwerten (im
+  Pilot e2e 71–94 % je Kriterium) fällt κ auch bei fast vollständiger Übereinstimmung niedrig aus. Findet sich bis
+  Mitte November keine Person, bewertet Jonas dieselbe Stichprobe frühestens zwei Wochen später erneut blind, und ein
+  Sprachmodell, das nicht das Antwortmodell ist, beantwortet die Prüffragen; das wird als Konsistenz- bzw.
+  Triangulationsprüfung berichtet, nicht als Inter-Rater-Reliabilität ([ADR 0046](../adr/0046-zweitbewertung.md);
+  Maße: [Evaluation](../reference/evaluation.md#zweitbewertung), Ablauf:
+  [Experiment durchführen](../how-to/run-the-experiment.md#zweitbewertung)).
+- **Statistik:** Viele Metriken und Teilgruppen würden ohne festen Plan viele Tests und damit Zufallsbefunde erzeugen.
+  Deshalb steht vor dem Hauptlauf fest, welche drei primären Metriken getestet werden: R@5, MRR und der Gesamtwert der
+  Antworten. Nur diese Tests sind konfirmatorisch; alle übrigen p-Werte (etwa die Korrelationen zu H2) sind explorativ,
+  alle übrigen Metriken und Aufteilungen werden nur beschrieben ([ADR 0044](../adr/0044-statistische-auswertung.md),
+  [Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-22102026-konfirmatorische-tests);
+  [ADR 0009](../adr/0009-hypothesen.md)). Friedman- und Wilcoxon-Test passen zu verbundenen, nicht
+  normalverteilten und stark gebundenen Werten; die Holm-Korrektur hält die Fehlerrate über die drei Tests und die
+  Paarvergleiche. Bei n = 48 ist die Teststärke begrenzt: Kleine Unterschiede bleiben unentdeckt, und je Fragetyp oder
+  Klasse wären nur große Effekte erkennbar. Verfahren im Einzelnen:
+  [Evaluation](../reference/evaluation.md#statistische-auswertung).
 - **Kosten:** Strategien unterscheiden sich im Aufwand; Qualität wird deshalb den Kosten gegenübergestellt
   ([ADR 0008](../adr/0008-kosten-als-variable.md)).
 
@@ -254,6 +287,11 @@ Prompt Assembly (Question + Context, identisch für alle Strategien)
 LLM Answer (Antwort; Quellen = die top-k Chunk-IDs des Prompts)
         ↓
 Evaluation (Retrieval-Metriken + Antwort-Rubrik + Effizienz)
+        ↓                                   ← Zweitbewertung parallel: Stichprobe 12 Fragen × C1–C3,
+        ↓                                     gezogen nach dem Einfrieren, vor der eigenen Bewertung
+RAGAS (nach der regelbasierten Bewertung, anderes Richtermodell)
+        ↓
+Auswertung (analyse.py: Testplan, Tabellen, Abbildungen)
 
 Kontrolle K0 (im selben Lauf, ohne Retrieval):
 Question → Closed-Book-Prompt → LLM Answer → Evaluation (Rubrik ohne Quellenbezug, nach C1–C3)
@@ -269,7 +307,9 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
   Fragen retrieval-abhängig sind ([Warum Closed-Book-Prüfung und K0](#warum-closed-book-prüfung-und-k0)).
 - **Externe Validität:** begrenzt; ein Korpus (e2e, [ADR 0038](../adr/0038-korpus-e2e.md)): ein junges Projekt
   (angelegt 22.07.2026) mit einem dem Modell vertrauten Fachgebiet und nach Einschätzung teils KI-geschriebener
-  Dokumentation ([Korpusauswahl](../reference/corpus-selection.md)). Die Ergebnisse liefern Hinweise, keine universelle
+  Dokumentation ([Korpusauswahl](../reference/corpus-selection.md)). Untersucht ist Prosa-Dokumentation (Leitfäden und
+  Referenzseiten); auf strukturierte API-Spezifikationen lassen sich die Ergebnisse nicht ohne Weiteres übertragen
+  ([Forschungslücke](#forschungslücke-und-abgrenzung-drei-säulen)). Die Ergebnisse liefern Hinweise, keine universelle
   Aussage.
 - **Korpuswechsel:** Das angemeldete Exposé nennt Vue.js als Datengrundlage. Der Wechsel zu e2e ist mit Messung
   begründet, und der Betreuer wurde informiert ([ADR 0038](../adr/0038-korpus-e2e.md)); die Arbeit nennt die
@@ -277,15 +317,18 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
 - **Konstruktvalidität:** etablierte Metriken, transparente Rubrik mit regelbasierten Prüffragen und vorab
   eingefrorenen Kernpunkten, blind bewertet ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
   [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md),
-  [0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md));
-  eine zweite Person bewertet 36 Antworten blind ([ADR 0046](../adr/0046-zweitbewertung.md), [Evaluation](../reference/evaluation.md#zweitbewertung)).
+  [0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)); RAGAS als zweite, automatische Sicht
+  ([ADR 0047](../adr/0047-ragas-als-triangulation.md)).
 - **Kontrollen:** Das Closed-Book-Urteil fällt Jonas über Antworten auf seine eigenen Fragen, nicht blind
   ([ADR 0040](../adr/0040-closed-book-pruefung.md)); K0 wird nicht blind bewertet, und der Quellenbezug fehlt im
   Vergleich ([ADR 0041](../adr/0041-kontrolle-k0.md)). Die Diagnose für die Korpuswahl stammt von Agenten und beruht
   auf 20 Fragen je Korpus, mit entsprechend breiten Intervallen ([ADR 0038](../adr/0038-korpus-e2e.md)).
 - **Reliabilität:** Temperatur 0, Rohdaten speichern, Modellversionen dokumentieren, fixierter Snapshot, Prompts
   veröffentlichen. Temperatur 0 verringert die Zufälligkeit, garantiert aber keine identischen Ausgaben; deshalb werden
-  die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)).
+  die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)). Eine zweite Person
+  bewertet 36 Antworten blind; ohne sie ersetzt eine Intra-Rater-Wiederholung mit LLM-Gegenprobe die Messung, berichtet
+  als Konsistenzprüfung, nicht als Inter-Rater-Reliabilität
+  ([Zweitbewertung](#warum-die-evaluation-so-angelegt-ist), [ADR 0046](../adr/0046-zweitbewertung.md)).
 - **Generator:** Das Antwortmodell antwortet direkt, ohne verdecktes Reasoning (`config.LLM_REASONING_EFFORT` =
   `none`, die Voraussetzung für Temperatur 0). Die Ergebnisse gelten für einen solchen Generator; ein Reasoning-Modell
   könnte schwache Kontexte teilweise ausgleichen, sodass die Unterschiede zwischen den Strategien kleiner ausfielen
