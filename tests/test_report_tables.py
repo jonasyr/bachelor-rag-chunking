@@ -132,19 +132,14 @@ def test_tests_table_holds_only_the_confirmatory_tests(tmp_path):
 def test_tests_table_has_no_pvalues_for_descriptive_metrics(tmp_path):
     results = build_results(make_data(), 0.05)
     write_tables(results, tmp_path)
-    lines = (tmp_path / "tests_descriptive.tex").read_text(encoding="utf-8").splitlines()
-    group, seen = None, set()
-    for line in lines:
-        if line.startswith(r"\multicolumn"):
-            group = line.split("{")[-1].split("}")[0]
-            seen.add(group)
-        elif (
-            group and group.startswith(("Hit@5", "P@5", "Kontext@5", "Korrektheit")) and "&" in line
-        ):
-            cells = [c.strip(" \\") for c in line.split("&")]
-            # columns: Vergleich, Statistik, p, p (Holm), Effekt, Median-Differenz
-            assert cells[2] == "--" and cells[3] == "--", line
-    assert any(g.startswith("Hit@5") for g in seen)
+    text = (tmp_path / "tests_descriptive.tex").read_text(encoding="utf-8")
+    # no test, so no columns for statistic and p-values that would only hold dashes
+    assert "Vergleich & Effekt & Median-Differenz" in text and "p (Holm)" not in text
+    align = text.split(r"\begin{tabular}{")[1].split("}")[0]
+    assert align == "lrr"
+    groups = [line.split("{")[-1].split("}")[0] for line in text.splitlines()
+              if line.startswith(r"\multicolumn")]  # fmt: skip
+    assert any(g.startswith("Hit@5") for g in groups)
 
 
 def test_tables_follow_the_iu_rules(tmp_path):

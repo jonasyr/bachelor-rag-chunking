@@ -553,21 +553,18 @@ def _tests_table(results: dict) -> str:
 
 
 def _tests_descriptive_table(results: dict) -> str:
-    """Kendall's W and pairwise r of the measures without a test, without p-values; same column
-    layout as the tests table, so the two read alike."""
-    header = ["Vergleich", "Statistik", "p", "p (Holm)", "Effekt", "Median-Differenz"]
+    """Kendall's W and pairwise r of the measures without a test; no columns for statistic and
+    p-values, which would only hold dashes."""
+    header = ["Vergleich", "Effekt", "Median-Differenz"]
     rows: list[list[str] | str] = []
     desc = results["descriptive_effects"]
     for block in (desc[ANALYSIS_RULE], desc["answers"]):
         for key, e in block.items():
             unit = " (Tokens)" if key == "context_tokens" else ""
             rows.append(_group(f"{e['label']}{unit}", len(header), not rows))
-            rows.append(["Friedman", DASH, DASH, DASH, _w(e["kendalls_w"]), DASH])
+            rows.append(["Friedman", _w(e["kendalls_w"]), DASH])
             for pair, v in e["pairs"].items():
-                rows.append(
-                    [pair.replace("-", "–"), DASH, DASH, DASH, _r(v["r"]),
-                     fmt_opt(v["median_diff"])]
-                )  # fmt: skip
+                rows.append([pair.replace("-", "–"), _r(v["r"]), fmt_opt(v["median_diff"])])
     note = (
         "Deskriptiv, ohne p-Werte: Maße ohne Test (Retrieval nach der Hauptregel, Kriterien der "
         "Antwort). Effekt: Kendalls W bzw. r; Median-Differenz jeweils erste minus zweite "
@@ -575,7 +572,7 @@ def _tests_descriptive_table(results: dict) -> str:
     )
     return latex_table(
         "tests_descriptive", "Deskriptive Effektstärken der Strategien C1 bis C3", header, rows,
-        "lrrrrr", note,
+        "lrr", note,
     )  # fmt: skip
 
 
