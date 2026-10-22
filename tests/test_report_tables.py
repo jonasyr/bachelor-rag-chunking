@@ -185,10 +185,12 @@ def test_all_tables_are_written(tmp_path):
         assert r"\hline" not in text and r"\label{tab:" + p.stem + "}" in text
 
 
-def test_captions_with_pvalues_say_explorativ(tmp_path):
+def test_captions_name_the_kind_of_test(tmp_path):
+    """The three primary tests are confirmatory, the correlations exploratory (ADR 0044)."""
     write_tables(build_results(make_data(), 0.05), tmp_path)
-    for name in ("tests.tex", "correlation.tex"):
-        assert "explorativ" in (tmp_path / name).read_text(encoding="utf-8").lower()
+    tests = (tmp_path / "tests.tex").read_text(encoding="utf-8").lower()
+    assert "konfirmatorisch" in tests and "explorativ" not in tests
+    assert "explorativ" in (tmp_path / "correlation.tex").read_text(encoding="utf-8").lower()
 
 
 def test_outputs_are_byte_identical_on_rerun(tmp_path):

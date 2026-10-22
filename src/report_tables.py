@@ -575,8 +575,9 @@ def _tests_table(results: dict) -> str:
                  fmt_de(w["median_diff"], REPORT_DECIMALS)]
             )  # fmt: skip
     note = (
-        f"Explorativ, Signifikanzniveau {fmt_de(results['alpha'], 2)}. Friedman-Test je "
-        "Hauptmetrik mit Holm-Korrektur über die Hauptmetriken; paarweise Wilcoxon-Tests nur bei "
+        "Konfirmatorisch (Testplan vor dem Hauptlauf), Signifikanzniveau "
+        f"{fmt_de(results['alpha'], 2)}. Friedman-Test je Hauptmetrik mit Holm-Korrektur über "
+        "die Hauptmetriken; paarweise Wilcoxon-Tests nur bei "
         "signifikantem Gesamttest, Holm-korrigiert über alle Paare. Effekt: Kendalls W bzw. r; "
         "Median-Differenz jeweils erste minus zweite Strategie. Übrige Maße deskriptiv in einer "
         "eigenen Tabelle."
