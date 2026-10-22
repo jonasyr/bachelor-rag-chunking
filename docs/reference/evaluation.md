@@ -192,16 +192,37 @@ und Embedding getrennt), ohne Verhältniszahl ([ADR 0008](../adr/0008-kosten-als
 
 ## Zweitbewertung
 
-Mit denselben Prüffragen in der App, ohne Schlüssel ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
-[ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)): eine Kopie des Sets als Ordner unter `data/pilot/`
-(z. B. `data/pilot/zweitbewertung`) mit `scoring_items.jsonl`, `key_points.csv` (die eingefrorenen Kernpunkte),
-`runs.jsonl` (mit dem `scaffold`- und `key_points`-Eintrag) und leerem `scoring_sheet.csv`, ohne `scoring_key.csv` und
-ohne `scoring_checks.csv`; die zweite Person bewertet dort 12 Fragen × C1–C3 (36 Antworten) unabhängig, gezogen mit
-festem Seed vor der eigenen Bewertung ([ADR 0046](../adr/0046-zweitbewertung.md)). Übereinstimmung je Prüffrage und je
-Kriterium: einfache Übereinstimmung, Gwets AC1 (Prüffragen) bzw. AC2 (Kriterien 0–2, ordinal gewichtet) und
-Krippendorffs α (ordinal), jeweils mit Bootstrap-Konfidenzintervall. Kein Cohens Kappa: bei fast nur 2en ist es
-irreführend niedrig. Ohne zweite Person ersatzweise Intra-Rater und ein Sprachmodell als Gegenprobe (ADR 0046).
-Ziehung und Rechnung sind noch umzusetzen.
+Entscheidung: [ADR 0046](../adr/0046-zweitbewertung.md); Befehle: `src/second_rater.py`
+([Werkzeuge](tooling.md#skripte-und-optionen)), Dateien: [Datenformate](data-formats.md#zweitbewertung).
+
+1. **Ziehung** (`--mode draw`): nach dem Einfrieren des Katalogs und vor jedem eigenen Wert 12 Fragen mit festem Seed
+   (`config.SECOND_RATER_SEED`), geschichtet nach Fragetyp und Konstruktionsklasse: je Klasse 3; factual,
+   procedural, conceptual je 3; comparative und limitation zusammen 3 (2 + 1, der Seed entscheidet). Die Ziehung liest
+   nur `questions.csv`.
+2. **Satz für R2** (`--mode export`): nach Scaffold und eingefrorenen Kernpunkten, solange `scores.csv` fehlt; der
+   Ordner `data/evaluation/second_rater/` enthält die 36 Items (dieselben Codes und dieselbe Reihenfolge), die
+   eingefrorenen Kernpunkte der 12 Fragen, einen leeren Bogen und ein Laufprotokoll, aber keinen Schlüssel und keine
+   eigenen Prüfantworten.
+3. **Bewertung durch R2** an Jonas' Rechner im R2-Modus der App:
+   `SCORING_RATER=R2 uv run streamlit run app/catalogue_editor.py --server.address localhost` zeigt nur die Seite
+   Scoring und nur den R2-Satz; die Kernpunkte sind dort nicht bearbeitbar. R2 sieht das Repo nicht, und bis R2
+   abgeschlossen hat, pusht Jonas seine `scoring_checks.csv` und `scoring_sheet.csv` nicht (Regel, nicht technisch
+   erzwungen).
+4. **Abschluss** (`--mode close`): prüft Vollständigkeit, eingefrorene Kernpunkte und dass jeder Wert aus seinen
+   Prüfantworten folgt, schreibt den Eintrag `second_rater_close` und macht den Satz schreibgeschützt.
+5. **Auswertung** in `analyse.py`: nur eine abgeschlossene Zweitbewertung, deren Dateien noch zum Eintrag passen;
+   verglichen Code für Code mit Jonas' Prüfantworten und Werten (gleiche Regelversion, gleiche Items und Kernpunkte).
+
+Übereinstimmung je Prüffrage, für die Kernpunkt-Markierungen (gepoolt) und je Kriterium: einfache Übereinstimmung,
+Gwets AC1 (Ja/Nein-Prüffragen, Kernpunkte) bzw. AC2 mit ordinalen Gewichten (`grounded` none < some < all,
+`hallucination` substantive < minor < none, Kriterien 0–2; Nachtrag in ADR 0046) und Krippendorffs α (ordinal), jeweils
+mit Perzentil-Bootstrap-Intervall über die Fragen (`config.AGREEMENT_*`). Kein Cohens Kappa: bei fast nur 2en ist es
+irreführend niedrig. Ist α nicht bestimmbar (nur eine Kategorie), steht „nicht bestimmbar“. Tabelle `agreement`
+(Anhang B) mit den Bezeichnungen Ablehnung (`declines`), Kernaussage falsch (`core_wrong`), Anderer Fehler
+(`other_error`), Durch Passagen gestützt (`grounded`), Halluzination (`hallucination`), Frage beantwortet
+(`answers_question`), Direkt (`direct`), Wortreich (`wordy`); dazu `second_rater_disagreements.csv` zum Besprechen.
+Die Werte der Arbeit bleiben Jonas' Bewertung. Ohne zweite Person bis Mitte November: Ersatzverfahren nach ADR 0046
+(noch nicht umgesetzt; ein Intra-Rater-Satz wäre ein weiterer R2-Ordner).
 
 ## Statistische Auswertung
 

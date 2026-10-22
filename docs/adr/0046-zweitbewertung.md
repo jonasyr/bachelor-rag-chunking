@@ -5,7 +5,8 @@
 Angenommen (21.10.2026; konkretisiert die Empfehlung aus [ADR 0007](0007-triangulation.md) und
 [Evaluation](../reference/evaluation.md#zweitbewertung)); Person, Stichprobe und Relevanz von Jonas entschieden, das
 Übereinstimmungsmaß ist ein Vorschlag von Claude. Ergänzt am 22.10.2026 um den
-[Datenschutz der zweiten Person](#nachtrag-22102026-datenschutz-der-zweiten-person) (Jonas).
+[Datenschutz der zweiten Person](#nachtrag-22102026-datenschutz-der-zweiten-person) (Jonas). Präzisiert am 22.10.2026:
+[Maß für die geordneten Prüffragen](#nachtrag-22102026-maß-für-die-geordneten-prüffragen) (Jonas).
 
 ## Kontext
 
@@ -56,6 +57,14 @@ Von Jonas entschieden; ändert die Entscheidung oben nicht.
   werden sie aus dem aktuellen Stand entfernt (die Git-Historie bleibt); die Arbeit berichtet dann das
   Ersatzverfahren.
 - In der Danksagung erscheint sie nur mit ihrem Einverständnis.
+
+## Nachtrag 22.10.2026: Maß für die geordneten Prüffragen
+
+Von Jonas entschieden; präzisiert das Maß, ändert Umfang und Verfahren nicht. Die beiden dreistufigen, geordneten
+Prüffragen `grounded` (none < some < all) und `hallucination` (substantive < minor < none) bekommen wie die Kriterien
+Gwets AC2 mit ordinalen Gewichten statt AC1, so dass ein knappes Verfehlen als knapp zählt und AC2 und α derselben
+Zeile dieselbe Ordnung nutzen. Die Ja/Nein-Prüffragen und die Kernpunkte behalten AC1 (AC2 ohne Gewichte ist AC1).
+Umsetzung: [Design](../superpowers/specs/2026-10-22-second-rater-design.md).
 
 ## Literatur
 
