@@ -1,9 +1,10 @@
 import importlib.util
 
+import pytest
+
 from config import (
     CONTROL_RETRIEVED_FILE,
     GROUND_TRUTH_FILE,
-    PILOT_DIR,
     PILOT_RUNS_FILE_NAME,
     QUERY_EMBEDDINGS_FILE,
     QUESTIONS_FILE,
@@ -21,8 +22,9 @@ def load_probe():
     return module
 
 
-def test_default_pilot_set_comes_from_the_config():
-    assert load_probe().pilot_dir(["difficulty_probe.py"]) == PILOT_DIR
+def test_set_dir_is_required():
+    with pytest.raises(SystemExit, match="SET_DIR"):
+        load_probe().pilot_dir(["difficulty_probe.py"])
 
 
 def test_a_named_pilot_set_is_resolved_from_the_repo_root():

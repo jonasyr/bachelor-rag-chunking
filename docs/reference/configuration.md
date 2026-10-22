@@ -21,7 +21,7 @@ Formate aller Dateien: [Datenformate](data-formats.md).
 | `DATA_RAW` | `data/raw/e2e_docs_snapshot` | Rohdateien des Snapshots | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `DATA_PROCESSED` | `data/processed` | Zwischenstände (Dokumente, Abschnitte, Chunks, Vektoren) | – |
 | `DATA_EVAL` | `data/evaluation` | Fragen, Ground Truth, Ergebnisse | – |
-| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | – |
+| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (Pilot-Sets in `catalogue.py` und auf der Bewertungsseite der App) | – |
 | `PILOT_RUNS_FILE_NAME` | `"runs.jsonl"` | Laufprotokoll je Pilot-Set; die übrigen Pilotdateien tragen die Namen der Evaluationsartefakte | – |
 | `CHROMA_DIR` | `chroma_db` | Chroma-Index (lokal, persistent) | – |
 | `DOCS_DIR` | `docs` | Dokumentation | – |

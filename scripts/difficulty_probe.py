@@ -7,8 +7,8 @@ ceiling effect). Recall@5 = share of a question's relevant sections that any top
 The kind of a question is its `notes` field without the leading "pilot". Also runs the
 size-matched control K1 (ADR 0026) and prints chunk size and context tokens per strategy.
 
-Usage: uv run python scripts/difficulty_probe.py [SET_DIR]
-(SET_DIR defaults to config.PILOT_DIR = data/pilot; the hard set is data/pilot/hard)
+Usage: uv run python scripts/difficulty_probe.py SET_DIR
+(SET_DIR relative to the repo root, e.g. data/pilot/e2e; no default, the sets differ in corpus)
 
 The pilot sets in data/pilot/ are historical: their ground truth carries Vue.js IDs (corpus before
 ADR 0038), while SECTIONS_FILE and the chunk files in data/processed/ now hold the e2e corpus. They
@@ -32,7 +32,6 @@ from config import (  # noqa: E402
     CONTROL_RETRIEVED_FILE,
     CONTROL_STRATEGIES,
     GROUND_TRUTH_FILE,
-    PILOT_DIR,
     PILOT_RUNS_FILE_NAME,
     QUERY_EMBEDDINGS_FILE,
     QUESTIONS_FILE,
@@ -67,8 +66,10 @@ def length(chunk: dict) -> int:
 
 
 def pilot_dir(argv: list[str]) -> Path:
-    """The pilot set to probe: SET_DIR relative to the repo root, default config.PILOT_DIR."""
-    return ROOT / argv[1] if len(argv) > 1 else PILOT_DIR
+    """The pilot set to probe: SET_DIR relative to the repo root (required)."""
+    if len(argv) < 2:
+        raise SystemExit("usage: difficulty_probe.py SET_DIR (e.g. data/pilot/e2e)")
+    return ROOT / argv[1]
 
 
 def set_files(pilot: Path) -> dict[str, Path]:
