@@ -449,3 +449,13 @@ CORPUS_QUESTIONS_JUDGE_SEEDS = {1: 7, 2: 8}  # order of the blinded answers per 
 AGREEMENT_BOOTSTRAP_REPS = 2000  # cluster bootstrap over questions for the agreement CIs
 AGREEMENT_CI_LEVEL = 0.95  # percentile interval
 AGREEMENT_SEED = 20261022  # seed of the agreement bootstrap
+SECOND_RATER_QUESTIONS = (
+    12  # questions the second rater scores (x C1-C3); a quarter of the catalogue
+)
+SECOND_RATER_SEED = 20261022  # seed of the stratified draw
+SECOND_RATER_MAX_DRAWS = 100_000  # rejection-sampling attempts before the draw aborts
+SECOND_RATER_PSEUDONYM = "R2"  # the only name of the second rater in files, run records and output
+SECOND_RATER_DIR_NAME = "second_rater"  # folder of R2's set (inside data/evaluation or a pilot set)
+SECOND_RATER_DIR = DATA_EVAL / SECOND_RATER_DIR_NAME
+SECOND_RATER_SAMPLE_FILE = DATA_EVAL / "second_rater_sample.csv"  # the drawn questions
+SECOND_RATER_ENV = "SCORING_RATER"  # environment variable that starts the app in R2 mode
