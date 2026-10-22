@@ -3,10 +3,14 @@
 ## Status
 
 Angenommen (21.10.2026; konkretisiert die Empfehlung aus [ADR 0007](0007-triangulation.md) und
-[Evaluation](../reference/evaluation.md#zweitbewertung)); Person, Stichprobe und Relevanz von Jonas entschieden, das
-Übereinstimmungsmaß ist ein Vorschlag von Claude. Ergänzt am 22.10.2026 um den
-[Datenschutz der zweiten Person](#nachtrag-22102026-datenschutz-der-zweiten-person) (Jonas). Präzisiert am 22.10.2026:
-[Maß für die geordneten Prüffragen](#nachtrag-22102026-maß-für-die-geordneten-prüffragen) (Jonas).
+[Evaluation](../reference/evaluation.md#zweitbewertung); ersetzt den Intra-Rater-Folgeschritt von
+[ADR 0035](0035-regelbasierte-bewertung.md), die Intra-Rater-Wiederholung bleibt nur Ersatzverfahren); Person,
+Stichprobe und Relevanz von Jonas entschieden, das Übereinstimmungsmaß ist ein Vorschlag von Claude. Ergänzt am
+22.10.2026 um den [Datenschutz der zweiten Person](#nachtrag-22102026-datenschutz-der-zweiten-person) (Jonas).
+Präzisiert am 22.10.2026: [Maß für die geordneten Prüffragen](#nachtrag-22102026-maß-für-die-geordneten-prüffragen)
+(Jonas) und [Zufallszahlen](#nachtrag-22102026-zufallszahlen) (Jonas). Ziehung, Export, Abschluss und
+Übereinstimmungsrechnung umgesetzt am 22.10.2026 (PR #40, `src/second_rater.py`, `src/agreement.py`); die Konsequenz
+„noch umzusetzen“ ist erledigt, das Ersatzverfahren ist nicht umgesetzt
 
 ## Kontext
 
@@ -65,6 +69,16 @@ Prüffragen `grounded` (none < some < all) und `hallucination` (substantive < mi
 Gwets AC2 mit ordinalen Gewichten statt AC1, so dass ein knappes Verfehlen als knapp zählt und AC2 und α derselben
 Zeile dieselbe Ordnung nutzen. Die Ja/Nein-Prüffragen und die Kernpunkte behalten AC1 (AC2 ohne Gewichte ist AC1).
 Umsetzung: [Design](../superpowers/specs/2026-10-22-second-rater-design.md).
+
+## Nachtrag 22.10.2026: Zufallszahlen
+
+Von Jonas entschieden; ändert die Entscheidung oben nicht. Die Ziehung der 12 Fragen nutzt `random.Random`
+(`config.SECOND_RATER_SEED`), das Bootstrap-Intervall NumPys `default_rng` (`config.AGREEMENT_SEED`); die Reihenfolge
+der blinden Bewertung ([ADR 0032](0032-blinde-rubrik-bewertung.md)) mischt ebenfalls mit `random.Random`
+(`config.SCORING_SEED`). Diese Ströme sind nicht über Python- und NumPy-Versionen garantiert; deshalb wählte
+[ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md) für den Stichprobenplan SHA-256. Hier genügt der Seed trotzdem:
+Stichprobe (`second_rater_sample.csv`), Schlüssel (`scoring_key.csv`) und Laufeinträge werden gespeichert, nie neu
+gezogen und nie überschrieben; maßgeblich sind diese Dateien, nicht eine Wiederholung der Ziehung.
 
 ## Literatur
 

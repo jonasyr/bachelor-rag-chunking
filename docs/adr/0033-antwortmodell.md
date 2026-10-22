@@ -81,7 +81,7 @@ vor dem Hauptlauf.
 
 ## Nachtrag 22.10.2026: Belege am Volltext geprüft
 
-Ändert die Entscheidung nicht; präzisiert, was die Quellen im Kontext tragen.
+Von Jonas beauftragte Prüfung der Volltexte; ändert die Entscheidung nicht; präzisiert, was die Quellen im Kontext tragen.
 
 - `renze2024temperature`: Renze und Guven (2024) haben auch in der Findings-Fassung zwei Autoren. Die Studie prüft nur
   Multiple-Choice-Problemlösen (Mathematik, Naturwissenschaft, Recht, Medizin u. a.); dort hat die Temperatur zwischen

@@ -1,83 +1,106 @@
 # Literaturbasis
 
-> Seitentyp: Nachschlagen (reference). Stand: 21.10.2026. Übersicht: [Dokumentation](../README.md).
+*[Doku-Index](../README.md) · Referenz · Verwandt: [Forschungsdesign](../explanation/research-design.md), [ADR 0018](../adr/0018-literaturbasis.md), [ADR 0002](../adr/0002-zitierstil-apa.md)*
 
+Alle Quellen der Arbeit mit ihrer Rolle, Stand 22.10.2026. Maßgeblich für die bibliografischen Angaben ist die
+`main.bib` der Bachelorarbeit im privaten PaperLab-Repo (am 22.10.2026 gegen Crossref, arXiv, ACL Anthology und die
+Webseiten geprüft, einzelne Angaben am Volltext: Renze und Guven, Lee et al., Taiwo und Amaluddin Yusoff); diese Seite spiegelt sie für Leser des öffentlichen Repos. Das Exposé-Bib (`expose/latex/main.bib`)
+ist eingefroren und enthält noch ältere Angaben (etwa die Autorenreihenfolge von Qu et al.). Zitierstil: APA 7 /
+biblatex / biber ([ADR 0002](../adr/0002-zitierstil-apa.md)).
 
-Die 15 Quellen der ersten Tabelle ([ADR 0018](../adr/0018-literaturbasis.md)) sind im Exposé zitiert; nur ihre BibTeX-Einträge liegen im privaten PaperLab-Repo unter `expose/latex/main.bib` im Ordner der Bachelorarbeit. Die Webquellen der folgenden Abschnitte sind dort noch nicht enthalten. Zitierstil: APA 7 / biblatex / biber ([ADR 0002](../adr/0002-zitierstil-apa.md)).
+Jede Tabelle hat dieselben Spalten: BibTeX-Key, Quelle (APA 7, gekürzt) und was die Quelle in der Arbeit belegt.
 
-| BibTeX-Key | Rolle in der Argumentation | Typ |
-|------------|----------------------------|-----|
-| `lewis2020rag` | RAG-Grundlagenpaper | NeurIPS |
-| `gao2023ragsurvey` | RAG-Survey, Pipeline-Komponenten | Preprint |
-| `yu2025ragevalsurvey` | Evaluation auf Komponentenebene | Springer |
-| `es2024ragas` | RAGAS, sekundäre automatisierte Evaluation | EACL-Demo |
-| `karpukhin2020dpr` | Dense Retrieval | EMNLP |
-| `manning2008ir` | IR-Metriken: Precision, Recall, MRR | Buch |
-| `reimers2019sbert` | Satz-Embeddings / semantische Ähnlichkeit | EMNLP-IJCNLP |
-| `devlin2019bert` | Kontextuelle Repräsentationen (Transformer) | NAACL |
-| `hladena2025chunksize` | Einfluss der Chunk-Größe | Springer |
-| `jimenoyepes2024chunking` | strukturbasiertes/element-basiertes Chunking | Preprint |
-| `finardi2024chronicles` | Retriever/Chunk/Generator als Einheit | Preprint |
-| `ji2023hallucination` | Halluzinationen in NLG | ACM CSUR |
-| `taiwo2026chunking` | Chunking-Vergleich (Öl & Gas) – domänenfremde Lücke | Preprint |
-| `gomezcabello2025chunking` | Chunking-Vergleich (klinisch) – domänenfremde Lücke | Bioengineering |
-| `qu2025semanticchunking` | semantisch/struktur ≠ konsistent besser → starke Baseline, „nicht trivial" | NAACL Findings |
+## Kernquellen
 
-> Nicht zitierfähig, aber in „Verwandte Arbeiten" zu erwähnen: der Praktiker-Blogbeitrag (Mai 2026) mit nahezu identischem Setup auf FastAPI/Supabase/Stripe.
+Die 15 im Exposé zitierten Quellen ([ADR 0018](../adr/0018-literaturbasis.md)) und eine am 22.10.2026 ergänzte
+Domänenstudie (Pesl et al.).
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `lewis2020rag` | Lewis, P., et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. In *Advances in Neural Information Processing Systems 33* (S. 9459–9474). Curran Associates. | RAG-Grundlagenpaper |
+| `gao2023ragsurvey` | Gao, Y., et al. (2023). *Retrieval-augmented generation for large language models: A survey* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2312.10997 | RAG-Survey, Pipeline-Komponenten |
+| `yu2025ragevalsurvey` | Yu, H., et al. (2025). Evaluation of retrieval-augmented generation: A survey. In *Big data (BigData 2024)* (CCIS 2301, S. 102–120). Springer. https://doi.org/10.1007/978-981-96-1024-2_8 | Evaluation auf Komponentenebene |
+| `es2024ragas` | Es, S., James, J., Espinosa Anke, L., & Schockaert, S. (2024). RAGAs: Automated evaluation of retrieval augmented generation. In *Proceedings of EACL 2024: System Demonstrations* (S. 150–158). https://doi.org/10.18653/v1/2024.eacl-demo.16 | RAGAS, sekundäre automatisierte Evaluation ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) |
+| `karpukhin2020dpr` | Karpukhin, V., et al. (2020). Dense passage retrieval for open-domain question answering. In *Proceedings of EMNLP 2020* (S. 6769–6781). https://doi.org/10.18653/v1/2020.emnlp-main.550 | Dense Retrieval |
+| `manning2008ir` | Manning, C. D., Raghavan, P., & Schütze, H. (2008). *Introduction to information retrieval*. Cambridge University Press. https://doi.org/10.1017/CBO9780511809071 | IR-Metriken: Precision, Recall, MRR |
+| `reimers2019sbert` | Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. In *Proceedings of EMNLP-IJCNLP 2019* (S. 3982–3992). https://doi.org/10.18653/v1/D19-1410 | Satz-Embeddings, semantische Ähnlichkeit |
+| `devlin2019bert` | Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. In *Proceedings of NAACL-HLT 2019* (S. 4171–4186). https://doi.org/10.18653/v1/N19-1423 | Kontextuelle Repräsentationen (Transformer) |
+| `hladena2025chunksize` | Hladěna, J., et al. (2025). The effect of chunk size on the RAG performance. In *Software engineering: Emerging trends and practices in system development (CSOC 2025)* (LNNS 1559, S. 317–326). Springer. https://doi.org/10.1007/978-3-032-00712-4_21 | Einfluss der Chunk-Größe |
+| `jimenoyepes2024chunking` | Jimeno Yepes, A., et al. (2024). *Financial report chunking for effective retrieval augmented generation* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2402.05131 | strukturbasiertes, element-basiertes Chunking |
+| `finardi2024chronicles` | Finardi, P., et al. (2024). *The chronicles of RAG: The retriever, the chunk and the generator* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2401.07883 | Retriever, Chunk und Generator als Einheit |
+| `ji2023hallucination` | Ji, Z., et al. (2023). Survey of hallucination in natural language generation. *ACM Computing Surveys, 55*(12), Artikel 248. https://doi.org/10.1145/3571730 | Halluzinationen in NLG |
+| `taiwo2026chunking` | Taiwo, S., & Amaluddin Yusoff, M. (2026). Evaluating chunking strategies for retrieval-augmented generation in oil and gas enterprise documents. In D. C. Wyld et al. (Hrsg.), *Computer Science & Information Technology (CS & IT)* (S. 69–79). AIRCC Publishing Corporation. https://doi.org/10.5121/csit.2026.160507 | nur Domänenbeispiel (Öl und Gas, nur Retrieval); trägt die Forschungslücke nicht, weil der Verlag AIRCC auf Beall's List steht |
+| `gomezcabello2025chunking` | Gomez-Cabello, C. A., et al. (2025). Comparative evaluation of advanced chunking for retrieval-augmented generation in large language models for clinical decision support. *Bioengineering, 12*(11), 1194. https://doi.org/10.3390/bioengineering12111194 | Chunking-Vergleich in einer Fachdomäne (klinisch), Forschungslücke ([ADR 0011](../adr/0011-forschungsluecke.md)) |
+| `qu2025semanticchunking` | Qu, R., Tu, R., & Bao, F. S. (2025). Is semantic chunking worth the computational cost? In *Findings of the ACL: NAACL 2025* (S. 2155–2177). https://doi.org/10.18653/v1/2025.findings-naacl.114 | semantisch/strukturell nicht konsistent besser: starke Baseline, Thema nicht trivial ([ADR 0010](../adr/0010-starke-baseline.md)) |
+| `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (strukturbasiert je Endpunkt schlägt Token-Chunking); Abgrenzung über die Dokumentart ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); Volltext noch zu lesen |
+
+Nicht zitierfähig und darum ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; seine
+Einordnung steht im [Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten).
 
 ## Technische Quellen (Web)
 
-Abgerufen am 13.10.2026; Grundlage von [ADR 0023](../adr/0023-embedding-modell.md) und
-[ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md). Für die Arbeit als APA-7-Webquellen in die BibTeX-Datei
-(PaperLab) übernehmen.
+Webseiten ohne Datum stehen in der Bibliografie ohne Abrufdatum (Regel der PaperLab-Klasse); das Abrufdatum hier
+dokumentiert nur den geprüften Stand.
 
-| Kurzname | Quelle (APA 7) | Belegt |
-|----------|----------------|--------|
+### Embedding und Vektorsuche
+
+Abgerufen am 13.10.2026; Grundlage von [ADR 0023](../adr/0023-embedding-modell.md) und
+[ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md).
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
 | `openai2024embeddingmodels` | OpenAI. (2024, 25. Januar). *New embedding models and API updates*. https://openai.com/index/new-embedding-models-and-api-updates/ | Einführung von `text-embedding-3-small/-large` |
 | `openai2026embeddingsguide` | OpenAI. (o. J.). *Vector embeddings* [Leitfaden]. https://developers.openai.com/api/docs/guides/embeddings | MTEB 64,6 % / 62,3 %, max. 8.192 Tokens, `cl100k_base`, Normierung auf Länge 1, Kosinus, Dimensionen |
 | `openai2026te3large` | OpenAI. (o. J.). *text-embedding-3-large* [Modellseite]. https://developers.openai.com/api/docs/models/text-embedding-3-large | Preis 0,13 USD je 1 Mio. Tokens, Snapshot nur als Alias |
 | `openai2026embeddingsapi` | OpenAI. (o. J.). *Create embeddings* [API-Referenz]. https://developers.openai.com/api/reference/resources/embeddings/methods/create | ≤ 2.048 Eingaben und ≤ 300.000 Tokens je Anfrage, `usage.prompt_tokens` |
 | `chroma2026configure` | Chroma. (o. J.). *Configure collections*. https://docs.trychroma.com/docs/collections/configure | HNSW ist approximativ; Standard `l2`, `ef_search` = 100 |
 
+### Chunk-Größe
+
 Abgerufen am 14.10.2026; Grundlage von [ADR 0025](../adr/0025-korpus-guide-api-styleguide.md) und
 [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) (dort auch die Begründung der C3-Obergrenze aus
 [ADR 0021](../adr/0021-c3-grenzen.md)).
 
-| Kurzname | Quelle (APA 7) | Belegt |
-|----------|----------------|--------|
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
 | `smith2024chunking` | Smith, B., & Troynikov, A. (2024, 3. Juli). *Evaluating chunking strategies for retrieval*. Chroma. https://www.trychroma.com/research/evaluating-chunking | `text-embedding-3-large`, fünf abgerufene Chunks; kleinere Chunks (800 → 200 Tokens) erhöhen die Precision deutlich bei etwa gleichem Recall (rund 85–89 %) |
-| `bhat2025chunksize` | Bhat, S. R., Rudat, M., Spiekermann, J., & Flores-Herr, N. (2025). *Rethinking chunk size for long-document retrieval: A multi-dataset analysis* (arXiv:2505.21700). https://arxiv.org/abs/2505.21700 | beste Chunk-Größe hängt vom Datensatz und Fragetyp ab (64–128 Tokens für knappe Fakten, 512–1.024 für breiten Kontext) und vom Embedding-Modell |
-| `vuejs2026compare` | vuejs/docs. (2026). *Compare b75d188…40aa88a* [GitHub-Vergleich]. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien; historisch (Vue-Korpus, ADR 0025 ersetzt durch [ADR 0038](../adr/0038-korpus-e2e.md)) |
+| `bhat2025chunksize` | Bhat, S. R., Rudat, M., Spiekermann, J., & Flores-Herr, N. (2025). *Rethinking chunk size for long-document retrieval: A multi-dataset analysis* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2505.21700 | beste Chunk-Größe hängt vom Datensatz und Fragetyp ab (64–128 Tokens für knappe Fakten, 512–1.024 für breiten Kontext) und vom Embedding-Modell |
+| `vuejs2026compare` | vuejs/docs. (o. J.). *Comparing b75d188...40aa88a*. GitHub. https://github.com/vuejs/docs/compare/b75d188ab16bf83bd1f364a77dfd2315be8f3fa4...40aa88af0094f7bab4aaf786e55c748a6a251d88 | acht Commits, im Ausschnitt sechs geänderte Guide-Dateien; historisch (Vue-Korpus, ADR 0025 ersetzt durch [ADR 0038](../adr/0038-korpus-e2e.md)) |
 
-Abgerufen am 17.10.2026; Grundlage von [ADR 0033](../adr/0033-antwortmodell.md).
+### Antwortmodell
 
-| Kurzname | Quelle (APA 7) | Belegt |
-|----------|----------------|--------|
+Abgerufen am 17.10.2026, Volltexte von Renze und Guven sowie Lee et al. am 22.10.2026 geprüft; Grundlage von
+[ADR 0033](../adr/0033-antwortmodell.md) (mit Nachtrag 22.10.2026).
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
 | `openai2026gpt6luna` | OpenAI. (o. J.). *GPT-6 Luna* [Modellseite]. https://developers.openai.com/api/docs/models/gpt-6-luna | 0,10/0,50 USD je 1 Mio. Ein-/Ausgabe-Tokens, Wissensstand 18.05.2026, Effort `none` bis `max`, nur Alias |
 | `openai2026latestmodel` | OpenAI. (o. J.). *Using GPT-6* [Leitfaden]. https://developers.openai.com/api/docs/guides/latest-model | `temperature` nur bei Effort `none`; `none` nur bei GPT-6 Sol und GPT-6 Luna |
 | `openai2026reasoning` | OpenAI. (o. J.). *Reasoning models* [Leitfaden]. https://developers.openai.com/api/docs/guides/reasoning | Effort-Stufen, Parameter bei Reasoning |
 | `openai2026deprecations` | OpenAI. (o. J.). *Deprecations*. https://developers.openai.com/api/docs/deprecations | GPT-4.1/4o-Snapshots bis 14.01.2027, GPT-5-Snapshots bis 11.12.2026 |
-| `renze2024temperature` | Renze, M., & Guven, E. (2024). The effect of sampling temperature on problem solving in large language models. In *Findings of the Association for Computational Linguistics: EMNLP 2024*. https://arxiv.org/abs/2402.05201 | keine signifikante Wirkung der Temperatur 0,0–1,0 auf die Lösungsgüte |
-| `atil2024nondeterminism` | Atil, B., et al. (2024). *Non-determinism of "deterministic" LLM settings* (arXiv:2408.04667). https://arxiv.org/abs/2408.04667 | Genauigkeitsschwankungen bis 15 % trotz „deterministischer“ Einstellungen |
-| `lee2026noisybench` | Lee, S., et al. (2026). *Lost in the noise: How test-time reasoning fails with contextual distractors* (arXiv:2601.07226). https://arxiv.org/abs/2601.07226 | Reasoning-Modelle brechen mit störenden Passagen ebenfalls ein; nur Abstract geprüft, vor dem Zitieren Volltext lesen |
+| `renze2024temperature` | Renze, M., & Guven, E. (2024). The effect of sampling temperature on problem solving in large language models. In *Findings of the ACL: EMNLP 2024* (S. 7346–7356). https://doi.org/10.18653/v1/2024.findings-emnlp.432 | keine signifikante Wirkung der Temperatur 0,0–1,0 auf die Lösungsgüte bei Multiple-Choice-Problemlösen; für offene Fragen mit Kontext nur eine Übertragung, keine Messung. Zwei Autoren (laut PDF; ACL Anthology und Crossref nennen einen) |
+| `atil2024nondeterminism` | Atil, B., et al. (2024). *Non-determinism of "deterministic" LLM settings* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2408.04667 | Genauigkeitsschwankungen bis 15 % trotz „deterministischer“ Einstellungen; trägt „Temperatur 0 garantiert keine identischen Ausgaben“ |
+| `lee2026noisybench` | Lee, S., Jo, Y., Seo, M., Lee, M., & Seo, M. (2026). *Lost in the noise: How reasoning models fail with contextual distractors* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2601.07226 | Reasoning-Modelle brechen mit störenden Passagen ebenfalls ein; nicht begutachteter Preprint (arXiv v1); kein Vergleich mit abgeschaltetem Reasoning ([ADR 0033](../adr/0033-antwortmodell.md), Nachtrag) |
 
-Abgerufen am 18.10.2026 (Snapshot); Grundlage von [ADR 0038](../adr/0038-korpus-e2e.md). Commit, Daten und
-SHA-256 je Datei: `docs/corpus_snapshot.txt`; Umfang und Lizenz: [Korpus](corpus.md).
+### Korpus
 
-| Kurzname | Quelle (APA 7) | Belegt |
-|----------|----------------|--------|
-| `testerarmy2026e2e` | TesterArmy, Inc. (2026). *e2e* (Commit ef977f4856da009cac26d78d2e9bb14e5991ee41, 17.10.2026) [Software und Dokumentation, Apache-2.0]. GitHub. https://github.com/tester-army/e2e/tree/ef977f4856da009cac26d78d2e9bb14e5991ee41/docs | Korpus des Experiments: Dokumentation unter `docs/` auf dem festen Commit (`config.CORPUS_COMMIT`) |
+Abgerufen am 18.10.2026 (Snapshot); Grundlage von [ADR 0038](../adr/0038-korpus-e2e.md). Commit, Daten und SHA-256 je
+Datei: `docs/corpus_snapshot.txt`; Umfang und Lizenz: [Korpus](corpus.md).
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `testerarmy2026e2e` | TesterArmy, Inc. (2026). *e2e* (Version ef977f4, Commit ef977f4856da009cac26d78d2e9bb14e5991ee41 vom 17.10.2026) [Computer Software, Apache-2.0]. GitHub. https://github.com/tester-army/e2e/tree/ef977f4856da009cac26d78d2e9bb14e5991ee41/docs | Korpus des Experiments: Dokumentation unter `docs/` auf dem festen Commit (`config.CORPUS_COMMIT`) |
 
 ## Methodenquellen der Bewertung
 
-Grundlage von [ADR 0046](../adr/0046-zweitbewertung.md) (Übereinstimmungsmaße der Zweitbewertung) und
-[ADR 0047](../adr/0047-ragas-als-triangulation.md) (Richtermodell für RAGAS); geprüft am 21.10.2026. Für die Arbeit in
-die BibTeX-Datei (PaperLab) übernehmen; RAGAS selbst steht schon oben (`es2024ragas`).
+Geprüft am 21.10.2026, DOIs am 22.10.2026 ergänzt; Grundlage von [ADR 0046](../adr/0046-zweitbewertung.md)
+(Übereinstimmungsmaße der Zweitbewertung) und [ADR 0047](../adr/0047-ragas-als-triangulation.md) (Richtermodell für
+RAGAS). RAGAS selbst steht unter den Kernquellen (`es2024ragas`).
 
-| Kurzname | Quelle (APA 7) | Belegt |
-|----------|----------------|--------|
-| `feinstein1990kappa` | Feinstein, A. R., & Cicchetti, D. V. (1990). High agreement but low kappa: I. The problems of two paradoxes. *Journal of Clinical Epidemiology, 43*(6), 543–549. | Kappa-Paradox bei hoher Prävalenz: darum kein Cohens Kappa |
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `feinstein1990kappa` | Feinstein, A. R., & Cicchetti, D. V. (1990). High agreement but low kappa: I. The problems of two paradoxes. *Journal of Clinical Epidemiology, 43*(6), 543–549. https://doi.org/10.1016/0895-4356(90)90158-L | Kappa-Paradox bei hoher Prävalenz: darum kein Cohens Kappa |
 | `gwet2008ac1` | Gwet, K. L. (2008). Computing inter-rater reliability and its variance in the presence of high agreement. *British Journal of Mathematical and Statistical Psychology, 61*(1), 29–48. https://doi.org/10.1348/000711006X126600 | AC1, stabil bei hoher Übereinstimmung |
-| `gwet2014handbook` | Gwet, K. L. (2014). *Handbook of inter-rater reliability* (4. Aufl.). Advanced Analytics. | AC2 mit Gewichten für ordinale Skalen |
-| `hayes2007alpha` | Hayes, A. F., & Krippendorff, K. (2007). Answering the call for a standard reliability measure for coding data. *Communication Methods and Measures, 1*(1), 77–89. | Krippendorffs α (ordinal) als Vergleichsmaß |
-| `zheng2023judge` | Zheng, L., Chiang, W.-L., Sheng, Y., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. *Advances in Neural Information Processing Systems 36* (Datasets and Benchmarks Track). | Selbstbevorzugung des Richtermodells; LLM-Gegenprobe nur als Triangulation |
+| `gwet2014handbook` | Gwet, K. L. (2014). *Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters* (4. Aufl.). Advanced Analytics. | AC2 mit Gewichten für ordinale Skalen |
+| `hayes2007alpha` | Hayes, A. F., & Krippendorff, K. (2007). Answering the call for a standard reliability measure for coding data. *Communication Methods and Measures, 1*(1), 77–89. https://doi.org/10.1080/19312450709336664 | Krippendorffs α (ordinal) als Vergleichsmaß |
+| `zheng2023judge` | Zheng, L., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. In *Advances in Neural Information Processing Systems 36* (S. 46595–46623). Curran Associates. https://doi.org/10.52202/075280-2020 | Selbstbevorzugung des Richtermodells; LLM-Gegenprobe nur als Triangulation |

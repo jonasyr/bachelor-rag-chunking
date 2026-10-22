@@ -1,10 +1,13 @@
 # Korpus (e2e)
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026, festgelegt in [ADR 0038](../adr/0038-korpus-e2e.md) (Regeln aus [ADR 0019](../adr/0019-korpus-ausschnitt.md), Umwandlung nach [ADR 0042](../adr/0042-mdx-umwandlung.md)). Übersicht: [Dokumentation](../README.md).
+*[Doku-Index](../README.md) · Referenz · Verwandt: [Korpusauswahl](corpus-selection.md), [Experiment-Protokoll](experiment-record.md), [Snapshot erstellen](../how-to/create-corpus-snapshot.md)*
+
+Stand: 19.10.2026. Festgelegt in [ADR 0038](../adr/0038-korpus-e2e.md) (Regeln aus
+[ADR 0019](../adr/0019-korpus-ausschnitt.md), Umwandlung nach [ADR 0042](../adr/0042-mdx-umwandlung.md)).
 
 Bis 18.10.2026 war der Korpus die Vue.js-Dokumentation ([ADR 0025](../adr/0025-korpus-guide-api-styleguide.md),
-abgelöst durch [ADR 0038](../adr/0038-korpus-e2e.md)); ihre Zahlen stehen weiter im
-[Experiment-Protokoll](experiment-record.md), ihre Bereinigungsregeln in der Git-Historie von `src/preprocess.py`.
+abgelöst durch [ADR 0038](../adr/0038-korpus-e2e.md)); ihre Zahlen stehen im
+[Experiment-Protokoll: Vue.js](experiment-record-vue.md#snapshot-vuejs-bis-18102026), ihre Bereinigungsregeln in der Git-Historie von `src/preprocess.py`.
 Warum e2e: [Korpusauswahl](corpus-selection.md). Diese Seite ist die einzige Stelle für die Zahlen des Korpus (Seiten,
 Tokens, Abschnitte, Bereiche); andere Seiten verlinken hierher. Die Slots je Bereich stehen verbindlich in
 `config.CATALOGUE_AREA_SLOTS` ([Konfiguration](configuration.md#fragenkatalog)).
@@ -16,7 +19,7 @@ Tokens, Abschnitte, Bereiche); andere Seiten verlinken hierher. Die Slots je Ber
 | Repository | `tester-army/e2e` (https://github.com/tester-army/e2e), Ordner `docs/` (Mintlify, MDX) |
 | Commit | `ef977f4856da009cac26d78d2e9bb14e5991ee41` (17.10.2026) |
 | Lizenz | Apache License 2.0, © TesterArmy, Inc. ([Lizenzhinweise im README](../../README.md#license)) |
-| Snapshot | 18.10.2026; Datensatz [`docs/corpus_snapshot.txt`](../corpus_snapshot.txt) (Format: [Datenformate](data-formats.md#korpus)) |
+| Snapshot | 18.10.2026; Datensatz [`docs/corpus_snapshot.txt`](../corpus_snapshot.txt) (Format: [Datenformate](data-formats.md#korpus); Ablauf: [Snapshot erstellen](../how-to/create-corpus-snapshot.md)) |
 | Seiten | alle 60 `*.mdx` unter `docs/`; die Menge muss genau den Seiten der Navigation (`docs.json`) entsprechen, sonst brechen Snapshot und Ingest ab |
 | Mitkopiert | `docs.json` (Navigation, liefert die Bereiche) und `snippets/model-provider.jsx` (Daten der Anbieterliste) |
 | Nicht im Korpus | Bilder, Videos, `examples/` (Beispielprojekte, nur Code), Styles und Skripte der Website |

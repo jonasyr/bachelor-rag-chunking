@@ -2,7 +2,9 @@
 
 ## Status
 
-Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0017](0017-fragenkatalog.md)); Zahlen im Kontext: Korpus `b75d188` (13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md)
+Angenommen (13.10.2026; ergänzt [ADR 0019](0019-korpus-ausschnitt.md) und [ADR 0017](0017-fragenkatalog.md)); der
+H1-Anker ist seit [ADR 0042](0042-mdx-umwandlung.md) der Slug des Seitenpfads; Zahlen im Kontext: Korpus `b75d188`
+(13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md)
 
 ## Kontext
 

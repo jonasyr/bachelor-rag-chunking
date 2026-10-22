@@ -6,13 +6,14 @@ Angenommen (14.10.2026; präzisiert [ADR 0017](0017-fragenkatalog.md); ergänzt 
 [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md) (Stichprobenplan, KI-Durchsicht); Bereichsuntergrenzen ersetzt und
 Stoppwörter angepasst (`e2e` statt `v` und `vue`) durch [ADR 0039](0039-stichprobenplan-e2e.md)); Zahlen im Kontext:
 Vue-Korpus `40aa88a` ([ADR 0025](0025-korpus-guide-api-styleguide.md)); aktuelle Werte in
-[Korpus](../reference/corpus.md)
+[Korpus](../reference/corpus.md). Korrektur zum Kontext: das Verhältnis 2:2:2:1:1 der Fragetypen steht nicht in ADR
+0017, sondern in der Tabelle von Leitfaden §11 (10/10/10/5/5)
 
 ## Kontext
 
 - ADR 0017 legt etwa 40 Fragen (30–60) in fünf Typen im Verhältnis 2:2:2:1:1 fest; das Exposé nennt „etwa 40 Fragen“.
   H3 ([ADR 0009](0009-hypothesen.md)) braucht neben dem Typ die Unterscheidung abschnittsübergreifender Fragen.
-- Pilotprobe 2 ([Experiment-Protokoll](../reference/experiment-record.md#pilotproben-auf-dem-erweiterten-korpus-14102026)):
+- Pilotprobe 2 ([Experiment-Protokoll](../reference/experiment-record-vue.md#pilotproben-auf-dem-erweiterten-korpus-14102026)):
   Einfache Fragen erreichen bei allen Strategien Hit@5 = 1,0 (Deckeneffekt); die Konstruktion der Frage
   (mehrere Abschnitte, Detail, Paraphrase) trennt C3 und K1.
 - Eine subjektive Schwierigkeit (leicht/mittel/schwer) ist nicht prüfbar; eine Konstruktionsklasse lässt sich gegen die

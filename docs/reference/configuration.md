@@ -1,14 +1,19 @@
 # Konfiguration (`src/config.py`)
 
-> Seitentyp: Nachschlagen (reference). Stand: 19.10.2026. Übersicht: [Dokumentation](../README.md).
+*[Doku-Index](../README.md) · Referenz · Verwandt: [Datenformate](data-formats.md), [Evaluation](evaluation.md), [Werkzeuge](tooling.md)*
 
 Alle Parameter des Experiments stehen ausschließlich in [`src/config.py`](../../src/config.py); **die Datei ist
 maßgeblich**, diese Seite beschreibt sie. Weicht ein Wert hier ab, gilt `config.py` und diese Seite ist zu
 korrigieren. Andere Seiten dürfen einen Wert nur zusammen mit seinem Schlüssel (`config.X`) nennen und verlinken
-hierher. Gruppen und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`). Spalte
-„Entscheidung“: die ADR, die den Wert festgelegt hat, dahinter die ADR, die ihn zuletzt geändert oder ergänzt hat.
+hierher. Abschnitte und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zur Repo-Wurzel (`ROOT`). Spalte
+„Entscheidung“: die ADR, unter der der Wert steht (dahinter die ADR, die ihn zuletzt geändert oder ergänzt hat);
+setzt erst ein Design-Dokument die Zahl, folgt ein Link „Spec“ darauf. Umgebungsvariablen (`OPENAI_API_KEY`,
+`SCORING_RATER`, `PAPERLAB_FONTS`, `RAGAS_DO_NOT_TRACK`) stehen nicht hier, sondern in
+[Werkzeuge](tooling.md#umgebungsvariablen).
 
 ## Pfade
+
+Formate aller Dateien: [Datenformate](data-formats.md).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -18,13 +23,13 @@ hierher. Gruppen und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zu
 | `DATA_EVAL` | `data/evaluation` | Fragen, Ground Truth, Ergebnisse | – |
 | `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | – |
 | `PILOT_RUNS_FILE_NAME` | `"runs.jsonl"` | Laufprotokoll je Pilot-Set; die übrigen Pilotdateien tragen die Namen der Evaluationsartefakte | – |
-| `CHROMA_DIR` | `chroma_db` | Chroma-Index (lokal, persistent) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
+| `CHROMA_DIR` | `chroma_db` | Chroma-Index (lokal, persistent) | – |
 | `DOCS_DIR` | `docs` | Dokumentation | – |
 | `DOCUMENTS_FILE` | `data/processed/documents.jsonl` | Dokumente nach Ingest/Preprocessing | – |
-| `SNAPSHOT_INFO_FILE` | `docs/corpus_snapshot.txt` | Snapshot-Datensatz (versioniert): Commit, Daten, SHA-256 je Datei | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
+| `SNAPSHOT_INFO_FILE` | `docs/corpus_snapshot.txt` | Snapshot-Datensatz: Commit, Daten, SHA-256 je Datei | [ADR 0038](../adr/0038-korpus-e2e.md), [Spec](../superpowers/specs/2026-10-18-e2e-snapshot-design.md) |
 | `SECTIONS_FILE` | `data/processed/sections.jsonl` | H1–H3-Abschnitte mit Token-Spannen | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) |
 | `SECTION_INDEX_FILE` | `data/processed/section_index.md` | Abschnitts-Nachschlageliste für die Annotation (`catalogue.py sections`) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
-| `CORPUS_MANIFEST_FILE` | `docs/corpus_manifest.csv` | Korpusmanifest (versioniert) | – |
+| `CORPUS_MANIFEST_FILE` | `docs/corpus_manifest.csv` | Korpusmanifest | – |
 | `CHUNKS_C1_FILE`, `CHUNKS_C2_FILE`, `CHUNKS_C3_FILE` | `data/processed/chunks_c1.jsonl`, `chunks_c2.jsonl`, `chunks_c3.jsonl` | Chunks je Strategie | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `QUESTIONS_FILE` | `data/evaluation/questions.csv` | Fragenkatalog | [ADR 0017](../adr/0017-fragenkatalog.md) |
 | `GROUND_TRUTH_FILE` | `data/evaluation/ground_truth.csv` | Referenzantworten und relevante Abschnitte | [ADR 0017](../adr/0017-fragenkatalog.md) |
@@ -36,7 +41,7 @@ hierher. Gruppen und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zu
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten (nie überschrieben) | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `GENERATED_ANSWERS_CONTROL_FILE` | `data/evaluation/generated_answers_control.csv` | Antworten der Kontrolle K0 (nie überschrieben) | [ADR 0041](../adr/0041-kontrolle-k0.md) |
-| `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll von `generate.py` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll der Antwort-, Bewertungs-, RAGAS- und Zweitbewertungsschritte und der Closed-Book-Prüfung ([Schritte](data-formats.md#laufprotokoll)) | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen mit Strategie (abgeleitet aus Bogen und Schlüssel) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `SCORING_PACKET_FILE` | `data/evaluation/scoring_packet.md` | Lesepaket der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
@@ -48,9 +53,9 @@ hierher. Gruppen und Reihenfolge der Zeilen wie in `config.py`; Pfade relativ zu
 | `RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores.csv` | Retrieval-Metriken je Frage, Strategie und Relevanzregel | [ADR 0012](../adr/0012-retrieval-metriken.md) |
 | `CONTROL_RETRIEVAL_SCORES_FILE` | `data/evaluation/retrieval_scores_control.csv` | dasselbe für die Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 
-Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
-
 ## Korpus
+
+Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -59,15 +64,16 @@ Formate aller Dateien: [Datenartefakte und Formate](data-formats.md).
 | `CORPUS_ROOT` | `"docs"` | Dokumentationswurzel im Repository; der Snapshot spiegelt sie unter `DATA_RAW` | – |
 | `CORPUS_PAGE_SUFFIX` | `".mdx"` | Seitendateien unter `CORPUS_ROOT`; ihre Menge muss den Seiten der Navigation entsprechen | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_NAV_FILE` | `"docs.json"` | Navigation (Tabs, Gruppen, Seiten); liefert die Bereiche | [ADR 0038](../adr/0038-korpus-e2e.md) |
-| `CORPUS_PROVIDER_SNIPPET` | `"snippets/model-provider.jsx"` | Daten der Komponente `<ModelProvider>` (Anbieterliste) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+| `CORPUS_PROVIDER_SNIPPET` | `"snippets/model-provider.jsx"` | Daten der Komponente `<ModelProvider>` (Anbieterliste) | [ADR 0038](../adr/0038-korpus-e2e.md), [Spec](../superpowers/specs/2026-10-18-e2e-snapshot-design.md) |
 | `CORPUS_SUPPORT_FILES` | `(CORPUS_NAV_FILE, CORPUS_PROVIDER_SNIPPET)` | mit den Seiten kopiert und im Snapshot-Datensatz geprüft | – |
 | `CORPUS_AREAS` | Tupel der 15 Navigationsgruppen in Reihenfolge (Get started … Engine contract, Examples) | Bereiche; `ingest.py` bricht ab, wenn die Navigation abweicht | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `TOKEN_ENCODING` | `"cl100k_base"` | Token-Kodierung (`tiktoken` 0.13.0, gepinnt in `pyproject.toml`) | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
 | `SECTION_MAX_LEVEL` | `3` | H1–H3 werden Abschnitte (`sections.jsonl`, C3-Grenzen) | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0021](../adr/0021-c3-grenzen.md), [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md) |
 
-Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
-
 ## Chunking
+
+Begründung der Strategien: [Forschungsdesign](../explanation/research-design.md#chunking-strategien). Die Kontrollen
+haben eigene `CONTROL_*`-Zuordnungen, damit sie nie in die Schleifen über `STRATEGY_IDS` geraten.
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -85,15 +91,15 @@ Umfang und Bereinigung des Korpus: [Korpus](corpus.md).
 | `CHUNK_FILES` | `{"C1": CHUNKS_C1_FILE, "C2": …, "C3": …}` | Chunk-Datei je Strategie | – |
 | `EMBEDDING_FILES` | `{"C1": data/processed/embeddings_c1.npz, …c2, …c3}` | gespeicherte Referenzvektoren je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `QUERY_EMBEDDINGS_FILE` | `data/evaluation/query_embeddings.npz` | gespeicherte Fragevektoren | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
-| `EMBEDDING_RUNS_FILE` | `data/processed/embedding_runs.jsonl` | Laufprotokoll von `embed.py` und `retrieve.py` (Modell, Versionen, Tokens, Kosten) | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
+| `EMBEDDING_RUNS_FILE` | `data/processed/embedding_runs.jsonl` | Laufprotokoll von `embed.py`, `retrieve.py` und `evaluate_retrieval.py` ([Schritte](data-formats.md#laufprotokoll)) | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `CHROMA_COLLECTIONS` | `{"C1": "rag_c1", "C2": "rag_c2", "C3": "rag_c3"}` | Chroma-Collection je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `CONTROL_CHUNK_FILES` | `{"K1": data/processed/chunks_k1.jsonl}` | Chunk-Datei der Kontrolle | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `CONTROL_EMBEDDING_FILES` | `{"K1": data/processed/embeddings_k1.npz}` | Vektordatei der Kontrolle | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `CONTROL_COLLECTIONS` | `{"K1": "rag_k1"}` | Chroma-Collection der Kontrolle | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 
-Die Kontrolle hat eigene `CONTROL_*`-Zuordnungen, damit sie nie in die Schleifen über `STRATEGY_IDS` gerät.
-
 ## Retrieval
+
+Metriken und Relevanzregel: [Evaluation](evaluation.md).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -103,13 +109,13 @@ Die Kontrolle hat eigene `CONTROL_*`-Zuordnungen, damit sie nie in die Schleifen
 | `CHROMA_SPACE` | `"cosine"` | Distanzmaß; Ähnlichkeit = 1 − Distanz | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `CANARY_MIN_COSINE` | `0.999` | Schwelle der Modellstand-Prüfung; darunter Abbruch (gemessen 13.10.2026: gleiches Modell ≥ 0,99996, verschiedene Chunks ≤ 0,84) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `CANARY_PROBE_POSITIONS` | `(0.0, 0.5, 1.0)` | relative Positionen der erneut eingebetteten Texte je Vektordatei (erster, mittlerer, letzter) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
-| `ID_SEPARATOR` | `";"` | Trennzeichen mehrerer IDs in einem Feld von `ground_truth.csv` | – |
+| `ID_SEPARATOR` | `";"` | Trennzeichen mehrerer IDs in einem Feld von `ground_truth.csv` und in `sources` von `generated_answers*.csv` | – |
 | `RELEVANCE_MIN_OVERLAP` | `1` | Hauptregel: Chunk relevant bei mindestens so vielen Tokens Überlappung mit einem relevanten Abschnitt (jede Überlappung) | [ADR 0019](../adr/0019-korpus-ausschnitt.md) |
 | `SENSITIVITY_MIN_OVERLAP` | `100` | Sensitivitätsprüfung: benötigt werden min(100, Chunk-Länge) Tokens, mindestens 1 (`relevance.is_relevant`); von `evaluate_retrieval.py` als Regel `sensitivity` ausgewertet | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 
-Metriken und Relevanzregel: [Evaluation](evaluation.md).
-
 ## Fragenkatalog
+
+Regeln des Katalogs: [Fragenkatalog](question-catalogue.md).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -120,7 +126,7 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `MULTI_SECTION_MIN_SECTIONS` | `2` | `multi-section`: mindestens so viele unabhängige relevante Abschnitte (ein Abschnitt innerhalb eines anderen angegebenen zählt nicht) | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `SINGLE_CLASS_SECTIONS` | `1` | `single`, `detail`, `paraphrase`: genau so viele relevante Abschnitte | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_REPORT_MIN_PAGES` | `2` | Bericht von `check`: Anzahl der `multi-section`-Fragen mit Abschnitten auf mindestens so vielen Seiten (nur Anzeige, keine Regel) | – |
-| `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext je Seite eines Treffers (nie über den Abschnitt hinaus) | – |
+| `CATALOGUE_EXCERPT_CHARS` | `60` | `catalogue.py find`: Zeichen Kontext vor und nach einem Treffer (nie über den Abschnitt hinaus) | – |
 | `CATALOGUE_HEADING_SEPARATOR` | `" › "` | Trenner im Überschriftenpfad (`section_index.md`, `find`, `show`) | – |
 | `CORPUS_SITE_URL` | `"https://e2e.tester.army/docs"` | Editor, formatierte Ansicht: seitenrelative Links der Doku zeigen auf die öffentliche Seite | – |
 | `CATALOGUE_SEED` | `20261014` | Seed des Stichprobenplans (Tag der Entscheidung; nie angepasst) | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
@@ -142,9 +148,11 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 
 ## LLM und Embedding
 
+Konstante Einstellungen der Antwortgenerierung: [Prompts](prompts.md).
+
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
-| `EMBEDDING_MODEL` | `"text-embedding-3-large"` | Embedding-Modell (nur als Alias angeboten, daher Vektoren einmal speichern) | [ADR 0023](../adr/0023-embedding-modell.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
+| `EMBEDDING_MODEL` | `"text-embedding-3-large"` | Embedding-Modell (nur als Alias angeboten, daher Vektoren einmal speichern); auch für Response Relevancy in RAGAS ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) | [ADR 0023](../adr/0023-embedding-modell.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `EMBEDDING_DIMENSIONS` | `3072` | Vektordimension (Modellstandard) | [ADR 0023](../adr/0023-embedding-modell.md) |
 | `EMBEDDING_BATCH_SIZE` | `100` | Texte je API-Anfrage (API-Grenze: ≤ 2.048 Eingaben, ≤ 300.000 Tokens) | – |
 | `EMBEDDING_PRICE_PER_MTOK` | `0.13` | USD je 1 Mio. Eingabe-Tokens (OpenAI-Modellseite, abgerufen 13.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0023](../adr/0023-embedding-modell.md) |
@@ -154,10 +162,45 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `LLM_SEED` | `20261017` | fester `seed` jeder Anfrage (OpenAI: Beta, nur „best effort“); fest, nie getunt | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
-| `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung, wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht beide) | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
+
+### RAGAS
+
+Richter und Einstellungen sind für alle vier Metriken gleich und gepinnt ([ADR 0047](../adr/0047-ragas-als-triangulation.md));
+Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ragas). In `config.py`
+stehen die Schlüssel im Block „LLM / Embedding“ zwischen den Preisen des Antwortmodells und den Prompts.
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `RAGAS_JUDGE_MODEL` | `"gpt-6-sol"` | Richtermodell, nicht das Antwortmodell | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md), [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_TEMPERATURE` | `0.0` | Temperatur der Richteraufrufe (RAGAS 0.4.3 würde 1,0 senden, siehe [Werkzeuge](tooling.md#ragas-pins)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_SEED` | `20261021` | fester `seed` jeder Richteranfrage (nur „best effort“); fest, nie getunt | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_STRICTNESS` | `1` | Zahl der Fragen, die Response Relevancy je Antwort erzeugt; bei Temperatur 0 wiederholt jede weitere denselben Prompt | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_METRICS` | `("faithfulness", "response_relevancy", "context_precision", "context_recall")` | die vier Metriken = Spalten von `ragas_scores.csv` (Context Precision und Recall mit Referenz) | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_DECIMALS` | `6` | Nachkommastellen der Werte in `ragas_scores*.csv` | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+| `RAGAS_SCORES_FILE` | `data/evaluation/ragas_scores.csv` | Ergebnisdatei des Hauptlaufs | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_REPEAT_FILE_NAME` | `"ragas_scores_repeat.csv"` | Name der Wiederholungsdatei neben der Ergebnisdatei (`--repeat`, nur Pilot-Sets) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_JUDGE_PRICE_INPUT_PER_MTOK`, `RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK` | `2.0`, `10.0` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens des Richters (abgerufen 17.10.2026); Grundlage von `judge_cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `RAGAS_TIMEOUT_S` | `120` | Zeitgrenze je Anfrage in Sekunden | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_MAX_RETRIES` | `5` | Wiederholungen je Anfrage im SDK | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_CONCURRENCY` | `8` | gleichzeitige Bewertungsaufträge (eine Antwort mit einer Metrik) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_DO_NOT_TRACK` | `True` | unterbindet das Senden der RAGAS-Telemetrie ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
+
+### Prompts
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung: die beiden Texte wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht sie), `CONTEXT_SEPARATOR` (`"\n---\n"`) wie dort beschrieben | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
 | `CLOSED_BOOK_SYSTEM_PROMPT`, `CLOSED_BOOK_USER_TEMPLATE` | Texte | Prompt der Closed-Book-Prüfung und von K0, wörtlich wie in [Prompts](prompts.md#closed-book-prompt-prüfung-und-k0) | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
 
 ## Evaluation
+
+Rubrik und Statistik: [Evaluation](evaluation.md). Die Dateinamen der Tabellen und Abbildungen
+(`report_tables.TABLE_NAMES`, `report_figures.FIGURE_NAMES`) stehen nicht in `config.py`: Sie sind Namen von
+Artefakten, keine Parameter des Experiments, und sind in [Datenformate](data-formats.md#auswertung-output)
+beschrieben.
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -169,10 +212,10 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
-| `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `TABLES_DIR` | `output/tables` | Tabellen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURES_DIR` | `output/figures` | Abbildungen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `ANALYSIS_FILE` | `output/analysis.json` | Kennzahlen und Testergebnisse der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
+| `TABLES_DIR` | `output/tables` | Tabellen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
+| `FIGURES_DIR` | `output/figures` | Abbildungen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
+| `ANALYSIS_FILE` | `output/analysis.json` | Kennzahlen und Testergebnisse der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
 | `ANALYSIS_ALPHA` | `0.05` | Signifikanzniveau der konfirmatorischen Tests (Holm-korrigiert) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_DIFF_DECIMALS` | `12` | Rundung der Differenzen im Wilcoxon-Test, damit gleiche Differenzen gebrochener Metriken trotz Gleitkommafehler eine Bindungsgruppe bilden | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_PRIMARY` | `{"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}` | konfirmatorische Metriken: Spalte → Anzeigename | [ADR 0044](../adr/0044-statistische-auswertung.md) |
@@ -183,56 +226,14 @@ Metriken und Relevanzregel: [Evaluation](evaluation.md).
 | `BYTES_PER_MB` | `1000000` | Indexgröße in MB (dezimal) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `JSON_DECIMALS` | `6` | Rundung der Gleitkommazahlen in `analysis.json` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_WIDTH_CM`, `FIGURE_HEIGHT_CM` | `17.0`, `6.5` | Abbildungen in Endgröße (Breite des Satzspiegels; Standardhöhe, Panels und Heatmap wachsen mit ihren Zeilen) | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_FONT_FILE` | `"arial282/Arial282-Regular.ttf"` | Arial unter `PAPERLAB_FONTS` oder `fonts/` von PaperLab (eine Schrift in der Arbeit, Prüfung `schrift`); fehlt sie, DejaVu Sans mit Hinweis | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_COLORS` | `C1` `#184F95`, `C2` `#B8461A`, `C3` `#11866A`, `K1` `#52514E`, `K0` `#8E8C87` | Farben der Strategien: Klassenfarben FigBlue und FigOrange, dritter Farbton auf Farbsehschwäche geprüft (alle Paare ΔE ≥ 10), Kontrollen grau | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_HATCHES`, `FIGURE_MARKERS` | Kontrollen schraffiert; Marker je Strategie | Farbe nie alleiniger Informationsträger | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_INK`, `FIGURE_MUTED`, `FIGURE_GRID` | `#0B0B0B`, `#52514E`, `#E4E3DF` | Text, Achsen, Gitterlinien | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-| `FIGURE_SEQUENTIAL` | `#F2F7FE` → `#CDE2FB` → `#184F95` | einfarbige Skala der Heatmap und Zähltabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_FONT_SIZE` | `9` | Schriftgröße der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_DPI` | `300` | Auflösung der Abbildungen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_FONT_FILE` | `"arial282/Arial282-Regular.ttf"` | Arial unter `PAPERLAB_FONTS` ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) oder `fonts/` von PaperLab (eine Schrift in der Arbeit, Prüfung `schrift`); fehlt sie, DejaVu Sans mit Hinweis | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_COLORS` | `C1` `#184F95`, `C2` `#B8461A`, `C3` `#11866A`, `K1` `#52514E`, `K0` `#8E8C87` | Farben der Strategien: Klassenfarben FigBlue und FigOrange, dritter Farbton auf Farbsehschwäche geprüft (alle Paare ΔE ≥ 10), Kontrollen grau | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_HATCHES`, `FIGURE_MARKERS` | Schraffur: `K1` `///`, `K0` `xxx`, C1–C3 ohne; Marker: `C1` `o`, `C2` `s`, `C3` `D`, `K0` `^` (K1 erscheint nur als Balken) | Farbe nie alleiniger Informationsträger | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_INK`, `FIGURE_MUTED`, `FIGURE_GRID` | `#0B0B0B`, `#52514E`, `#E4E3DF` | Text, Achsen, Gitterlinien | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `FIGURE_SEQUENTIAL` | `#F2F7FE` → `#CDE2FB` → `#184F95` | einfarbige Skala der Heatmap und Zähltabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `FIGURE_HISTOGRAM_BINS` | `20` | Klassen der Chunk-Längen-Histogramme | [ADR 0044](../adr/0044-statistische-auswertung.md) |
-
-## RAGAS
-
-Richter und Einstellungen sind für alle vier Metriken gleich und gepinnt ([ADR 0047](../adr/0047-ragas-als-triangulation.md));
-Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ergebnisse).
-
-| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
-|---|---|---|---|
-| `RAGAS_JUDGE_MODEL` | `"gpt-6-sol"` | Richtermodell, nicht das Antwortmodell | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt | [ADR 0033](../adr/0033-antwortmodell.md), [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_TEMPERATURE` | `0.0` | Temperatur der Richteraufrufe (RAGAS 0.4.3 würde 1,0 senden, siehe [Werkzeuge](tooling.md#ragas-pins)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_SEED` | `20261021` | fester `seed` jeder Richteranfrage (nur „best effort“); fest, nie getunt | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_STRICTNESS` | `1` | Zahl der Fragen, die Response Relevancy je Antwort erzeugt; bei Temperatur 0 wiederholt jede weitere denselben Prompt | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_METRICS` | `("faithfulness", "response_relevancy", "context_precision", "context_recall")` | die vier Metriken = Spalten von `ragas_scores.csv` (Context Precision und Recall mit Referenz) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_DECIMALS` | `6` | Nachkommastellen der Werte in `ragas_scores*.csv` | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_SCORES_FILE` | `data/evaluation/ragas_scores.csv` | Ergebnisdatei des Hauptlaufs | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_REPEAT_FILE_NAME` | `"ragas_scores_repeat.csv"` | Name der Wiederholungsdatei neben der Ergebnisdatei (`--repeat`, nur Pilot-Sets) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_JUDGE_PRICE_INPUT_PER_MTOK`, `RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK` | `2.0`, `10.0` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens des Richters (abgerufen 17.10.2026); Grundlage von `judge_cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
-| `RAGAS_TIMEOUT_S` | `120` | Zeitgrenze je Anfrage in Sekunden | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_MAX_RETRIES` | `5` | Wiederholungen je Anfrage im SDK | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_CONCURRENCY` | `8` | gleichzeitige Bewertungsaufträge (eine Antwort mit einer Metrik) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_DO_NOT_TRACK` | `True` | schaltet die Telemetrie von RAGAS ab (siehe [Werkzeuge](tooling.md#skripte-und-optionen)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-| `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
-
-## Zweitbewertung
-
-[ADR 0046](../adr/0046-zweitbewertung.md); Verfahren: [Evaluation](evaluation.md#zweitbewertung).
-
-| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
-|---|---|---|---|
-| `SECOND_RATER_QUESTIONS` | `12` | gezogene Fragen im Hauptkatalog (× C1–C3 = 36 Antworten) | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `SECOND_RATER_SEED` | `20261022` | Seed der geschichteten Ziehung; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `SECOND_RATER_MAX_DRAWS` | `100000` | Versuche, bis eine Ziehung beide Schichtungen trifft; sonst Abbruch | Design 22.10.2026 |
-| `SECOND_RATER_PSEUDONYM` | `"R2"` | einziger Name der zweiten Person in Dateien, Einträgen und Ausgaben | [ADR 0046](../adr/0046-zweitbewertung.md) (Nachtrag Datenschutz) |
-| `SECOND_RATER_DIR_NAME`, `SECOND_RATER_DIR` | `second_rater`, `data/evaluation/second_rater` | Ordner des R2-Satzes (im Pilot-Set `DIR/second_rater`) | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `SECOND_RATER_SAMPLE_FILE` | `data/evaluation/second_rater_sample.csv` | gezogene Fragen | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2-Modus der App | Design 22.10.2026 |
-| `SECOND_RATER_DISAGREEMENTS_FILE_NAME` | `second_rater_disagreements.csv` | Abweichungsliste in `output/` | Design 22.10.2026 |
-| `AGREEMENT_BOOTSTRAP_REPS` | `2000` | Bootstrap-Wiederholungen über Fragen für die Intervalle | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `AGREEMENT_CI_LEVEL` | `0.95` | Niveau des Perzentil-Intervalls | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `AGREEMENT_SEED` | `20261022` | Seed des Bootstraps; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md) |
 
 ## Korpusauswahl
 
@@ -258,3 +259,22 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 | `CORPUS_QUESTIONS_PER_PAGE` | `2` | höchstens so viele gezogene Abschnitte je Seite | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_SECTION_CHARS` | `5000` | Abschnittstext für Fragenschreiber und Open-Book-Lauf (Zeichen) | [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `CORPUS_QUESTIONS_JUDGE_SEEDS` | `{1: 7, 2: 8}` | Reihenfolge der verblindeten Antworten je Urteilslauf (1: fünf Korpora, 2: Angular) | [ADR 0038](../adr/0038-korpus-e2e.md) |
+
+## Zweitbewertung
+
+[ADR 0046](../adr/0046-zweitbewertung.md); Verfahren: [Evaluation](evaluation.md#zweitbewertung), Dateien:
+[Datenformate](data-formats.md#zweitbewertung).
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `AGREEMENT_BOOTSTRAP_REPS` | `2000` | Bootstrap-Wiederholungen über Fragen für die Intervalle | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
+| `AGREEMENT_CI_LEVEL` | `0.95` | Niveau des Perzentil-Intervalls | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `AGREEMENT_SEED` | `20261022` | Seed des Bootstraps; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
+| `SECOND_RATER_QUESTIONS` | `12` | gezogene Fragen im Hauptkatalog (× C1–C3 = 36 Antworten) | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_DISAGREEMENTS_FILE_NAME` | `"second_rater_disagreements.csv"` | Abweichungsliste in `output/` | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
+| `SECOND_RATER_SEED` | `20261022` | Seed der geschichteten Ziehung; fest, nie getunt | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_MAX_DRAWS` | `100000` | Versuche, bis eine Ziehung beide Schichtungen trifft; sonst Abbruch | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_PSEUDONYM` | `"R2"` | einziger Name der zweiten Person in Dateien, Einträgen und Ausgaben | [ADR 0046](../adr/0046-zweitbewertung.md) (Nachtrag Datenschutz) |
+| `SECOND_RATER_DIR_NAME`, `SECOND_RATER_DIR` | `"second_rater"`, `data/evaluation/second_rater` | Ordner des R2-Satzes (im Pilot-Set `DIR/second_rater`) | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_SAMPLE_FILE` | `data/evaluation/second_rater_sample.csv` | gezogene Fragen | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2-Modus der App; nur Wert `R2` erlaubt, sonst Abbruch ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |

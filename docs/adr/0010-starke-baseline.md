@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (D10 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
+Angenommen (D10 im Leitfaden; Quelle: Chat, ergänzt die Baseline); Korrektur zum Kontext: die Autorenreihenfolge der
+Quelle ist Qu, Tu & Bao (2025)
 
 ## Kontext
 

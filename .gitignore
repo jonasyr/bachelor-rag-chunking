@@ -21,6 +21,10 @@ data/raw/e2e_docs_snapshot/*
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/embedding_runs.jsonl
+# Vue history (ADR 0038): only the run log of the archived Vue runs is versioned; it backs the costs in experiment-record-vue.md
+!data/processed/archive_vue_2026-10-18/
+data/processed/archive_vue_2026-10-18/*
+!data/processed/archive_vue_2026-10-18/embedding_runs.jsonl
 data/evaluation/scores.csv
 data/evaluation/scores_control.csv
 data/evaluation/scoring_packet.md

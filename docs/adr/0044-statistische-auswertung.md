@@ -3,7 +3,9 @@
 ## Status
 
 Angenommen (20.10.2026; vor dem Hauptlauf festgelegt; ergänzt [ADR 0008](0008-kosten-als-variable.md),
-[ADR 0009](0009-hypothesen.md), [ADR 0012](0012-retrieval-metriken.md) und [ADR 0013](0013-antwort-rubrik.md))
+[ADR 0012](0012-retrieval-metriken.md) und [ADR 0013](0013-antwort-rubrik.md) sowie [ADR 0015](0015-tech-stack.md) (SciPy); ändert die Auswertungsart von
+[ADR 0009](0009-hypothesen.md)). Präzisiert am 22.10.2026: [konfirmatorische
+Tests](#nachtrag-22102026-konfirmatorische-tests) (Jonas)
 
 ## Kontext
 
@@ -44,3 +46,17 @@ zeigen.
 - Neutral: `scipy` ist neu und auf 1.17.1 gepinnt (die einzige Version, die für alle von `requires-python` erlaubten
   Interpreter auflöst). Pilot-Sets werden ohne Laufeintrag `summarise` ausgewertet, weil ihre Bewertungen unter einer
   älteren Regelversion entstanden ([ADR 0043](0043-praezisierung-direct-und-teilantworten.md)).
+
+## Nachtrag 22.10.2026: konfirmatorische Tests
+
+Von Jonas entschieden; präzisiert die Entscheidung oben, ändert den Testplan nicht.
+
+- Die Tests von R@5, MRR und Gesamtwert (`config.ANALYSIS_PRIMARY`) sind konfirmatorisch: der Plan stand vor dem
+  Hauptlauf fest, die Fehlerrate ist mit Holm kontrolliert. Für diese drei Metriken ersetzt das „deskriptiv, nicht
+  inferenzstatistisch“ aus [ADR 0009](0009-hypothesen.md).
+- „Alle p-Werte gelten als explorativ“ meint alle übrigen p-Werte, etwa die der H2-Korrelationen (Spearmans ρ je
+  Strategie).
+- Die Konsequenz „belegen oder ausschließen“ gilt in diesem Sinn: für die drei primären Metriken, im Rahmen der
+  begrenzten Teststärke (Negativ-Konsequenz oben).
+- Die Tabellennotiz von `tests.tex` (`src/report_tables.py`) sagt noch „Explorativ“; sie wird im nächsten Code-PR
+  korrigiert ([Backlog](../plan.md#backlog)).

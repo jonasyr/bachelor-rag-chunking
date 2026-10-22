@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (20.10.2026; ergänzt [ADR 0035](0035-regelbasierte-bewertung.md) und
+Angenommen (20.10.2026; präzisiert [ADR 0035](0035-regelbasierte-bewertung.md) und
 [ADR 0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md); Anlass: [Pilot e2e](../reference/experiment-record.md#pilot-e2e-1920102026))
 
 ## Kontext

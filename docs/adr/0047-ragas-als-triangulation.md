@@ -2,10 +2,12 @@
 
 ## Status
 
-Angenommen (21.10.2026; konkretisiert [ADR 0007](0007-triangulation.md); ändert „optional RAGAS“ in
-[ADR 0015](0015-tech-stack.md)); Richtermodell und Metriken von Jonas entschieden. Umgesetzt 21.10.2026; die
-Kosten liegen nach dem Pilot bei 2,02 USD je 48 Antworten, nicht im Cent-Bereich
-([Experiment-Protokoll](../reference/experiment-record.md#ragas-pilot-e2e-21102026)).
+Angenommen (21.10.2026; konkretisiert [ADR 0007](0007-triangulation.md) und ändert dessen RAGAS-Metriken; ändert „optional RAGAS“ in
+[ADR 0015](0015-tech-stack.md)); Richtermodell und Metriken von Jonas entschieden. Umgesetzt 21.10.2026 (PR #37),
+`ragas` auf 0.4.3 gepinnt; die Konsequenz „Code noch umzusetzen“ ist erledigt. Korrektur zu den Konsequenzen: die Kosten
+liegen nach dem Pilot bei 2,02 USD je 48 Antworten, nicht im Cent-Bereich
+([Experiment-Protokoll](../reference/experiment-record.md#ragas-pilot-e2e-21102026)). Präzisiert am 21.10.2026:
+[Strictness 1](#nachtrag-21102026-strictness-1) (Jonas)
 
 ## Kontext
 
@@ -43,6 +45,13 @@ K0 bekommt kein RAGAS (ohne Kontext entfallen drei der vier Metriken).
 - Negativ: Ein weiteres Modell und eine weitere Abhängigkeit sind zu pinnen und zu dokumentieren; die Werte sind nicht
   bitgleich wiederholbar und dürfen deshalb nur sekundär sein. Code dafür ist noch umzusetzen.
 - Neutral: Die Kosten liegen nach den Pilotkosten im Cent-Bereich; sie werden wie die übrigen Kosten protokolliert.
+
+## Nachtrag 21.10.2026: Strictness 1
+
+Von Jonas entschieden; präzisiert einen Parameter, ändert die Entscheidung nicht. Response Relevancy läuft mit
+`config.RAGAS_STRICTNESS` = 1: Der Richter erzeugt aus der Antwort Fragen und vergleicht deren Embeddings mit der echten
+Frage. Bei Temperatur 0 ist der Prompt für jede der `strictness` Fragen derselbe, weitere Fragen brächten also dieselbe
+Frage noch einmal und nur Kosten.
 
 ## Literatur
 

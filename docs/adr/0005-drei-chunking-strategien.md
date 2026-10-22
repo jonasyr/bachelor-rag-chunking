@@ -2,7 +2,10 @@
 
 ## Status
 
-Angenommen (D5 im Leitfaden; Quelle: Exposé/Baseline, übernommen); C3-Grenzen konkretisiert durch [ADR 0021](0021-c3-grenzen.md); ergänzt durch [ADR 0026](0026-c3-vergleichbarkeit.md) (Größenkontrolle K1); C4-Bedingung präzisiert durch [ADR 0028](0028-c4-bedingung.md)
+Angenommen (D5 im Leitfaden; Quelle: Exposé/Baseline, übernommen); C3-Grenzen konkretisiert durch
+[ADR 0021](0021-c3-grenzen.md); ergänzt durch [ADR 0026](0026-c3-vergleichbarkeit.md) (Größenkontrolle K1); C4-Bedingung
+präzisiert durch [ADR 0028](0028-c4-bedingung.md); die Beispiele in den Konsequenzen stammen vom Vue-Korpus, seit
+[ADR 0038](0038-korpus-e2e.md) ist der Korpus e2e
 
 ## Kontext
 

@@ -2,7 +2,8 @@
 
 ## Status
 
-Angenommen (D3 im Leitfaden; Quelle: Chat, ergänzt die Baseline)
+Angenommen (D3 im Leitfaden; Quelle: Chat, ergänzt die Baseline); Korpus seit [ADR 0038](0038-korpus-e2e.md) e2e statt
+Vue.js, die Entscheidung bleibt
 
 ## Kontext
 
