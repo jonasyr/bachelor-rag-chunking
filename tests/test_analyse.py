@@ -50,3 +50,14 @@ def test_run_without_second_rating_removes_stale_disagreements(paths, monkeypatc
     stale.write_text("stale", encoding="utf-8")
     analyse.main(["--set", str(tmp_path)])
     assert not stale.exists()
+
+
+def test_set_output_folder_name_comes_from_config(paths, monkeypatch, tmp_path):  # noqa: F811 (fixture)
+    root = tmp_path / "elsewhere" / "results"
+    monkeypatch.setattr(analyse, "OUTPUT_DIR", root)
+    monkeypatch.setattr(analyse, "TABLES_DIR", root / "tables")
+    monkeypatch.setattr(analyse, "FIGURES_DIR", root / "figures")
+    monkeypatch.setattr(analyse, "ANALYSIS_FILE", root / "analysis.json")
+    monkeypatch.setattr(analyse.analysis_data, "set_paths", lambda set_dir: paths)
+    analyse.main(["--set", str(tmp_path)])
+    assert (tmp_path / "results" / "analysis.json").exists()
