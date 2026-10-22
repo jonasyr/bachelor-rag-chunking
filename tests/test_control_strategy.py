@@ -1,11 +1,13 @@
+import ast
 import json
+from pathlib import Path
 
 import pytest
 
 import chunking
 import tokens
 from chunking import check_chunks, chunk, control_size, rounded_mean
-from config import CONTROL_STRATEGIES, K1_CHUNK_SIZE, STRATEGY_IDS
+from config import CONTROL_ANSWER_STRATEGIES, CONTROL_STRATEGIES, K1_CHUNK_SIZE, STRATEGY_IDS
 from preprocess import clean_markdown, section_spans
 
 
@@ -67,3 +69,17 @@ def test_k1_refuses_a_size_that_is_not_the_c3_mean(inputs, tmp_path, monkeypatch
     monkeypatch.setattr(chunking, "K1_CHUNK_SIZE", control_size(docs, by_doc) + 1)
     with pytest.raises(ValueError, match="set config.K1_CHUNK_SIZE"):
         chunk("K1", docs_file, sections_file, tmp_path / "k1.jsonl")
+
+
+def test_control_keys_come_from_config_only():
+    """Strategy keys of the controls are read from config, never spelled out (AGENTS.md)."""
+    keys = {*CONTROL_STRATEGIES, *CONTROL_ANSWER_STRATEGIES}
+    found = []
+    files = [*Path("src").glob("*.py"), *Path("app").glob("*.py"), *Path("scripts").glob("*.py")]
+    for path in sorted(files):
+        if path.name == "config.py":
+            continue
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Constant) and node.value in keys:
+                found.append(f"{path}:{node.lineno}")
+    assert found == []

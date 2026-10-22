@@ -22,7 +22,9 @@ from config import (
     ANALYSIS_PRIMARY,
     ANALYSIS_RULE,
     BYTES_PER_MB,
+    CONTROL_ANSWER_STRATEGIES,
     CONTROL_CRITERIA,
+    CONTROL_STRATEGIES,
     JSON_DECIMALS,
     RAGAS_METRICS,
     REPORT_COST_DECIMALS,
@@ -31,6 +33,10 @@ from config import (
     RUBRIC_CRITERIA,
     STRATEGY_IDS,
 )
+
+(K1,) = CONTROL_STRATEGIES  # "K1"
+(K0,) = CONTROL_ANSWER_STRATEGIES  # "K0"
+
 
 TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
@@ -86,7 +92,7 @@ CHECK_LABELS = {  # the eight checks of scoring_rules.CHECKS
     "direct": "Direkt",
     "wordy": "Wortreich",
 }
-RETRIEVAL_STRATEGIES = [*STRATEGY_IDS, "K1"]
+RETRIEVAL_STRATEGIES = [*STRATEGY_IDS, K1]
 VERDICT_LABELS = {
     "dependent": "abhängig (miss)",
     "known": "bekannt (hit)",
@@ -248,8 +254,8 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
     if data.scores_control is not None:
         k0 = _k0_frame(data)
         k0_cols = [*CONTROL_CRITERIA, "total_score", "total_four"]
-        k0w = {c: _wide(k0, c, ["K0"], qids)["K0"] for c in k0_cols}
-        answer_means["K0"] = {c: _mean(v) for c, v in k0w.items()}
+        k0w = {c: _wide(k0, c, [K0], qids)[K0] for c in k0_cols}
+        answer_means[K0] = {c: _mean(v) for c, v in k0w.items()}
     results["answers"] = {"means": answer_means}
 
     # confirmatory family
@@ -284,8 +290,8 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
     else:
         control = {}
         for s in STRATEGY_IDS:
-            diffs = {c: answer_means[s][c] - answer_means["K0"][c] for c in CONTROL_CRITERIA}
-            diffs["total_four"] = answer_means[s]["total_four"] - answer_means["K0"]["total_four"]
+            diffs = {c: answer_means[s][c] - answer_means[K0][c] for c in CONTROL_CRITERIA}
+            diffs["total_four"] = answer_means[s]["total_four"] - answer_means[K0]["total_four"]
             pair = stats.wilcoxon_pair(awide["total_four"][s], k0w["total_four"])
             control[s] = {
                 "diff": diffs,
@@ -447,7 +453,7 @@ def _efficiency(data: AnalysisData, retrieval: dict, answers: dict, notes: list)
         return None
     n = len(data.questions)
     out = {}
-    for s in [*RETRIEVAL_STRATEGIES, "K0"]:
+    for s in [*RETRIEVAL_STRATEGIES, K0]:
         entry: dict = {}
         if s in data.chunks:
             lengths = data.chunks[s]
@@ -530,7 +536,7 @@ def _answers_table(results: dict) -> str:
     for label, key in lines:
         cells = []
         for s in strategies:
-            hidden = s == "K0" and key == "total_score"  # K0 has no groundedness score
+            hidden = s == K0 and key == "total_score"  # K0 has no groundedness score
             cells.append(DASH if hidden else fmt_opt(means[s].get(key)))
         rows.append([label, *cells])
     note = (

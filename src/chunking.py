@@ -37,6 +37,8 @@ from config import (
 )
 from preprocess import closes_fence, fence_marker
 
+(K1,) = CONTROL_STRATEGIES  # "K1"
+
 Span = tuple[int, int]
 
 ALL_STRATEGIES = {**STRATEGY_IDS, **CONTROL_STRATEGIES}  # experiment + control (D26)
@@ -44,9 +46,9 @@ ALL_CHUNK_FILES = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
 FIXED_WINDOWS = {
     "C1": (C1_CHUNK_SIZE, C1_OVERLAP),
     "C2": (C2_CHUNK_SIZE, C2_OVERLAP),
-    "K1": (K1_CHUNK_SIZE, K1_OVERLAP),
+    K1: (K1_CHUNK_SIZE, K1_OVERLAP),
 }
-MAX_LENGTH = {"C1": C1_CHUNK_SIZE, "C2": C2_CHUNK_SIZE, "C3": C3_MAX_TOKENS, "K1": K1_CHUNK_SIZE}
+MAX_LENGTH = {"C1": C1_CHUNK_SIZE, "C2": C2_CHUNK_SIZE, "C3": C3_MAX_TOKENS, K1: K1_CHUNK_SIZE}
 
 
 def fixed_size_spans(n_tokens: int, size: int, overlap: int) -> list[Span]:
