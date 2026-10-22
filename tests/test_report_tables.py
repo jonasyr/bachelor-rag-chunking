@@ -463,6 +463,10 @@ def test_agreement_table_iu_rules(tmp_path, monkeypatch):
     for word in ("Prüffragen", "Kernpunkte", "Kriterien", "AC1", "AC2", "ordinal", "Bootstrap"):
         assert word in text
     assert "100 Wiederholungen" in text
+    note = text.split(r"\end{tabular}")[1]
+    assert (
+        "„Durch Passagen gestützt“" in note and "Quellenbezug" not in note
+    )  # check, not criterion
     align = text.split(r"\begin{tabular}{")[1].split("}")[0]
     assert len(align) <= 5
 

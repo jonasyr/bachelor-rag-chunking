@@ -99,8 +99,8 @@ def require_same_inputs(
         raise ValueError(f"key points of {', '.join(wrong)} differ between the ratings")
 
 
-def _units(paired: list[dict]) -> list[tuple[str, str, list, list]]:
-    """(group, label, [(question, a, b)], categories-or-None): one entry per output row."""
+def _units(paired: list[dict]) -> list[tuple[str, str, list, list, bool]]:
+    """(group, label, [(question, a, b)], categories, ordinal): one entry per output row."""
     out = []
     for name in CHECKS:
         categories = ORDERED_CHECKS.get(name, YES_NO)

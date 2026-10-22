@@ -769,7 +769,8 @@ def _agreement_table(results: dict) -> str:
         f"Erst- und Zweitbewertung derselben {block['n_codes']} Antworten ({block['n_questions']} "
         "Fragen, je C1 bis C3). n: Antworten, bei den Kernpunkten alle Kernpunkt-Markierungen. "
         "AC1: Gwets Koeffizient für Ja/Nein-Prüffragen und Kernpunkte, AC2: mit ordinalen "
-        "Gewichten für Quellenbezug, Halluzination und die Kriterien. α: Krippendorffs Alpha, "
+        "Gewichten für „Durch Passagen gestützt“, „Halluzination“ und die Kriterien. α: "
+        "Krippendorffs Alpha, "
         f"ordinal. Intervalle: Perzentil-Bootstrap über die Fragen ({block['reps']} "
         f"Wiederholungen, {level} %-Niveau)."
         + (
