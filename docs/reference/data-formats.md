@@ -444,7 +444,7 @@ Oberste Schlüssel von `analysis.json`: `n_questions`, `alpha`, `retrieval` (Mit
 `config.ANALYSIS_PRIMARY`), `descriptive_effects` (Effektstärken ohne p-Werte, getrennt nach Regel und `answers`),
 `control_k0` (K0 gegen C1–C3, `null` ohne K0-Bewertung), `correlation` (Spearmans ρ je Strategie und `pooled`, dieses ohne `p`),
 `efficiency` (Chunks, Längen, Kontext-Tokens, Indexgröße, Embedding- und Generierungskosten je Strategie),
-`breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil) `ragas` (`means`, `nan_counts` und `effects` je Metrik, jeweils je Strategie; Kendalls W und r über die Fragen mit Wert in
+`breakdown` (Fragetyp, Konstruktionsklasse und Closed-Book-Urteil), `ragas` (`means`, `nan_counts` und `effects` je Metrik, jeweils je Strategie; Kendalls W und r über die Fragen mit Wert in
 allen Strategien, ohne p-Werte), `ragas_agreement` (Schlüssel `<Metrik>~<Gegenstück>`, je Strategie und `pooled` mit `rho`,
 `n`, `testable`, ohne `p`; `rho` ist `null`, wenn eine Seite konstant ist), `ragas_stability` (je Metrik `n`,
 `mean_abs_diff`, `rho`, `share_equal`; nur wenn `ragas_scores_repeat.csv` vorliegt, also bei Pilot-Sets) und

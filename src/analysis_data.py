@@ -222,9 +222,16 @@ def _load_answers_question(paths: dict, notes: list[str]) -> dict | None:
         return None
     by_code = {r["code"]: (r["question_id"], r["strategy"]) for r in read_csv(key, KEY_HEADER)}
     values = {"yes": 1, "no": 0}
-    return {
-        by_code[r["code"]]: values[r["answers_question"]] for r in read_csv(checks, CHECKS_HEADER)
-    }
+    result = {}
+    for r in read_csv(checks, CHECKS_HEADER):
+        if r["code"] not in by_code:
+            raise ValueError(f"{checks.name}: code {r['code']} is not in {key.name}")
+        if r["answers_question"] not in values:
+            raise ValueError(
+                f"{checks.name}: code {r['code']} has answers_question {r['answers_question']!r}"
+            )
+        result[by_code[r["code"]]] = values[r["answers_question"]]
+    return result
 
 
 def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:

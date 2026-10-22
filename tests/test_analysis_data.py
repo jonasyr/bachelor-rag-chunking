@@ -4,7 +4,7 @@ import pytest
 
 import analysis_data
 from analysis_data import load
-from atomic_csv import write_csv
+from atomic_csv import read_csv, write_csv
 from config import STRATEGY_IDS
 from control_k0 import CONTROL_SCORES_HEADER
 from evaluate_answers import SCORES_HEADER
@@ -282,6 +282,24 @@ def test_answers_question_is_unblinded(paths, tmp_path):
     assert data.answers_question[("Q002", "C3")] == 0
     assert data.answers_question[("Q001", "C3")] == 1
     assert len(data.answers_question) == 6
+
+
+def test_inconsistent_scoring_files_name_the_problem(paths, tmp_path):
+    """A code missing from the key, or a value other than yes/no, stops with the file and the
+    code instead of a bare KeyError."""
+    from evaluate_answers import KEY_HEADER
+
+    answers = {(q, s): "yes" for q in QIDS for s in STRATEGIES}
+    _blinded(paths, tmp_path, answers)
+    rows = read_csv(paths["scoring_key_file"], KEY_HEADER)
+    write_csv(paths["scoring_key_file"], KEY_HEADER, rows[1:])
+    with pytest.raises(
+        ValueError, match=rf"scoring_checks.csv: code {rows[0]['code']} .*scoring_key.csv"
+    ):
+        load(paths, main=False)
+    _blinded(paths, tmp_path, answers | {("Q001", "C1"): "maybe"})
+    with pytest.raises(ValueError, match="answers_question 'maybe'"):
+        load(paths, main=False)
 
 
 def test_answers_question_absent_is_noted(paths, tmp_path):
