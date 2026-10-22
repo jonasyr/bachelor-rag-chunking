@@ -69,7 +69,7 @@ from config import (
     STRATEGY_IDS,
 )
 from embed import load_jsonl
-from freeze import is_main_catalogue, require_frozen
+from freeze import is_main_catalogue, require_frozen, require_rules_version
 from generate import ANSWERS_HEADER
 from prompt import context
 from retrieve import (
@@ -95,8 +95,11 @@ def catalogue(
     documents_file: Path,
     freeze_file: Path,
 ) -> tuple[dict[str, dict], dict[str, dict]]:
-    """Questions and ground truth by ID; the main catalogue only while it is frozen."""
+    """Questions and ground truth by ID; the main catalogue only while it is frozen and under the
+    rules version of its freeze."""
     require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
+    if is_main_catalogue(questions_file, ground_truth_file):
+        require_rules_version(freeze_file)
     questions = read_rows(
         questions_file, "question catalogue", QUESTIONS_HEADER, QUESTIONS_REQUIRED
     )

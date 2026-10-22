@@ -12,6 +12,7 @@ from conftest import (
 import freeze
 from catalogue import freeze_catalogue
 from catalogue_review import ensure_review_file
+from config import RUBRIC_RULES_VERSION
 from run_log import sha256_of
 
 
@@ -53,7 +54,16 @@ def test_freeze_writes_hashes_counts_and_date(corpus, main_catalogue, pilot, tmp
     }
     assert stored["questions"] == 48 and stored["types"]["comparative"] == 6
     assert stored["closed_book"] == {"dependent": 48, "known": 0}
-    assert set(stored) == {"date", "questions", "types", "classes", "closed_book", "sha256"}
+    assert stored["rules_version"] == RUBRIC_RULES_VERSION
+    assert set(stored) == {
+        "date",
+        "rules_version",
+        "questions",
+        "types",
+        "classes",
+        "closed_book",
+        "sha256",
+    }
 
 
 def test_freeze_refuses_a_failing_catalogue_and_writes_nothing(
@@ -235,3 +245,20 @@ def test_freeze_refuses_too_many_hits(corpus, main_catalogue, pilot, tmp_path):
             fresh_plan=fresh_plan_for(valid_rows()),
         )
     assert not out.exists()
+
+
+def test_rules_version_must_match_the_freeze(tmp_path, monkeypatch):
+    """Scoring rules changed after the freeze are refused (ADR 0035, 0043)."""
+    out = tmp_path / "freeze.json"
+    out.write_text(json.dumps({"rules_version": RUBRIC_RULES_VERSION}), encoding="utf-8")
+    freeze.require_rules_version(out)
+    monkeypatch.setattr(freeze, "RUBRIC_RULES_VERSION", "2099-01-01")
+    with pytest.raises(RuntimeError, match="scoring rules changed since the freeze"):
+        freeze.require_rules_version(out)
+
+
+def test_rules_version_missing_in_the_freeze_is_refused(tmp_path):
+    out = tmp_path / "freeze.json"
+    out.write_text(json.dumps({"date": "2026-11-06"}), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="rules_version"):
+        freeze.require_rules_version(out)

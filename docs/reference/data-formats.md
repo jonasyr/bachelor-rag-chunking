@@ -146,6 +146,7 @@ Markdown-Tabelle mit einer Zeile je Abschnitt in der Reihenfolge von `sections.j
 ```json
 {
   "date": "…",
+  "rules_version": "2026-10-20",
   "questions": 48,
   "types": {"factual": 12, "procedural": 12, "conceptual": 12, "comparative": 6, "limitation": 6},
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
@@ -157,7 +158,10 @@ Markdown-Tabelle mit einer Zeile je Abschnitt in der Reihenfolge von `sections.j
 
 Plan-, Durchsichts- und Closed-Book-Datei werden nur aufgezeichnet, und nur, sofern sie vorhanden sind; die Sperre
 (`freeze.require_frozen`, in jedem Schritt ab `retrieve.py`) prüft die vier übrigen Dateien. `closed_book` = Zahl der
-retrieval-abhängigen (`miss`) und -unabhängigen (`hit`) Fragen.
+retrieval-abhängigen (`miss`) und -unabhängigen (`hit`) Fragen. `rules_version` = `config.RUBRIC_RULES_VERSION` beim
+Einfrieren; Scaffold und Zusammenfassung des Hauptkatalogs (auch K0) brechen ab, wenn die Regeln seither geändert wurden
+(`freeze.require_rules_version`, [ADR 0035](../adr/0035-regelbasierte-bewertung.md),
+[ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)).
 
 **`catalogue_plan.csv`** (`data/evaluation/`, einmal geschrieben von `catalogue.py plan`, danach ändert
 der Editor nur Status, Sprunggrund und Frage-ID sowie bei einem Sprung Slot und Klasse der nachrückenden Reservezeile;

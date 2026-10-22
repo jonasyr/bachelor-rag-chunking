@@ -208,7 +208,7 @@ beschrieben.
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
-| `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
+| `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` und im Einfrier-Eintrag (`catalogue_freeze.json`), danach gesperrt | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
