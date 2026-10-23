@@ -34,10 +34,6 @@ data/evaluation/scoring_items.jsonl
 chroma_db/
 *.chroma
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb_checkpoints
-
 # Generated / binary docs
 *.pdf
 !output/figures/*.pdf

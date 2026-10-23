@@ -613,7 +613,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `output/figures/*.pdf` | Abbildungen der Auswertung | [Auswertung](#auswertung-output) | versioniert (Ausnahme von `*.pdf`) |
 | `data/corpus_probe/docs/`, `probes/`, `sources/`, `questions/*-sections.json` | nachgebaute Seiten, Proben mit Abschnittstext, Klone der Kandidaten | [Korpusauswahl](corpus-selection.md#dateien-und-befehle) | ignoriert; übrige Dateien in `data/corpus_probe/` versioniert |
 | `*.pdf` | erzeugte Dokumente | – | ignoriert, außer `output/figures/*.pdf` (siehe oben) |
-| `.env`, `.venv/`, `venv/`, `env/`, `__pycache__/`, `*.py[cod]`, `*.pyo`, `.vscode/`, `.ipynb_checkpoints/`, `.DS_Store` | Geheimnisse, Umgebung, Editor | – | ignoriert |
+| `.env`, `.venv/`, `venv/`, `env/`, `__pycache__/`, `*.py[cod]`, `*.pyo`, `.vscode/`, `.DS_Store` | Geheimnisse, Umgebung, Editor | – | ignoriert |
 
 Die Vue-Verarbeitungsdateien, die nicht im Archivordner liegen (`documents.jsonl`, `sections.jsonl`), entstehen neu
 aus `vuejs/docs` auf Commit `40aa88a` mit dem Code vor ADR 0038
