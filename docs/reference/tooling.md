@@ -13,7 +13,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | Zweck | Werkzeug |
 |-------|----------|
 | Sprache | Python ≥ 3.11 |
-| Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs; Gruppe `dev`: pytest, Jupyter, ipykernel) |
+| Paketverwaltung | **uv** + `pyproject.toml` (inkl. `uv.lock` für reproduzierbare Installs; Gruppe `dev`: pytest) |
 | Dokumentverarbeitung | Standardbibliothek: `re`, `pathlib`, `csv`, `json` (`src/mdx.py`, `src/preprocess.py`) |
 | Markdown-Darstellung | `markdown-it-py` (formatierte Ansicht in der App: `src/catalogue_store.py`, `src/scoring_store.py`) |
 | Token-Zählung | `tiktoken` 0.13.0 (gepinnt), gekapselt in `src/tokens.py` ([ADR 0019](../adr/0019-korpus-ausschnitt.md)) |
