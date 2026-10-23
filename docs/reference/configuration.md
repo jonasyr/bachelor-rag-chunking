@@ -21,7 +21,7 @@ Formate aller Dateien: [Datenformate](data-formats.md).
 | `DATA_RAW` | `data/raw/e2e_docs_snapshot` | Rohdateien des Snapshots | [ADR 0019](../adr/0019-korpus-ausschnitt.md), [ADR 0038](../adr/0038-korpus-e2e.md) |
 | `DATA_PROCESSED` | `data/processed` | Zwischenstände (Dokumente, Abschnitte, Chunks, Vektoren) | – |
 | `DATA_EVAL` | `data/evaluation` | Fragen, Ground Truth, Ergebnisse | – |
-| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (`scripts/difficulty_probe.py`) | – |
+| `PILOT_DIR` | `data/pilot` | Pilotproben, nicht der Fragenkatalog (Pilot-Sets in `catalogue.py` und auf der Bewertungsseite der App) | – |
 | `PILOT_RUNS_FILE_NAME` | `"runs.jsonl"` | Laufprotokoll je Pilot-Set; die übrigen Pilotdateien tragen die Namen der Evaluationsartefakte | – |
 | `CHROMA_DIR` | `chroma_db` | Chroma-Index (lokal, persistent) | – |
 | `DOCS_DIR` | `docs` | Dokumentation | – |
@@ -163,11 +163,17 @@ Konstante Einstellungen der Antwortgenerierung: [Prompts](prompts.md).
 | `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 
-### RAGAS
+### Prompts
+
+| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
+|---|---|---|---|
+| `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung: die beiden Texte wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht sie), `CONTEXT_SEPARATOR` (`"\n---\n"`) wie dort beschrieben | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
+| `CLOSED_BOOK_SYSTEM_PROMPT`, `CLOSED_BOOK_USER_TEMPLATE` | Texte | Prompt der Closed-Book-Prüfung und von K0, wörtlich wie in [Prompts](prompts.md#closed-book-prompt-prüfung-und-k0) | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
+
+## RAGAS
 
 Richter und Einstellungen sind für alle vier Metriken gleich und gepinnt ([ADR 0047](../adr/0047-ragas-als-triangulation.md));
-Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ragas). In `config.py`
-stehen die Schlüssel im Block „LLM / Embedding“ zwischen den Preisen des Antwortmodells und den Prompts.
+Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](data-formats.md#ragas).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -188,13 +194,6 @@ stehen die Schlüssel im Block „LLM / Embedding“ zwischen den Preisen des An
 | `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |
 
-### Prompts
-
-| Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
-|---|---|---|---|
-| `SYSTEM_PROMPT`, `USER_PROMPT_TEMPLATE`, `CONTEXT_SEPARATOR` | Texte | Prompt der Generierung: die beiden Texte wörtlich wie in [Prompts](prompts.md) (ein Test vergleicht sie), `CONTEXT_SEPARATOR` (`"\n---\n"`) wie dort beschrieben | [ADR 0006](../adr/0006-nur-chunking-variiert.md) |
-| `CLOSED_BOOK_SYSTEM_PROMPT`, `CLOSED_BOOK_USER_TEMPLATE` | Texte | Prompt der Closed-Book-Prüfung und von K0, wörtlich wie in [Prompts](prompts.md#closed-book-prompt-prüfung-und-k0) | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
-
 ## Evaluation
 
 Rubrik und Statistik: [Evaluation](evaluation.md). Die Dateinamen der Tabellen und Abbildungen
@@ -209,7 +208,7 @@ beschrieben.
 | `RUBRIC_MAX_SCORE` | `2` | Höchstwert je Kriterium (Skala 0–2) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `KEY_POINTS_MAX` | `4` | höchstens so viele Kernpunkte je Frage; Punkt 1 = Kernaussage | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
-| `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
+| `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` und im Einfrier-Eintrag (`catalogue_freeze.json`), danach gesperrt | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |

@@ -8,6 +8,8 @@ from importlib.metadata import version
 from pathlib import Path
 
 from config import (
+    CONTROL_ANSWER_STRATEGIES,
+    CONTROL_STRATEGIES,
     EMBEDDING_MODEL,
     EMBEDDING_PRICE_PER_MTOK,
     EMBEDDING_RUNS_FILE,
@@ -28,6 +30,9 @@ from config import (
     RAGAS_TEMPERATURE,
     SCORING_METHOD,
 )
+
+(K1,) = CONTROL_STRATEGIES  # "K1"
+(K0,) = CONTROL_ANSWER_STRATEGIES  # "K0"
 
 
 def sha256_of(path: Path) -> str:
@@ -131,7 +136,7 @@ def ragas_record(record: dict) -> dict:
 def step_command(step: str, strategy: str) -> str:
     """The command that writes the `step` record over `strategy`, for error messages."""
     if step in ("scaffold", "summarise"):
-        control = " --control" if strategy == "K0" else ""
+        control = " --control" if strategy == K0 else ""
         return f"src/evaluate_answers.py --mode {step}{control}"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
@@ -141,7 +146,7 @@ def step_command(step: str, strategy: str) -> str:
         return "src/ragas_eval.py --repeat"
     if step == "ragas":
         return "src/ragas_eval.py"
-    if step in ("retrieve", "evaluate_retrieval") and strategy == "K1":
+    if step in ("retrieve", "evaluate_retrieval") and strategy == K1:
         return f"src/{step}.py --control"
     return f"src/{step}.py"
 

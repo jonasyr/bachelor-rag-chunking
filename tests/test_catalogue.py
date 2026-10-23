@@ -21,6 +21,7 @@ from catalogue import (
     exit_code,
     find,
     forms,
+    h1_findings,
     load_corpus,
     main,
     section_index,
@@ -208,6 +209,16 @@ def test_paraphrase_must_not_share_section_or_page_heading_words(corpus):
     ]
 
 
+def test_h1_section_needs_a_reason_in_notes(corpus):
+    """ADR 0022: a whole page is relevant only with a reason in `notes`."""
+    page = [corpus.by_id["D002#watchers"]]
+    assert h1_findings(question("single") | {"notes": ""}, page) == [
+        "D002#watchers is a whole page (H1); give the reason in notes (ADR 0022)"
+    ]
+    assert h1_findings(question("single") | {"notes": "the page is the answer"}, page) == []
+    assert h1_findings(question("single") | {"notes": ""}, [corpus.by_id["D002#once"]]) == []
+
+
 def run_check(corpus, tmp_path, rows, pilot_dir, screen=True):
     questions, truth = write_catalogue(tmp_path, rows)
     plan = write_plan_for(tmp_path, rows)
@@ -223,6 +234,16 @@ def run_check(corpus, tmp_path, rows, pilot_dir, screen=True):
         plan_file=plan,
         review_file=review,
         fresh_plan=fresh_plan_for(rows),
+    )
+
+
+def test_check_reports_an_h1_section_without_reason(corpus, tmp_path, pilot):
+    rows = valid_rows()
+    qid, text, qtype, cls, answer, _ = rows[-1]
+    rows[-1] = (qid, text, qtype, cls, answer, ["D002#watchers"])
+    report = run_check(corpus, tmp_path, rows, pilot)
+    assert f"{qid}: D002#watchers is a whole page (H1); give the reason in notes (ADR 0022)" in (
+        report.findings
     )
 
 

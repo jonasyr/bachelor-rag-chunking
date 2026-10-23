@@ -442,6 +442,23 @@ def test_main_catalogue_is_always_scored_in_full(files, monkeypatch):
     assert_nothing_scaffolded(files)
 
 
+def test_main_catalogue_is_scored_under_the_frozen_rules(files, monkeypatch):
+    """ADR 0035, 0043: a rules change after the freeze stops scaffold and summarise."""
+    monkeypatch.setattr(freeze, "QUESTIONS_FILE", files["questions_file"])
+    monkeypatch.setattr(freeze, "GROUND_TRUTH_FILE", files["ground_truth_file"])
+    freeze.write_freeze(
+        *(files[k] for k in ("questions_file", "ground_truth_file", "sections_file")),
+        files["documents_file"],
+        files["freeze_file"],
+    )
+    monkeypatch.setattr(freeze, "RUBRIC_RULES_VERSION", "2099-01-01")
+    with pytest.raises(RuntimeError, match="scoring rules changed"):
+        run_scaffold(files)
+    with pytest.raises(RuntimeError, match="scoring rules changed"):
+        run_summarise(files)
+    assert_nothing_scaffolded(files)
+
+
 def test_pilot_paths_keep_every_file_inside_the_set(tmp_path):
     paths = pilot_paths(tmp_path)
     assert set(paths) == {

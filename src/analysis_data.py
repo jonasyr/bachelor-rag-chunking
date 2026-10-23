@@ -21,9 +21,11 @@ from config import (
     CATALOGUE_FREEZE_FILE,
     CHUNK_FILES,
     CLOSED_BOOK_FILE,
+    CONTROL_ANSWER_STRATEGIES,
     CONTROL_CHUNK_FILES,
     CONTROL_RETRIEVAL_SCORES_FILE,
     CONTROL_RETRIEVED_FILE,
+    CONTROL_STRATEGIES,
     DOCUMENTS_FILE,
     EMBEDDING_RUNS_FILE,
     GENERATED_ANSWERS_CONTROL_FILE,
@@ -59,6 +61,9 @@ from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, 
 from run_log import latest_run, require_run
 from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
 from second_rater import CLOSE_STEP
+
+(K1,) = CONTROL_STRATEGIES  # "K1"
+(K0,) = CONTROL_ANSWER_STRATEGIES  # "K0"
 
 EXPERIMENT = ",".join(STRATEGY_IDS)
 VERDICT_GROUPS = {"miss": "dependent", "hit": "known"}
@@ -153,7 +158,7 @@ def _with_inputs(paths: dict, results_dir: Path) -> dict:
         "retrieval_inputs": {
             EXPERIMENT: [results_dir / RETRIEVED_RESULTS_FILE.name, *catalogue]
             + [chunks[k] for k in STRATEGY_IDS],
-            "K1": [results_dir / CONTROL_RETRIEVED_FILE.name, *catalogue, chunks["K1"]],
+            K1: [results_dir / CONTROL_RETRIEVED_FILE.name, *catalogue, chunks[K1]],
         },
         "scores_inputs": [
             results_dir / f.name
@@ -316,14 +321,14 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     inputs = paths["retrieval_inputs"]
     for file, key in (
         (paths["retrieval_file"], EXPERIMENT),
-        (paths["retrieval_control_file"], "K1"),
+        (paths["retrieval_control_file"], K1),
     ):
         _checked(file, inputs[key], runs, "evaluate_retrieval", key, main, notes)
     retrieval = pd.DataFrame(
         read_csv(paths["retrieval_file"], RETRIEVAL_HEADER)
         + read_csv(paths["retrieval_control_file"], RETRIEVAL_HEADER)
     )
-    _complete(retrieval, qids, [*STRATEGY_IDS, "K1"], paths["retrieval_file"].name)
+    _complete(retrieval, qids, [*STRATEGY_IDS, K1], paths["retrieval_file"].name)
 
     gen_runs = paths["generation_runs_file"]
     _checked(
@@ -336,10 +341,10 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     if paths["scores_control_file"].exists():
         _checked(
             paths["scores_control_file"], paths["scores_control_inputs"], gen_runs,
-            "summarise_control", "K0", main, notes,
+            "summarise_control", K0, main, notes,
         )  # fmt: skip
         control = pd.DataFrame(read_csv(paths["scores_control_file"], CONTROL_SCORES_HEADER))
-        _complete(control, qids, ["K0"], paths["scores_control_file"].name)
+        _complete(control, qids, [K0], paths["scores_control_file"].name)
     else:
         notes.append("K0 ohne Bewertung: Vergleich mit K0 entfällt")
 
@@ -369,7 +374,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     embedding = None
     emb = paths["embedding_runs_file"]
     if emb.exists():
-        found = {k: latest_run(emb, "embed", k) for k in [*STRATEGY_IDS, "K1"]}
+        found = {k: latest_run(emb, "embed", k) for k in [*STRATEGY_IDS, K1]}
         if all(found.values()):
             embedding = {
                 k: {f: r[f] for f in ("input_tokens", "cost_usd", "vector_bytes", "vectors")}

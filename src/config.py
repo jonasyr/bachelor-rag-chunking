@@ -273,7 +273,36 @@ LLM_MAX_TOKENS = 1024  # an answer cut off at this limit stops the run (D33)
 LLM_PRICE_INPUT_PER_MTOK = 0.10  # USD per 1M input tokens, OpenAI model page, accessed 17.10.2026
 LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date
 
-# RAGAS run (ADR 0047): judge model and settings are pinned; all four metrics use them.
+# Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
+# the documented text.
+SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework
+based solely on the provided documentation excerpts.
+Do not use any knowledge outside the provided context.
+If the context does not contain sufficient information to answer the question,
+state that explicitly."""  # noqa: E501 (verbatim prompt text)
+USER_PROMPT_TEMPLATE = """Answer the following question based exclusively on the documentation excerpts below.
+
+Question: {question}
+
+Documentation excerpts:
+{context}
+
+Answer:"""  # noqa: E501 (verbatim prompt text)
+CONTEXT_SEPARATOR = "\n---\n"  # between the excerpts; each starts with "[Excerpt N]"
+# Closed-book prompt (docs/reference/prompts.md): the screen of the catalogue and the control K0
+# (D38, D40); the RAG prompt without excerpts, so the model may answer from its own knowledge.
+CLOSED_BOOK_SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework.
+If you do not know the answer, state that explicitly."""  # noqa: E501 (verbatim prompt text)
+CLOSED_BOOK_USER_TEMPLATE = """Answer the following question.
+
+Question: {question}
+
+Answer:"""
+
+# ---------------------------------------------------------------------------
+# RAGAS triangulation (D47)
+# ---------------------------------------------------------------------------
+# Judge model and settings are pinned; all four metrics use them.
 RAGAS_JUDGE_MODEL = "gpt-6-sol"
 RAGAS_REASONING_EFFORT = "none"  # the only effort at which the API accepts a temperature (D33)
 RAGAS_TEMPERATURE = 0.0
@@ -300,32 +329,6 @@ RAGAS_NAN_REASONS = {
     "context_recall": "no classifications (ragas 0.4.3, context_recall/metric.py:123)",
     "context_precision": "NaN average precision (ragas 0.4.3, context_precision/metric.py:130)",
 }
-
-# Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
-# the documented text.
-SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework
-based solely on the provided documentation excerpts.
-Do not use any knowledge outside the provided context.
-If the context does not contain sufficient information to answer the question,
-state that explicitly."""  # noqa: E501 (verbatim prompt text)
-USER_PROMPT_TEMPLATE = """Answer the following question based exclusively on the documentation excerpts below.
-
-Question: {question}
-
-Documentation excerpts:
-{context}
-
-Answer:"""  # noqa: E501 (verbatim prompt text)
-CONTEXT_SEPARATOR = "\n---\n"  # between the excerpts; each starts with "[Excerpt N]"
-# Closed-book prompt (docs/reference/prompts.md): the screen of the catalogue and the control K0
-# (D38, D40); the RAG prompt without excerpts, so the model may answer from its own knowledge.
-CLOSED_BOOK_SYSTEM_PROMPT = """You are a helpful assistant that answers questions about the e2e testing framework.
-If you do not know the answer, state that explicitly."""  # noqa: E501 (verbatim prompt text)
-CLOSED_BOOK_USER_TEMPLATE = """Answer the following question.
-
-Question: {question}
-
-Answer:"""
 
 # ---------------------------------------------------------------------------
 # Evaluation

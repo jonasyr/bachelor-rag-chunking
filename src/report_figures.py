@@ -29,7 +29,9 @@ from matplotlib.ticker import FuncFormatter, MultipleLocator  # noqa: E402
 from analysis_data import AnalysisData  # noqa: E402
 from config import (  # noqa: E402
     ANALYSIS_RULE,
+    CONTROL_ANSWER_STRATEGIES,
     CONTROL_CRITERIA,
+    CONTROL_STRATEGIES,
     FIGURE_COLORS,
     FIGURE_DPI,
     FIGURE_FONT_FILE,
@@ -49,12 +51,15 @@ from config import (  # noqa: E402
 )
 from report_tables import fmt_de  # noqa: E402
 
+(K1,) = CONTROL_STRATEGIES  # "K1"
+(K0,) = CONTROL_ANSWER_STRATEGIES  # "K0"
+
 FIGURE_NAMES = [
     "recall.pdf", "mrr.pdf", "answers_distribution.pdf", "heatmap.pdf",
     "scatter_retrieval_answer.pdf", "catalogue_composition.pdf", "chunk_lengths.pdf", "cost.pdf",
 ]  # fmt: skip
 PDF_METADATA = {"CreationDate": None, "ModDate": None, "Producer": None, "Creator": None}
-STRATEGIES = [*STRATEGY_IDS, "K1"]
+STRATEGIES = [*STRATEGY_IDS, K1]
 LABEL_TOTAL = "Gesamtwert (0 bis 2)"
 CM = 1 / 2.54
 WIDTH = FIGURE_WIDTH_CM * CM
@@ -223,8 +228,8 @@ def _answers_distribution(data: AnalysisData, qids: list[str], path: Path) -> Pa
         for c in CONTROL_CRITERIA:
             ctrl[c] = pd.to_numeric(ctrl[c])
         ctrl["total_four"] = ctrl[CONTROL_CRITERIA].mean(axis=1)
-        k0 = _wide(ctrl, "total_four", ["K0"], qids)["K0"]
-        series.append(("K0", "K0 (vier Kriterien)", k0))
+        k0 = _wide(ctrl, "total_four", [K0], qids)[K0]
+        series.append((K0, "K0 (vier Kriterien)", k0))
     fig, ax = plt.subplots(figsize=(WIDTH, 7.5 * CM))
     for x, (key, _, values) in enumerate(series):
         offsets = _dot_offsets(values)
@@ -364,7 +369,7 @@ def _cost(data: AnalysisData, path: Path) -> Path:
     parts = []
     n = len(data.questions)
     if data.generation:
-        keys = [k for k in (*STRATEGY_IDS, "K0") if k in data.generation]
+        keys = [k for k in (*STRATEGY_IDS, K0) if k in data.generation]
         values = [1000 * data.generation[k]["cost_usd"] / n for k in keys]
         parts.append(("Generierung", "Kosten je 1.000 Antworten (USD)", keys, values))
     if data.embedding:

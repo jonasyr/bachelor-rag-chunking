@@ -55,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     if args.set:
         data = analysis_data.load(analysis_data.set_paths(args.set), main=False)
-        out_dir = args.set / "output"
+        out_dir = args.set / OUTPUT_DIR.name
     else:
         data = analysis_data.load_main()
         out_dir = OUTPUT_DIR

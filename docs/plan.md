@@ -4,11 +4,11 @@
 
 ## Stand
 
-Stand 22.10.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
+Stand 23.10.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
 Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlaufs sind bestanden
-([Experiment-Protokoll](reference/experiment-record.md)). **In Arbeit:** Doku-Audit (22.10.). **Nächster Schritt:**
-Fragenkatalog, drei Blöcke je Woche ab 23.10. ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der Hauptkatalog hat
-0 von 48 Fragen; Einfrieren geplant am 06.11., spätestens 09.11. ([Zeitplan](#zeitplan)).
+([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audit (PR #41) und seine Code-Befunde (PR #42).
+**Nächster Schritt:** Fragenkatalog, drei Blöcke je Woche ab 23.10. ([Backlog](#backlog) Punkt 1). **Größtes Risiko:**
+Der Hauptkatalog hat 0 von 48 Fragen; Einfrieren geplant am 06.11., spätestens 09.11. ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
 
@@ -59,33 +59,20 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 5. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
    R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
    ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-6. **Code-PR nach dem Audit.** Wer: Claude. Frist: vor dem Einfrieren (06.11.). Fertig, wenn der PR gemergt ist mit:
-   - K1/K0-Literale in `report_figures.py`, `report_tables.py`, `analysis_data.py` und `run_log.py` durch
-     `config.CONTROL_STRATEGIES` bzw. `config.CONTROL_ANSWER_STRATEGIES` ersetzt;
-   - fest codiertes `"output"` in `analyse.py` in `src/config.py` verschoben;
-   - `scripts/difficulty_probe.py`: Standard-Set (ein altes Vue-Pilot-Set) entfernt, `SET_DIR` Pflicht;
-   - eigener Abschnittskopf für den RAGAS-Block in `src/config.py`;
-   - Hinweis in `tests.tex` für die drei primären Tests „Konfirmatorisch“ statt „Explorativ“ (ADR 0044, Nachtrag);
-   - `notebooks/analysis.ipynb` (Gerüst) und die Abhängigkeit `plotly` gelöscht;
-   - Regelversion (`config.RUBRIC_RULES_VERSION`) beim Einfrieren des Katalogs festgehalten, damit eine spätere
-     Regeländerung auffällt (Schutz nach [ADR 0035](adr/0035-regelbasierte-bewertung.md) und
-     [ADR 0043](adr/0043-praezisierung-direct-und-teilantworten.md));
-   - Warnung in `catalogue.py check` für H1-Abschnitte in `relevant_section_ids` ohne Begründung in `notes`
-     ([ADR 0022](adr/0022-h1-abschnitte-in-ground-truth.md)).
-7. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (10.–16.11.). Fertig, wenn Python-Version und
+6. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (10.–16.11.). Fertig, wenn Python-Version und
    `system_fingerprint` im [Experiment-Protokoll](reference/experiment-record.md) stehen
    ([ADR 0033](adr/0033-antwortmodell.md)).
-8. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
+7. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
-9. **Volltext Pesl et al. (2026) lesen.** Wer: Jonas. Frist: vor dem Methodik- und Verwandte-Arbeiten-Kapitel (Anfang
+8. **Volltext Pesl et al. (2026) lesen.** Wer: Jonas. Frist: vor dem Methodik- und Verwandte-Arbeiten-Kapitel (Anfang
    November). Fertig, wenn feststeht, ob die Studie auch die Antwortqualität misst, und
    [Forschungsdesign](explanation/research-design.md#verwandte-arbeiten) und
    [Literaturbasis](reference/literature.md) das nennen.
-10. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
+9. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
-11. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+10. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
 
 ## Offene Entscheidungen
 
@@ -137,8 +124,13 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   Nachtrag zu ADR 0033 (PR #40). Doku-Audit; Entscheidungen von Jonas: die Tests von R@5, MRR und Gesamtwert sind
   konfirmatorisch, alle übrigen p-Werte explorativ ([ADR 0044](adr/0044-statistische-auswertung.md#nachtrag-22102026-konfirmatorische-tests)); C4 nur beschreibend ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-22102026-c4-nur-deskriptiv)); Forschungslücke Säule 2 auf
   Prosa-Entwicklerdokumentation eingegrenzt, Pesl et al. (2026) als nächste verwandte Arbeit ([ADR 0011](adr/0011-forschungsluecke.md#nachtrag-22102026-zweite-säule-eingeengt)); Ziehung und Bootstrap der
-  Zweitbewertung und Mischung der Bewertung mit `random`/NumPy akzeptiert, weil die gespeicherten Artefakte gelten ([ADR 0046](adr/0046-zweitbewertung.md#nachtrag-22102026-zufallszahlen)); Notebook-Gerüst und `plotly` entfallen
- ; Lizenzspalte für die Korpusproben; Vue-Archiv `embedding_runs.jsonl` und die Hauptlauf-Ausgaben
+  Zweitbewertung und Mischung der Bewertung mit `random`/NumPy akzeptiert, weil die gespeicherten Artefakte gelten ([ADR 0046](adr/0046-zweitbewertung.md#nachtrag-22102026-zufallszahlen)); Notebook-Gerüst und `plotly` entfallen;
+  Lizenzspalte für die Korpusproben; Vue-Archiv `embedding_runs.jsonl` und die Hauptlauf-Ausgaben
   `analysis.json` und `second_rater_disagreements.csv` werden versioniert; eigene Bewertung erst nach dem
-  Abschluss der Zweitbewertung pushen; Fragenkatalog mit drei Blöcken je Woche ab 23.10., Einfrieren 06.11.
- ; Code-Befunde in einem eigenen PR.
+  Abschluss der Zweitbewertung pushen; Fragenkatalog mit drei Blöcken je Woche ab 23.10., Einfrieren 06.11.;
+  Code-Befunde in einem eigenen PR (PR #42); Doku-Audit (PR #41).
+- 23.10.2026: Code-Befunde des Audits (PR #42): Schlüssel von K1 und K0 nur aus `config`, Ausgabeordner der Pilot-Sets
+  aus `config`, `difficulty_probe.py` verlangt das Set, RAGAS-Block als eigener Abschnitt in `config.py`, Testtabelle
+  „konfirmatorisch“, Notebook-Gerüst und `plotly` entfernt, Regelversion im Einfrier-Eintrag
+  ([ADR 0035](adr/0035-regelbasierte-bewertung.md)), `catalogue.py check` meldet H1-Abschnitte ohne Begründung
+  ([ADR 0022](adr/0022-h1-abschnitte-in-ground-truth.md)).
