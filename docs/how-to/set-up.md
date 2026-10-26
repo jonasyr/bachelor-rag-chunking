@@ -1,6 +1,6 @@
 # Einrichten
 
-*[Doku-Index](../README.md) · Anleitung · Verwandt: [Werkzeuge](../reference/tooling.md), [Korpus-Snapshot erstellen](create-corpus-snapshot.md), [Experiment durchführen](run-the-experiment.md)*
+*[Doku-Index](../README.md) · Anleitung · Verwandt: [Werkzeuge](../reference/tooling.md), [Auf zwei Rechnern arbeiten](work-on-two-machines.md), [Korpus-Snapshot erstellen](create-corpus-snapshot.md), [Experiment durchführen](run-the-experiment.md)*
 
 0. Voraussetzungen: `git` und [uv](https://docs.astral.sh/uv/). Repo klonen und hineinwechseln. Wer mit PaperLab
    arbeitet, klont dort mit `git clone --recurse-submodules`; dieses Repo liegt dann als Submodul `code/` im Ordner der
@@ -17,3 +17,5 @@
    `--help` ([Skripte und Optionen](../reference/tooling.md#skripte-und-optionen)).
 5. Nur ohne PaperLab-Checkout und nur für die Abbildungen der Auswertung: `PAPERLAB_FONTS` auf einen Ordner mit Arial
    setzen ([Umgebungsvariablen](../reference/tooling.md#umgebungsvariablen)).
+6. Korpusdateien und Index für die Arbeit an Katalog und Lauf: [Auf zwei Rechnern arbeiten](work-on-two-machines.md#einen-rechner-einrichten-einmal)
+   (ohne API-Aufruf).

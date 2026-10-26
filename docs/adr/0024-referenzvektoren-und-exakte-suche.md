@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md)); Zahlen im Kontext: Korpus `b75d188` (13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md); welche Dateien unter `data/` versioniert sind, steht in [Werkzeuge](../reference/tooling.md) (nicht versioniert sind u. a. `data/processed/` außer `embedding_runs.jsonl`, nicht ganz `data/`; Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs sind seit [ADR 0045](0045-retrieval-ergebnisse-versioniert.md) versioniert)
+Angenommen (13.10.2026; konkretisiert [ADR 0015](0015-tech-stack.md)); Zahlen im Kontext: Korpus `b75d188` (13.10.2026); aktuelle Werte im [Experiment-Protokoll](../reference/experiment-record.md); welche Dateien unter `data/` versioniert sind, steht in [Datenformate](../reference/data-formats.md#versioniert-und-ignoriert) (Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs seit [ADR 0045](0045-retrieval-ergebnisse-versioniert.md), Chunk-Vektoren seit [ADR 0048](0048-korpus-und-chunk-vektoren-versioniert.md)); Archivierung der Vektordateien geändert durch [ADR 0048](0048-korpus-und-chunk-vektoren-versioniert.md)
 
 ## Kontext
 

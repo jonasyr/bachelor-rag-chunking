@@ -1,4 +1,6 @@
 # Install once per clone:  uv tool install pre-commit && pre-commit install
+# The corpus snapshot stays byte-identical to its checksums (ADR 0048): no hook may touch it.
+exclude: ^data/raw/
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
@@ -11,6 +13,7 @@ repos:
     hooks:
       - id: check-added-large-files
         args: [--maxkb=5120]
+        exclude: ^data/processed/embeddings_(c1|c2|c3|k1)\.npz$  # chunk vectors, ADR 0048
       - id: check-merge-conflict
       - id: check-yaml
       - id: check-toml

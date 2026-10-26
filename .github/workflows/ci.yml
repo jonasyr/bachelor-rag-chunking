@@ -17,6 +17,11 @@ jobs:
         run: uvx pre-commit run --all-files --show-diff-on-failure
       - name: Byte-compile sources
         run: uv run python -m compileall -q src app
+      - name: Rebuild corpus files from the versioned snapshot (no API, ADR 0048)
+        run: |
+          uv run python src/ingest.py
+          uv run python src/preprocess.py
+          uv run python src/chunking.py
       - name: Tests
         run: |
           if [ -d tests ]; then uv run --with pytest pytest -q; else echo "no tests yet"; fi

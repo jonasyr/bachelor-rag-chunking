@@ -2,7 +2,7 @@
 
 ## Status
 
-Angenommen (21.10.2026; ändert die Versionierungsliste in [Datenformate](../reference/data-formats.md#versioniert-und-ignoriert) und den Status von [ADR 0024](0024-referenzvektoren-und-exakte-suche.md))
+Angenommen (21.10.2026; ändert die Versionierungsliste in [Datenformate](../reference/data-formats.md#versioniert-und-ignoriert) und die Versionierung von [ADR 0024](0024-referenzvektoren-und-exakte-suche.md)); Chunk-Vektoren versioniert seit [ADR 0048](0048-korpus-und-chunk-vektoren-versioniert.md) (ändert die neutrale Konsequenz)
 
 ## Kontext
 

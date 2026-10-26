@@ -18,6 +18,8 @@ from config import (
     CATALOGUE_PLAN_FILE,
     CATALOGUE_RESERVE,
     CHUNK_FILES,
+    CONTROL_CHUNK_FILES,
+    CONTROL_EMBEDDING_FILES,
     CONTROL_STRATEGIES,
     CORPUS_AREAS,
     CORPUS_NAV_FILE,
@@ -124,14 +126,20 @@ def test_c2_has_more_chunks_than_c1(tmp_path):
     assert chunk("C2", out_file=tmp_path / "c2.jsonl") > chunk("C1", out_file=tmp_path / "c1.jsonl")
 
 
-@pytest.mark.parametrize("key", list(STRATEGY_IDS))
+ALL_VECTOR_FILES = {**EMBEDDING_FILES, **CONTROL_EMBEDDING_FILES}  # C1-C3 and the control K1
+ALL_CHUNK_FILES = {**CHUNK_FILES, **CONTROL_CHUNK_FILES}
+
+
+@pytest.mark.parametrize("key", [*STRATEGY_IDS, *CONTROL_STRATEGIES])
 def test_reference_vectors_match_their_chunks(key):
-    if not EMBEDDING_FILES[key].exists():
+    if not ALL_VECTOR_FILES[key].exists():
         pytest.skip("not embedded; run src/embed.py")
+    if not ALL_CHUNK_FILES[key].exists():  # vectors are versioned, chunks are rebuilt (ADR 0048)
+        pytest.skip("not chunked; run src/chunking.py")
     chunks = [
-        json.loads(line) for line in CHUNK_FILES[key].read_text(encoding="utf-8").splitlines()
+        json.loads(line) for line in ALL_CHUNK_FILES[key].read_text(encoding="utf-8").splitlines()
     ]
-    with np.load(EMBEDDING_FILES[key], allow_pickle=False) as data:
+    with np.load(ALL_VECTOR_FILES[key], allow_pickle=False) as data:
         assert data["ids"].tolist() == [c["chunk_id"] for c in chunks]
         assert data["texts"].tolist() == [c["text"] for c in chunks]
         vectors = data["vectors"]

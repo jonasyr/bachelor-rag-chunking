@@ -31,7 +31,8 @@ uv sync                  # dependencies + dev group into .venv
 cp .env.example .env     # then add your OPENAI_API_KEY
 ```
 
-Full setup (pre-commit, check): [`docs/how-to/set-up.md`](docs/how-to/set-up.md).
+Full setup (pre-commit, check): [`docs/how-to/set-up.md`](docs/how-to/set-up.md). To reproduce the results without an
+API key: [`docs/how-to/reproduce-the-results.md`](docs/how-to/reproduce-the-results.md).
 
 ## How it runs
 
@@ -68,10 +69,12 @@ Code and documentation: [MIT](LICENSE), © 2026 Jonas Weirauch.
   documentation contributors, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); excerpts of it remain in the
   historical pilot sets `data/pilot/`, `data/pilot/hard/` and `data/pilot/hard_posthoc/`.
 
-### Corpus (not redistributed)
+### Corpus
 
 The [e2e documentation](https://github.com/tester-army/e2e/tree/main/docs) © 2026 TesterArmy, Inc., licensed under the
 Apache License 2.0 ([copy](LICENSES/Apache-2.0.txt)). Its NOTICE reads: "This product includes software developed at
-TesterArmy, Inc. (https://tester.army)." It is downloaded at run time (`src/snapshot.py`, commit in `src/config.py`)
-and not redistributed here. It is modified before use; the conversion rules are listed in
-[`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0038).
+TesterArmy, Inc. (https://tester.army)." The pages of commit `ef977f4` (pinned in `src/config.py`) are redistributed
+unchanged in `data/raw/e2e_docs_snapshot/`, together with the vectors computed from them
+(`data/processed/embeddings_*.npz`), so that the runs can be reproduced without the original repository
+([ADR 0048](docs/adr/0048-korpus-und-chunk-vektoren-versioniert.md)). The pipeline modifies them before use; the
+conversion rules are listed in [`docs/reference/corpus.md`](docs/reference/corpus.md) (decisions: ADR 0019, ADR 0038).

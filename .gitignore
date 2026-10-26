@@ -11,16 +11,15 @@ env/
 # Environment
 .env
 
-# Data — raw snapshot and processed artefacts (large files).
-# Contents ignored, but .gitkeep is tracked so the directory structure
-# survives a fresh clone (src/ingest.py writes into data/processed/).
+# Data. Versioned (ADR 0048): the e2e snapshot and the chunk vectors, which no run repeats
+# exactly. Ignored: everything rebuilt from them byte for byte (documents, sections, chunks,
+# the Chroma index); .gitkeep keeps data/processed/ on a fresh clone.
 data/raw/*
 !data/raw/e2e_docs_snapshot/
-data/raw/e2e_docs_snapshot/*
-!data/raw/e2e_docs_snapshot/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/embedding_runs.jsonl
+!data/processed/embeddings_*.npz
 # Vue history (ADR 0038): only the run log of the archived Vue runs is versioned; it backs the costs in experiment-record-vue.md
 !data/processed/archive_vue_2026-10-18/
 data/processed/archive_vue_2026-10-18/*
