@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_RAW = ROOT / "data" / "raw" / "e2e_docs_snapshot"
 DATA_PROCESSED = ROOT / "data" / "processed"
 DATA_EVAL = ROOT / "data" / "evaluation"
-PILOT_DIR = ROOT / "data" / "pilot"  # pilot probes, not the catalogue (scripts/difficulty_probe.py)
+PILOT_DIR = ROOT / "data" / "pilot"  # pilot sets (catalogue.py, scoring_store.py)
 PILOT_RUNS_FILE_NAME = "runs.jsonl"  # run log inside each pilot set; other pilot files reuse the
 # names of the evaluation artefacts below (QUESTIONS_FILE.name, GROUND_TRUTH_FILE.name, ...)
 CHROMA_DIR = ROOT / "chroma_db"
@@ -44,7 +44,7 @@ RETRIEVED_RESULTS_FILE = DATA_EVAL / "retrieved_results.csv"
 CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control K1 (D26)
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 GENERATED_ANSWERS_CONTROL_FILE = DATA_EVAL / "generated_answers_control.csv"  # control K0 (D41)
-GENERATION_RUNS_FILE = DATA_EVAL / "generation_runs.jsonl"  # one line per run of generate.py (D33)
+GENERATION_RUNS_FILE = DATA_EVAL / "generation_runs.jsonl"  # generation + later steps (D33)
 SCORES_FILE = DATA_EVAL / "scores.csv"
 # Blind rubric scoring (D32): the rater fills the sheet while reading the packet; the key that maps
 # each code to its strategy is opened only by `evaluate_answers.py --mode summarise`.

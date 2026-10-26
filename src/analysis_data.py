@@ -410,7 +410,3 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
 
 def load_main() -> AnalysisData:
     return load(main_paths(), main=True)
-
-
-def load_set(set_dir: Path) -> AnalysisData:
-    return load(set_paths(set_dir), main=False)
