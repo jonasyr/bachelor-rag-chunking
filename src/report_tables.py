@@ -19,8 +19,11 @@ import stats
 from analysis_data import AnalysisData
 from config import (
     AGREEMENT_CI_LEVEL,
+    ANALYSIS_BOOTSTRAP_REPS,
+    ANALYSIS_CI_LEVEL,
     ANALYSIS_PRIMARY,
     ANALYSIS_RULE,
+    ANALYSIS_SEED,
     BYTES_PER_MB,
     CONTROL_ANSWER_STRATEGIES,
     CONTROL_CRITERIA,
@@ -42,7 +45,7 @@ TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
     "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
-    "agreement.tex",
+    "agreement.tex", "differences.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -270,6 +273,20 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
     results["confirmatory"] = {
         col: {"label": ANALYSIS_PRIMARY[col], **r} for col, r in confirm.items()
     }
+    # mean differences with bootstrap CIs for every pair, not gated by the tests (ADR 0044)
+    results["differences"] = {
+        col: {
+            "label": ANALYSIS_PRIMARY[col],
+            "pairs": {
+                f"{x}-{y}": stats.mean_diff_ci(
+                    values[x], values[y], ANALYSIS_BOOTSTRAP_REPS, ANALYSIS_CI_LEVEL, ANALYSIS_SEED
+                )
+                for x, y in stats._pair_names(values)  # noqa: SLF001 (same pair order as the tests)
+            },
+        }
+        for col, values in primary.items()
+    }
+    results["bootstrap"] = {"reps": ANALYSIS_BOOTSTRAP_REPS, "level": ANALYSIS_CI_LEVEL}
 
     # descriptive effect sizes
     desc_retrieval = {m: e for m, e in main_effects.items() if m not in ANALYSIS_PRIMARY}
@@ -611,6 +628,31 @@ def _tests_descriptive_table(results: dict) -> str:
     )  # fmt: skip
 
 
+def _differences_table(results: dict) -> str:
+    """Mean differences of the primary metrics with bootstrap CIs, all pairs (ADR 0044)."""
+    header = ["Vergleich", "Mittlere Differenz", "Intervall"]
+    rows: list[list[str] | str] = []
+    for d in results["differences"].values():
+        rows.append(_group(d["label"], len(header), not rows))
+        for pair, v in d["pairs"].items():
+            interval = (
+                DASH
+                if v["low"] is None
+                else f"[{fmt_de(v['low'], REPORT_DECIMALS)}; {fmt_de(v['high'], REPORT_DECIMALS)}]"
+            )
+            rows.append([pair.replace("-", "–"), fmt_opt(v["mean_diff"]), interval])
+    boot = results["bootstrap"]
+    note = (
+        "Mittlere Differenz jeweils erste minus zweite Strategie, über alle Fragen; Intervall: "
+        f"{fmt_de(boot['level'] * 100, 0)}-%-Perzentil-Bootstrap über die Fragen "
+        f"({boot['reps']} Wiederholungen), für alle Paare unabhängig vom Testergebnis."
+    )
+    return latex_table(
+        "differences", "Mittlere Differenzen der Hauptmetriken mit Konfidenzintervall", header,
+        rows, "lrr", note,
+    )  # fmt: skip
+
+
 def _w(w: float | None) -> str:
     return DASH if w is None else "W = " + fmt_de(w, REPORT_DECIMALS)
 
@@ -889,6 +931,7 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
         "ragas_effects.tex": lambda: _ragas_effects_table(results),
         "ragas_agreement.tex": lambda: _ragas_agreement_table(results),
         "agreement.tex": lambda: _agreement_table(results),
+        "differences.tex": lambda: _differences_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",

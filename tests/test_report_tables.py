@@ -178,7 +178,7 @@ def test_descriptive_metrics_have_no_p_in_results():
 
 def test_all_tables_are_written(tmp_path):
     paths = write_tables(build_results(agreement_data(), 0.05), tmp_path)
-    assert len(TABLE_NAMES) == 13
+    assert len(TABLE_NAMES) == 14
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
         text = p.read_text(encoding="utf-8")
@@ -499,3 +499,24 @@ def test_agreement_skipped_without_second_rating(tmp_path):
     assert results["agreement"] is None
     paths = write_tables(results, tmp_path)
     assert "agreement.tex" not in {p.name for p in paths}
+
+
+def test_differences_have_intervals_for_every_pair_without_gating():
+    """The bootstrap intervals exist whether or not the omnibus test is significant (ADR 0044)."""
+    results = build_results(make_data(), 1e-9)  # nothing significant
+    diffs = results["differences"]
+    assert list(diffs) == ["recall", "reciprocal_rank", "total_score"]
+    for d in diffs.values():
+        assert list(d["pairs"]) == ["C1-C2", "C1-C3", "C2-C3"]
+        for p in d["pairs"].values():
+            assert p["low"] <= p["mean_diff"] <= p["high"]
+            assert p["n"] == len(QIDS)
+
+
+def test_differences_table(tmp_path):
+    write_tables(build_results(make_data(), 0.05), tmp_path)
+    tex = (tmp_path / "differences.tex").read_text(encoding="utf-8")
+    assert r"\label{tab:differences}" in tex
+    for label in ("R@5", "MRR", "Gesamtwert"):
+        assert rf"{{{label}}}" in tex
+    assert "Bootstrap" in tex and "erste minus zweite" in tex

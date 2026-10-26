@@ -355,6 +355,11 @@ ANALYSIS_DIFF_DECIMALS = (
 # Confirmatory metrics (column in the per-question table -> display name)
 ANALYSIS_PRIMARY = {"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}
 ANALYSIS_RULE = "main"  # relevance rule of the retrieval metrics used in the analysis
+ANALYSIS_BOOTSTRAP_REPS = (
+    2000  # bootstrap over questions for the CIs of the paired mean differences
+)
+ANALYSIS_CI_LEVEL = 0.95  # percentile interval of the mean differences
+ANALYSIS_SEED = 20261026  # seed of that bootstrap; fixed before the main run, never tuned
 REPORT_DECIMALS = 2  # decimals of scores, metrics, test statistics and effect sizes in the tables
 REPORT_P_DECIMALS = 3  # decimals of p-values; smaller ones are shown as "<0,001"
 REPORT_COST_DECIMALS = 5  # decimals of costs in USD in the efficiency table
