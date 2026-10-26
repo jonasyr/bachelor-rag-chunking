@@ -94,8 +94,9 @@ Prüffragen beantwortet:
 | `direct` | Steht die Kernaussage der Antwort in den ersten zwei Sätzen? (auch wenn sie falsch ist, das zählt unter Korrektheit, und auch wenn ein zweiter Teil der Frage später folgt; [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)) | `yes`, `no` |
 | `wordy` | Ist die Antwort wiederholend, aufgebläht oder verwirrend? | `yes`, `no` |
 
-Die Hilfetexte des Bewertungsformulars (`POINT_HELP`, `HELP` in `app/scoring_page.py`) geben diese Prüffragen
-wortgleich wieder; wer eine Prüffrage ändert, ändert beide (kein Test prüft das).
+Das Bewertungsformular zeigt diese Prüffragen auf Englisch aus `QUESTIONS` bzw. für K0 `CONTROL_QUESTIONS` in
+`app/scoring_page.py`; `POINT_HELP` und `HELP` ergänzen die Grenzfälle der Klammern oben. Wer eine Prüffrage oder
+ihre Grenzfallregel ändert, ändert dort beides (kein Test prüft das).
 
 Ableitung der Werte, verbindlich ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)):
 
