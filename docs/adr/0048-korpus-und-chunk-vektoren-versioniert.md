@@ -13,7 +13,7 @@ Angenommen (26.10.2026; von Jonas entschieden; ändert die Archivierung der Vekt
 - Versioniert waren bisher die Fragevektoren, die Retrieval-Ergebnisse, die Antworten und die Bewertungen
   ([ADR 0033](0033-antwortmodell.md), [ADR 0045](0045-retrieval-ergebnisse-versioniert.md)). Ignoriert waren der
   Korpus-Snapshot (`data/raw/e2e_docs_snapshot/`, 62 Dateien, 1,1 MB) und die Chunk-Vektoren
-  (`data/processed/embeddings_c1|c2|c3|k1.npz`, zusammen 54 MB); ADR 0024 sah vor, die Vektoren für die DOI gesondert zu
+  (`data/processed/embeddings_c1|c2|c3|k1.npz`, zusammen 56,9 MB); ADR 0024 sah vor, die Vektoren für die DOI gesondert zu
   sichern, ohne festzulegen wie.
 - Die Chunk-Vektoren lässt kein Lauf bitgleich neu entstehen: neue Vektoren kosten API-Aufrufe und weichen ab
   (Modellstand-Prüfung, [ADR 0024](0024-referenzvektoren-und-exakte-suche.md)). Mit den gespeicherten Vektoren baut
@@ -25,7 +25,7 @@ Angenommen (26.10.2026; von Jonas entschieden; ändert die Archivierung der Vekt
 - Aus dem Snapshot entstehen `documents.jsonl`, `sections.jsonl` und `chunks_*.jsonl` bitgleich neu (geprüft am
   26.10.2026 auf einer frischen Kopie: alle sechs Dateien mit identischer SHA-256); jeder spätere Schritt prüft ihre
   Prüfsummen ohnehin.
-- Die Vektoren werden einmal erzeugt; die Datei je Strategie liegt unter 17 MB und damit unter den Grenzen von GitHub.
+- Die Vektoren werden einmal erzeugt; die größte Datei hat 17,7 MB und liegt damit unter den Grenzen von GitHub.
 
 ## Entscheidung
 
@@ -43,6 +43,6 @@ laufen.
   ([Auf zwei Rechnern arbeiten](../how-to/work-on-two-machines.md)); das DOI-Archiv enthält alles ohne gesonderte
   Sicherung.
 - Positiv: Die CI prüft bei jedem Pull Request, dass Snapshot, Chunks und Vektoren zusammenpassen.
-- Negativ: Etwa 55 MB Binärdaten in der Git-Historie; ein erneutes Einbetten käme noch einmal hinzu.
+- Negativ: Etwa 57 MB Binärdaten in der Git-Historie; ein erneutes Einbetten käme noch einmal hinzu.
 - Neutral: Der Korpus wird weitergegeben; Lizenztext und NOTICE stehen im [README](../../README.md#license).
   `snapshot.py` bleibt der Weg, den Snapshot gegen das Original zu prüfen; es schreibt dieselben Bytes.
