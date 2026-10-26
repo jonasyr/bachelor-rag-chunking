@@ -66,13 +66,19 @@ tragen irrelevante Information mit, und eine Zerlegung quer zur Dokumentstruktur
 
 Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
 
-1. **Anderer Korpus:** e2e ([ADR 0038](../adr/0038-korpus-e2e.md); ursprünglich Vue.js) statt der bereits informell
-   untersuchten FastAPI/Supabase/Stripe-Dokumentation.
+1. **Dem Modell unbekannter Korpus:** e2e ([ADR 0038](../adr/0038-korpus-e2e.md); ursprünglich Vue.js), per
+   Closed-Book-Prüfung kontrolliert. Sprachmodelle kennen populäre öffentliche Inhalte, und Retrieval hilft vor allem
+   bei seltenem Wissen (Mallen et al., 2023; Kandpal et al., 2023); auf einem bekannten Korpus vermischen sich
+   Retrieval-Effekte mit Modellwissen ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-blogbeitrag-entfällt-erste-säule-neu)).
 2. **Andere Domäne und Dokumentart:** entwicklerorientierte Prosa-Dokumentation eines Testframeworks (Leitfäden und
    Referenzseiten in Markdown/MDX). Kontrollierte Chunking-Vergleiche gibt es bislang vor allem für spezialisierte
    Fachdomänen (etwa klinische Entscheidungsunterstützung) und für strukturierte API-Spezifikationen (OpenAPI, Pesl et
-   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Die im Exposé genannten
-   „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
+   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Eine dokumentierte Suche vom 26.10.2026 fand
+   keine begutachtete Studie, die die Strategien kontrolliert auf Prosa-Entwicklerdokumentation vergleicht und die
+   Antwortqualität misst; nächste Treffer sind Pham Doan und Luong Ngoc (2025, überschriftenbasiertes Chunking auf
+   AWS-Handbüchern) und Dhakal et al. (2026, nur Retrieval). Die Aussage ist suchbegrenzt und vorläufig, bis der
+   Volltext von Pham Doan und Luong Ngoc geprüft ist (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im
+   Exposé genannten „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
    ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1
@@ -114,9 +120,10 @@ die Arbeit über die Dokumentart ab: Prosa-Leitfäden und Referenzseiten statt s
 Pesl et al. auch die Antwortqualität messen oder nur das Retrieval, ist noch am Volltext zu prüfen
 ([Backlog](../plan.md#backlog)); davon hängt ab, wie scharf die Abgrenzung über die Methodik (Säule 3) ausfällt.
 
-Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup ist keine zitierfähige wissenschaftliche Quelle, wird
-aber im Kapitel „Verwandte Arbeiten“ kurz als informeller Vorläufer eingeordnet; das unterstreicht die Abgrenzung
-([ADR 0011](../adr/0011-forschungsluecke.md)). Quellen und ihre Rolle: [Literaturbasis](../reference/literature.md).
+Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup erscheint in der Arbeit nicht: Das Thesis-Handbuch
+schließt Blogbeiträge in der theoretischen Fundierung aus
+([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-blogbeitrag-entfällt-erste-säule-neu)). Quellen und ihre
+Rolle: [Literaturbasis](../reference/literature.md).
 
 ## Korpus: Begründung der Wahl
 

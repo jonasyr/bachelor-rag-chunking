@@ -2,7 +2,7 @@
 
 *[Doku-Index](../README.md) · Referenz · Verwandt: [Forschungsdesign](../explanation/research-design.md), [ADR 0018](../adr/0018-literaturbasis.md), [ADR 0002](../adr/0002-zitierstil-apa.md)*
 
-Alle Quellen der Arbeit mit ihrer Rolle, Stand 22.10.2026. Maßgeblich für die bibliografischen Angaben ist die
+Alle Quellen der Arbeit mit ihrer Rolle, Stand 26.10.2026. Maßgeblich für die bibliografischen Angaben ist die
 `main.bib` der Bachelorarbeit im privaten PaperLab-Repo (am 22.10.2026 gegen Crossref, arXiv, ACL Anthology und die
 Webseiten geprüft, einzelne Angaben am Volltext: Renze und Guven, Lee et al., Taiwo und Amaluddin Yusoff); diese Seite spiegelt sie für Leser des öffentlichen Repos. Das Exposé-Bib (`expose/latex/main.bib`)
 ist eingefroren und enthält noch ältere Angaben (etwa die Autorenreihenfolge von Qu et al.). Zitierstil: APA 7 /
@@ -34,8 +34,63 @@ ergänzte Domänenstudie (Pesl et al.).
 | `qu2025semanticchunking` | Qu, R., Tu, R., & Bao, F. S. (2025). Is semantic chunking worth the computational cost? In *Findings of the ACL: NAACL 2025* (S. 2155–2177). https://doi.org/10.18653/v1/2025.findings-naacl.114 | semantisch/strukturell nicht konsistent besser: starke Baseline, Thema nicht trivial ([ADR 0010](../adr/0010-starke-baseline.md)) |
 | `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (strukturbasiert je Endpunkt schlägt Token-Chunking); Abgrenzung über die Dokumentart ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); **vorläufig:** nach [ADR 0018](../adr/0018-literaturbasis.md) erst nach der Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 8) |
 
-Nicht zitierfähig und darum ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; seine
-Einordnung steht im [Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten).
+Ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; er erscheint in der Arbeit nicht
+([ADR 0011, Nachtrag](../adr/0011-forschungsluecke.md#nachtrag-26102026-blogbeitrag-entfällt-erste-säule-neu)).
+
+## Ergänzte Quellen (26.10.2026)
+
+Bei der Kapitelplanung der Arbeit gezielt für Lücken gesucht und am 26.10.2026 gegen Crossref, PMLR, ACL Anthology und
+OpenAlex geprüft (bibliografische Angaben). Die Befunde stammen aus den Abstracts; nach
+[ADR 0018](../adr/0018-literaturbasis.md) sind alle Quellen dieses Abschnitts darum **vorläufig** und erst nach der
+Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 13). Für die
+Webquelle `smith2024chunking` (Chroma-Blog) gilt: nur als technische Begründung in ADRs und der Methodik, nicht in der
+theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024bestpractices` und `liu2024lostmiddle`.
+
+### Chunking und Kontext
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `liu2024lostmiddle` | Liu, N. F., et al. (2024). Lost in the middle: How language models use long contexts. *Transactions of the Association for Computational Linguistics, 12*, 157–173. https://doi.org/10.1162/tacl_a_00638 | Sprachmodelle nutzen Passagen in der Mitte langer Kontexte schlechter |
+| `chen2024densex` | Chen, T., et al. (2024). Dense X retrieval: What retrieval granularity should we use? In *Proceedings of EMNLP 2024* (S. 15159–15177). https://doi.org/10.18653/v1/2024.emnlp-main.845 | Granularität der Retrieval-Einheit beeinflusst Retrieval und QA |
+| `wang2024bestpractices` | Wang, X., et al. (2024). Searching for best practices in retrieval-augmented generation. In *Proceedings of EMNLP 2024* (S. 17716–17736). https://doi.org/10.18653/v1/2024.emnlp-main.981 | Abwägung der Chunk-Größe; Überlappung (Sliding Window) verbessert das Retrieval in einem kleinen Experiment |
+
+### Modellwissen und Kontamination
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `mallen2023whennot` | Mallen, A., et al. (2023). When not to trust language models: Investigating effectiveness of parametric and non-parametric memories. In *Proceedings of ACL 2023* (S. 9802–9822). https://doi.org/10.18653/v1/2023.acl-long.546 | Retrieval hilft vor allem bei seltenem Wissen: erste Säule, Korpuswechsel, K0 |
+| `kandpal2023longtail` | Kandpal, N., et al. (2023). Large language models struggle to learn long-tail knowledge. In *Proceedings of ICML 2023* (PMLR 202, S. 15696–15707). https://proceedings.mlr.press/v202/kandpal23a.html | selten vorkommendes Wissen wird schlecht gelernt |
+| `sainz2023contamination` | Sainz, O., et al. (2023). NLP evaluation in trouble: On the need to measure LLM data contamination for each benchmark. In *Findings of the ACL: EMNLP 2023* (S. 10776–10787). https://doi.org/10.18653/v1/2023.findings-emnlp.722 | Kontamination je Datensatz und Modell messen: Closed-Book-Prüfung |
+
+### Antwortbewertung und Fragetypen
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `krishna2021hurdles` | Krishna, K., Roy, A., & Iyyer, M. (2021). Hurdles to progress in long-form question answering. In *Proceedings of NAACL-HLT 2021* (S. 4940–4957). https://doi.org/10.18653/v1/2021.naacl-main.393 | ROUGE taugt für lange Antworten nicht: manuelle Bewertung |
+| `rashkin2023attribution` | Rashkin, H., et al. (2023). Measuring attribution in natural language generation models. *Computational Linguistics, 49*(4), 777–840. https://doi.org/10.1162/coli_a_00486 | Attribution als eigenes, menschlich bewertetes Kriterium: Quellenbezug |
+| `bolotova2022nonfactoid` | Bolotova, V., et al. (2022). A non-factoid question-answering taxonomy. In *Proceedings of SIGIR 2022* (S. 1196–1207). https://doi.org/10.1145/3477495.3531926 | Fragetypen jenseits faktischer Fragen: H3 |
+| `beyer2020questions` | Beyer, S., Macho, C., Di Penta, M., & Pinzger, M. (2020). What kind of questions do developers ask on Stack Overflow? *Empirical Software Engineering, 25*(3), 2258–2301. https://doi.org/10.1007/s10664-019-09758-x | Kategorien von Entwicklerfragen |
+
+### Statistik
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `friedman1937ranks` | Friedman, M. (1937). The use of ranks to avoid the assumption of normality implicit in the analysis of variance. *Journal of the American Statistical Association, 32*(200), 675–701. https://doi.org/10.1080/01621459.1937.10503522 | Friedman-Test ([ADR 0044](../adr/0044-statistische-auswertung.md)) |
+| `wilcoxon1945ranking` | Wilcoxon, F. (1945). Individual comparisons by ranking methods. *Biometrics Bulletin, 1*(6), 80–83. https://doi.org/10.2307/3001968 | Wilcoxon-Vorzeichen-Rang-Test |
+| `holm1979sequentially` | Holm, S. (1979). A simple sequentially rejective multiple test procedure. *Scandinavian Journal of Statistics, 6*(2), 65–70. https://www.jstor.org/stable/4615733 | Holm-Korrektur |
+| `kendall1939rankings` | Kendall, M. G., & Babington Smith, B. (1939). The problem of m rankings. *The Annals of Mathematical Statistics, 10*(3), 275–287. https://doi.org/10.1214/aoms/1177732186 | Kendalls W |
+| `fritz2012effectsize` | Fritz, C. O., Morris, P. E., & Richler, J. J. (2012). Effect size estimates: Current use, calculations, and interpretation. *Journal of Experimental Psychology: General, 141*(1), 2–18. https://doi.org/10.1037/a0024338 | Effektstärke r = \|z\| / √n |
+| `spearman1904proof` | Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology, 15*(1), 72–101. https://doi.org/10.2307/1412159 | Spearmans ρ (H2) |
+| `efron1979bootstrap` | Efron, B. (1979). Bootstrap methods: Another look at the jackknife. *The Annals of Statistics, 7*(1), 1–26. https://doi.org/10.1214/aos/1176344552 | Bootstrap-Intervalle ([ADR 0044, Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen), [ADR 0046](../adr/0046-zweitbewertung.md)) |
+| `dror2018hitchhiker` | Dror, R., Baumer, G., Shlomov, S., & Reichart, R. (2018). The hitchhiker's guide to testing statistical significance in natural language processing. In *Proceedings of ACL 2018* (S. 1383–1392). https://doi.org/10.18653/v1/P18-1128 | Wahl der Signifikanztests beim Systemvergleich |
+
+Endseiten von Wilcoxon (83) und Spearman (101) sowie das Heft von Holm (2) sind nicht maschinell bestätigt.
+
+### Entwicklerdokumentation
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `aghajani2019issues` | Aghajani, E., et al. (2019). Software documentation issues unveiled. In *Proceedings of ICSE 2019* (S. 1199–1210). IEEE. https://doi.org/10.1109/ICSE.2019.00122 | Probleme von Softwaredokumentation: Relevanz der Domäne |
 
 ## Technische Quellen (Web)
 
@@ -104,3 +159,14 @@ RAGAS). RAGAS selbst steht unter den Kernquellen (`es2024ragas`).
 | `gwet2014handbook` | Gwet, K. L. (2014). *Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters* (4. Aufl.). Advanced Analytics. | AC2 mit Gewichten für ordinale Skalen |
 | `hayes2007alpha` | Hayes, A. F., & Krippendorff, K. (2007). Answering the call for a standard reliability measure for coding data. *Communication Methods and Measures, 1*(1), 77–89. https://doi.org/10.1080/19312450709336664 | Krippendorffs α (ordinal) als Vergleichsmaß |
 | `zheng2023judge` | Zheng, L., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. In *Advances in Neural Information Processing Systems 36* (S. 46595–46623). Curran Associates. https://doi.org/10.52202/075280-2020 | Selbstbevorzugung des Richtermodells; LLM-Gegenprobe nur als Triangulation |
+
+### Nächste Treffer der Suche zur zweiten Säule
+
+Dokumentierte Suche vom 26.10.2026 (Protokoll im Recherche-Log der Arbeit, PaperLab); bibliografische Angaben gegen
+Crossref geprüft, nur Abstracts gelesen. **Vorläufig:** Pham Doan und Luong Ngoc (2025) erst nach der Volltextprüfung
+([Backlog](../plan.md#backlog), Punkt 12); Dhakal et al. (2026) nur als Suchtreffer, Begutachtung der Zeitschrift unklar.
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `phamdoan2025headingaware` | Pham Doan, T., & Luong Ngoc, P. (2025). Optimizing context retrieval for RAG via heading-aware chunking and hierarchical document structure integration. In *2025 IEEE 7th Symposium on Computers & Informatics (ISCI)* (S. 456–461). IEEE. https://doi.org/10.1109/ISCI65687.2025.11167620 | nächster Treffer: überschriftenbasiertes Chunking auf AWS-Handbüchern; ob größenbasierte und semantische Baselines dabei sind, am Volltext prüfen |
+| `dhakal2026techdocs` | Dhakal, A., Neupane, S. S., Dhakal, A., & Paudel, M. (2026). Optimizing technical documentation for RAG systems: A comparative analysis of semantic chunking vs. structural formatting. *International Journal of Scientific Research in Science, Engineering and Technology, 13*(1), 222–227. https://doi.org/10.32628/ijsrset261313 | semantisch gegen ganzes Dokument, nur Retrieval |
