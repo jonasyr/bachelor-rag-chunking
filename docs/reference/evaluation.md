@@ -255,6 +255,7 @@ p-Werte (H2-Korrelationen) sind explorativ.
 | Omnibus | Friedman-Test über C1–C3 je Metrik, Holm-Korrektur über die p-Werte der testbaren Metriken (eine konstante Metrik hat kein p und fällt aus der Familie; [ADR 0044, Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-26102026-holm-über-die-testbaren-metriken)), Niveau `config.ANALYSIS_ALPHA` |
 | Paare | nur für Metriken mit korrigiertem p < α Wilcoxon-Tests C1–C2, C1–C3, C2–C3: zweiseitig, Normalapproximation, Bindungskorrektur, ohne Stetigkeitskorrektur, Nulldifferenzen verworfen, Differenzen auf `config.ANALYSIS_DIFF_DECIMALS` Stellen gerundet; ein Paar mit einer Differenz ungleich 0 ist testbar; Holm über alle diese Paare |
 | Effektstärken | Kendalls W = χ²_F / (n (k − 1)) aus dem bindungskorrigierten Friedman-Wert (voll gebundene Fragen zählen in n) und r = \|z\| / √n′ (n′ = Differenzen ungleich 0); die Richtung zeigt die Median-Differenz |
+| Differenzen | für jede Metrik und jedes Paar, unabhängig vom Testergebnis: mittlere gepaarte Differenz (erste minus zweite Strategie) mit 95-%-Perzentil-Bootstrap-Intervall über die Fragen (`config.ANALYSIS_BOOTSTRAP_REPS`, `ANALYSIS_CI_LEVEL`, `ANALYSIS_SEED`); deskriptiv, zeigt bei nicht signifikantem Test, wie große Unterschiede die Daten noch zulassen ([ADR 0044, Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen)) |
 
 **Beschreibend** (Mittel, Median, Effektstärken, keine p-Werte): nach der Hauptregel Hit@5, P@5 und Kontext@5, nach
 der Sensitivitätsregel alle Retrieval-Metriken, die fünf Kriterien der Rubrik, K0 gegen C1–C3 über
@@ -277,6 +278,7 @@ Teile ohne Eingabedaten entfallen mit einem Hinweis in `notes` von `analysis.jso
 | Retrieval-Mittel, Sensitivitätsregel | `retrieval_sensitivity.tex` | `retrieval.sensitivity` |
 | Antwort-Mittel je Kriterium | `answers.tex` | `answers.means` |
 | Konfirmatorische Tests | `tests.tex` | `confirmatory` |
+| Mittlere Differenzen der Hauptmetriken mit Bootstrap-Intervall, alle Paare | `differences.tex` | `differences`, `bootstrap` |
 | Effektstärken ohne Test, Hauptregel und Kriterien | `tests_descriptive.tex` | `descriptive_effects.main`, `descriptive_effects.answers` |
 | Effektstärken ohne Test, Sensitivitätsregel | keine (nur JSON) | `descriptive_effects.sensitivity` |
 | K0 gegen C1–C3 | `control_k0.tex` | `control_k0` |

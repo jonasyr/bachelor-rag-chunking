@@ -3,7 +3,8 @@
 Pure functions. Inputs map a strategy to its per-question values, all lists in the same question
 order (paired by question). A constant or otherwise untestable metric is reported with
 ``testable = False`` and without a p-value; nothing here returns NaN. Agreement measures of the
-second rating (D46): Gwet's AC1/AC2, Krippendorff's alpha and a cluster bootstrap over questions.
+second rating (D46): Gwet's AC1/AC2, Krippendorff's alpha and a cluster bootstrap over questions,
+which also gives the intervals of the paired mean differences between strategies.
 """
 
 from __future__ import annotations
@@ -267,3 +268,19 @@ def cluster_bootstrap_ci(
     tail = (1 - level) / 2 * 100
     low, high = np.percentile(values, [tail, 100 - tail])
     return {"low": float(low), "high": float(high), "dropped": dropped}
+
+
+def mean_diff_ci(a: list[float], b: list[float], reps: int, level: float, seed: int) -> dict:
+    """Mean of the paired differences a - b with a percentile bootstrap CI over the questions.
+
+    Shows how large a difference the data still allow, also when no test is significant.
+    """
+    if len(a) != len(b):
+        raise ValueError(f"lists differ in length: {len(a)} vs {len(b)}")
+    diffs = [[x - y] for x, y in zip(a, b, strict=True)]
+
+    def mean(sample: list[list[float]]) -> float | None:
+        return float(np.mean([d[0] for d in sample])) if sample else None
+
+    ci = cluster_bootstrap_ci(diffs, mean, reps, level, seed)
+    return {"mean_diff": mean(diffs), "low": ci["low"], "high": ci["high"], "n": len(diffs)}

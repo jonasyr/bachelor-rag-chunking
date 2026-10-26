@@ -509,6 +509,7 @@ Klasse; negative Werte mit typografischem Minus.
 | `answers` | Rubrik-Kriterien und Gesamtwert je Strategie | – |
 | `tests` | nur die konfirmatorischen Tests | – |
 | `tests_descriptive` | W und r der Maße ohne Test | – |
+| `differences` | mittlere Differenz und Bootstrap-Intervall je Paar der Hauptmetriken | – |
 | `control_k0` | K0 gegen C1–C3 | keine K0-Bewertung |
 | `correlation` | Rangkorrelation zwischen Retrieval- und Antwortqualität (H2) | – |
 | `efficiency` | Chunks, Längen, Kontext-Tokens, Indexgröße, Kosten | Chunk-Dateien oder `embed`-Einträge fehlen |
@@ -540,6 +541,8 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
   Kriterien ohne Quellenbezug, für den Vergleich mit K0), einschließlich K0.
 - `confirmatory`: Friedman-Test, Holm-korrigierte p, Kendalls W und paarweise Wilcoxon-Tests je Metrik aus
   `config.ANALYSIS_PRIMARY`.
+- `differences`: je Metrik aus `config.ANALYSIS_PRIMARY` und Paar `mean_diff` (erste minus zweite Strategie), `low`,
+  `high` und `n`; dazu `bootstrap` mit `reps` und `level`.
 - `descriptive_effects`: Effektstärken ohne p-Werte, getrennt nach Regel und `answers`.
 - `control_k0`: K0 gegen C1–C3; `null` ohne K0-Bewertung.
 - `correlation`: je Retrieval-Metrik (`recall`, `reciprocal_rank`) Spearmans ρ zum Gesamtwert je Strategie und

@@ -219,6 +219,9 @@ beschrieben.
 | `ANALYSIS_DIFF_DECIMALS` | `12` | Rundung der Differenzen im Wilcoxon-Test, damit gleiche Differenzen gebrochener Metriken trotz Gleitkommafehler eine Bindungsgruppe bilden | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_PRIMARY` | `{"recall": "R@5", "reciprocal_rank": "MRR", "total_score": "Gesamtwert"}` | konfirmatorische Metriken: Spalte → Anzeigename | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `ANALYSIS_RULE` | `"main"` | Relevanzregel der Retrieval-Metriken in der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md) |
+| `ANALYSIS_BOOTSTRAP_REPS` | `2000` | Wiederholungen des Bootstraps über die Fragen für die Intervalle der mittleren Differenzen | [ADR 0044](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen) |
+| `ANALYSIS_CI_LEVEL` | `0.95` | Niveau dieser Perzentil-Intervalle | [ADR 0044](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen) |
+| `ANALYSIS_SEED` | `20261026` | Seed dieses Bootstraps; vor dem Hauptlauf fest, nie getunt | [ADR 0044](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen) |
 | `REPORT_DECIMALS` | `2` | Nachkommastellen von Werten, Kennzahlen, Teststatistiken und Effektstärken in den Tabellen | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `REPORT_P_DECIMALS` | `3` | Nachkommastellen der p-Werte; kleinere erscheinen als `<0,001` | [ADR 0044](../adr/0044-statistische-auswertung.md) |
 | `REPORT_COST_DECIMALS` | `5` | Nachkommastellen der Kosten (USD) in der Effizienztabelle | [ADR 0044](../adr/0044-statistische-auswertung.md) |

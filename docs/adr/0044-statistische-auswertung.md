@@ -7,7 +7,8 @@ Angenommen (20.10.2026; vor dem Hauptlauf festgelegt; ergänzt [ADR 0008](0008-k
 [ADR 0009](0009-hypothesen.md)). Präzisiert am 22.10.2026: [konfirmatorische
 Tests](#nachtrag-22102026-konfirmatorische-tests) (Jonas); die dort genannte Tabellennotiz von `tests.tex` ist
 korrigiert (PR #42). Präzisiert am 26.10.2026: [Holm über die testbaren
-Metriken](#nachtrag-26102026-holm-über-die-testbaren-metriken) (Jonas)
+Metriken](#nachtrag-26102026-holm-über-die-testbaren-metriken) (Jonas). Ergänzt am 26.10.2026: [Konfidenzintervalle der
+Differenzen](#nachtrag-26102026-konfidenzintervalle-der-differenzen) (Jonas, vor dem Hauptlauf)
 
 ## Kontext
 
@@ -71,3 +72,15 @@ primären Metriken, deren Friedman-Test einen p-Wert hat. Eine Metrik, die über
 fällt aus der Familie und wird als nicht testbar berichtet; die übrigen werden über die verbleibenden p-Werte
 korrigiert (`stats.confirmatory`; [Evaluation](../reference/evaluation.md#statistische-auswertung)). Für die Paare gilt
 dasselbe: Holm über alle testbaren Paare.
+
+## Nachtrag 26.10.2026: Konfidenzintervalle der Differenzen
+
+Von Jonas entschieden (Kapitelplanung der Arbeit), vor dem Hauptlauf und vor jeder Ergebnisansicht. Ein nicht
+signifikanter Test belegt bei 48 Fragen keine Gleichwertigkeit der Strategien. Damit die Arbeit in diesem Fall sagen
+kann, wie große Unterschiede die Daten noch zulassen, berichtet die Auswertung für jede primäre Metrik und jedes Paar
+(C1–C2, C1–C3, C2–C3) die mittlere gepaarte Differenz (erste minus zweite Strategie) mit einem
+95-%-Perzentil-Bootstrap-Intervall über die Fragen, unabhängig vom Testergebnis (`stats.mean_diff_ci`, Tabelle
+`differences.tex`, Schlüssel `differences` in `analysis.json`; Wiederholungen, Niveau und Seed:
+`config.ANALYSIS_BOOTSTRAP_REPS`, `ANALYSIS_CI_LEVEL`, `ANALYSIS_SEED`). Die mittlere statt der Median-Differenz, weil der
+Median auf den diskreten Werten (0/1, 0–2) im Bootstrap kaum variiert. Die Intervalle sind deskriptiv; Testplan,
+Holm-Familien und die konfirmatorischen Tests bleiben unverändert.

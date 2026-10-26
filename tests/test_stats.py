@@ -259,3 +259,23 @@ def test_cluster_bootstrap_varying_statistic_gets_full_resamples():
     res = stats.cluster_bootstrap_ci(clusters, stat, 100, 0.95, 3)
     assert res["low"] < res["high"] and res["dropped"] == 0
     assert sizes == [4] * 100
+
+
+def test_mean_diff_ci_constant_shift_is_exact():
+    r = stats.mean_diff_ci([2.0, 3.0, 4.0, 5.0], [1.0, 2.0, 3.0, 4.0], reps=200, level=0.95, seed=1)
+    assert r == {"mean_diff": 1.0, "low": 1.0, "high": 1.0, "n": 4}
+
+
+def test_mean_diff_ci_covers_the_mean_and_is_deterministic():
+    a = [1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.5, 1.0]
+    b = [0.0, 0.0, 1.0, 0.5, 0.0, 0.0, 0.5, 1.0]
+    r = stats.mean_diff_ci(a, b, reps=500, level=0.95, seed=7)
+    assert r["mean_diff"] == pytest.approx(0.3125)  # (1 + 0.5 + 1) / 8
+    assert r["low"] <= r["mean_diff"] <= r["high"]
+    assert r["low"] < r["high"]
+    assert r == stats.mean_diff_ci(a, b, reps=500, level=0.95, seed=7)
+
+
+def test_mean_diff_ci_rejects_unequal_lengths():
+    with pytest.raises(ValueError):
+        stats.mean_diff_ci([1.0], [1.0, 2.0], reps=10, level=0.95, seed=1)
