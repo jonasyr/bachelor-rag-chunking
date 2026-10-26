@@ -3,7 +3,7 @@
 ## Status
 
 Angenommen (19.10.2026; füllt die offene Frage aus [ADR 0038](0038-korpus-e2e.md), wer den Kernpunkt beurteilt; ergänzt
-[ADR 0030](0030-einfrieren-des-fragenkatalogs.md) und [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md); Prompt auch
+[ADR 0017](0017-fragenkatalog.md), [ADR 0030](0030-einfrieren-des-fragenkatalogs.md) und [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md); Prompt auch
 für K0: [ADR 0041](0041-kontrolle-k0.md)); die Blockgröße 8 (Kontext) steht nicht in ADR 0031, sondern in
 [plan.md](../plan.md) und [Fragenkatalog erstellen](../how-to/build-the-question-catalogue.md)
 

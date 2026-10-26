@@ -5,7 +5,9 @@
 Angenommen (20.10.2026; vor dem Hauptlauf festgelegt; ergänzt [ADR 0008](0008-kosten-als-variable.md),
 [ADR 0012](0012-retrieval-metriken.md) und [ADR 0013](0013-antwort-rubrik.md) sowie [ADR 0015](0015-tech-stack.md) (SciPy); ändert die Auswertungsart von
 [ADR 0009](0009-hypothesen.md)). Präzisiert am 22.10.2026: [konfirmatorische
-Tests](#nachtrag-22102026-konfirmatorische-tests) (Jonas)
+Tests](#nachtrag-22102026-konfirmatorische-tests) (Jonas); die dort genannte Tabellennotiz von `tests.tex` ist
+korrigiert (PR #42). Präzisiert am 26.10.2026: [Holm über die testbaren
+Metriken](#nachtrag-26102026-holm-über-die-testbaren-metriken) (Jonas)
 
 ## Kontext
 
@@ -60,3 +62,12 @@ Von Jonas entschieden; präzisiert die Entscheidung oben, ändert den Testplan n
   begrenzten Teststärke (Negativ-Konsequenz oben).
 - Die Tabellennotiz von `tests.tex` (`src/report_tables.py`) sagt noch „Explorativ“; sie wird im nächsten Code-PR
   korrigiert ([Backlog](../plan.md#backlog)).
+
+## Nachtrag 26.10.2026: Holm über die testbaren Metriken
+
+Von Jonas bestätigt (Doku-Audit); präzisiert „Holm-Korrektur über die drei p-Werte“ so, wie `src/stats.py` es seit
+20.10.2026 umsetzt. Die Holm-Familie der Omnibus-Tests sind die
+primären Metriken, deren Friedman-Test einen p-Wert hat. Eine Metrik, die über C1–C3 konstant ist, hat keinen p-Wert,
+fällt aus der Familie und wird als nicht testbar berichtet; die übrigen werden über die verbleibenden p-Werte
+korrigiert (`stats.confirmatory`; [Evaluation](../reference/evaluation.md#statistische-auswertung)). Für die Paare gilt
+dasselbe: Holm über alle testbaren Paare.

@@ -4,7 +4,8 @@
 
 Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline); „Öl und Gas“ im Kontext ist das Beispiel aus der
 Quelle `taiwo2026chunking`; maßgeblich für die Domäne ist der Wortlaut des Exposés, „unternehmensinterne technische
-Dokumente“. Zweite Säule eingeengt am 22.10.2026: [Nachtrag](#nachtrag-22102026-zweite-säule-eingeengt)
+Dokumente“. Zweite Säule eingeengt am 22.10.2026: [Nachtrag](#nachtrag-22102026-zweite-säule-eingeengt); Taiwo (2026) kein Beleg der
+Lücke: [Nachtrag 26.10.2026](#nachtrag-26102026-taiwo-kein-beleg-der-lücke)
 
 ## Kontext
 
@@ -27,3 +28,13 @@ Von Jonas entschieden. Pesl et al. (2026) vergleichen Chunking auf OpenAPI-Spezi
 verwandte Arbeit. Die zweite Säule („andere Domäne“) ist deshalb auf Fließtext-Anleitungen und -Referenzen für
 Entwickler (Markdown/MDX) statt strukturierter API-Spezifikationen eingeengt. Begründung und Wortlaut:
 [Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen).
+
+## Nachtrag 26.10.2026: Taiwo kein Beleg der Lücke
+
+Von Jonas entschieden. `taiwo2026chunking` erscheint bei AIRCC, einem Verlag auf Beall's List, und trägt die
+Forschungslücke nicht ([Literaturbasis](../reference/literature.md#kernquellen)). Die Aussage, kontrollierte
+Chunking-Vergleiche lägen vor allem in fachfremden Domänen vor, stützt sich deshalb auf `gomezcabello2025chunking`
+(klinisch) und, vorläufig bis zur Volltextprüfung, auf Pesl et al. (2026, OpenAPI); die Domäne „unternehmensinterne
+technische Dokumente“ aus dem Exposé wird nicht mehr als belegt angeführt
+([Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen)). Die Entscheidung
+selbst und ihre drei Säulen bleiben.

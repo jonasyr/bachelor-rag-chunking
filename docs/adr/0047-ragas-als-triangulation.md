@@ -7,7 +7,8 @@ Angenommen (21.10.2026; konkretisiert [ADR 0007](0007-triangulation.md) und änd
 `ragas` auf 0.4.3 gepinnt; die Konsequenz „Code noch umzusetzen“ ist erledigt. Korrektur zu den Konsequenzen: die Kosten
 liegen nach dem Pilot bei 2,02 USD je 48 Antworten, nicht im Cent-Bereich
 ([Experiment-Protokoll](../reference/experiment-record.md#ragas-pilot-e2e-21102026)). Präzisiert am 21.10.2026:
-[Strictness 1](#nachtrag-21102026-strictness-1) (Jonas)
+[Strictness 1](#nachtrag-21102026-strictness-1) (Jonas); am 26.10.2026: [fehlende
+Werte](#nachtrag-26102026-fehlende-werte) (Jonas)
 
 ## Kontext
 
@@ -52,6 +53,15 @@ Von Jonas entschieden; präzisiert einen Parameter, ändert die Entscheidung nic
 `config.RAGAS_STRICTNESS` = 1: Der Richter erzeugt aus der Antwort Fragen und vergleicht deren Embeddings mit der echten
 Frage. Bei Temperatur 0 ist der Prompt für jede der `strictness` Fragen derselbe, weitere Fragen brächten also dieselbe
 Frage noch einmal und nur Kosten.
+
+## Nachtrag 26.10.2026: Fehlende Werte
+
+Von Jonas bestätigt (Doku-Audit); hält die Regel fest, die `src/ragas_eval.py` seit dem 21.10.2026 umsetzt. Ein NaN, das eine
+Metrik selbst meldet, ist ein gültiges Ergebnis: leere Zelle mit Grund (`config.RAGAS_NAN_REASONS`), gezählt und
+berichtet. Mittelwerte gelten über die Fragen mit Wert, Effektstärken nur über die Fragen mit Wert in allen drei
+Strategien. Ein NaN ohne erwarteten Grund, ein Wert außerhalb 0–1, ein Fehler oder eine abgeschnittene Ausgabe des
+Richters und ein wechselndes Modell brechen den Lauf ab, ohne etwas zu schreiben. Einzelheiten:
+[Evaluation](../reference/evaluation.md#triangulation).
 
 ## Literatur
 

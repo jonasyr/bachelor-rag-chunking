@@ -5,7 +5,8 @@
 Angenommen (D15 im Leitfaden; Quelle: Baseline, übernommen); konkretisiert durch [ADR 0023](0023-embedding-modell.md)
 (Embedding-Modell, SDK- und Chroma-Version) und [ADR 0024](0024-referenzvektoren-und-exakte-suche.md) (Referenzvektoren,
 exakte Suche); „optional RAGAS“ geändert durch [ADR 0047](0047-ragas-als-triangulation.md) (RAGAS läuft fest als
-Triangulation); ergänzt durch [ADR 0044](0044-statistische-auswertung.md) (SciPy)
+Triangulation); ergänzt durch [ADR 0044](0044-statistische-auswertung.md) (SciPy). Hinweis: Plotly wird nicht verwendet (entfernt
+in PR #42, 23.10.2026); aktueller Stack: [Werkzeuge](../reference/tooling.md#tech-stack)
 
 ## Kontext
 
