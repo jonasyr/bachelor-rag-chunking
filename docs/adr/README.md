@@ -3,7 +3,7 @@
 *[Doku-Index](../README.md) · Entscheidungen*
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0047 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0048 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -65,7 +65,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0021](0021-c3-grenzen.md) | C3: Untergrenze 50 Tokens, Verschmelzen vor dem Teilen | Angenommen; ergänzt durch 0026 (auch Begründung der Obergrenze) |
 | [0022](0022-h1-abschnitte-in-ground-truth.md) | H1-Abschnitte in der Ground Truth nur, wenn die ganze Seite die Antwort ist | Angenommen; Hinweis: H1-Anker seit 0042 aus dem Seitenpfad |
 | [0023](0023-embedding-modell.md) | Embedding-Modell: text-embedding-3-large mit 3.072 Dimensionen | Angenommen |
-| [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen; Versionierung geändert durch 0045 |
+| [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen; Versionierung geändert durch 0045; Archivierung geändert durch 0048 |
 | [0025](0025-korpus-guide-api-styleguide.md) | Korpus: Guide, API-Referenz (Composition) und Style Guide auf `40aa88a` | Ersetzt durch 0038 |
 | [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen; Hinweis: Zahlen vom Vue-Korpus, K1-Wert korpusabhängig |
 | [0027](0027-blinde-annotation.md) | Relevanz-Annotation blind vor jedem Retrieval; nachträgliche Ergänzungen nur als Sensitivität | Angenommen; technisch umgesetzt durch 0030 |
@@ -86,6 +86,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0042](0042-mdx-umwandlung.md) | MDX-Umwandlung: eigene Anker, Agent-Prompts und Video-Karten bleiben | Angenommen; ersetzt die Ankerregel von 0019; ändert die Bereinigungsregel von 0038 |
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen; präzisiert 0035, 0037 |
 | [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0012, 0013, 0015 (SciPy); ändert die Auswertungsart von 0009; Nachtrag 22.10.2026 (konfirmatorische Tests) |
-| [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen; ändert die Versionierung von 0024 |
+| [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen; ändert die Versionierung von 0024; Chunk-Vektoren geändert durch 0048 |
 | [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007; ersetzt den Intra-Rater-Folgeschritt von 0035; umgesetzt (PR #40); Nachträge 22.10.2026 (Datenschutz, Maß, Zufallszahlen) |
 | [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachtrag 21.10.2026 (Strictness) |
+| [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |

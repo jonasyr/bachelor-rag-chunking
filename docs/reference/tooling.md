@@ -66,13 +66,14 @@ bachelor-rag-chunking/
 ├── scripts/                            (difficulty_probe.py, remap_pilot.py (historisch), corpus_probe/)
 ├── tests/                              (pytest, siehe Tests)
 ├── data/
-│   ├── raw/e2e_docs_snapshot/          (Snapshot, nicht versioniert)
-│   ├── processed/                      (documents, sections, chunks_*, embeddings_*, embedding_runs)
+│   ├── raw/e2e_docs_snapshot/          (Snapshot, versioniert, ADR 0048)
+│   ├── processed/                      (documents, sections, chunks_* (neu erzeugt); embeddings_*, embedding_runs
+│   │                                    (versioniert))
 │   ├── evaluation/                     (Katalog, Ground Truth, Ergebnisse, second_rater/; archive_vue/)
 │   ├── pilot/                          (Pilot-Sets: e2e/ (aktuell), e2e_jonas/; ., hard/, hard_posthoc/
 │   │                                    historisch, Vue-IDs)
 │   └── corpus_probe/                   (Korpusauswahl: Kandidaten, Ergebnisse, Wertung)
-├── chroma_db/                          (Chroma-Index, entsteht beim ersten embed.py)
+├── chroma_db/                          (Chroma-Index, embed.py baut ihn aus den Vektoren)
 ├── output/                             (tables/, figures/, analysis.json; schreibt analyse.py)
 └── docs/                               (Index: docs/README.md)
 ```

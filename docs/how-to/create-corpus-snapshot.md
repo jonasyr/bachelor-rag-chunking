@@ -8,6 +8,10 @@ Snapshots: Tokens und Abschnitte in [Korpus](../reference/corpus.md#quelle-und-a
 Dateizahl im [Experiment-Protokoll](../reference/experiment-record.md#snapshot-e2e). Die erwarteten Zahlen unten gelten
 für den Snapshot auf Commit `ef977f4`.
 
+Der Snapshot auf `ef977f4` ist versioniert ([ADR 0048](../adr/0048-korpus-und-chunk-vektoren-versioniert.md)): auf einem neuen Klon beginnen die Schritte bei 2, und
+`snapshot.py` dient nur noch dazu, ihn gegen das Original zu prüfen (es schreibt dieselben Bytes) oder einen neuen
+Snapshot anzulegen.
+
 `snapshot.py`, `ingest.py` und `preprocess.py` kennen keine Optionen: auch `--help` führt den Schritt aus
 (`snapshot.py` holt den Korpus und ersetzt den Inhalt von `data/raw/e2e_docs_snapshot/`).
 
@@ -29,10 +33,11 @@ für den Snapshot auf Commit `ef977f4`.
    Wer `ingest.py` neu laufen lässt, muss auch `preprocess.py` neu laufen lassen: `chunking.py` bricht ab, wenn
    `sections.jsonl` nicht zum Text in `documents.jsonl` passt.
 4. `uv run python src/catalogue.py sections` schreibt die Nachschlageliste `data/processed/section_index.md`.
-5. Prüfen: `uv run pytest` (die Integrationstests in `tests/test_corpus_integration.py` laufen nur mit vorhandenem
-   Snapshot). Weicht das gerundete Mittel der C3-Chunks von `config.K1_CHUNK_SIZE` ab, nennt der K1-Test den neuen
+5. Prüfen: `uv run pytest` (die Integrationstests in `tests/test_corpus_integration.py` brauchen die Dateien aus
+   den Schritten 2–3; die CI erzeugt sie vor den Tests neu). Weicht das gerundete Mittel der C3-Chunks von `config.K1_CHUNK_SIZE` ab, nennt der K1-Test den neuen
    Wert ([ADR 0026](../adr/0026-c3-vergleichbarkeit.md)); `chunking.py --strategy K1` bricht mit demselben Hinweis ab.
 6. Bei einem neuen Snapshot Dateizahl, Commit und Datum ins
    [Experiment-Protokoll](../reference/experiment-record.md#snapshot-e2e), Tokens und Abschnitte in
    [Korpus](../reference/corpus.md#quelle-und-ausschnitt) übernehmen; die erzeugten Dateien
-   `docs/corpus_snapshot.txt` und `docs/corpus_manifest.csv` unverändert committen.
+   `docs/corpus_snapshot.txt`, `docs/corpus_manifest.csv` und `data/raw/e2e_docs_snapshot/` unverändert committen;
+   neue Vektoren und eine neue ADR braucht es dann auch.

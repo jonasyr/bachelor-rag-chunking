@@ -89,7 +89,7 @@ haben eigene `CONTROL_*`-Zuordnungen, damit sie nie in die Schleifen über `STRA
 | `CONTROL_ANSWER_STRATEGIES` | `{"K0": "closed_book"}` | Kontrolle K0: Antworten ohne Retrieval (Closed-Book-Prompt); nicht in `STRATEGY_IDS` | [ADR 0041](../adr/0041-kontrolle-k0.md) |
 | `STRATEGY_IDS` | `{"C1": "fixed_500_no_overlap", "C2": "fixed_500_overlap_100", "C3": "structure_h2h3"}` | Schlüssel und `strategy`-Werte des Experiments (C1–C3); K1 gehört nicht hinein | [ADR 0005](../adr/0005-drei-chunking-strategien.md) |
 | `CHUNK_FILES` | `{"C1": CHUNKS_C1_FILE, "C2": …, "C3": …}` | Chunk-Datei je Strategie | – |
-| `EMBEDDING_FILES` | `{"C1": data/processed/embeddings_c1.npz, …c2, …c3}` | gespeicherte Referenzvektoren je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
+| `EMBEDDING_FILES` | `{"C1": data/processed/embeddings_c1.npz, …c2, …c3}` | gespeicherte Referenzvektoren je Strategie (versioniert) | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md), [ADR 0048](../adr/0048-korpus-und-chunk-vektoren-versioniert.md) |
 | `QUERY_EMBEDDINGS_FILE` | `data/evaluation/query_embeddings.npz` | gespeicherte Fragevektoren | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `EMBEDDING_RUNS_FILE` | `data/processed/embedding_runs.jsonl` | Laufprotokoll von `embed.py`, `retrieve.py` und `evaluate_retrieval.py` ([Schritte](data-formats.md#laufprotokoll)) | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |
 | `CHROMA_COLLECTIONS` | `{"C1": "rag_c1", "C2": "rag_c2", "C3": "rag_c3"}` | Chroma-Collection je Strategie | [ADR 0024](../adr/0024-referenzvektoren-und-exakte-suche.md) |

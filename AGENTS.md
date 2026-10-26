@@ -16,7 +16,7 @@ Public repo (DOI planned); used by the private PaperLab repo as submodule `code/
 |---|---|
 | Install | `uv sync` (then `cp .env.example .env`, add `OPENAI_API_KEY`) |
 | Lint/format | `uvx pre-commit run --all-files` (ruff + checks; also runs on commit after `pre-commit install`) |
-| Test | `uv run pytest` (`tests/`; corpus integration tests skip until the snapshot exists, e.g. in CI) |
+| Test | `uv run pytest` (`tests/`; corpus integration tests skip until ingest/preprocess/chunking ran; CI runs them first) |
 | Run | `uv run python src/<step>.py` — order: `docs/how-to/run-the-experiment.md`, options: `docs/reference/tooling.md` |
 | App (catalogue, scoring) | `uv run streamlit run app/catalogue_editor.py --server.address localhost` |
 

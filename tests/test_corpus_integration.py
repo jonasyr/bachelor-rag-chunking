@@ -128,6 +128,8 @@ def test_c2_has_more_chunks_than_c1(tmp_path):
 def test_reference_vectors_match_their_chunks(key):
     if not EMBEDDING_FILES[key].exists():
         pytest.skip("not embedded; run src/embed.py")
+    if not CHUNK_FILES[key].exists():  # vectors are versioned, chunks are rebuilt (ADR 0048)
+        pytest.skip("not chunked; run src/chunking.py")
     chunks = [
         json.loads(line) for line in CHUNK_FILES[key].read_text(encoding="utf-8").splitlines()
     ]

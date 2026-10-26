@@ -34,9 +34,9 @@ Alle Paketstände sind in `pyproject.toml` gepinnt und in `uv.lock` festgehalten
 
 ## Chunking (e2e)
 
-Lauf am 18.10.2026 (`src/chunking.py`). Die Chunk- und Vektordateien sind nicht versioniert; ihre SHA-256 stehen als
-`inputs_sha256` im versionierten `data/processed/embedding_runs.jsonl`, so lassen sich neu erzeugte Dateien gegen die
-eingebetteten prüfen.
+Lauf am 18.10.2026 (`src/chunking.py`). Die Vektordateien sind versioniert ([ADR 0048](../adr/0048-korpus-und-chunk-vektoren-versioniert.md)); die Chunk-Dateien entstehen aus dem Snapshot
+bitgleich neu, ihre SHA-256 stehen als `inputs_sha256` im versionierten `data/processed/embedding_runs.jsonl`, so
+lassen sich neu erzeugte Dateien gegen die eingebetteten prüfen.
 
 | Strategie | Chunks | Tokens min / Mittel / max | Median |
 |---|---:|---|---:|
