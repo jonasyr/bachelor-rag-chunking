@@ -163,8 +163,8 @@ RAGAS). RAGAS selbst steht unter den Kernquellen (`es2024ragas`).
 ### Nächste Treffer der Suche zur zweiten Säule
 
 Dokumentierte Suche vom 26.10.2026 (Protokoll im Recherche-Log der Arbeit, PaperLab); bibliografische Angaben gegen
-Crossref geprüft, nur Abstracts gelesen. Pham Doan und Luong Ngoc (2025) am 26.10.2026 am Volltext geprüft; Dhakal et al. (2026) nur als Suchtreffer,
-Begutachtung der Zeitschrift unklar.
+Crossref geprüft, nur Abstracts gelesen. Pham Doan und Luong Ngoc (2025) am 26.10.2026 am Volltext geprüft; Dhakal et
+al. (2026) nur als Suchtreffer, Begutachtung der Zeitschrift unklar.
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|

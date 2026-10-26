@@ -79,9 +79,9 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
    und statistisch prüft. Am nächsten kommen Pham Doan und Luong Ngoc (2025): überschriftenbasiertes Chunking auf
    AWS-Benutzerhandbüchern, verglichen nur mit semantischem und elementbasiertem Chunking, bewertet allein durch ein
    Sprachmodell (Volltext geprüft); Dhakal et al. (2026) messen nur das Retrieval. Die Aussage ist suchbegrenzt
-   (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im
-   Exposé genannten „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
-   ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
+   (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im Exposé genannten „unternehmensinternen technischen
+   Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt ([ADR
+   0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1
    und K0.
