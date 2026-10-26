@@ -541,8 +541,9 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
   Kriterien ohne Quellenbezug, für den Vergleich mit K0), einschließlich K0.
 - `confirmatory`: Friedman-Test, Holm-korrigierte p, Kendalls W und paarweise Wilcoxon-Tests je Metrik aus
   `config.ANALYSIS_PRIMARY`.
-- `differences`: je Metrik aus `config.ANALYSIS_PRIMARY` und Paar `mean_diff` (erste minus zweite Strategie), `low`,
-  `high` und `n`; dazu `bootstrap` mit `reps` und `level`.
+- `differences`: je Metrik aus `config.ANALYSIS_PRIMARY` `label` und `pairs`, je Paar (`C1-C2`, `C1-C3`, `C2-C3`)
+  `mean_diff` (erste minus zweite Strategie), `low`, `high` und `n`.
+- `bootstrap`: `reps` und `level` der Intervalle in `differences`.
 - `descriptive_effects`: Effektstärken ohne p-Werte, getrennt nach Regel und `answers`.
 - `control_k0`: K0 gegen C1–C3; `null` ohne K0-Bewertung.
 - `correlation`: je Retrieval-Metrik (`recall`, `reciprocal_rank`) Spearmans ρ zum Gesamtwert je Strategie und
