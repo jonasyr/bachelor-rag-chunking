@@ -52,7 +52,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0008](0008-kosten-als-variable.md) | Kosten/Effizienz als eigene abhängige Variable | Angenommen; ergänzt durch 0044 |
 | [0009](0009-hypothesen.md) | Drei geschärfte Hypothesen H1–H3, explorativ | Angenommen; Auswertungsart geändert durch 0044; Nachtrag 22.10.2026 |
 | [0010](0010-starke-baseline.md) | Fixed-size mit Overlap ist eine starke Baseline | Angenommen; Hinweis: Autorenreihenfolge Qu, Tu & Bao |
-| [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen; Hinweis: Domäne im Wortlaut des Exposés, zweite Säule nach Pesl et al. (2026) eingeengt; Nachtrag 26.10.2026 (Taiwo kein Beleg) |
+| [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen; Hinweis: Domäne im Wortlaut des Exposés, zweite Säule nach Pesl et al. (2026) eingeengt; Nachtrag 26.10.2026 (Taiwo kein Beleg); Nachtrag 26.10.2026 (Blogbeitrag entfällt, erste Säule neu) |
 | [0012](0012-retrieval-metriken.md) | Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k) | Angenommen; ergänzt durch 0044 |
 | [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen; ergänzt durch 0032, 0044; Stufen operationalisiert durch 0035; Hinweis: Normierung 0–100 nicht umgesetzt |
 | [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen; umgesetzt in 0033 |

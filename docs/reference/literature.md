@@ -40,7 +40,9 @@ Ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; 
 ## Ergänzte Quellen (26.10.2026)
 
 Bei der Kapitelplanung der Arbeit gezielt für Lücken gesucht und am 26.10.2026 gegen Crossref, PMLR, ACL Anthology und
-OpenAlex geprüft. Die Befunde stammen aus den Abstracts; vor dem Zitieren einer Zahl am Volltext prüfen. Für die
+OpenAlex geprüft (bibliografische Angaben). Die Befunde stammen aus den Abstracts; nach
+[ADR 0018](../adr/0018-literaturbasis.md) sind alle Quellen dieses Abschnitts darum **vorläufig** und erst nach der
+Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 13). Für die
 Webquelle `smith2024chunking` (Chroma-Blog) gilt: nur als technische Begründung in ADRs und der Methodik, nicht in der
 theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024bestpractices` und `liu2024lostmiddle`.
 
@@ -157,3 +159,14 @@ RAGAS). RAGAS selbst steht unter den Kernquellen (`es2024ragas`).
 | `gwet2014handbook` | Gwet, K. L. (2014). *Handbook of inter-rater reliability: The definitive guide to measuring the extent of agreement among raters* (4. Aufl.). Advanced Analytics. | AC2 mit Gewichten für ordinale Skalen |
 | `hayes2007alpha` | Hayes, A. F., & Krippendorff, K. (2007). Answering the call for a standard reliability measure for coding data. *Communication Methods and Measures, 1*(1), 77–89. https://doi.org/10.1080/19312450709336664 | Krippendorffs α (ordinal) als Vergleichsmaß |
 | `zheng2023judge` | Zheng, L., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. In *Advances in Neural Information Processing Systems 36* (S. 46595–46623). Curran Associates. https://doi.org/10.52202/075280-2020 | Selbstbevorzugung des Richtermodells; LLM-Gegenprobe nur als Triangulation |
+
+### Nächste Treffer der Suche zur zweiten Säule
+
+Dokumentierte Suche vom 26.10.2026 (Protokoll im Recherche-Log der Arbeit, PaperLab); bibliografische Angaben gegen
+Crossref geprüft, nur Abstracts gelesen. **Vorläufig:** Pham Doan und Luong Ngoc (2025) erst nach der Volltextprüfung
+([Backlog](../plan.md#backlog), Punkt 12); Dhakal et al. (2026) nur als Suchtreffer, Begutachtung der Zeitschrift unklar.
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `phamdoan2025headingaware` | Pham Doan, T., & Luong Ngoc, P. (2025). Optimizing context retrieval for RAG via heading-aware chunking and hierarchical document structure integration. In *2025 IEEE 7th Symposium on Computers & Informatics (ISCI)* (S. 456–461). IEEE. https://doi.org/10.1109/ISCI65687.2025.11167620 | nächster Treffer: überschriftenbasiertes Chunking auf AWS-Handbüchern; ob größenbasierte und semantische Baselines dabei sind, am Volltext prüfen |
+| `dhakal2026techdocs` | Dhakal, A., Neupane, S. S., Dhakal, A., & Paudel, M. (2026). Optimizing technical documentation for RAG systems: A comparative analysis of semantic chunking vs. structural formatting. *International Journal of Scientific Research in Science, Engineering and Technology, 13*(1), 222–227. https://doi.org/10.32628/ijsrset261313 | semantisch gegen ganzes Dokument, nur Retrieval |

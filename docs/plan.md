@@ -77,6 +77,14 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 10. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
 11. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
     [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
+12. **Volltext Pham Doan und Luong Ngoc (2025) lesen.** Wer: Jonas. Frist: vor dem Kapitel zu verwandten Arbeiten
+    (Anfang November). Fertig, wenn feststeht, gegen welche Strategien sie vergleichen, und die suchbegrenzte Aussage der
+    zweiten Säule im [Forschungsdesign](explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen)
+    bestätigt oder enger gefasst ist ([Literaturbasis](reference/literature.md#nächste-treffer-der-suche-zur-zweiten-säule)).
+13. **Volltextprüfung der am 26.10. ergänzten Quellen** ([ADR 0018](adr/0018-literaturbasis.md)). Wer: Jonas, Claude
+    fasst zusammen. Frist: vor dem Schreiben des jeweiligen Kapitels, zuerst Mallen et al., Kandpal et al. und Sainz et
+    al. (erste Säule). Fertig, wenn jede zitierte Aussage am Volltext bestätigt und der Vermerk „vorläufig“ in der
+    [Literaturbasis](reference/literature.md#ergänzte-quellen-26102026) entfernt ist.
 
 ## Offene Entscheidungen
 

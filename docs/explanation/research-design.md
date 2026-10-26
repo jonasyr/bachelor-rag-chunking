@@ -77,8 +77,8 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
    keine begutachtete Studie, die die Strategien kontrolliert auf Prosa-Entwicklerdokumentation vergleicht und die
    Antwortqualität misst; nächste Treffer sind Pham Doan und Luong Ngoc (2025, überschriftenbasiertes Chunking auf
    AWS-Handbüchern) und Dhakal et al. (2026, nur Retrieval). Die Aussage ist suchbegrenzt und vorläufig, bis der
-   Volltext von Pham Doan und Luong Ngoc geprüft ist (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im Exposé genannten
-   „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
+   Volltext von Pham Doan und Luong Ngoc geprüft ist (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im
+   Exposé genannten „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
    ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1

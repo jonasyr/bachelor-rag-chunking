@@ -53,3 +53,8 @@ Antwortmodell weitgehend unbekannter Korpus, per Closed-Book-Prüfung kontrollie
 `kandpal2023longtail`); Kontamination ist je Datensatz und Modell zu messen (`sainz2023contamination`). Auf einem
 bekannten Korpus vermischen sich Retrieval-Effekte mit Modellwissen; die Messung auf Vue.js hat genau das gezeigt
 ([ADR 0038](0038-korpus-e2e.md)). Wortlaut: [Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen).
+
+Die Entscheidung selbst bleibt: die Lücke als entwicklerorientierte Open-Source-Dokumentation mit drei Säulen. Der
+Nachtrag ersetzt nur den Bezugspunkt der ersten Säule, die schon zuvor auf e2e als Korpus zielte, so wie der Nachtrag
+vom 22.10.2026 die zweite Säule eingeengt hat. Die Quellen sind nach [ADR 0018](0018-literaturbasis.md) vorläufig,
+bis sie am Volltext geprüft sind ([Backlog](../plan.md#backlog)).
