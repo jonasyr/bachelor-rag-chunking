@@ -24,7 +24,7 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | LLM | `config.LLM_MODEL` über die OpenAI Chat Completions API, `config.LLM_REASONING_EFFORT`, `config.LLM_TEMPERATURE` (`src/llm_client.py`, [ADR 0033](../adr/0033-antwortmodell.md)) |
 | Umgebung | `python-dotenv` (`.env`) |
 | Datenanalyse | Pandas |
-| Diagramme | Matplotlib (PDF-Abbildungen der Auswertung, `src/report_figures.py`); Plotly deklariert, ungenutzt |
+| Diagramme | Matplotlib (PDF-Abbildungen der Auswertung, `src/report_figures.py`) |
 | App/Dashboard | Streamlit (`app/catalogue_editor.py` mit den Seiten Catalogue und Scoring) |
 | Evaluation | eigene Skripte (regelbasierte Bewertung, [ADR 0035](../adr/0035-regelbasierte-bewertung.md)); RAGAS als feste Triangulation nach der regelbasierten Bewertung ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) |
 
