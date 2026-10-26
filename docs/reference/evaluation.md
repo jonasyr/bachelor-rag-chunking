@@ -2,7 +2,7 @@
 
 *[Doku-Index](../README.md) · Referenz · Verwandt: [Datenformate](data-formats.md#auswertung-output), [Forschungsdesign](../explanation/research-design.md#warum-die-evaluation-so-angelegt-ist), [Experiment durchführen](../how-to/run-the-experiment.md)*
 
-Stand: 22.10.2026. Diese Seite beschreibt die Maße; Ablauf und Befehle stehen in
+Stand: 26.10.2026. Diese Seite beschreibt die Maße; Ablauf und Befehle stehen in
 [Experiment durchführen](../how-to/run-the-experiment.md), Parameterwerte (`TOP_K`, Überlappungsschwellen, Rubrik) in
 [Konfiguration](configuration.md).
 
@@ -94,6 +94,10 @@ Prüffragen beantwortet:
 | `direct` | Steht die Kernaussage der Antwort in den ersten zwei Sätzen? (auch wenn sie falsch ist, das zählt unter Korrektheit, und auch wenn ein zweiter Teil der Frage später folgt; [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)) | `yes`, `no` |
 | `wordy` | Ist die Antwort wiederholend, aufgebläht oder verwirrend? | `yes`, `no` |
 
+Das Bewertungsformular zeigt diese Prüffragen auf Englisch aus `QUESTIONS` bzw. für K0 `CONTROL_QUESTIONS` in
+`app/scoring_page.py`; `POINT_HELP` und `HELP` ergänzen die Grenzfälle der Klammern oben. Wer eine Prüffrage oder
+ihre Grenzfallregel ändert, ändert dort beides (kein Test prüft das).
+
 Ableitung der Werte, verbindlich ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)):
 
 | Kriterium | 2 | 1 | 0 |
@@ -117,7 +121,9 @@ vermerkt.
 Die Antworten stehen in `scoring_checks.csv` ([Datenformate](data-formats.md#bewertung)). `--mode summarise` prüft,
 dass die Kernpunkte die eingefrorenen des aktuellen Scaffolds sind, die Prüfantworten in der Reihenfolge des Bogens
 stehen und unter der aktuellen `RUBRIC_RULES_VERSION` gegeben wurden, jede Zeile so viele Kernpunkte markiert, wie ihre
-Frage hat, und jede Zeile des Bogens den abgeleiteten Werten entspricht.
+Frage hat, und jede Zeile des Bogens den abgeleiteten Werten entspricht. Auf dem Hauptkatalog brechen Scaffold und
+Summarise zudem ab, wenn der Freeze-Datensatz eine andere Regelversion hält (`freeze.require_rules_version`): der
+Hauptlauf wird nach den Regeln bewertet, die beim Einfrieren galten.
 
 ## Blinde Bewertung
 
@@ -201,12 +207,13 @@ Hauptkatalog `summarise` gelaufen ist.
   bei Context Precision). Response Relevancy liefert 0,0 statt NaN, ein NaN dort wäre unerwartet, hat keinen Grund und
   bricht den Lauf. Ebenso brechen ein Wert außerhalb 0–1, ein Fehler des Richters, eine abgeschnittene Ausgabe
   (`RAGAS_MAX_TOKENS`) und ein wechselndes Modell oder mehrere System-Fingerabdrücke ab; dann wird nichts geschrieben.
-  Mittel gelten über die Fragen mit Wert, Effektstärken über die Fragen mit Wert in allen Strategien.
+  Mittel gelten über die Fragen mit Wert, Effektstärken über die Fragen mit Wert in allen Strategien
+  ([ADR 0047, Nachtrag](../adr/0047-ragas-als-triangulation.md#nachtrag-26102026-fehlende-werte)).
 - **Übereinstimmung** (`ragas_agreement`): Spearmans ρ je Antwort zwischen Metrik und Gegenstück, je Strategie und über
   alle Strategien (`gesamt`, jede Frage dreifach), beschreibend ohne p-Werte; eine Frage ohne RAGAS-Wert entfällt im
   Paar, ist eine Seite konstant, steht „nicht bestimmbar“ (in keiner Gruppe bestimmbar: eine Zeile für das ganze Paar).
-  Neben jedem paarweisen r steht n′, die Zahl der Fragen mit Differenz ungleich 0
-  ([ADR 0044](../adr/0044-statistische-auswertung.md)).
+- **Effekte** (`ragas_effects`): je Metrik paarweise r und Median-Differenz wie in der Statistik; neben jedem r steht
+  n′, die Zahl der Fragen mit Differenz ungleich 0 ([ADR 0044](../adr/0044-statistische-auswertung.md)).
 - **Stabilität:** Auf Pilot-Sets läuft `--repeat` ein zweites Mal; `ragas_stability` in `analysis.json` vergleicht
   beide Läufe je Metrik (Anteil gleicher Werte, mittlere absolute Differenz, ρ). Befund des Pilots:
   [Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21102026). Der Hauptlauf läuft einmal.
@@ -245,7 +252,7 @@ p-Werte (H2-Korrelationen) sind explorativ.
 | Schritt | Verfahren |
 |---|---|
 | Metriken | R@5, MRR (Hauptregel `config.ANALYSIS_RULE`) und Gesamtwert der Antworten |
-| Omnibus | Friedman-Test über C1–C3 je Metrik, Holm-Korrektur über die p-Werte der testbaren Metriken (eine konstante Metrik hat kein p und fällt aus der Familie), Niveau `config.ANALYSIS_ALPHA` |
+| Omnibus | Friedman-Test über C1–C3 je Metrik, Holm-Korrektur über die p-Werte der testbaren Metriken (eine konstante Metrik hat kein p und fällt aus der Familie; [ADR 0044, Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-26102026-holm-über-die-testbaren-metriken)), Niveau `config.ANALYSIS_ALPHA` |
 | Paare | nur für Metriken mit korrigiertem p < α Wilcoxon-Tests C1–C2, C1–C3, C2–C3: zweiseitig, Normalapproximation, Bindungskorrektur, ohne Stetigkeitskorrektur, Nulldifferenzen verworfen, Differenzen auf `config.ANALYSIS_DIFF_DECIMALS` Stellen gerundet; ein Paar mit einer Differenz ungleich 0 ist testbar; Holm über alle diese Paare |
 | Effektstärken | Kendalls W = χ²_F / (n (k − 1)) aus dem bindungskorrigierten Friedman-Wert (voll gebundene Fragen zählen in n) und r = \|z\| / √n′ (n′ = Differenzen ungleich 0); die Richtung zeigt die Median-Differenz |
 
@@ -255,7 +262,8 @@ der Sensitivitätsregel alle Retrieval-Metriken, die fünf Kriterien der Rubrik,
 mit R@5 und Gesamtwert).
 
 **Zusammenhang Retrieval und Antwort** (H2, [ADR 0009](../adr/0009-hypothesen.md)): Spearmans ρ zwischen R@5 bzw. MRR
-und dem Gesamtwert, je Strategie und gepoolt (gepoolt nur ρ: jede Frage geht dreifach ein).
+und dem Gesamtwert, je Strategie und gepoolt (gepoolt nur ρ: jede Frage geht dreifach ein); „nicht bestimmbar“ bei
+weniger als drei Fragen oder einer konstanten Seite.
 
 Teile ohne Eingabedaten entfallen mit einem Hinweis in `notes` von `analysis.json`
 ([Datenformate](data-formats.md#auswertung-output)). Die Mittel der Einzelschritte (`evaluate_retrieval.py`,

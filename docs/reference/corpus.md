@@ -70,7 +70,7 @@ Code in Fences bleibt unverändert bis auf Info-String, Einrückung und Leerzeic
 | `<Accordion title>`, `<Tab title>` | Zeile `**Titel**`, dann der Inhalt |
 | `<Steps>`/`<Step title>` | Zeile `**N. Titel**` (N zählt ab 1 je Block), dann der Inhalt |
 | `<AccordionGroup>`, `<Tabs>`, `<CodeGroup>`, `<CardGroup>`, `<ShowMore>`, `<Video>` | Hülle entfällt, Inhalt bleibt (bei `CodeGroup` alle Varianten) |
-| `<Card title href>Text</Card>` | Listenpunkt `- [Titel](href): Text` |
+| `<Card title href>Text</Card>` | Listenpunkt `- [Titel](href): Text`; ohne `href` `- **Titel**: Text` |
 | `<VideoCard title subtitle …/>` | Listenpunkt `- **Titel**: Untertitel` |
 | `<video …/>` (Bildunterschrift bleibt), `<a id/>`, `<span id/>` | entfällt |
 | `<ModelProvider show="select"/>` | Tabelle aller 51 Anbieter (Anbieter mit Link, Gruppe, Pakete, Variablen, Import, Modell, Hinweis) |
@@ -97,7 +97,8 @@ ist rein regelbasiert und deterministisch; Tests je Regel in `tests/test_mdx.py`
 
 ## Korpusmanifest (`corpus_manifest.csv`)
 
-Eine Zeile je Seite; `section` = Bereich, `tokens` nach dem Preprocessing. Drei echte Zeilen:
+Eine Zeile je Seite; `section` = Bereich, `tokens` nach dem Preprocessing; `included` ist immer `yes` (jede Seite
+gehört zum Korpus). Drei echte Zeilen:
 
 | file_id | path | title | section | tokens | included |
 |---------|------|-------|---------|-------:|----------|

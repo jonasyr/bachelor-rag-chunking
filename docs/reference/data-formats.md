@@ -387,22 +387,25 @@ prüft mit `run_log.require_run`, dass er auf genau den Dateien des letzten pass
 - **`second_rater/runs.jsonl`** (`config.PILOT_RUNS_FILE_NAME` im R2-Ordner): `scaffold`, `key_points` und
   `second_rater_close` des R2-Satzes.
 
-Pilot-Sets schreiben die Einträge der ersten beiden Dateien in ihre `DIR/runs.jsonl` ([Pilot-Sets](#pilot-sets)).
-Jeder Eintrag beginnt mit `date`; Einträge mit API-Aufrufen tragen danach die gepinnten Einstellungen und enden mit
-Tokens und `cost_usd`. Die übrigen lokalen Schritte ohne API schreibt `run_log.append_step_run`: `date`, `step`, `strategy`, `inputs_sha256`,
+Pilot-Sets schreiben ihre Einträge in `DIR/runs.jsonl` ([Pilot-Sets](#pilot-sets)): `retrieve` (über
+`scripts/difficulty_probe.py`), `evaluate_retrieval` und die Schritte aus `generation_runs.jsonl`; `embed` läuft nur
+auf dem Hauptkorpus. Jeder Eintrag beginnt mit `date`; Einträge mit API-Aufrufen tragen danach die gepinnten
+Einstellungen und enden mit Tokens und Kosten: `generate` und `closed_book_screen` mit `cost_usd`, `embed` und
+`retrieve` danach mit `canary_input_tokens`, `canary_cost_usd` und `api_called`, `ragas` zuletzt mit
+`outputs_sha256`. Die übrigen lokalen Schritte ohne API schreibt `run_log.append_step_run`: `date`, `step`, `strategy`, `inputs_sha256`,
 `outputs_sha256`, dann die eigenen Felder; `scaffold` und `key_points` tragen nur `date`, `step`, `strategy`, ihre
 Felder und `outputs_sha256`.
 
 | `step` | Datei | `strategy` | geschrieben von | eigene Felder | geprüft von |
 |---|---|---|---|---|---|
 | `embed` | `embedding_runs.jsonl` | eine Strategie (`C1` … `K1`) | `embed.py`, ein Eintrag je Strategie | `model`, `openai_sdk`, `chromadb`, `dimensions`, `vectors`, `vector_bytes`, `inputs_sha256` (Chunk-Datei), `canary_*`, `input_tokens`, `cost_usd`, `api_called` | `analyse.py` liest den letzten Eintrag je Strategie (Indexgröße, Embedding-Kosten), ohne Prüfsummen |
-| `retrieve` | `embedding_runs.jsonl` | `C1,C2,C3` bzw. `K1` (`--control`) | `retrieve.py`; Pilot-Sets über `scripts/difficulty_probe.py` | wie `embed`, `vectors`/`dimensions` der Fragen, `inputs_sha256` (Fragen, Ground Truth nach [ADR 0017](../adr/0017-fragenkatalog.md), Abschnitte, Vektor- und Chunk-Dateien), seit 17.10.2026 `outputs_sha256` | `generate.py` (Ergebnisdatei, Fragen, Ground Truth, Chunk-Dateien; ältere Pilot-Einträge ohne `outputs_sha256` nur an den Eingaben) |
+| `retrieve` | `embedding_runs.jsonl` | `C1,C2,C3` bzw. `K1` (`--control`) | `retrieve.py`; Pilot-Sets über `scripts/difficulty_probe.py` | wie `embed` ohne `vector_bytes`, `vectors`/`dimensions` der Fragen, `inputs_sha256` (Fragen, Ground Truth nach [ADR 0017](../adr/0017-fragenkatalog.md), Abschnitte, Vektor- und Chunk-Dateien), seit 17.10.2026 `outputs_sha256` | `generate.py` (Ergebnisdatei, Fragen, Ground Truth, Chunk-Dateien; ältere Pilot-Einträge ohne `outputs_sha256` nur an den Eingaben) |
 | `evaluate_retrieval` | `embedding_runs.jsonl` | `C1,C2,C3` bzw. `K1` | `evaluate_retrieval.py` | `inputs_sha256` (`retrieved_results*.csv`, Fragen, Ground Truth, `sections.jsonl`, Chunk-Dateien), `outputs_sha256` (`retrieval_scores*.csv`) | `analyse.py` |
 | `generate` | `generation_runs.jsonl` | `C1,C2,C3` | `generate.py`, nur nach einem erfolgreichen Lauf | siehe unten | `evaluate_answers.py --mode scaffold` (Fragen, Ground Truth, Chunk-Dateien, `generated_answers.csv`), `--mode scaffold --control` (Fragen, Ground Truth, `generated_answers_control.csv`), `ragas_eval.py`, `analyse.py` (nur die Antwortdateien, für die Kosten) |
 | `scaffold` | `generation_runs.jsonl` | `C1,C2,C3` | `evaluate_answers.py --mode scaffold`, nur bei neu erzeugtem Bogen | `scoring` (`config.SCORING_METHOD`, [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md); ältere Einträge ohne), `codes` (Zahl), `outputs_sha256` (`scoring_items.jsonl`) | erneutes `--mode scaffold`, `--mode summarise` (`scoring`), Bewertungsseite beim Einfrieren der Kernpunkte |
 | `scaffold` | `generation_runs.jsonl` | `K0` | `evaluate_answers.py --mode scaffold --control` ([ADR 0041](../adr/0041-kontrolle-k0.md)) | wie oben, `outputs_sha256` (`scoring_items_control.jsonl`) | – |
 | `key_points` | `generation_runs.jsonl` | `C1,C2,C3` | Bewertungsseite beim Einfrieren | `outputs_sha256` (`key_points.csv`, `scoring_items.jsonl`) | Bewertungsseite, `--mode summarise`, K0-Scaffold und `--control`-Summarise, `second_rater.py --mode export` |
-| `summarise` | `generation_runs.jsonl` | `C1,C2,C3` | `evaluate_answers.py --mode summarise` (auch mit `--set`) | `inputs_sha256` (Bogen, Schlüssel und, sofern vorhanden, `scoring_checks.csv`, `key_points.csv`), `outputs_sha256` (`scores.csv`) | `ragas_eval.py` (Hauptkatalog), `analyse.py` (Pilot-Sets ohne Eintrag mit Hinweis, [ADR 0044](../adr/0044-statistische-auswertung.md)) |
+| `summarise` | `generation_runs.jsonl` | `C1,C2,C3` | `evaluate_answers.py --mode summarise` (auch mit `--set`) | `inputs_sha256` (Bogen, Schlüssel und, sofern vorhanden, `scoring_checks.csv`, `key_points.csv`), `outputs_sha256` (`scores.csv`) | `ragas_eval.py` (jedes Set mit `summarise`-Eintrag; Pilot-Sets ohne Eintrag mit Hinweis), `analyse.py` (Pilot-Sets ohne Eintrag mit Hinweis, [ADR 0044](../adr/0044-statistische-auswertung.md)) |
 | `summarise_control` | `generation_runs.jsonl` | `K0` | `evaluate_answers.py --mode summarise --control` | `inputs_sha256` (Bogen und Prüfungen von K0, die eingefrorene `key_points.csv` von C1–C3, `scores.csv`), `outputs_sha256` (`scores_control.csv`) | `analyse.py` |
 | `ragas` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), nur nach einem erfolgreichen Lauf | siehe unten | `ragas_eval.py --repeat`, `analyse.py` |
 | `ragas_repeat` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py --repeat` (nur Pilot-Sets) | wie `ragas`, `outputs_sha256` (`ragas_scores_repeat.csv`) | `analyse.py` |
@@ -533,12 +536,14 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
 
 - `n_questions`, `alpha`.
 - `retrieval`: Mittel je Relevanzregel (`main`, `sensitivity`) und Strategie, einschließlich K1.
-- `answers`: `means` je Strategie und Kriterium, einschließlich K0.
+- `answers`: `means` je Strategie und Kriterium, dazu `total_score` und `total_four` (Gesamtwert über die vier
+  Kriterien ohne Quellenbezug, für den Vergleich mit K0), einschließlich K0.
 - `confirmatory`: Friedman-Test, Holm-korrigierte p, Kendalls W und paarweise Wilcoxon-Tests je Metrik aus
   `config.ANALYSIS_PRIMARY`.
 - `descriptive_effects`: Effektstärken ohne p-Werte, getrennt nach Regel und `answers`.
 - `control_k0`: K0 gegen C1–C3; `null` ohne K0-Bewertung.
-- `correlation`: Spearmans ρ je Strategie und `pooled` (dieses ohne `p`).
+- `correlation`: je Retrieval-Metrik (`recall`, `reciprocal_rank`) Spearmans ρ zum Gesamtwert je Strategie und
+  `pooled` (dieses ohne `p`).
 - `efficiency`: Chunks, Längen, Kontext-Tokens, Indexgröße, Embedding- und Generierungskosten je Strategie; `null`,
   wenn Chunk-Dateien oder `embed`-Einträge fehlen.
 - `breakdown`: nach Fragetyp, Konstruktionsklasse und Closed-Book-Urteil.
@@ -607,7 +612,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
 | `data/evaluation/ragas_scores.csv` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) | [RAGAS](#ragas) | versioniert |
 | `data/evaluation/second_rater_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
-| `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den drei folgenden Zeilen |
+| `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien wie im Hauptlauf | [Vektoren](#vektoren), [Bewertung](#bewertung) | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl` |
 | `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`), auch `second_rater_disagreements.csv` | [Auswertung](#auswertung-output) | ignoriert |
 | `output/tables/*.tex`, `output/analysis.json`, `output/second_rater_disagreements.csv` | Tabellen, Kennzahlen und Abweichungsliste der Auswertung | [Auswertung](#auswertung-output), [Zweitbewertung](#zweitbewertung) | versioniert (nicht in `.gitignore`) |

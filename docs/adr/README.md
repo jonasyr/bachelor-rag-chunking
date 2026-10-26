@@ -52,7 +52,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0008](0008-kosten-als-variable.md) | Kosten/Effizienz als eigene abhängige Variable | Angenommen; ergänzt durch 0044 |
 | [0009](0009-hypothesen.md) | Drei geschärfte Hypothesen H1–H3, explorativ | Angenommen; Auswertungsart geändert durch 0044; Nachtrag 22.10.2026 |
 | [0010](0010-starke-baseline.md) | Fixed-size mit Overlap ist eine starke Baseline | Angenommen; Hinweis: Autorenreihenfolge Qu, Tu & Bao |
-| [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen; Hinweis: Domäne im Wortlaut des Exposés, zweite Säule nach Pesl et al. (2026) eingeengt |
+| [0011](0011-forschungsluecke.md) | Forschungslücke: entwicklerorientierte Open-Source-Dokumentation | Angenommen; Hinweis: Domäne im Wortlaut des Exposés, zweite Säule nach Pesl et al. (2026) eingeengt; Nachtrag 26.10.2026 (Taiwo kein Beleg) |
 | [0012](0012-retrieval-metriken.md) | Retrieval-Metriken: Recall@k, Precision@k, MRR (+ Hit@k) | Angenommen; ergänzt durch 0044 |
 | [0013](0013-antwort-rubrik.md) | Antwort-Rubrik: Skala 0–2, fünf Kriterien, gleich gewichtet | Angenommen; ergänzt durch 0032, 0044; Stufen operationalisiert durch 0035; Hinweis: Normierung 0–100 nicht umgesetzt |
 | [0014](0014-temperatur-und-topk.md) | Temperatur 0 und top-k 5 konstant | Angenommen; umgesetzt in 0033 |
@@ -67,7 +67,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0023](0023-embedding-modell.md) | Embedding-Modell: text-embedding-3-large mit 3.072 Dimensionen | Angenommen |
 | [0024](0024-referenzvektoren-und-exakte-suche.md) | Referenzvektoren speichern und exakt suchen | Angenommen; Versionierung geändert durch 0045; Archivierung geändert durch 0048 |
 | [0025](0025-korpus-guide-api-styleguide.md) | Korpus: Guide, API-Referenz (Composition) und Style Guide auf `40aa88a` | Ersetzt durch 0038 |
-| [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen; Hinweis: Zahlen vom Vue-Korpus, K1-Wert korpusabhängig |
+| [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen; ändert die Sensitivitätsregel von 0019; Hinweis: Zahlen vom Vue-Korpus, K1-Wert korpusabhängig |
 | [0027](0027-blinde-annotation.md) | Relevanz-Annotation blind vor jedem Retrieval; nachträgliche Ergänzungen nur als Sensitivität | Angenommen; technisch umgesetzt durch 0030 |
 | [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen; Nachtrag 22.10.2026 (C4 nur deskriptiv) |
 | [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragetypen, Konstruktionsklassen und Quoten des Fragenkatalogs | Angenommen; ergänzt durch 0031; Bereichsuntergrenzen ersetzt und Stoppwörter angepasst durch 0039; Hinweis: Quelle des Verhältnisses 2:2:2:1:1 |
@@ -81,12 +81,12 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen; präzisiert durch 0043 |
 | [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen; ersetzt 0001, 0025; Stichprobenplan 0039; Beurteilung festgelegt durch 0040; K0 umgesetzt durch 0041; Bereinigungsregel geändert durch 0042 |
 | [0039](0039-stichprobenplan-e2e.md) | Stichprobenplan und Bereichsquoten auf e2e | Angenommen |
-| [0040](0040-closed-book-pruefung.md) | Closed-Book-Prüfung des Fragenkatalogs | Angenommen; Prompt auch für K0 (0041) |
+| [0040](0040-closed-book-pruefung.md) | Closed-Book-Prüfung des Fragenkatalogs | Angenommen; ergänzt 0017, 0030, 0031; Prompt auch für K0 (0041) |
 | [0041](0041-kontrolle-k0.md) | Kontrolle K0: Erzeugung und Bewertung | Angenommen |
 | [0042](0042-mdx-umwandlung.md) | MDX-Umwandlung: eigene Anker, Agent-Prompts und Video-Karten bleiben | Angenommen; ersetzt die Ankerregel von 0019; ändert die Bereinigungsregel von 0038 |
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen; präzisiert 0035, 0037 |
-| [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0012, 0013, 0015 (SciPy); ändert die Auswertungsart von 0009; Nachtrag 22.10.2026 (konfirmatorische Tests) |
+| [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0012, 0013, 0015 (SciPy); ändert die Auswertungsart von 0009; Nachtrag 22.10.2026 (konfirmatorische Tests, Tabellennotiz korrigiert in PR #42); Nachtrag 26.10.2026 (Holm-Familie) |
 | [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen; ändert die Versionierung von 0024; Chunk-Vektoren geändert durch 0048 |
 | [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007; ersetzt den Intra-Rater-Folgeschritt von 0035; umgesetzt (PR #40); Nachträge 22.10.2026 (Datenschutz, Maß, Zufallszahlen) |
-| [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachtrag 21.10.2026 (Strictness) |
+| [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachträge 21.10.2026 (Strictness), 26.10.2026 (fehlende Werte) |
 | [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |

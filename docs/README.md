@@ -23,7 +23,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 | [how-to/set-up.md](how-to/set-up.md) | Einrichten: Voraussetzungen, Abhängigkeiten, API-Schlüssel, pre-commit |
 | [how-to/create-corpus-snapshot.md](how-to/create-corpus-snapshot.md) | e2e-Snapshot erstellen, aufbereiten, Manifest erzeugen |
 | [how-to/build-the-question-catalogue.md](how-to/build-the-question-catalogue.md) | Fragenkatalog schreiben, annotieren, Closed-Book-Prüfung, prüfen und einfrieren |
-| [how-to/run-the-experiment.md](how-to/run-the-experiment.md) | Hauptlauf in Reihenfolge: Retrieval, Antworten, Bewertung, Zweitbewertung, RAGAS, Auswertung; Prüfliste |
+| [how-to/run-the-experiment.md](how-to/run-the-experiment.md) | Vorbereitung (Chunking, Embeddings) und Hauptlauf in Reihenfolge auf dem Branch `run/hauptlauf`: Retrieval, Antworten, Bewertung, Zweitbewertung, RAGAS, Auswertung; Prüfliste |
 | [how-to/deliver-results-to-thesis.md](how-to/deliver-results-to-thesis.md) | Ergebnisse aus `output/` per Pull Request und Submodul-Zeiger an die Arbeit (PaperLab) übergeben |
 | [how-to/work-on-two-machines.md](how-to/work-on-two-machines.md) | Laptop und PC: einen Rechner einrichten, wechseln, was nur auf einem Rechner läuft |
 | [how-to/reproduce-the-results.md](how-to/reproduce-the-results.md) | Für Begutachtende: Korpus, Index, Retrieval und Auswertung ohne API-Schlüssel nachrechnen und vergleichen |

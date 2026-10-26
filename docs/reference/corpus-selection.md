@@ -118,8 +118,8 @@ und rund 0,01 USD (Closed-Book-Fragen). Vollständige Werte: [`data/corpus_probe
 ### Alle Kandidaten
 
 Rangfolge nach der vorab festgelegten Wertung (0–100). Stufen U/S/St/Q/Sb/P (je 0–4) = Unbekanntheit, Markdown-Sauberkeit,
-Struktur, Dokumentationsqualität, Stabilität, Passung. Tokens = Zeichen / 4 nach `to_docs.py`; ADR 0038 und die
-Pipeline zählen dagegen tiktoken-Tokens nach dem Preprocessing (Vue 177.951 hier gegen 165.723 im
+Struktur, Dokumentationsqualität, Stabilität, Passung. Tokens = Zeichen / 4 nach `to_docs.py` (so auch in ADR 0038); die
+Pipeline zählt dagegen tiktoken-Tokens nach dem Preprocessing (Vue 177.951 hier gegen 165.723 im
 [Experiment-Protokoll: Vue.js](experiment-record-vue.md#snapshot-vuejs-bis-18102026), e2e 228.266 gegen 250.380 in
 [Korpus](corpus.md#quelle-und-ausschnitt)). Seiten = alle `.md`/`.mdx` nach `to_docs.py` (e2e 61: die 60 Seiten der
 Navigation und `docs/images/examples/README.md`). Sterne = GitHub-Sterne aus `candidates.csv` (Messzeitpunkt; die
@@ -343,7 +343,7 @@ Skripte in `scripts/corpus_probe/`, Daten in `config.CORPUS_PROBE_DIR` = `data/c
 | `candidates.csv` | `name`, `repo` (`local` = Vue-Snapshot), `docs_path`, `commit`, `commit_date`, `product` (Name im Prompt), `drops`, `skip_changelogs` (`yes` = Changelog-Dateien auslassen), `commits30` (Docs-Commits in 30 Tagen), `stars`, `ai` (grobe Einschätzung des KI-geschriebenen Textanteils: `low`, `medium`, `medium-high`, `high`; kein Messwert), `new` (nach dem 31.05.2026 veröffentlicht) |
 | `stats.json` | Seitenstatistik je Korpus (Tokens je Seite, H2–H4 je Seite, JSX-Zeilen, Codeblöcke, Frontmatter-Titel, Ebenensprünge, Referenzanteil) |
 | `results/<name>.jsonl` | eine Zeile je Probe: `doc_id`, `path`, `page`, `section`, `sentence` (maskiert), `answer` (Ausdruck), `kind`, `area`, `closed`, `open`, `closed_ok`, `open_ok`; neue Läufe zusätzlich `model`, `closed_fingerprint`, `open_fingerprint` |
-| `misses/<name>.json` | eindeutig gestellte closed-book-Fehltreffer mit `category`; `id` = Zeile in `results/` (ab 0) |
+| `misses/<name>.json` | eindeutig gestellte closed-book-Fehltreffer: `id` (Zeile in `results/`, ab 0), `page`, `section`, `sentence`, `answer`, `closed_book_guess` (die ersten `config.CORPUS_PROBE_GUESS_CHARS` Zeichen der Closed-Book-Antwort), `category` |
 | `summary.json` | Messwerte, Stufen und Wertung je Korpus, Rangfolgen der Gewichtungen |
 | `questions/<name>.json` | Closed-Book-Fragen: `id`, `path`, `section`, `type`, `question`, `reference`, `closed`, `open`, `closed_verdict`, `open_verdict`, `judge_batch`; neue Läufe zusätzlich `model` |
 

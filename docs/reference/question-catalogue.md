@@ -16,7 +16,7 @@ Stand: 22.10.2026.
 | Vergleichend | `comparative` | 6 | What is the difference between … and …? |
 | Einschränkung/Fehler | `limitation` | 6 | What happens if …? |
 
-Die Platzhalter zeigen nur die Form; Beispiele aus dem e2e-Korpus trägt Jonas mit den ersten Katalogfragen nach.
+Die Platzhalter zeigen nur die Form (echte Beispiele: [Backlog](../plan.md#backlog), Punkt 11).
 
 **Konstruktionsklassen (`difficulty`, je 12 Fragen):**
 

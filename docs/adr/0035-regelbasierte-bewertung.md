@@ -2,8 +2,8 @@
 
 ## Status
 
-Angenommen (17.10.2026; ergänzt [ADR 0013](0013-antwort-rubrik.md), [ADR 0032](0032-blinde-rubrik-bewertung.md) und
-[ADR 0034](0034-bewertung-in-der-app.md)); der Intra-Rater-Folgeschritt unten entfällt, ersetzt durch die Zweitbewertung
+Angenommen (17.10.2026; operationalisiert die Stufen von [ADR 0013](0013-antwort-rubrik.md); ergänzt
+[ADR 0032](0032-blinde-rubrik-bewertung.md) und [ADR 0034](0034-bewertung-in-der-app.md)); der Intra-Rater-Folgeschritt unten entfällt, ersetzt durch die Zweitbewertung
 nach [ADR 0046](0046-zweitbewertung.md), die Intra-Rater-Wiederholung nur noch als deren Ersatzverfahren (Jonas,
 22.10.2026); verpflichtend für neue Scaffolds: [ADR 0036](0036-regelbasierte-bewertung-verpflichtend.md); für K0 ergänzt
 durch [ADR 0041](0041-kontrolle-k0.md) (Regeln ohne `grounded`). Die Regeln wurden zweimal angepasst, nicht einmal wie

@@ -120,10 +120,7 @@ OUTPUT FORMAT:
   searching files; and
   `PYTHONDONTWRITEBYTECODE=1 uv run --frozen --offline --no-sync pytest -p no:cacheprovider <files>` (`--no-sync`
   needs an existing `.venv`; if there is none, e.g. in a fresh worktree, skip the tests and say so). Never run any
-  script under `src/` or `scripts/`: they rewrite `data/` and `docs/corpus_manifest.csv` (`src/snapshot.py` also
-  `docs/corpus_snapshot.txt` and `data/raw/`), download the corpus or call the OpenAI API;
-  `scripts/difficulty_probe.py` runs retrieval and writes `data/pilot/`, `scripts/remap_pilot.py` rewrites ground truth,
-  `scripts/corpus_probe/` clones candidate repositories, writes `data/corpus_probe/` and calls the API, and
-  `src/catalogue.py screen` calls the API and writes `data/evaluation/`.
+  script under `src/` or `scripts/`: they rewrite files under `data/` and `docs/`, download the corpus, clone
+  repositories or call the OpenAI API (what each one writes: `docs/reference/tooling.md#skripte-und-optionen`).
   Never edit files, and never change the working tree, the index or refs (no checkout, stash, reset, fetch or commit).
 - Output exactly the JSON the rubric specifies, nothing else.

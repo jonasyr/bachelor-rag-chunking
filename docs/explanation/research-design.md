@@ -2,7 +2,10 @@
 
 *[Doku-Index](../README.md) · Hintergrund · Verwandt: [Evaluation](../reference/evaluation.md), [ADRs](../adr/README.md), [Plan](../plan.md)*
 
-Diese Seite erklärt, was die Arbeit untersucht und warum sie so angelegt ist. Sie legt nichts fest.
+Diese Seite erklärt, was die Arbeit untersucht und warum sie so angelegt ist. Sie legt nichts fest; sie hält nur den
+Wortlaut zweier Entscheidungen, auf den die ADRs verweisen: die [Hypothesen](#hypothesen-aus-dem-exposé)
+([ADR 0009](../adr/0009-hypothesen.md)) und die [drei Säulen](#forschungslücke-und-abgrenzung-drei-säulen) der
+Forschungslücke ([ADR 0011](../adr/0011-forschungsluecke.md)). Dieser Wortlaut ändert sich nur mit einer ADR.
 
 **Was gilt bei Widersprüchen:** Die [ADRs](../adr/README.md) sind verbindlich; danach gelten die Seiten unter
 [Nachschlagen](../README.md#nachschlagen-reference). Das Exposé legt nur Forschungsfrage und Vorgehen fest. Frühere
@@ -67,8 +70,10 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
    untersuchten FastAPI/Supabase/Stripe-Dokumentation.
 2. **Andere Domäne und Dokumentart:** entwicklerorientierte Prosa-Dokumentation eines Testframeworks (Leitfäden und
    Referenzseiten in Markdown/MDX). Kontrollierte Chunking-Vergleiche gibt es bislang vor allem für spezialisierte
-   Fachdomänen (unternehmensinterne technische Dokumente, klinische Entscheidungsunterstützung) und für strukturierte
-   API-Spezifikationen (OpenAPI, Pesl et al., 2026; siehe [Verwandte Arbeiten](#verwandte-arbeiten)).
+   Fachdomänen (etwa klinische Entscheidungsunterstützung) und für strukturierte API-Spezifikationen (OpenAPI, Pesl et
+   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Die im Exposé genannten
+   „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
+   ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1
    und K0.
@@ -102,7 +107,8 @@ Antwort und der Wechselwirkung mit dem Fragetyp.
 
 ### Verwandte Arbeiten
 
-Nächste verwandte Arbeit ist Pesl et al. (2026, IEEE Transactions on Services Computing): ein Chunking-Vergleich auf
+Nächste verwandte Arbeit ist, vorläufig bis zur Volltextprüfung ([ADR 0018](../adr/0018-literaturbasis.md)), Pesl et
+al. (2026, IEEE Transactions on Services Computing): ein Chunking-Vergleich auf
 OpenAPI-Dokumentation, in dem strukturbasiertes Chunking je Endpunkt das Token-Chunking übertrifft. Davon grenzt sich
 die Arbeit über die Dokumentart ab: Prosa-Leitfäden und Referenzseiten statt strukturierter API-Spezifikationen. Ob
 Pesl et al. auch die Antwortqualität messen oder nur das Retrieval, ist noch am Volltext zu prüfen
@@ -213,8 +219,12 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   Die Ausgangsabschnitte werden reproduzierbar zufällig nach Textlänge gezogen und nach dem Tokenanteil der Bereiche
   verteilt, damit nicht die Vorlieben der verfassenden Person die Themen bestimmen und jeder Bereich vorkommt
   ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md)).
-  Eine KI-Durchsicht schlägt nur vor; Fragen, Referenzantworten und Relevanzurteile schreibt allein Jonas, und jeder
-  Vorschlag ist für die KI-Offenlegung protokolliert (ADR 0031).
+  Eine KI-Durchsicht schlägt nur vor, und jeder Vorschlag ist für die KI-Offenlegung protokolliert (ADR 0031). Was
+  Urteil ist, schreibt nie eine KI: Fragen, Referenzantworten, Relevanzurteile, Kernpunkte, Closed-Book-Urteile und
+  die Werte der Hauptbewertung schreibt allein Jonas, die Werte der Zweitbewertung allein R2
+  ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md), [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md),
+  [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0040](../adr/0040-closed-book-pruefung.md),
+  [ADR 0046](../adr/0046-zweitbewertung.md)).
 - **Retrieval und Antwort getrennt:** Retrieval-Metriken ([ADR 0012](../adr/0012-retrieval-metriken.md)) und die
   Antwort-Rubrik ([ADR 0013](../adr/0013-antwort-rubrik.md)) werden getrennt erhoben, weil H2 gerade fragt, ob sich
   Unterschiede im Retrieval auf die Antworten übertragen.
@@ -240,14 +250,13 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   und RAGAS ist nie alleinige Grundlage ([ADR 0007](../adr/0007-triangulation.md),
   [ADR 0047](../adr/0047-ragas-als-triangulation.md)).
 - **Zweitbewertung:** Bewertet nur eine Person, bleibt offen, wie stark die Werte von ihr abhängen. Eine zweite Person
-  bewertet deshalb 12 Fragen × C1–C3 = 36 der 144 Antworten blind, mit denselben Prüffragen und eingefrorenen
-  Kernpunkten. Die 12 Fragen werden nach dem Einfrieren und vor der eigenen Bewertung gezogen, so dass keine Auswahl
-  nach Ergebnissen möglich ist. Gemessen wird mit Gwets AC1 bzw. AC2 statt Cohens κ: Bei so vielen Höchstwerten (im
-  Pilot e2e 71–94 % je Kriterium) fällt κ auch bei fast vollständiger Übereinstimmung niedrig aus. Findet sich bis
-  Mitte November keine Person, bewertet Jonas dieselbe Stichprobe frühestens zwei Wochen später erneut blind, und ein
-  Sprachmodell, das nicht das Antwortmodell ist, beantwortet die Prüffragen; das wird als Konsistenz- bzw.
-  Triangulationsprüfung berichtet, nicht als Inter-Rater-Reliabilität ([ADR 0046](../adr/0046-zweitbewertung.md);
-  Maße: [Evaluation](../reference/evaluation.md#zweitbewertung), Ablauf:
+  bewertet deshalb eine Stichprobe der Antworten blind, mit denselben Prüffragen und eingefrorenen Kernpunkten. Die
+  Stichprobe wird nach dem Einfrieren und vor der eigenen Bewertung gezogen, so dass keine Auswahl nach Ergebnissen
+  möglich ist. Gemessen wird mit Gwets AC1 bzw. AC2 statt Cohens κ, weil κ bei vielen Höchstwerten auch bei fast
+  vollständiger Übereinstimmung niedrig ausfällt. Ohne zweite Person tritt eine Konsistenz- und
+  Triangulationsprüfung an ihre Stelle, die nicht als Inter-Rater-Reliabilität berichtet wird
+  ([ADR 0046](../adr/0046-zweitbewertung.md); Umfang, Maße und Ersatzverfahren:
+  [Evaluation](../reference/evaluation.md#zweitbewertung), Ablauf:
   [Experiment durchführen](../how-to/run-the-experiment.md#zweitbewertung)).
 - **Statistik:** Viele Metriken und Teilgruppen würden ohne festen Plan viele Tests und damit Zufallsbefunde erzeugen.
   Deshalb steht vor dem Hauptlauf fest, welche drei primären Metriken getestet werden: R@5, MRR und der Gesamtwert der
@@ -266,8 +275,8 @@ Metriken, Formeln und Rubrik im Einzelnen: [Evaluation](../reference/evaluation.
 
 ## RAG-Pipeline-Architektur
 
-Konzeptionelle Übersicht; die Reihenfolge der Schritte und ihre Befehle stehen im README und in
-[Werkzeuge](../reference/tooling.md).
+Konzeptionelle Übersicht; die Reihenfolge der Schritte und ihre Befehle stehen in
+[Experiment durchführen](../how-to/run-the-experiment.md), die Optionen in [Werkzeuge](../reference/tooling.md).
 
 ```
 Documentation Snapshot (e2e, MDX)
@@ -325,10 +334,9 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
   auf 20 Fragen je Korpus, mit entsprechend breiten Intervallen ([ADR 0038](../adr/0038-korpus-e2e.md)).
 - **Reliabilität:** Temperatur 0, Rohdaten speichern, Modellversionen dokumentieren, fixierter Snapshot, Prompts
   veröffentlichen. Temperatur 0 verringert die Zufälligkeit, garantiert aber keine identischen Ausgaben; deshalb werden
-  die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)). Eine zweite Person
-  bewertet 36 Antworten blind; ohne sie ersetzt eine Intra-Rater-Wiederholung mit LLM-Gegenprobe die Messung, berichtet
-  als Konsistenzprüfung, nicht als Inter-Rater-Reliabilität
-  ([Zweitbewertung](#warum-die-evaluation-so-angelegt-ist), [ADR 0046](../adr/0046-zweitbewertung.md)).
+  die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)). Wie stark die
+  Bewertung von der bewertenden Person abhängt, misst die Zweitbewertung
+  ([Zweitbewertung](#warum-die-evaluation-so-angelegt-ist)).
 - **Generator:** Das Antwortmodell antwortet direkt, ohne verdecktes Reasoning (`config.LLM_REASONING_EFFORT` =
   `none`, die Voraussetzung für Temperatur 0). Die Ergebnisse gelten für einen solchen Generator; ein Reasoning-Modell
   könnte schwache Kontexte teilweise ausgleichen, sodass die Unterschiede zwischen den Strategien kleiner ausfielen

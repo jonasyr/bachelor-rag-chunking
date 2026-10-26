@@ -4,9 +4,11 @@
 
 ## Stand
 
-Stand 23.10.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
+Stand 26.10.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
 Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlaufs sind bestanden
-([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audit (PR #41) und seine Code-Befunde (PR #42).
+([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
+und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
+([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Fragenkatalog, drei Blöcke je Woche ab 23.10. ([Backlog](#backlog) Punkt 1). **Größtes Risiko:**
 Der Hauptkatalog hat 0 von 48 Fragen; Einfrieren geplant am 06.11., spätestens 09.11. ([Zeitplan](#zeitplan)).
 
@@ -73,6 +75,8 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
 10. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+11. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
+    [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
 
 ## Offene Entscheidungen
 
@@ -128,9 +132,18 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   Lizenzspalte für die Korpusproben; Vue-Archiv `embedding_runs.jsonl` und die Hauptlauf-Ausgaben
   `analysis.json` und `second_rater_disagreements.csv` werden versioniert; eigene Bewertung erst nach dem
   Abschluss der Zweitbewertung pushen; Fragenkatalog mit drei Blöcken je Woche ab 23.10., Einfrieren 06.11.;
-  Code-Befunde in einem eigenen PR (PR #42); Doku-Audit (PR #41).
+  Code-Befunde in einem eigenen PR (am 23.10.); Doku-Audit (PR #41).
 - 23.10.2026: Code-Befunde des Audits (PR #42): Schlüssel von K1 und K0 nur aus `config`, Ausgabeordner der Pilot-Sets
   aus `config`, `difficulty_probe.py` verlangt das Set, RAGAS-Block als eigener Abschnitt in `config.py`, Testtabelle
   „konfirmatorisch“, Notebook-Gerüst und `plotly` entfernt, Regelversion im Einfrier-Eintrag
   ([ADR 0035](adr/0035-regelbasierte-bewertung.md)), `catalogue.py check` meldet H1-Abschnitte ohne Begründung
-  ([ADR 0022](adr/0022-h1-abschnitte-in-ground-truth.md)).
+  ([ADR 0022](adr/0022-h1-abschnitte-in-ground-truth.md)); `jupyter` und `ipykernel` entfernt (PR #43).
+- 26.10.2026: Doku-Audit; Entscheidungen von Jonas: Korpus-Snapshot und Chunk-Vektoren versioniert, damit
+  Begutachtende und ein zweiter Rechner Retrieval und Auswertung ohne API nachrechnen
+  ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md), PR #45); der Hauptlauf läuft auf dem Branch
+  `run/hauptlauf`; Taiwo (2026) belegt die Forschungslücke nicht mehr
+  ([ADR 0011](adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)); Pesl et al. (2026)
+  vorläufig bis zur Volltextprüfung; Nachträge zur NaN-Regel von RAGAS
+  ([ADR 0047](adr/0047-ragas-als-triangulation.md#nachtrag-26102026-fehlende-werte)) und zur Holm-Familie
+  ([ADR 0044](adr/0044-statistische-auswertung.md#nachtrag-26102026-holm-über-die-testbaren-metriken));
+  toter Code und Platzhalter-App entfernt (PR #44); Doku-Audit (PR #46).
