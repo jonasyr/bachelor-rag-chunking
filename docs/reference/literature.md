@@ -32,7 +32,7 @@ ergänzte Domänenstudie (Pesl et al.).
 | `taiwo2026chunking` | Taiwo, S., & Amaluddin Yusoff, M. (2026). Evaluating chunking strategies for retrieval-augmented generation in oil and gas enterprise documents. In D. C. Wyld et al. (Hrsg.), *Computer Science & Information Technology (CS & IT)* (S. 69–79). AIRCC Publishing Corporation. https://doi.org/10.5121/csit.2026.160507 | nur Domänenbeispiel (Öl und Gas, nur Retrieval); trägt die Forschungslücke nicht, weil der Verlag AIRCC auf Beall's List steht ([ADR 0011, Nachtrag](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)) |
 | `gomezcabello2025chunking` | Gomez-Cabello, C. A., et al. (2025). Comparative evaluation of advanced chunking for retrieval-augmented generation in large language models for clinical decision support. *Bioengineering, 12*(11), 1194. https://doi.org/10.3390/bioengineering12111194 | Chunking-Vergleich in einer Fachdomäne (klinisch), Forschungslücke ([ADR 0011](../adr/0011-forschungsluecke.md)) |
 | `qu2025semanticchunking` | Qu, R., Tu, R., & Bao, F. S. (2025). Is semantic chunking worth the computational cost? In *Findings of the ACL: NAACL 2025* (S. 2155–2177). https://doi.org/10.18653/v1/2025.findings-naacl.114 | semantisch/strukturell nicht konsistent besser: starke Baseline, Thema nicht trivial ([ADR 0010](../adr/0010-starke-baseline.md)) |
-| `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (strukturbasiert je Endpunkt schlägt Token-Chunking); Abgrenzung über die Dokumentart ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); **vorläufig:** nach [ADR 0018](../adr/0018-literaturbasis.md) erst nach der Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 8) |
+| `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (Aufteilung je Endpunkt schlägt ganzes Dokument und JSON-Aufteilung, S. 1530); misst nur das Retrieval (Recall, Precision, S. 1527); Abgrenzung über Dokumentart und Methodik ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); Volltext am 26.10.2026 geprüft |
 
 Ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; er erscheint in der Arbeit nicht
 ([ADR 0011, Nachtrag](../adr/0011-forschungsluecke.md#nachtrag-26102026-blogbeitrag-entfällt-erste-säule-neu)).
@@ -42,7 +42,7 @@ Ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; 
 Bei der Kapitelplanung der Arbeit gezielt für Lücken gesucht und am 26.10.2026 gegen Crossref, PMLR, ACL Anthology und
 OpenAlex geprüft (bibliografische Angaben). Die Befunde stammen aus den Abstracts; nach
 [ADR 0018](../adr/0018-literaturbasis.md) sind alle Quellen dieses Abschnitts darum **vorläufig** und erst nach der
-Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 13). Für die
+Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 11). Für die
 Webquelle `smith2024chunking` (Chroma-Blog) gilt: nur als technische Begründung in ADRs und der Methodik, nicht in der
 theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024bestpractices` und `liu2024lostmiddle`.
 
@@ -163,10 +163,10 @@ RAGAS). RAGAS selbst steht unter den Kernquellen (`es2024ragas`).
 ### Nächste Treffer der Suche zur zweiten Säule
 
 Dokumentierte Suche vom 26.10.2026 (Protokoll im Recherche-Log der Arbeit, PaperLab); bibliografische Angaben gegen
-Crossref geprüft, nur Abstracts gelesen. **Vorläufig:** Pham Doan und Luong Ngoc (2025) erst nach der Volltextprüfung
-([Backlog](../plan.md#backlog), Punkt 12); Dhakal et al. (2026) nur als Suchtreffer, Begutachtung der Zeitschrift unklar.
+Crossref geprüft, nur Abstracts gelesen. Pham Doan und Luong Ngoc (2025) am 26.10.2026 am Volltext geprüft; Dhakal et
+al. (2026) nur als Suchtreffer, Begutachtung der Zeitschrift unklar.
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|
-| `phamdoan2025headingaware` | Pham Doan, T., & Luong Ngoc, P. (2025). Optimizing context retrieval for RAG via heading-aware chunking and hierarchical document structure integration. In *2025 IEEE 7th Symposium on Computers & Informatics (ISCI)* (S. 456–461). IEEE. https://doi.org/10.1109/ISCI65687.2025.11167620 | nächster Treffer: überschriftenbasiertes Chunking auf AWS-Handbüchern; ob größenbasierte und semantische Baselines dabei sind, am Volltext prüfen |
+| `phamdoan2025headingaware` | Pham Doan, T., & Luong Ngoc, P. (2025). Optimizing context retrieval for RAG via heading-aware chunking and hierarchical document structure integration. In *2025 IEEE 7th Symposium on Computers & Informatics (ISCI)* (S. 456–461). IEEE. https://doi.org/10.1109/ISCI65687.2025.11167620 | nächster Treffer: überschriftenbasiertes Chunking mit Überlappung auf AWS-Handbüchern (100 Fragen), verglichen nur mit semantischem und elementbasiertem Chunking, keine größenbasierte Baseline; Bewertung allein per LLM-as-a-Judge (binär), keine Statistik |
 | `dhakal2026techdocs` | Dhakal, A., Neupane, S. S., Dhakal, A., & Paudel, M. (2026). Optimizing technical documentation for RAG systems: A comparative analysis of semantic chunking vs. structural formatting. *International Journal of Scientific Research in Science, Engineering and Technology, 13*(1), 222–227. https://doi.org/10.32628/ijsrset261313 | semantisch gegen ganzes Dokument, nur Retrieval |
