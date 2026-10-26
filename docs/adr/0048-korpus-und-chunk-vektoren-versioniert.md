@@ -46,3 +46,6 @@ laufen.
 - Negativ: Etwa 57 MB Binärdaten in der Git-Historie; ein erneutes Einbetten käme noch einmal hinzu.
 - Neutral: Der Korpus wird weitergegeben; Lizenztext und NOTICE stehen im [README](../../README.md#license).
   `snapshot.py` bleibt der Weg, den Snapshot gegen das Original zu prüfen; es schreibt dieselben Bytes.
+- Neutral: `docs.json` enthält den PostHog-Projektschlüssel von TesterArmy, einen öffentlichen Client-Schlüssel, der
+  auch im Original-Repository steht. Er bleibt, damit der Snapshot byte-gleich bleibt; die Regel gegen Schlüssel in
+  [AGENTS.md](../../AGENTS.md#secrets-and-privacy) nimmt ihn aus (Jonas, 26.10.2026, nach dem Codex-Review von #45).

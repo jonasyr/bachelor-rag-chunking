@@ -61,7 +61,8 @@ GitHub posts only P0 and P1 findings, so every rule that must surface is P1.
 
 ### Secrets and privacy
 - `.env`, API keys and personal data (e-mail, matriculation number) never appear in committed files, logs or output;
-  the repo is public. P1. (Git author metadata is outside this rule.)
+  the repo is public. P1. (Outside this rule: Git author metadata, and third-party public client keys inside the
+  unmodified corpus snapshot `data/raw/e2e_docs_snapshot/`, such as TesterArmy's PostHog key in `docs.json`, ADR 0048.)
 
 ### Tests
 - Tests never call the OpenAI API and need no network beyond tiktoken's one-time download of the `cl100k_base`
