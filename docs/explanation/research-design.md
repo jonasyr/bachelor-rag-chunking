@@ -73,7 +73,11 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
 2. **Andere Domäne und Dokumentart:** entwicklerorientierte Prosa-Dokumentation eines Testframeworks (Leitfäden und
    Referenzseiten in Markdown/MDX). Kontrollierte Chunking-Vergleiche gibt es bislang vor allem für spezialisierte
    Fachdomänen (etwa klinische Entscheidungsunterstützung) und für strukturierte API-Spezifikationen (OpenAPI, Pesl et
-   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Die im Exposé genannten
+   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Eine dokumentierte Suche vom 26.10.2026 fand
+   keine begutachtete Studie, die die Strategien kontrolliert auf Prosa-Entwicklerdokumentation vergleicht und die
+   Antwortqualität misst; nächste Treffer sind Pham Doan und Luong Ngoc (2025, überschriftenbasiertes Chunking auf
+   AWS-Handbüchern) und Dhakal et al. (2026, nur Retrieval). Die Aussage ist suchbegrenzt und vorläufig, bis der
+   Volltext von Pham Doan und Luong Ngoc geprüft ist (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im Exposé genannten
    „unternehmensinternen technischen Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt
    ([ADR 0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
 3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
