@@ -73,7 +73,7 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
 2. **Andere Domäne und Dokumentart:** entwicklerorientierte Prosa-Dokumentation eines Testframeworks (Leitfäden und
    Referenzseiten in Markdown/MDX). Kontrollierte Chunking-Vergleiche gibt es bislang vor allem für spezialisierte
    Fachdomänen (etwa klinische Entscheidungsunterstützung) und für strukturierte API-Spezifikationen (OpenAPI, Pesl et
-   al., 2026, vorläufig; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Eine dokumentierte Suche vom 26.10.2026 fand
+   al., 2026; siehe [Verwandte Arbeiten](#verwandte-arbeiten)). Eine dokumentierte Suche vom 26.10.2026 fand
    keine begutachtete Studie, die strukturbasiertes Chunking auf Prosa-Entwicklerdokumentation kontrolliert gegen
    größenbasierte Baselines mit und ohne Überlappung vergleicht und die Antworten regelbasiert durch Menschen bewertet
    und statistisch prüft. Am nächsten kommen Pham Doan und Luong Ngoc (2025): überschriftenbasiertes Chunking auf
@@ -115,12 +115,13 @@ Antwort und der Wechselwirkung mit dem Fragetyp.
 
 ### Verwandte Arbeiten
 
-Nächste verwandte Arbeit ist, vorläufig bis zur Volltextprüfung ([ADR 0018](../adr/0018-literaturbasis.md)), Pesl et
-al. (2026, IEEE Transactions on Services Computing): ein Chunking-Vergleich auf
-OpenAPI-Dokumentation, in dem strukturbasiertes Chunking je Endpunkt das Token-Chunking übertrifft. Davon grenzt sich
-die Arbeit über die Dokumentart ab: Prosa-Leitfäden und Referenzseiten statt strukturierter API-Spezifikationen. Ob
-Pesl et al. auch die Antwortqualität messen oder nur das Retrieval, ist noch am Volltext zu prüfen
-([Backlog](../plan.md#backlog)); davon hängt ab, wie scharf die Abgrenzung über die Methodik (Säule 3) ausfällt.
+Nächste verwandte Arbeit ist Pesl et al. (2026, IEEE Transactions on Services Computing; Volltext am 26.10.2026
+geprüft): ein Chunking-Vergleich auf OpenAPI-Dokumentation, in dem Strategien mit Aufteilung je Endpunkt das Chunking
+des ganzen Dokuments und die JSON-Aufteilung übertreffen; innerhalb der Endpunkt-Varianten finden sie keinen
+signifikanten Unterschied (S. 1530). Gemessen wird nur das Retrieval, als Recall und Precision der gefundenen Endpunkte
+(S. 1527); Antworten werden nicht bewertet. Davon grenzt sich die Arbeit zweifach ab: über die Dokumentart
+(Prosa-Leitfäden und Referenzseiten statt strukturierter API-Spezifikationen) und über die Methodik (Säule 3:
+Antwortqualität, regelbasiert und manuell bewertet).
 
 Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup erscheint in der Arbeit nicht: Das Thesis-Handbuch
 schließt Blogbeiträge in der theoretischen Fundierung aus

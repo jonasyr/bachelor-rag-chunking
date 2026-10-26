@@ -67,17 +67,13 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 7. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
-8. **Volltext Pesl et al. (2026) lesen.** Wer: Jonas. Frist: vor dem Methodik- und Verwandte-Arbeiten-Kapitel (Anfang
-   November). Fertig, wenn feststeht, ob die Studie auch die Antwortqualität misst, und
-   [Forschungsdesign](explanation/research-design.md#verwandte-arbeiten) und
-   [Literaturbasis](reference/literature.md) das nennen.
-9. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
+8. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
-10. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
-11. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
+9. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+10. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
     [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
-12. **Volltextprüfung der am 26.10. ergänzten Quellen** ([ADR 0018](adr/0018-literaturbasis.md)). Wer: Jonas, Claude
+11. **Volltextprüfung der am 26.10. ergänzten Quellen** ([ADR 0018](adr/0018-literaturbasis.md)). Wer: Jonas, Claude
     fasst zusammen. Frist: vor dem Schreiben des jeweiligen Kapitels, zuerst Mallen et al., Kandpal et al. und Sainz et
     al. (erste Säule). Fertig, wenn jede zitierte Aussage am Volltext bestätigt und der Vermerk „vorläufig“ in der
     [Literaturbasis](reference/literature.md#ergänzte-quellen-26102026) entfernt ist.
