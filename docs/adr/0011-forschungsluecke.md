@@ -5,7 +5,8 @@
 Angenommen (D11 im Leitfaden; Quelle: Chat, ergänzt die Baseline); „Öl und Gas“ im Kontext ist das Beispiel aus der
 Quelle `taiwo2026chunking`; maßgeblich für die Domäne ist der Wortlaut des Exposés, „unternehmensinterne technische
 Dokumente“. Zweite Säule eingeengt am 22.10.2026: [Nachtrag](#nachtrag-22102026-zweite-säule-eingeengt); Taiwo (2026) kein Beleg der
-Lücke: [Nachtrag 26.10.2026](#nachtrag-26102026-taiwo-kein-beleg-der-lücke)
+Lücke: [Nachtrag 26.10.2026](#nachtrag-26102026-taiwo-kein-beleg-der-lücke); Blogbeitrag entfällt, erste Säule neu
+bestimmt: [Nachtrag 26.10.2026](#nachtrag-26102026-blogbeitrag-entfällt-erste-säule-neu)
 
 ## Kontext
 
@@ -38,3 +39,17 @@ Chunking-Vergleiche lägen vor allem in fachfremden Domänen vor, stützt sich d
 technische Dokumente“ aus dem Exposé wird nicht mehr als belegt angeführt
 ([Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen)). Die Entscheidung
 selbst und ihre drei Säulen bleiben.
+
+## Nachtrag 26.10.2026: Blogbeitrag entfällt, erste Säule neu
+
+Von Jonas entschieden (Kapitelplanung der Arbeit). Die verwandten Arbeiten stehen in der Arbeit als Abschnitt der
+theoretischen Fundierung, und für dieses Kapitel schließt das Thesis-Handbuch Blogbeiträge als Quellen aus (TH S. 11).
+Der Praktiker-Blogbeitrag (FastAPI/Supabase/Stripe) wird darum nicht mehr erwähnt; die Konsequenz „wird in
+‚Verwandte Arbeiten‘ kurz als informeller Vorläufer eingeordnet“ entfällt.
+
+Die erste Säule („anderer Korpus“ als der des Blogbeitrags) verliert damit ihren Bezugspunkt und lautet neu: **ein dem
+Antwortmodell weitgehend unbekannter Korpus, per Closed-Book-Prüfung kontrolliert.** Sprachmodelle kennen populäre
+öffentliche Inhalte, und Retrieval hilft vor allem bei selten vorkommendem Wissen (`mallen2023whennot`,
+`kandpal2023longtail`); Kontamination ist je Datensatz und Modell zu messen (`sainz2023contamination`). Auf einem
+bekannten Korpus vermischen sich Retrieval-Effekte mit Modellwissen; die Messung auf Vue.js hat genau das gezeigt
+([ADR 0038](0038-korpus-e2e.md)). Wortlaut: [Forschungsdesign](../explanation/research-design.md#forschungslücke-und-abgrenzung-drei-säulen).
