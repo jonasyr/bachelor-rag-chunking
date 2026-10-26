@@ -92,13 +92,6 @@ def append_generation_run(
     return full
 
 
-def append_ragas_run(record: dict, runs_file: Path) -> dict:
-    """Build and append the record of a RAGAS run (see `ragas_record`)."""
-    full = ragas_record(record)
-    _append(full, runs_file)
-    return full
-
-
 def append_record(record: dict, runs_file: Path) -> None:
     """Append a record that was built beforehand."""
     _append(record, runs_file)

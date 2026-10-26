@@ -24,8 +24,8 @@ Entscheidungen: [ADR 0015](../adr/0015-tech-stack.md) (Stack), [ADR 0016](../adr
 | LLM | `config.LLM_MODEL` über die OpenAI Chat Completions API, `config.LLM_REASONING_EFFORT`, `config.LLM_TEMPERATURE` (`src/llm_client.py`, [ADR 0033](../adr/0033-antwortmodell.md)) |
 | Umgebung | `python-dotenv` (`.env`) |
 | Datenanalyse | Pandas |
-| Diagramme | Matplotlib (PDF-Abbildungen der Auswertung, `src/report_figures.py`); Plotly deklariert, ungenutzt |
-| App/Dashboard | Streamlit (`app/catalogue_editor.py` mit den Seiten Catalogue und Scoring; später `app/streamlit_app.py`) |
+| Diagramme | Matplotlib (PDF-Abbildungen der Auswertung, `src/report_figures.py`) |
+| App/Dashboard | Streamlit (`app/catalogue_editor.py` mit den Seiten Catalogue und Scoring) |
 | Evaluation | eigene Skripte (regelbasierte Bewertung, [ADR 0035](../adr/0035-regelbasierte-bewertung.md)); RAGAS als feste Triangulation nach der regelbasierten Bewertung ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) |
 
 RAGAS läuft in `src/ragas_eval.py` ([Pins](#ragas-pins)). Telemetrie: Chroma bleibt abgeschaltet
@@ -60,8 +60,7 @@ bachelor-rag-chunking/
 │   ├── analyse.py analysis_data.py stats.py           (Auswertung, Tests und Effektstärken, ADR 0044)
 │   ├── report_tables.py report_figures.py             (LaTeX-Tabellen, PDF-Abbildungen)
 │   └── …                                              (Hilfsmodule, z. B. tokens.py, run_log.py, scoring_store.py)
-├── app/                                (Streamlit: catalogue_editor.py = Router, Seiten Catalogue und Scoring;
-│                                        streamlit_app.py = Platzhalter)
+├── app/                                (Streamlit: catalogue_editor.py = Router, Seiten Catalogue und Scoring)
 ├── .streamlit/config.toml              (Thema und localhost-Bindung der App)
 ├── scripts/                            (difficulty_probe.py, remap_pilot.py (historisch), corpus_probe/)
 ├── tests/                              (pytest, siehe Tests)
