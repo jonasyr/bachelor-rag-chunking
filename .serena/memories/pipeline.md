@@ -11,8 +11,11 @@ Order and procedure: `docs/how-to/run-the-experiment.md`; script options, env va
 - Closed-book screen (`catalogue.py screen`, calls the API) and K0 (written by `generate.py`): ADR 0040, 0041.
 - MDX: unknown components/HTML/JSX raise on purpose — add a test + rule in `src/mdx.py`, never silence it or
   special-case a page (ADR 0042).
-- Embedding vectors are stored once (ADR 0024); to re-embed, delete the `.npz` deliberately, never edit it.
+- Embedding vectors are stored once (ADR 0024) and versioned with the snapshot (ADR 0048); never re-embed or edit a
+  `.npz`. A fresh clone rebuilds chunks and index without API: `docs/how-to/work-on-two-machines.md`. No pre-commit
+  hook may touch `data/raw/` (snapshot checksums).
 - A corpus change renumbers doc IDs; remapping annotations is a scripted, reviewed step, never by hand
   (precedent: `scripts/remap_pilot.py`, ADR 0025, historical, does not apply to e2e).
 - Analysis: `src/analyse.py` (ADR 0044); `--set DIR` writes `DIR/output/`; procedure `evaluation.md#statistische-auswertung`.
-- Main-run query vectors and retrieval results are versioned (ADR 0045), pilot vectors are not.
+- Main-run query vectors and retrieval results are versioned (ADR 0045), pilot vectors are not; the main run happens
+  on branch `run/hauptlauf` (`docs/how-to/run-the-experiment.md`).
