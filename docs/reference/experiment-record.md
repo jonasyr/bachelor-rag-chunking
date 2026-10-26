@@ -30,7 +30,8 @@ MB = 10⁶ Byte.
 | tiktoken | 0.13.0 | 13.10.2026 |
 | `ragas` / `langchain-community` | 0.4.3 / 0.4.1 ([Pins](tooling.md#ragas-pins)) | 21.10.2026 |
 
-Alle Paketstände sind in `pyproject.toml` gepinnt und in `uv.lock` festgehalten.
+Die Pakete dieser Tabelle und `scipy` sind in `pyproject.toml` exakt gepinnt (`==`); die übrigen haben dort nur
+Untergrenzen (`>=`). Alle installierten Stände hält `uv.lock` fest.
 
 ## Chunking (e2e)
 
@@ -53,7 +54,7 @@ Lauf am 18.10.2026 (`src/embed.py`, Modell und Pakete: [Modellversionen](#modell
 Eingabe-Token weniger als die Korpussumme: Wie beim Vue-Lauf trennt ein fester Fensterschnitt ein Token-Paar, das beim
 erneuten Kodieren verschmilzt; Spannen und Relevanz bleiben unberührt.
 
-| Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Vektordatei | Modellstand-Prüfung (Kosinus) |
+| Strategie | Vektoren | Eingabe-Tokens | Kosten (USD) | Dateigröße `.npz`² | Modellstand-Prüfung (Kosinus) |
 |---|---:|---:|---:|---:|---:|
 | C1 | 529 | 250.380 | 0,0325 | 11,5 MB | –¹ |
 | C2 | 642 | 308.580 | 0,0401 | 14,0 MB | 0,99999 |
@@ -64,6 +65,8 @@ erneuten Kodieren verschmilzt; Spannen und Relevanz bleiben unberührt.
 ¹ C1 wurde zuerst eingebettet; es gab keine gespeicherte Vektordatei zum Vergleich (die Vue-Dateien sind archiviert).
 Die Prüfungen bei C2, C3 und K1 vergleichen mit den an diesem Tag gespeicherten e2e-Vektoren.
 Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl` bzw. den Dateigrößen.
+² Größe der Datei mit Vektoren, IDs und Texten. Die Indexgröße in `efficiency.tex` ist dagegen `vector_bytes` aus
+`embedding_runs.jsonl`, nur die float32-Vektoren (C1 529 × 3.072 × 4 B = 6,50 MB).
 
 ## Stichprobenplan (e2e)
 

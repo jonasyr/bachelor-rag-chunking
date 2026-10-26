@@ -12,8 +12,8 @@ Jede Tabelle hat dieselben Spalten: BibTeX-Key, Quelle (APA 7, gekürzt) und was
 
 ## Kernquellen
 
-Die 15 im Exposé zitierten Quellen ([ADR 0018](../adr/0018-literaturbasis.md)) und eine am 22.10.2026 ergänzte
-Domänenstudie (Pesl et al.).
+Die 15 im Exposé zitierten Quellen ([ADR 0018](../adr/0018-literaturbasis.md)) und eine am 22.10.2026 vorläufig
+ergänzte Domänenstudie (Pesl et al.).
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|
@@ -29,10 +29,10 @@ Domänenstudie (Pesl et al.).
 | `jimenoyepes2024chunking` | Jimeno Yepes, A., et al. (2024). *Financial report chunking for effective retrieval augmented generation* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2402.05131 | strukturbasiertes, element-basiertes Chunking |
 | `finardi2024chronicles` | Finardi, P., et al. (2024). *The chronicles of RAG: The retriever, the chunk and the generator* [Preprint]. arXiv. https://doi.org/10.48550/arXiv.2401.07883 | Retriever, Chunk und Generator als Einheit |
 | `ji2023hallucination` | Ji, Z., et al. (2023). Survey of hallucination in natural language generation. *ACM Computing Surveys, 55*(12), Artikel 248. https://doi.org/10.1145/3571730 | Halluzinationen in NLG |
-| `taiwo2026chunking` | Taiwo, S., & Amaluddin Yusoff, M. (2026). Evaluating chunking strategies for retrieval-augmented generation in oil and gas enterprise documents. In D. C. Wyld et al. (Hrsg.), *Computer Science & Information Technology (CS & IT)* (S. 69–79). AIRCC Publishing Corporation. https://doi.org/10.5121/csit.2026.160507 | nur Domänenbeispiel (Öl und Gas, nur Retrieval); trägt die Forschungslücke nicht, weil der Verlag AIRCC auf Beall's List steht |
+| `taiwo2026chunking` | Taiwo, S., & Amaluddin Yusoff, M. (2026). Evaluating chunking strategies for retrieval-augmented generation in oil and gas enterprise documents. In D. C. Wyld et al. (Hrsg.), *Computer Science & Information Technology (CS & IT)* (S. 69–79). AIRCC Publishing Corporation. https://doi.org/10.5121/csit.2026.160507 | nur Domänenbeispiel (Öl und Gas, nur Retrieval); trägt die Forschungslücke nicht, weil der Verlag AIRCC auf Beall's List steht ([ADR 0011, Nachtrag](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)) |
 | `gomezcabello2025chunking` | Gomez-Cabello, C. A., et al. (2025). Comparative evaluation of advanced chunking for retrieval-augmented generation in large language models for clinical decision support. *Bioengineering, 12*(11), 1194. https://doi.org/10.3390/bioengineering12111194 | Chunking-Vergleich in einer Fachdomäne (klinisch), Forschungslücke ([ADR 0011](../adr/0011-forschungsluecke.md)) |
 | `qu2025semanticchunking` | Qu, R., Tu, R., & Bao, F. S. (2025). Is semantic chunking worth the computational cost? In *Findings of the ACL: NAACL 2025* (S. 2155–2177). https://doi.org/10.18653/v1/2025.findings-naacl.114 | semantisch/strukturell nicht konsistent besser: starke Baseline, Thema nicht trivial ([ADR 0010](../adr/0010-starke-baseline.md)) |
-| `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (strukturbasiert je Endpunkt schlägt Token-Chunking); Abgrenzung über die Dokumentart ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); Volltext noch zu lesen |
+| `pesl2026servicediscovery` | Pesl, R. D., Mathew, J. G., Mecella, M., & Aiello, M. (2026). Retrieval-augmented generation for service discovery: Chunking strategies and benchmarking. *IEEE Transactions on Services Computing, 19*(2), 1520–1534. https://doi.org/10.1109/TSC.2026.3665441 | nächste verwandte Arbeit: Chunking-Vergleich auf OpenAPI-Dokumentation (strukturbasiert je Endpunkt schlägt Token-Chunking); Abgrenzung über die Dokumentart ([Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten)); **vorläufig:** nach [ADR 0018](../adr/0018-literaturbasis.md) erst nach der Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 8) |
 
 Nicht zitierfähig und darum ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; seine
 Einordnung steht im [Forschungsdesign](../explanation/research-design.md#verwandte-arbeiten).

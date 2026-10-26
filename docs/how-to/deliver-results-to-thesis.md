@@ -15,7 +15,7 @@ sonst ab ([Skripte und Optionen](../reference/tooling.md#skripte-und-optionen)).
    Inhalte: [Evaluation](../reference/evaluation.md#visualisierungen)). Alle vier werden versioniert; PDFs sind sonst
    gitignored, `output/figures/*.pdf` ist per Ausnahme in `.gitignore` freigegeben. Ohne PaperLab-Checkout vorher
    `PAPERLAB_FONTS` setzen ([Umgebungsvariablen](../reference/tooling.md#umgebungsvariablen)).
-2. `git add output/` auf einem Branch committen, pushen und einen Pull Request öffnen; Review und Merge nach den
+2. `git add output/` auf dem Lauf-Branch `run/hauptlauf` committen, pushen und einen Pull Request öffnen; Review und Merge nach den
    [Konventionen](../../AGENTS.md#conventions).
 3. In PaperLab im Ordner der Arbeit (`scientific-papers/thesis/thesis-semester-7-rag-chunking_jonas/`) den
    Submodul-Zeiger auf den Commit setzen, den der Squash-Merge auf `main` erzeugt hat: `git -C code switch main && git -C code pull`, dann

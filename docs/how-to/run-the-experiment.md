@@ -11,7 +11,9 @@ Optionen der Skripte: [Werkzeuge](../reference/tooling.md#skripte-und-optionen);
 
 ## Vorbereitung
 
-Einmal je Korpus, vor dem Fragenkatalog; Snapshot, Chunks und Embeddings des e2e-Korpus werden nicht wiederholt.
+Einmal je Korpus, vor dem Fragenkatalog. Snapshot und Vektoren des e2e-Korpus sind versioniert
+([ADR 0048](../adr/0048-korpus-und-chunk-vektoren-versioniert.md)); auf einem neuen Klon oder zweiten Rechner
+entstehen Chunks und Index ohne API-Aufruf neu ([Auf zwei Rechnern arbeiten](work-on-two-machines.md)).
 
 1. Snapshot, Ingest, Preprocessing: [Korpus-Snapshot erstellen](create-corpus-snapshot.md).
 2. Chunking für C1–C3 und die Kontrolle K1: `uv run python src/chunking.py`
@@ -21,15 +23,18 @@ Einmal je Korpus, vor dem Fragenkatalog; Snapshot, Chunks und Embeddings des e2e
 ## Hauptlauf auf einen Blick
 
 Der Hauptlauf beginnt mit dem eingefrorenen Katalog. Jeder Schritt ab `retrieve.py` prüft den Freeze-Datensatz vor
-jedem API-Aufruf und bricht sonst ab. Nach jedem Schritt die versionierten Dateien committen
+jedem API-Aufruf und bricht sonst ab. Der ganze Lauf geschieht auf einem eigenen Branch `run/hauptlauf`, nie auf
+`main` ([AGENTS.md](../../AGENTS.md#conventions)); nach Schritt 10 wird er per Pull Request zusammengeführt
+([Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md)). Nach jedem Schritt die versionierten Dateien committen
 ([Datenformate](../reference/data-formats.md#versioniert-und-ignoriert)), auch Fragevektoren und Retrieval-Ergebnisse
-([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)). **Pushen:** von Schritt 6 bis zum Abschluss der
+([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)). **Pushen** (auf `run/hauptlauf`): von Schritt 6 bis zum Abschluss der
 Zweitbewertung in Schritt 9 nichts pushen; das Repo ist öffentlich, und R2 darf Jonas' Prüfantworten nicht sehen
 ([Zweitbewertung](#zweitbewertung)).
 
 ```bash
-# 0. Katalog eingefroren: der Freeze-Commit existiert
+# 0. Katalog eingefroren: der Freeze-Commit existiert; Lauf-Branch anlegen
 git log -1 --oneline -- data/evaluation/catalogue_freeze.json
+git switch -c run/hauptlauf
 
 # 1. Zweitbewertung ziehen: direkt nach dem Einfrieren, vor jedem eigenen Wert
 uv run python src/second_rater.py --mode draw
@@ -97,7 +102,7 @@ git add output/
 git commit -m "chore(data): Auswertung des Hauptlaufs"
 ```
 
-Danach Branch, Pull Request und Submodul-Zeiger: [Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md).
+Danach Pull Request von `run/hauptlauf` und Submodul-Zeiger: [Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md).
 Bricht ein Schritt ab, nennt die Meldung den Befehl, der den fehlenden oder veralteten Laufeintrag schreibt.
 `retrieve.py` schreibt seine Ergebnisdateien bei jedem Lauf neu; weicht eine neue `retrieved_results.csv` von der ab,
 auf der `generate` lief, bricht `ragas_eval.py` ab (der Scaffold prüft die Retrieval-Datei nicht). Nach Schritt 3
@@ -130,7 +135,8 @@ localhost`, Seite „Scoring“; Regeln: [Evaluation](../reference/evaluation.md
   Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
 
 **Kontrolle K0** (Schritt 7, [ADR 0041](../adr/0041-kontrolle-k0.md)): erst nach `scores.csv`; dieselben eingefrorenen
-Kernpunkte, Prüffragen ohne Quellenbezug, nicht blind. Was verglichen wird:
+Kernpunkte, Prüffragen ohne Quellenbezug, nicht blind; `--mode summarise --control` schreibt `scores_control.csv`
+(nicht versioniert, entsteht mit demselben Befehl neu). Was verglichen wird:
 [Evaluation](../reference/evaluation.md#kontrolle-k0).
 
 ## Zweitbewertung
@@ -171,7 +177,9 @@ eine Ergebnisdatei nicht zum letzten Laufeintrag passt (dann den Schritt wiederh
 ## Vor jedem Evaluationslauf prüfen
 
 Erzwungen durch den Freeze-Datensatz und die Laufeinträge: `questions.csv`, `ground_truth.csv`, `sections.jsonl` und
-`documents.jsonl` unverändert seit dem Einfrieren; jede Ergebnisdatei passt zu ihrem Laufeintrag. Von Hand prüfen:
+`documents.jsonl` unverändert seit dem Einfrieren; Bewertung nach der Regelversion des Freeze-Datensatzes
+(`config.RUBRIC_RULES_VERSION`, sonst brechen Scaffold und Summarise ab); jede Ergebnisdatei passt zu ihrem
+Laufeintrag. Von Hand prüfen:
 
 - [ ] Snapshot-Commit in `docs/corpus_snapshot.txt` und im [Experiment-Protokoll](../reference/experiment-record.md)
 - [ ] Exakte Modellversionen im Experiment-Protokoll eingetragen
