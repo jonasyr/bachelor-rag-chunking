@@ -56,6 +56,7 @@ bekannten Korpus vermischen sich Retrieval-Effekte mit Modellwissen; die Messung
 
 Die Entscheidung selbst bleibt: die Lücke als entwicklerorientierte Open-Source-Dokumentation mit drei Säulen. Der
 Nachtrag ersetzt nur den Bezugspunkt der ersten Säule, die schon zuvor auf e2e als Korpus zielte, so wie der Nachtrag
-vom 22.10.2026 die zweite Säule eingeengt hat. Die Quellen sind nach [ADR 0018](0018-literaturbasis.md) vorläufig,
-bis sie am Volltext geprüft sind ([Backlog](../plan.md#backlog)). Pesl et al. (2026) ist am 26.10.2026 am Volltext
-geprüft und nicht mehr vorläufig: Die Studie misst nur das Retrieval (S. 1527).
+vom 22.10.2026 die zweite Säule eingeengt hat. Die Quellen waren nach [ADR 0018](0018-literaturbasis.md) vorläufig,
+bis sie am Volltext geprüft waren. Pesl et al. (2026) ist am 26.10.2026 am Volltext geprüft: Die Studie misst nur das
+Retrieval (S. 1527). Mallen et al., Kandpal et al. und Sainz et al. sind am 26.10.2026 geprüft und von Jonas am
+27.10.2026 freigegeben ([Literaturbasis](../reference/literature.md#ergänzte-quellen-26102026)).
