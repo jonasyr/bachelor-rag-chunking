@@ -12,8 +12,8 @@ Jede Tabelle hat dieselben Spalten: BibTeX-Key, Quelle (APA 7, gekürzt) und was
 
 ## Kernquellen
 
-Die 15 im Exposé zitierten Quellen ([ADR 0018](../adr/0018-literaturbasis.md)) und eine am 22.10.2026 vorläufig
-ergänzte Domänenstudie (Pesl et al.).
+Die 15 im Exposé zitierten Quellen ([ADR 0018](../adr/0018-literaturbasis.md)) und eine am 22.10.2026 ergänzte, am 26.10.2026
+am Volltext geprüfte Domänenstudie (Pesl et al.).
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|
@@ -40,9 +40,11 @@ Ohne Eintrag: der Praktiker-Blogbeitrag (Mai 2026) auf FastAPI/Supabase/Stripe; 
 ## Ergänzte Quellen (26.10.2026)
 
 Bei der Kapitelplanung der Arbeit gezielt für Lücken gesucht und am 26.10.2026 gegen Crossref, PMLR, ACL Anthology und
-OpenAlex geprüft (bibliografische Angaben). Die Befunde stammen aus den Abstracts; nach
-[ADR 0018](../adr/0018-literaturbasis.md) sind alle Quellen dieses Abschnitts darum **vorläufig** und erst nach der
-Volltextprüfung zitierbar ([Backlog](../plan.md#backlog), Punkt 11). Für die
+OpenAlex geprüft (bibliografische Angaben). Am 26. und 27.10.2026 hat Claude die zitierten Aussagen am Volltext
+geprüft, Jonas hat das Ergebnis am 27.10.2026 freigegeben; damit sind sie nach
+[ADR 0018](../adr/0018-literaturbasis.md) zitierbar. Prüfprotokoll mit Zitat, Seite und Einschränkung je Quelle: PaperLab,
+`planning/fulltext-check.md`; die Statistik-Originale sind nur für das Verfahren zitiert und bibliografisch an den
+JSTOR-PDFs geprüft. Für die
 Webquelle `smith2024chunking` (Chroma-Blog) gilt: nur als technische Begründung in ADRs und der Methodik, nicht in der
 theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024bestpractices` und `liu2024lostmiddle`.
 
@@ -66,7 +68,7 @@ theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024best
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|
-| `krishna2021hurdles` | Krishna, K., Roy, A., & Iyyer, M. (2021). Hurdles to progress in long-form question answering. In *Proceedings of NAACL-HLT 2021* (S. 4940–4957). https://doi.org/10.18653/v1/2021.naacl-main.393 | ROUGE taugt für lange Antworten nicht: manuelle Bewertung |
+| `krishna2021hurdles` | Krishna, K., Roy, A., & Iyyer, M. (2021). Hurdles to progress in long-form question answering. In *Proceedings of NAACL-HLT 2021* (S. 4940–4957). https://doi.org/10.18653/v1/2021.naacl-main.393 | ROUGE taugt für lange Antworten nicht; die Bewertung braucht klare Kriterien (menschliche Bewertung nennen sie ebenfalls unzuverlässig) |
 | `rashkin2023attribution` | Rashkin, H., et al. (2023). Measuring attribution in natural language generation models. *Computational Linguistics, 49*(4), 777–840. https://doi.org/10.1162/coli_a_00486 | Attribution als eigenes, menschlich bewertetes Kriterium: Quellenbezug |
 | `bolotova2022nonfactoid` | Bolotova, V., et al. (2022). A non-factoid question-answering taxonomy. In *Proceedings of SIGIR 2022* (S. 1196–1207). https://doi.org/10.1145/3477495.3531926 | Fragetypen jenseits faktischer Fragen: H3 |
 | `beyer2020questions` | Beyer, S., Macho, C., Di Penta, M., & Pinzger, M. (2020). What kind of questions do developers ask on Stack Overflow? *Empirical Software Engineering, 25*(3), 2258–2301. https://doi.org/10.1007/s10664-019-09758-x | Kategorien von Entwicklerfragen |
@@ -79,18 +81,24 @@ theoretischen Fundierung (TH S. 11); dort stehen `chen2024densex`, `wang2024best
 | `wilcoxon1945ranking` | Wilcoxon, F. (1945). Individual comparisons by ranking methods. *Biometrics Bulletin, 1*(6), 80–83. https://doi.org/10.2307/3001968 | Wilcoxon-Vorzeichen-Rang-Test |
 | `holm1979sequentially` | Holm, S. (1979). A simple sequentially rejective multiple test procedure. *Scandinavian Journal of Statistics, 6*(2), 65–70. https://www.jstor.org/stable/4615733 | Holm-Korrektur |
 | `kendall1939rankings` | Kendall, M. G., & Babington Smith, B. (1939). The problem of m rankings. *The Annals of Mathematical Statistics, 10*(3), 275–287. https://doi.org/10.1214/aoms/1177732186 | Kendalls W |
-| `fritz2012effectsize` | Fritz, C. O., Morris, P. E., & Richler, J. J. (2012). Effect size estimates: Current use, calculations, and interpretation. *Journal of Experimental Psychology: General, 141*(1), 2–18. https://doi.org/10.1037/a0024338 | Effektstärke r = \|z\| / √n |
+| `fritz2012effectsize` | Fritz, C. O., Morris, P. E., & Richler, J. J. (2012). Effect size estimates: Current use, calculations, and interpretation. *Journal of Experimental Psychology: General, 141*(1), 2–18. https://doi.org/10.1037/a0024338 | Effektstärke r = \|z\| / √N, Schwellen .1 / .3 / .5; N bei verbundenen Stichproben ist eigene Festlegung (Paare ohne Nulldifferenz) |
 | `spearman1904proof` | Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology, 15*(1), 72–101. https://doi.org/10.2307/1412159 | Spearmans ρ (H2) |
 | `efron1979bootstrap` | Efron, B. (1979). Bootstrap methods: Another look at the jackknife. *The Annals of Statistics, 7*(1), 1–26. https://doi.org/10.1214/aos/1176344552 | Bootstrap-Intervalle ([ADR 0044, Nachtrag](../adr/0044-statistische-auswertung.md#nachtrag-26102026-konfidenzintervalle-der-differenzen), [ADR 0046](../adr/0046-zweitbewertung.md)) |
 | `dror2018hitchhiker` | Dror, R., Baumer, G., Shlomov, S., & Reichart, R. (2018). The hitchhiker's guide to testing statistical significance in natural language processing. In *Proceedings of ACL 2018* (S. 1383–1392). https://doi.org/10.18653/v1/P18-1128 | Wahl der Signifikanztests beim Systemvergleich |
 
-Endseiten von Wilcoxon (83) und Spearman (101) sowie das Heft von Holm (2) sind nicht maschinell bestätigt.
+Endseiten von Wilcoxon (83) und Spearman (101) sowie das Heft von Holm (2) sind am 27.10.2026 an den JSTOR-PDFs bestätigt.
 
 ### Entwicklerdokumentation
 
 | BibTeX-Key | Quelle (APA 7) | Belegt |
 |------------|----------------|--------|
-| `aghajani2019issues` | Aghajani, E., et al. (2019). Software documentation issues unveiled. In *Proceedings of ICSE 2019* (S. 1199–1210). IEEE. https://doi.org/10.1109/ICSE.2019.00122 | Probleme von Softwaredokumentation: Relevanz der Domäne |
+| `aghajani2019issues` | Aghajani, E., et al. (2019). Software documentation issues unveiled. In *Proceedings of ICSE 2019* (S. 1199–1210). IEEE. https://doi.org/10.1109/ICSE.2019.00122 | Taxonomie mit 162 Problemtypen von Softwaredokumentation (878 Artefakte analysiert, 824 gelabelt): Relevanz der Domäne |
+
+### Methodik
+
+| BibTeX-Key | Quelle (APA 7) | Belegt |
+|------------|----------------|--------|
+| `doering2016forschungsmethoden` | Döring, N., & Bortz, J. (2016). *Forschungsmethoden und Evaluation in den Sozial- und Humanwissenschaften* (5. Aufl.). Springer. https://doi.org/10.1007/978-3-642-41089-5 | Kap. 7: experimentelles Design, interne und externe Validität (S. 184, 193); Messwiederholung, bei der dieselben Untersuchungseinheiten alle Bedingungen durchlaufen, erhöht die Teststärke (S. 209) |
 
 ## Technische Quellen (Web)
 
