@@ -41,6 +41,8 @@ mindestens so viele Fragen mit einem relevanten Abschnitt darin, wie der Bereich
 **Auswahl der Themen:** Je Slot zieht ein fester Stichprobenplan einen Ausgangsabschnitt (nach Textlänge, Seed
 `config.CATALOGUE_SEED`) und eine Konstruktionsklasse; Jonas wählt den Typ und schreibt Frage, Antwort und Annotation.
 Sprünge nur mit festem Grund, KI-Vorschläge werden protokolliert und von Jonas entschieden ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md));
+KI-Hilfen vor dem Schreiben (Überschneidungsliste, Leitfragen, Typvorschlag) legen nichts fest, Jonas übernimmt per Klick
+([ADR 0049](../adr/0049-schreibhilfen-im-editor.md));
 Slots und Reserve je Bereich nach [ADR 0039](../adr/0039-stichprobenplan-e2e.md) (`config.CATALOGUE_AREA_SLOTS`,
 `config.CATALOGUE_RESERVE`).
 

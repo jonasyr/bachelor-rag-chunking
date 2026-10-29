@@ -153,11 +153,12 @@ Markdown-Tabelle mit einer Zeile je Abschnitt in der Reihenfolge von `sections.j
   "classes": {"single": 12, "multi-section": 12, "detail": 12, "paraphrase": 12},
   "closed_book": {"dependent": 40, "known": 8},
   "sha256": {"questions.csv": "…", "ground_truth.csv": "…", "sections.jsonl": "…", "documents.jsonl": "…",
-             "catalogue_plan.csv": "…", "catalogue_review.csv": "…", "closed_book_screen.csv": "…"}
+             "catalogue_plan.csv": "…", "catalogue_review.csv": "…", "closed_book_screen.csv": "…",
+             "catalogue_overlap.csv": "…"}
 }
 ```
 
-Plan-, Durchsichts- und Closed-Book-Datei werden nur aufgezeichnet, und nur, sofern sie vorhanden sind; die Sperre
+Plan-, Durchsichts-, Closed-Book- und Überschneidungsdatei werden nur aufgezeichnet, und nur, sofern sie vorhanden sind; die Sperre
 (`freeze.require_frozen`, in jedem Schritt ab `retrieve.py`) prüft die vier übrigen Dateien. `closed_book` = Zahl der
 retrieval-abhängigen (`miss`) und -unabhängigen (`hit`) Fragen. `rules_version` = `config.RUBRIC_RULES_VERSION` beim
 Einfrieren; Scaffold und Zusammenfassung des Hauptkatalogs (auch K0) brechen ab, wenn die Regeln seither geändert wurden
@@ -191,6 +192,16 @@ round,question_id,kind,suggestion,section_id,decision,reason,date
 `round` = Durchsichtsrunde (ganze Zahl), `date` = Tag der Entscheidung; `kind` ∈ `config.CATALOGUE_REVIEW_KINDS`,
 `decision` ∈ `config.CATALOGUE_REVIEW_DECISIONS`; `section_id` nur bei `missing_section`, `reason` Pflicht bei
 `rejected`.
+
+**`catalogue_overlap.csv`** (`data/evaluation/`; einmal von Claude erstellt, versioniert; [ADR 0049](../adr/0049-schreibhilfen-im-editor.md)): je Zeile ein
+Abschnitt mit gleichem Inhalt wie ein Plan- oder Reserveabschnitt, gerichtet (gilt nur für `section_id`).
+```csv
+section_id,related_section_id,note
+D037#use-a-subscription-or-api-key,D055#subscriptions,Both list the npx e2e login command for each subscription plan.
+```
+`note` = ein neutraler Satz, was beide Abschnitte gemeinsam haben (nie eine Frageidee); leere `note`, Selbstbezug und
+doppelte Paare sind Fehler (`catalogue_overlap.read_overlap`). Fehlt die Datei, zeigt der Editor nur wörtliche
+Doppelungen.
 
 **`closed_book_screen.csv`** (`data/evaluation/`, nur für den Hauptkatalog; `catalogue.py screen` schreibt Antworten,
 Jonas die Urteile im Editor; [ADR 0040](../adr/0040-closed-book-pruefung.md)): eine Zeile je Katalogfrage, sortiert
@@ -607,7 +618,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/processed/` | `documents.jsonl`, `sections.jsonl`, `section_index.md`, `chunks_*.jsonl` | [Korpus](#korpus), [Fragen](#fragen-und-ground-truth), [Chunks](#chunks) | ignoriert (entstehen bitgleich neu); versioniert sind `.gitkeep`, das Laufprotokoll `embedding_runs.jsonl` ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) und die Chunk-Vektoren `embeddings_c1.npz`, `embeddings_c2.npz`, `embeddings_c3.npz`, `embeddings_k1.npz` ([Vektoren](#vektoren), [ADR 0048](../adr/0048-korpus-und-chunk-vektoren-versioniert.md)) |
 | `data/processed/archive_vue_2026-10-18/` | Vue-Chunks, -Vektoren, -Laufprotokoll und alter Chroma-Index ([Experiment-Protokoll Vue](experiment-record-vue.md#embedding-vuejs)) | [Laufprotokoll](#laufprotokoll) | ignoriert; versioniert nur `embedding_runs.jsonl` (Kosten der Vue-Läufe) |
 | `chroma_db/` (auch `*.chroma`) | Chroma-Index; `embed.py` baut ihn aus den versionierten Vektoren ohne API-Aufruf | [Vektoren](#vektoren) | ignoriert (ganzer Ordner, kein `.gitkeep`) |
-| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | [Fragen](#fragen-und-ground-truth) | versioniert |
+| `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_overlap.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | [Fragen](#fragen-und-ground-truth) | versioniert |
 | `data/evaluation/archive_vue/catalogue_plan.csv` | unbenutzter Vue-Plan ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) | [Fragen](#fragen-und-ground-truth) | versioniert |
 | `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs | [Vektoren](#vektoren), [Retrieval](#retrieval-ergebnisse) | versioniert ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) |
 | `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | [Antworten](#antworten), [Laufprotokoll](#laufprotokoll) | versioniert |

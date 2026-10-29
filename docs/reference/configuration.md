@@ -35,6 +35,7 @@ Formate aller Dateien: [Datenformate](data-formats.md).
 | `GROUND_TRUTH_FILE` | `data/evaluation/ground_truth.csv` | Referenzantworten und relevante Abschnitte | [ADR 0017](../adr/0017-fragenkatalog.md) |
 | `CATALOGUE_FREEZE_FILE` | `data/evaluation/catalogue_freeze.json` | Freeze-Datensatz des Katalogs (Datum, Anzahlen, SHA-256) | [ADR 0030](../adr/0030-einfrieren-des-fragenkatalogs.md) |
 | `CATALOGUE_PLAN_FILE` | `data/evaluation/catalogue_plan.csv` | Stichprobenplan der Slots | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
+| `CATALOGUE_OVERLAP_FILE` | `data/evaluation/catalogue_overlap.csv` | Abschnitte mit gleichem Inhalt je Plan-Abschnitt (KI-Vorauswahl) | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `CATALOGUE_REVIEW_FILE` | `data/evaluation/catalogue_review.csv` | Vorschläge und Entscheidungen der KI-Durchsicht | [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md) |
 | `CLOSED_BOOK_FILE` | `data/evaluation/closed_book_screen.csv` | Antworten ohne Kontext und Urteile | [ADR 0040](../adr/0040-closed-book-pruefung.md) |
 | `RETRIEVED_RESULTS_FILE` | `data/evaluation/retrieved_results.csv` | Top-k je Frage und Strategie | – |
@@ -144,6 +145,11 @@ Regeln des Katalogs: [Fragenkatalog](question-catalogue.md).
 | `CATALOGUE_CAMEL_BOUNDARY` | `r"(?<=[a-z0-9])(?=[A-Z])"` | camelCase-Grenze; Bezeichner zählen auch mit ihren Teilen | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_FOLD_MIN_LENGTH` | `4` | ab dieser Länge auch ohne `s`/`es`, mit `ies` → `y` | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
+| `CATALOGUE_DUPLICATE_MIN_WORDS`, `CATALOGUE_DUPLICATE_EXCERPT_WORDS` | `8`, `24` | Editor: geteilte Wortfolge ab so vielen Wörtern gilt als wörtliche Doppelung; Länge des Ausschnitts | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
+| `CATALOGUE_DUPLICATE_MAX_SECTIONS` | `8` | eine Wortfolge in mehr Abschnitten gilt als Vorlage, nicht als Doppelung | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
+| `CATALOGUE_DUPLICATE_VISIBLE` | `10` | Treffer im Kasten „Also covered elsewhere“ vor „Show all“ | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
+| `QUESTION_TYPE_HINTS` | geordnete Paare (Typ, Regex) | Typvorschlag aus dem Wortlaut der Frage; erster Treffer gilt, Jonas bestätigt | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
+| `CATALOGUE_CLASS_GUIDE` | je Klasse `rule` und 2–3 `prompts` | Leitfragen über dem Formular, für jeden Abschnitt gleich | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `CATALOGUE_STOPWORDS` | Tupel englischer Funktions- und Fragewörter plus `e2e` (Produktname) | beim Vergleich ignoriert | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), [ADR 0039](../adr/0039-stichprobenplan-e2e.md) |
 
 ## LLM und Embedding

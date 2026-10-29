@@ -32,15 +32,19 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    Parametern des Zugs ([Konfiguration](../reference/configuration.md#fragenkatalog)) oder geändertem Korpus, und
    `catalogue.py check` meldet einen Plan, der nicht zu einem frischen Zug passt, als `ERROR`.
 
-2. Den Editor starten (nur auf diesem Rechner erreichbar; die Option gilt unabhängig vom Arbeitsverzeichnis):
+2. Den Editor starten (bindet an `localhost`; vom Handy über Tailscale Serve im eigenen Tailnet,
+   `tailscale serve --bg --https=8501 http://127.0.0.1:8501`, ADR 0049):
 
    ```bash
    uv run streamlit run app/catalogue_editor.py --server.address localhost
    ```
 
    Der Abschnitt erscheint formatiert (Markdown); „Source text“ zeigt den genauen Text, auf den sich die Relevanzregel
-   bezieht. Je Slot: den Ausgangsabschnitt lesen, Frage, Typ und Referenzantwort schreiben und weitere relevante Abschnitte über
-   „Find more sections“ suchen und hinzufügen, auch in anderen Bereichen. Der Ausgangsabschnitt gehört
+   bezieht. Je Slot: die Leitfragen der Klasse oben lesen, den Ausgangsabschnitt lesen, Frage und Referenzantwort
+   schreiben. „Also covered elsewhere“ unter dem Abschnitt zeigt Abschnitte mit demselben Text (mechanisch) oder Inhalt
+   (vorab von Claude, `catalogue_overlap.csv`); jeden, der einen nötigen Teil der Antwort enthält, mit „Add“
+   übernehmen, weitere über „Find more sections“ suchen, auch in anderen Bereichen. Der Typ startet leer; der Editor
+   schlägt einen aus dem Wortlaut der Frage vor, gesetzt wird er erst per Klick ([ADR 0049](../adr/0049-schreibhilfen-im-editor.md)). Der Ausgangsabschnitt gehört
    immer zur Annotation. Wer einen H1-Abschnitt (eine ganze Seite) annotiert, nennt den Grund in `notes`
    ([ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md)); ohne Grund meldet die Prüfung ihn. Während des Schreibens markiert der Editor Wörter der Frage, die in den Überschriften
    vorkommen; bei `paraphrase` müssen sie umformuliert werden, bei `detail` zeigt die Prüfung die Länge der Antwort.
