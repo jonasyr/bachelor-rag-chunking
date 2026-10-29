@@ -18,6 +18,7 @@ from catalogue_plan import skip_slot as catalogue_skip
 from catalogue_review import decide, read_review
 from config import (
     CATALOGUE_FREEZE_FILE,
+    CATALOGUE_OVERLAP_FILE,
     CATALOGUE_PLAN_FILE,
     CATALOGUE_REVIEW_FILE,
     CLOSED_BOOK_FILE,

@@ -262,3 +262,23 @@ def test_rules_version_missing_in_the_freeze_is_refused(tmp_path):
     out.write_text(json.dumps({"date": "2026-11-06"}), encoding="utf-8")
     with pytest.raises(RuntimeError, match="rules_version"):
         freeze.require_rules_version(out)
+
+
+def test_overlap_file_is_recorded_when_present(corpus, main_catalogue, pilot, tmp_path):
+    questions, truth, sections, documents = main_catalogue
+    overlap = tmp_path / "catalogue_overlap.csv"
+    overlap.write_text("section_id,related_section_id,note\n", encoding="utf-8")
+    record = freeze_catalogue(
+        corpus,
+        questions,
+        truth,
+        tmp_path / "catalogue_freeze.json",
+        pilot,
+        sections,
+        documents,
+        plan_file=write_plan_for(tmp_path, valid_rows()),
+        review_file=tmp_path / "catalogue_review.csv",
+        fresh_plan=fresh_plan_for(valid_rows()),
+        overlap_file=overlap,
+    )
+    assert record["sha256"]["catalogue_overlap.csv"] == sha256_of(overlap)

@@ -34,6 +34,7 @@ QUESTIONS_FILE = DATA_EVAL / "questions.csv"
 GROUND_TRUTH_FILE = DATA_EVAL / "ground_truth.csv"
 CATALOGUE_FREEZE_FILE = DATA_EVAL / "catalogue_freeze.json"  # SHA-256 of the frozen catalogue (D30)
 CATALOGUE_PLAN_FILE = DATA_EVAL / "catalogue_plan.csv"  # random sampling plan of the slots (D31)
+CATALOGUE_OVERLAP_FILE = DATA_EVAL / "catalogue_overlap.csv"  # same-content sections (ADR 0049)
 CATALOGUE_REVIEW_FILE = (
     DATA_EVAL / "catalogue_review.csv"
 )  # AI review suggestions and decisions (D31)

@@ -43,6 +43,7 @@ from config import (
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_FREEZE_FILE,
     CATALOGUE_HEADING_SEPARATOR,
+    CATALOGUE_OVERLAP_FILE,
     CATALOGUE_PLAN_FILE,
     CATALOGUE_PREFIX_MIN,
     CATALOGUE_PREFIX_SLACK,
@@ -626,6 +627,7 @@ def freeze_catalogue(
     review_file: Path = CATALOGUE_REVIEW_FILE,
     fresh_plan: list[dict] | None = None,
     closed_book_file: Path | None = None,
+    overlap_file: Path | None = None,
 ) -> dict:
     """Strict check, then the freeze record (ADR 0030); nothing is written if the check fails.
 
@@ -633,6 +635,7 @@ def freeze_catalogue(
     pin which text the section IDs refer to.
     """
     closed_book_file = closed_book_file or CLOSED_BOOK_FILE
+    overlap_file = overlap_file or CATALOGUE_OVERLAP_FILE
     report = check(
         corpus,
         questions_file,
@@ -653,7 +656,9 @@ def freeze_catalogue(
         "classes": report.classes,
         "closed_book": {k: report.closed_book[k] for k in ("dependent", "known")},
     }
-    recorded = tuple(p for p in (plan_file, review_file, closed_book_file) if p.exists())
+    recorded = tuple(
+        p for p in (plan_file, review_file, closed_book_file, overlap_file) if p.exists()
+    )
     return write_freeze(
         questions_file,
         ground_truth_file,

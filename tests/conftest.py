@@ -114,6 +114,17 @@ def closed_book_file(tmp_path, monkeypatch):
     return path
 
 
+@pytest.fixture(autouse=True)
+def overlap_file(tmp_path, monkeypatch):
+    """Tests never read data/evaluation/catalogue_overlap.csv; freeze and the editor use this."""
+    import catalogue_store
+
+    path = tmp_path / "catalogue_overlap.csv"
+    monkeypatch.setattr(catalogue, "CATALOGUE_OVERLAP_FILE", path)
+    monkeypatch.setattr(catalogue_store, "CATALOGUE_OVERLAP_FILE", path)
+    return path
+
+
 def write_screen_for(path, rows, hits=0):
     """A screen file in which every catalogue row is screened and judged; the first `hits` hit."""
     screen_rows = [
