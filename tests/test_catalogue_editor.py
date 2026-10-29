@@ -91,6 +91,7 @@ def test_an_accepted_section_survives_the_next_save(app):
     at, paths = app
     at.text_area(key="question_S01").input("What does it return?")
     at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("factual")
     at.button(key="save").click().run()  # S01 used; the editor caches its section list
     suggestion = dict.fromkeys(REVIEW_HEADER, "") | {
         "round": "1",
@@ -113,6 +114,7 @@ def test_saving_moves_to_the_next_open_slot(app):
     at, _ = app
     at.text_area(key="question_S01").input("What does it return?")
     at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("factual")
     at.button(key="save").click().run()
     assert not at.exception
     assert any("Slot S02" in h.proto.body for h in at.get("html"))
@@ -134,6 +136,7 @@ def test_hand_edited_rows_replace_the_form(app):
     at, paths = app
     at.text_area(key="question_S01").input("What does it return?")
     at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("factual")
     at.button(key="save").click().run()
     at.selectbox(key="slot").select("S01").run()  # the form now shows the saved question
     path = paths["QUESTIONS_FILE"]
@@ -178,6 +181,7 @@ def save_and_screen(at, paths):
 
     at.text_area(key="question_S01").input("What does it return?")
     at.text_area(key="answer_S01").input("A reactive ref object.")
+    at.selectbox(key="qtype_S01").select("factual")
     at.button(key="save").click().run()
     questions, truth = store.load_catalogue()
     closed_book.screen(questions, truth, FakeCompleter(), paths["CLOSED_BOOK_FILE"], [])
@@ -188,6 +192,7 @@ def test_closed_book_tab_asks_to_screen_first(app):
     at, _ = app
     at.text_area(key="question_S01").input("What does it return?")
     at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("factual")
     at.button(key="save").click().run()
     assert any("catalogue.py screen" in i.value for i in at.info)
 
@@ -241,3 +246,102 @@ def test_write_tab_shows_no_model_answer(app):
     at.selectbox(key="slot").select("S01").run()
     write_tab_html = [h.proto.body for h in at.tabs[0].get("html")]
     assert not any("Guess 1." in body for body in write_tab_html)
+
+
+def seed_of(paths, slot="S01"):
+    return next(r for r in read_plan(paths["CATALOGUE_PLAN_FILE"]) if r["slot_id"] == slot)
+
+
+def other_section(corpus, seed_id):
+    """A section on another page than the seed (never nested in it)."""
+    doc = seed_id.split("#")[0]
+    return next(s["section_id"] for s in corpus.sections if s["doc_id"] != doc and s["level"] > 1)
+
+
+def test_type_starts_empty_and_save_is_blocked(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A ref.").run()
+    assert at.selectbox(key="qtype_S01").value is None
+    assert at.button(key="save").disabled
+    assert any("Choose a type" in c.value for c in at.caption)
+
+
+def test_suggested_type_is_set_only_on_click(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("How do I make it reactive?").run()
+    assert at.selectbox(key="qtype_S01").value is None
+    at.button(key="use_type").click().run()
+    assert not at.exception
+    assert at.selectbox(key="qtype_S01").value == "procedural"
+
+
+def test_add_from_also_covered(app, corpus, overlap_file):
+    at, paths = app
+    seed = seed_of(paths)["section_id"]
+    other = other_section(corpus, seed)
+    overlap_file.write_text(
+        f"section_id,related_section_id,note\n{seed},{other},Both state the same rule.\n",
+        encoding="utf-8",
+    )
+    at.run()
+    assert any("Both state the same rule." in m.value for m in [*at.caption, *at.markdown])
+    at.button(key=f"add_dup_{other}").click().run()
+    assert not at.exception
+    assert other in at.session_state["extra_S01"]
+    assert at.button(key=f"add_dup_{other}").disabled
+
+
+def test_full_type_quota_blocks_save(app, monkeypatch):
+    import catalogue_aids  # noqa: F401  (module imported by the page)
+
+    at, _ = app
+    monkeypatch.setitem(catalogue_aids.QUESTION_TYPES, "factual", 0)
+    at.run()
+    at.text_area(key="question_S01").input("What does it return?")
+    at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("factual").run()
+    assert at.button(key="save").disabled
+    assert any("factual quota is full" in c.value for c in at.caption)
+
+
+def test_saved_question_keeps_its_type_and_quota(app):
+    at, _ = app
+    at.text_area(key="question_S01").input("Why does it return this?")
+    at.text_area(key="answer_S01").input("A ref.")
+    at.selectbox(key="qtype_S01").select("conceptual")
+    at.button(key="save").click().run()
+    at.selectbox(key="slot").select("S01").run()
+    assert at.selectbox(key="qtype_S01").value == "conceptual"
+    assert not at.button(key="save").disabled  # its own row does not count against the quota
+
+
+def test_unknown_overlap_section_is_reported(app, overlap_file):
+    at, paths = app
+    seed = seed_of(paths)["section_id"]
+    overlap_file.write_text(
+        f"section_id,related_section_id,note\n{seed},D999#gone,Same.\n", encoding="utf-8"
+    )
+    at.run()
+    assert not at.exception
+    assert any("D999#gone" in e.value for e in at.error)
+
+
+def test_frozen_disables_add_and_use_type(app, corpus, overlap_file):
+    at, paths = app
+    seed = seed_of(paths)["section_id"]
+    other = other_section(corpus, seed)
+    overlap_file.write_text(
+        f"section_id,related_section_id,note\n{seed},{other},Same rule.\n", encoding="utf-8"
+    )
+    at.text_area(key="question_S01").input("How do I make it reactive?")
+    paths["CATALOGUE_FREEZE_FILE"].write_text("{}", encoding="utf-8")
+    at.run()
+    assert at.button(key=f"add_dup_{other}").disabled
+    assert at.button(key="use_type").disabled
+
+
+def test_class_guide_is_shown(app):
+    at, paths = app
+    cls = seed_of(paths)["class"]
+    assert any(cls in e.label for e in at.expander)

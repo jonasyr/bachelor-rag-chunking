@@ -64,6 +64,27 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
   line-height: 1.6; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
   border-radius: 6px; padding: 0.75rem 1.25rem; white-space: pre-wrap; overflow-wrap: anywhere;}
 ::selection {background: var(--select);}
+/* Writing aids (ADR 0049): class guide, "Also covered elsewhere" */
+.guide-rule {margin: 0 0 0.35rem; color: var(--ink); font-weight: 600;}
+.guide-prompts {margin: 0; padding-left: 1.2rem; color: var(--muted);}
+.guide-prompts li {margin: 0.1rem 0;}
+.dup-head {display: flex; gap: 0.6rem; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap;}
+.dup-path {font-weight: 600; color: var(--ink); overflow-wrap: anywhere;}
+.dup-badge {font-size: 0.78rem; color: var(--muted); border: 1px solid var(--line);
+  border-radius: 999px; padding: 0.05rem 0.55rem; white-space: nowrap;}
+.dup-badge.is-added {color: var(--ok); border-color: var(--ok);}
+.dup-id {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.8rem;
+  color: var(--muted);}
+.dup-excerpt {color: var(--muted); font-size: 0.92rem; border-left: 2px solid var(--line);
+  padding-left: 0.7rem; overflow-wrap: anywhere;}
+.st-key-also {margin-top: 1rem;}
+@media (max-width: 639px) {
+  .slot-title span {display: block; font-size: 1rem; margin-top: 0.2rem;}
+  .formatted, .source {max-height: 60vh; overflow-y: auto;}
+  [data-testid="stBaseButton-primary"], [data-testid="stBaseButton-secondary"] {
+    min-height: 2.75rem;}
+}
 </style>
 """
 # Scoring page only (injected by app/scoring_page.py): the page has no tabs above its first row,
