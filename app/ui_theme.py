@@ -17,19 +17,14 @@ CSS = """
 .slot-title {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 1.5rem;
   font-weight: 600; line-height: 1.25; margin: 0; color: var(--ink);}
 .slot-title span {color: var(--muted); font-weight: 400;}
-/* Two columns (640 px and up): the starting section fills the height of the form beside it
-   and scrolls inside; a found section scrolls within most of the window. */
+/* Two columns (640 px and up): every section view scrolls inside its own box; the starting
+   section keeps most of the window so "Also covered elsewhere" starts right below it. */
 @media (min-width: 640px) {
   .formatted, .source {max-height: 75vh; overflow-y: auto;
     scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
-  [data-testid="stColumn"]:has(.st-key-reader) {display: flex; flex-direction: column;}
-  [data-testid="stColumn"]:has(.st-key-reader) > [data-testid="stVerticalBlock"],
-  [data-testid="stLayoutWrapper"]:has(> .st-key-reader),
-  .st-key-reader, .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source),
-  .st-key-reader .stHtml:has(.formatted, .source) {
-    flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;}
-  .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source) {min-height: 20rem;}
-  .st-key-reader .formatted, .st-key-reader .source {flex: 1 1 0; min-height: 0; max-height: none;}
+  [data-testid="stMainBlockContainer"] {padding-left: 2.5rem; padding-right: 2.5rem;}
+  .st-key-reader .formatted, .st-key-reader .source {max-height: 80vh; min-height: 24rem;}
+  .st-key-also .formatted, .st-key-also .source {max-height: 50vh;}
 }
 .formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
   font-size: 1.02rem; line-height: 1.7; color: var(--ink); background: var(--surface);
@@ -50,7 +45,12 @@ CSS = """
   border-radius: 6px; overflow-x: auto; line-height: 1.5;}
 .formatted pre code {background: none; padding: 0; font-size: 0.86rem; overflow-wrap: normal;}
 .formatted table {border-collapse: collapse; display: block; overflow-x: auto;}
-.formatted th, .formatted td {border: 1px solid var(--line); padding: 0.3rem 0.6rem;}
+.formatted th, .formatted td {border: 1px solid var(--line); padding: 0.3rem 0.6rem;
+  vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 6rem;
+  max-width: 26rem;}
+/* wide tables keep whole words and scroll sideways inside the section box */
+.formatted > table, .formatted > pre, .formatted > *:has(table, pre) {max-width: 100%;}
+.formatted td code, .formatted th code {white-space: normal; overflow-wrap: normal;}
 .formatted a {color: var(--accent);}
 .source .code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.88rem;
   line-height: 1.55;}
@@ -64,6 +64,37 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
   line-height: 1.6; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
   border-radius: 6px; padding: 0.75rem 1.25rem; white-space: pre-wrap; overflow-wrap: anywhere;}
 ::selection {background: var(--select);}
+/* Writing aids (ADR 0049): class guide, "Also covered elsewhere" */
+.guide-rule {margin: 0 0 0.35rem; color: var(--ink); font-weight: 600;}
+.guide-prompts {margin: 0; padding-left: 1.2rem; color: var(--muted);}
+.guide-prompts li {margin: 0.1rem 0;}
+.dup-head {display: flex; gap: 0.6rem; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap;}
+.dup-path {font-weight: 600; color: var(--ink); overflow-wrap: anywhere;}
+.dup-badge {font-size: 0.78rem; color: var(--muted); border: 1px solid var(--line);
+  border-radius: 999px; padding: 0.05rem 0.55rem; white-space: nowrap;}
+.dup-badge.is-added {color: var(--ok); border-color: var(--ok);}
+.dup-id {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.8rem;
+  color: var(--muted);}
+.dup-excerpt {color: var(--muted); font-size: 0.92rem; border-left: 1px solid var(--line);
+  padding-left: 0.7rem; overflow-wrap: anywhere;}
+.st-key-also {margin-top: 1rem;}
+.rel-path {color: var(--ink); line-height: 1.35; overflow-wrap: anywhere;}
+/* captions: the theme's own text colour, slightly lighter (Streamlit's grey fails 4.5:1) */
+[data-testid="stCaptionContainer"] {color: color-mix(in srgb, currentColor 76%, transparent);}
+[data-testid="stCaptionContainer"] p {color: inherit;}
+[data-testid="stMainBlockContainer"] p, .guide-prompts li {text-wrap: pretty;}
+.st-key-search {margin-top: 1.25rem;}
+.st-key-use_type button, .st-key-use_type button p {color: var(--accent); font-weight: 600;}
+/* "Read section" and "Add" stay side by side on a phone */
+.st-key-also [data-testid="stHorizontalBlock"] {flex-wrap: nowrap;}
+.st-key-also [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {min-width: 0;}
+@media (max-width: 639px) {
+  .slot-title span {display: block; font-size: 1rem; margin-top: 0.2rem;}
+  .formatted, .source {max-height: 60vh; overflow-y: auto;}
+  [data-testid="stBaseButton-primary"], [data-testid="stBaseButton-secondary"] {
+    min-height: 2.75rem;}
+}
 </style>
 """
 # Scoring page only (injected by app/scoring_page.py): the page has no tabs above its first row,

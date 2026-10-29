@@ -4,7 +4,8 @@
 
 Angenommen (14.10.2026; ergänzt [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md); erweitert
 [ADR 0030](0030-einfrieren-des-fragenkatalogs.md); Slotzahlen ersetzt durch [ADR 0039](0039-stichprobenplan-e2e.md);
-ergänzt durch [ADR 0040](0040-closed-book-pruefung.md) (Closed-Book-Prüfung nach jedem Block)); Zahlen im Kontext:
+ergänzt durch [ADR 0040](0040-closed-book-pruefung.md) (Closed-Book-Prüfung nach jedem Block) und
+[ADR 0049](0049-schreibhilfen-im-editor.md) (Schreibhilfen, Zugriff über Tailscale)); Zahlen im Kontext:
 Vue-Korpus `40aa88a` ([ADR 0025](0025-korpus-guide-api-styleguide.md)); aktuelle Werte in
 [Korpus](../reference/corpus.md)
 

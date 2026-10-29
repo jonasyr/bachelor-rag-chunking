@@ -15,12 +15,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 import streamlit as st  # noqa: E402
 
 import catalogue  # noqa: E402
+import catalogue_aids as aids  # noqa: E402
+import catalogue_overlap  # noqa: E402
 import catalogue_plan  # noqa: E402
 import catalogue_review  # noqa: E402
 import catalogue_store as store  # noqa: E402
 import closed_book  # noqa: E402
 from config import (  # noqa: E402
     AREA_MIN_QUESTIONS,
+    CATALOGUE_CLASS_GUIDE,
+    CATALOGUE_DUPLICATE_VISIBLE,
     CATALOGUE_SKIP_REASONS,
     DETAIL_MAX_ANSWER_WORDS,
     ID_SEPARATOR,
@@ -134,6 +138,72 @@ def render_checks(items: list[tuple[bool, str]]) -> None:
     st.markdown(f'<ul class="checks">{lis}</ul>', unsafe_allow_html=True)
 
 
+def class_guide(cls: str, open_: bool) -> None:
+    """The class rule and its prompts; the same for every section, so they suggest no content.
+    Open until the slot has a question, then folded so the section gets the room."""
+    guide = CATALOGUE_CLASS_GUIDE[cls]
+    with st.expander(f"How to write a {cls} question", expanded=open_):
+        prompts = "".join(f"<li>{html.escape(p)}</li>" for p in guide["prompts"])
+        st.html(
+            f'<div class="guide"><p class="guide-rule">{html.escape(guide["rule"])}</p>'
+            f'<ul class="guide-prompts">{prompts}</ul></div>'
+        )
+
+
+def also_covered_box(corpus, seed, overlap, ids: list[str], extra_key: str, view, frozen) -> None:
+    """Sections sharing text or content with the seed; Jonas adds the relevant ones (ADR 0049)."""
+    rows = aids.also_covered(corpus, seed, overlap)
+    listed = [corpus.by_id[i] for i in ids]
+    with st.container(key="also"):
+        st.markdown(f"**Also covered elsewhere** ({len(rows)})")
+        st.caption(
+            "Add every section that holds a part your answer needs. "
+            + " ".join(
+                text
+                for kind, text in (
+                    ("same text", "Same text: found by comparing words."),
+                    ("related", "Related: listed beforehand by Claude, with what both share."),
+                )
+                if any(r["kind"] == kind for r in rows)
+            )
+            + ("" if rows else "No other section shares text with this one; use the search.")
+        )
+        visible = rows[:CATALOGUE_DUPLICATE_VISIBLE]
+        if len(rows) > CATALOGUE_DUPLICATE_VISIBLE and st.toggle(
+            f"Show all {len(rows)}", key=f"show_all_{seed['section_id']}"
+        ):
+            visible = rows
+        for row in visible:
+            section, sid = row["section"], row["section"]["section_id"]
+            added = sid in ids
+            inside = not added and any(catalogue.nested(section, s) for s in listed)
+            with st.container(border=True, key=f"dup_{sid}"):
+                badge = "added" if added else ("inside an added section" if inside else row["kind"])
+                st.html(
+                    f'<div class="dup-head"><span class="dup-path">'
+                    f"{html.escape(corpus.heading_path(section))}</span>"
+                    f'<span class="dup-badge {"is-added" if added else ""}">{badge}</span></div>'
+                    f'<div class="dup-id">{html.escape(sid)}</div>'
+                )
+                if row["note"]:
+                    st.caption(row["note"])
+                if row["kind"] == "same text" and not row["note"]:
+                    excerpt = html.escape(aids.plain_excerpt(row["detail"]))
+                    st.html(f'<div class="dup-excerpt">“{excerpt}”</div>')
+                read, add = st.columns([3, 1], vertical_alignment="center")
+                shown = read.toggle("Read section", key=f"read_{sid}")
+                if add.button(
+                    "Added" if added else "Add",
+                    key=f"add_dup_{sid}",
+                    disabled=frozen or added,
+                    use_container_width=True,
+                ):
+                    st.session_state[extra_key].append(sid)
+                    st.rerun()
+                if shown:  # rendered only when open: the box reruns on every keystroke
+                    source_page(corpus, section, [], f"dup_{sid}", view)
+
+
 def next_open(after: str) -> str:
     """The first open slot after `after` in slot order, else the first open one, else `after`."""
     plan = catalogue_plan.read_plan(store.CATALOGUE_PLAN_FILE)
@@ -142,7 +212,7 @@ def next_open(after: str) -> str:
     return (later or open_slots or [after])[0]
 
 
-def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
+def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
     slots = sorted({r["slot_id"] for r in plan if r["status"] in ("open", "used")})
     first_open = next(
         (r["slot_id"] for r in sorted(plan, key=lambda r: r["slot_id"]) if r["status"] == "open"),
@@ -155,7 +225,7 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
 
     if "goto" in st.session_state:  # set by Save/Skip; allowed before the widget exists
         st.session_state["slot"] = st.session_state.pop("goto")
-    title, picker = st.columns([7, 5], vertical_alignment="bottom", gap="large")
+    title, picker = st.columns([2, 1], vertical_alignment="bottom", gap="large")
     with picker:
         sid = (
             st.selectbox(
@@ -169,6 +239,8 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
     saved_q = next((q for q in questions if q["question_id"] == qid), None)
     saved_t = truth.get(qid or "", {})
     title.html(f'<h2 class="slot-title">Slot {sid} <span>{row["area"]}, {row["class"]}</span></h2>')
+    drafted = st.session_state.get(f"question_{sid}", saved_q["question"] if saved_q else "")
+    class_guide(row["class"], open_=not str(drafted).strip())
 
     # Reload the form when the saved rows changed on disk (hand edit, review decision).
     fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))
@@ -181,7 +253,10 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
         saved_ids = saved_t.get("relevant_section_ids", "").split(ID_SEPARATOR) if saved_t else []
         st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
 
-    left, right = st.columns([7, 5], gap="large")
+    # Two rows in working order; on narrow screens they stack as section, form, other sections,
+    # relevant sections and save, search.
+    left, right = st.columns([2, 1], gap="large")
+    left_b, right_b = st.columns([2, 1], gap="large")
     with right:
         question = (
             st.text_area(
@@ -193,15 +268,28 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
             or ""
         )
         types = list(QUESTION_TYPES)
-        qtype = (
-            st.selectbox(
-                "Type",
-                types,
-                key=f"qtype_{sid}",
-                index=types.index(saved_q["type"]) if saved_q else 0,
-            )
-            or types[0]
+        type_key = f"qtype_{sid}"
+        qtype = st.selectbox(
+            "Type",
+            types,
+            key=type_key,
+            index=(
+                types.index(saved_q["type"])
+                if saved_q and saved_q["type"] in types and type_key not in st.session_state
+                else None
+            ),
+            placeholder="Choose a type",
+            format_func=lambda t: f"{t} · {aids.type_quota_left(questions, t, qid)} left",
         )
+        hint = catalogue.suggest_type(question)
+        if hint and hint[0] != qtype:
+            st.button(
+                f"Looks like {hint[0]} (“{hint[1]}”) · use it",
+                key="use_type",
+                disabled=frozen,
+                type="tertiary",
+                on_click=lambda k=type_key, t=hint[0]: st.session_state.update({k: t}),
+            )
         answer = (
             st.text_area(
                 "Reference answer",
@@ -215,25 +303,39 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
             st.text_input("Notes", value=saved_q["notes"] if saved_q else "", key=f"notes_{sid}")
             or ""
         )
+    with right_b:
         ids = [seed["section_id"], *st.session_state[extra_key]]
         sections = [corpus.by_id[s] for s in ids]
-        st.markdown("**Relevant sections**")
+        st.markdown(f"**Relevant sections** ({len(sections)})")
         for s in sections:
-            cols = st.columns([5, 1])
-            cols[0].markdown(f"`{s['section_id']}` {corpus.heading_path(s)}")
+            cols = st.columns([5, 1], vertical_alignment="center")
+            cols[0].html(
+                f'<div class="rel-path">{html.escape(corpus.heading_path(s))}</div>'
+                f'<div class="dup-id">{html.escape(s["section_id"])}</div>'
+            )
             if s["section_id"] != seed["section_id"] and cols[1].button(
-                "Remove", key=f"remove_{s['section_id']}", disabled=frozen
+                "Remove", key=f"remove_{s['section_id']}", disabled=frozen, type="tertiary"
             ):
                 st.session_state[extra_key].remove(s["section_id"])
                 st.rerun()
-        render_checks(checks(corpus, row, question, answer, sections, questions, qid))
-        if st.button("Save question", type="primary", key="save", disabled=frozen):
+        items = checks(corpus, row, question, answer, sections, questions, qid)
+        render_checks(items)
+        blocker = aids.save_blocker(question, answer, qtype, items, questions, qid)
+        if blocker:
+            st.caption(blocker)
+        if st.button(
+            "Save question",
+            type="primary",
+            key="save",
+            disabled=frozen or blocker is not None,
+            use_container_width=True,
+        ):
             try:
                 saved = store.save_question(
                     corpus,
                     sid,
                     question,
-                    qtype,
+                    qtype or "",
                     answer,
                     notes,
                     st.session_state[extra_key],
@@ -277,10 +379,11 @@ def write_tab(corpus, plan, questions, truth, frozen: bool) -> None:
             or VIEWS[0]
         )
         source_page(corpus, seed, words, "seed", view)
+    with left_b:
+        also_covered_box(corpus, seed, overlap, ids, extra_key, view, frozen)
 
-    # Second row: on narrow screens the search follows the question and its checks.
-    search, _ = st.columns([7, 5], gap="large")
-    with search:
+    # Search below the form: next to the relevant sections on wide screens, last on narrow ones.
+    with right_b, st.container(key="search"):
         term = st.text_input(
             "Find more sections", key="find", placeholder="Search the documentation"
         )
@@ -408,11 +511,13 @@ def closed_book_tab(screen_rows, questions, truth, frozen: bool) -> None:
                     record(qid, other, note)
 
 
-def unknown_sections(corpus, plan, truth, review) -> list[str]:
-    """Section IDs in the plan, the ground truth or the review that the corpus does not have."""
+def unknown_sections(corpus, plan, truth, review, overlap=None) -> list[str]:
+    """Section IDs in the plan, the ground truth, the review or the overlap list that the corpus
+    does not have."""
     ids = {r["section_id"] for r in plan}
     ids |= {s for t in truth.values() for s in t["relevant_section_ids"].split(ID_SEPARATOR) if s}
     ids |= {r["section_id"] for r in review if r["section_id"]}
+    ids |= catalogue_overlap.overlap_section_ids(overlap or {})
     return sorted(ids - set(corpus.by_id))
 
 
@@ -430,7 +535,12 @@ def main() -> None:
     except ValueError as error:
         st.error(str(error))
         return
-    unknown = unknown_sections(corpus, plan, truth, review)
+    try:
+        overlap = catalogue_overlap.read_overlap(store.CATALOGUE_OVERLAP_FILE)
+    except ValueError as error:
+        st.error(str(error))
+        return
+    unknown = unknown_sections(corpus, plan, truth, review, overlap)
     if unknown:
         st.error(
             f"Section IDs not in sections.jsonl: {', '.join(unknown)}. The corpus was rebuilt or a "
@@ -455,7 +565,7 @@ def main() -> None:
         ]
     )
     with write:
-        write_tab(corpus, plan, questions, truth, frozen)
+        write_tab(corpus, plan, questions, truth, overlap, frozen)
     with rev:
         review_tab(corpus, review, questions, frozen)
     with cb:

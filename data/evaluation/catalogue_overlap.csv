@@ -1,0 +1,1079 @@
+section_id,related_section_id,note
+D003#signed-in-requests,D053#the-browser-fixture,Both state that browser.cookies() returns the cookies visible to the current browser context.
+D004#session-rules,D005#pick-a-lease-scope,"Both say sessions need engine state capture and restore, which a per-attempt hosted browser lease lacks."
+D004#session-rules,D033#what-differs-on-purpose,Both say sessions last one run and the session file is encrypted and deleted at cleanup.
+D004#session-rules,D035#what-differs-from-the-web,Both say mobile targets cannot save and restore sessions because the engine has no state snapshot.
+D004#session-rules,D042#state,Both say saved state is encrypted with a per-run key that stays off disk and is bound to the run.
+D004#session-rules,D044#exit-codes,Both say a failing setup test causes its dependent tests to be skipped.
+D004#session-rules,D044#runner-codes,"Both say SESSION_CONTRACT is raised when a setup test saves a session twice, saves an undeclared name, or misses a declared one."
+D004#session-rules,D051#sessions,Both say a session is encrypted with a per-run key held in memory and removed when the run ends.
+D004#session-rules,D052#members,Both state that SESSION_CONTRACT is thrown when a declared session was not saved or was saved twice.
+D004#session-rules,D052#options,Both say a setup test declares the session names it must save via the sessions option.
+D004#session-rules,D053#options,Both say a persistent-context hosted browser does not support session state capture and restore.
+D004#session-rules,D060#state-is-a-credential,Both say the runner encrypts saved session state per run and deletes it after the run.
+D005#run-a-script-before-the-page,D033#map-each-api,Both name web({ initScripts }) and browser.addInitScript as the way to run a script before page scripts.
+D005#run-a-script-before-the-page,D053#options,"Both state that an init script runs in every document before the page's own scripts, via web({ initScripts }) or browser.addInitScript."
+D005#run-a-script-before-the-page,D053#weboptions,Both mention the initScripts option running scripts before the page's own in every document.
+D005#run-a-script-before-the-page,D053#browser-interface,Both describe browser.addInitScript adding a script that runs before the page's own scripts.
+D005#pick-a-lease-scope,D005#write-a-provider,"Both describe the optional sweep hook releasing leases a dead worker left open, and the per-attempt reconnectEndpoint."
+D005#pick-a-lease-scope,D024#scopes,Both explain worker scope keeps one browser per slot and attempt scope leases a fresh browser per attempt with its limits.
+D005#pick-a-lease-scope,D024#watch-and-clean-up-browsers,Both say the provider releases browsers of a worker that died when the run ends.
+D005#pick-a-lease-scope,D025#options,"Both note a provider with per-attempt scope reattaches by the default context identity, which Lightpanda does not offer."
+D005#pick-a-lease-scope,D026#choose-device-options,Both say the engine releases all acquired leases when the run finishes or is interrupted.
+D005#pick-a-lease-scope,D027#choose-a-scope,Both explain worker scope versus per-attempt scope and the per-attempt lease limits such as no sessions.
+D005#pick-a-lease-scope,D028#limits,"Both warn that hosted sessions are billed while leased, so keep workers within what is needed."
+D005#pick-a-lease-scope,D035#hosted-devices,"Both say leases are released after the last worker exits within cleanupTimeout, and hosted sessions are billed so workers should match the suite."
+D005#pick-a-lease-scope,D053#options,"Both list the persistent-context limits of per-attempt leases: headers, userAgent, locale, timezoneId are INVALID_CONFIG and no clearState or session state."
+D006#next,D019#explore,"Both point to e2e explore, which runs the agent against the app with a goal instead of a test file."
+D006#next,D019#read-the-results,Both refer to the explore run's report and findings.
+D006#next,D019#if-the-run-stops-too-early,Both refer to the explore run's budgets: the default step and time limits and how to raise them.
+D006#next,D029#mcp,Both describe the MCP server giving coding agents live sessions on the app.
+D006#next,D029#run-several-agents,Both say several agents can each open their own live MCP session at the same time.
+D006#next,D046#several-sessions,"Both say several MCP sessions can be open at once, for example for parallel subagents in a bug bash."
+D008#model-credentials,D009#model-key,Both say the model key is kept in CI secrets and pull request builds only get it under restricted conditions.
+D008#model-credentials,D010#model-key,"Both warn that every build reading the key can read it, untrusted pull request code included."
+D008#model-credentials,D011#model-key,Both name AI_GATEWAY_API_KEY as the CI secret and warn that jobs reading it expose it to untrusted pull requests.
+D008#model-credentials,D012#web,Both show AI_GATEWAY_API_KEY passed to the CI job from repository secrets.
+D008#model-credentials,D012#ios-and-android,Both show AI_GATEWAY_API_KEY passed to the CI job from repository secrets.
+D008#model-credentials,D017#run-an-example,"Both say tests that use the agent need AI_GATEWAY_API_KEY, otherwise they skip or are not needed."
+D008#model-credentials,D036#pick-a-gateway-or-a-provider,Both name AI_GATEWAY_API_KEY as the credential for the Vercel AI Gateway model provider.
+D008#model-credentials,D043#model,Both name AI_GATEWAY_API_KEY as the credential the gateway provider reads.
+D008#model-credentials,D054#what-runs-with-your-permissions,Both say untrusted pull request code should run without secrets or write tokens.
+D009#workflow,D008#upload-the-reports,"Both upload the .e2e directory (report.json, junit.xml) at the end of each job."
+D009#workflow,D008#mobile-jobs,"Both describe mobile CI jobs: macOS simulator and Linux emulator, install the build, then run npx e2e run --target ios or android."
+D009#workflow,D009#artifacts-and-test-reports,Both zip or upload .e2e output after the run and send junit.xml to the CI test reports tab.
+D009#workflow,D010#workflow,"Both give a CI workflow for iOS and Android that boots a simulator or emulator, installs the app and runs npx e2e run per target with junit."
+D009#workflow,D011#workflow,"Both give a CI workflow building iOS and Android apps, installing them on a simulator or emulator and running npx e2e run --target with junit."
+D009#workflow,D012#ios-and-android,"Both give a CI workflow with one job per platform that boots a simulator or emulator, installs the build and runs npx e2e run --target."
+D010#workflow,D008#upload-the-reports,"Both upload .e2e/report.json, junit.xml and results as CI artifacts and point the CI test report at junit.xml."
+D010#workflow,D008#mobile-jobs,"Both describe mobile CI jobs: macOS simulator and Linux emulator, install the build, then run npx e2e run --target ios or android."
+D010#workflow,D009#workflow,"Both give a CI workflow for iOS and Android that boots a simulator or emulator, installs the app and runs npx e2e run per target with junit."
+D010#workflow,D009#artifacts-and-test-reports,Both send junit.xml to the CI service's test report tab and keep the .e2e output as build artifacts.
+D010#workflow,D011#workflow,"Both give a CI workflow building iOS and Android apps, installing them on a simulator or emulator and running npx e2e run --target with junit."
+D010#workflow,D012#ios-and-android,Both create an iPhone 17 simulator on a named iOS runtime via xcrun simctl and run npx e2e run --target ios and android with junit.
+D011#workflow,D008#upload-the-reports,Both upload the .e2e output as a CI artifact even when the run fails.
+D011#workflow,D008#mobile-jobs,Both say the Android emulator needs a Linux runner with nested virtualization and iOS needs a macOS runner with a booted simulator.
+D011#workflow,D009#workflow,"Both give a CI workflow building iOS and Android apps, installing them on a simulator or emulator and running npx e2e run --target with junit."
+D011#workflow,D010#workflow,"Both create an iPhone 17 simulator via xcrun simctl, install the app and run npx e2e run --target ios and android with junit."
+D011#workflow,D011#build-profile,Both rely on an e2e build profile producing a simulator iOS build and an Android apk without credentials.
+D011#workflow,D012#ios-and-android,"Both give a CI workflow with one job per platform that boots a simulator or emulator, installs the build and runs npx e2e run --target."
+D013#install-the-skill,D006#install-the-skill,"Both say the e2e skill is installed by e2e init or, without init, by npx skills add tester-army/e2e."
+D013#install-the-skill,D013#generate-a-verification-skill-for-your-app,"Both give npx skills add tester-army/e2e to install e2e skills, here the create-verification-skill skill."
+D013#install-the-skill,D013#migrate-an-existing-suite,"Both give npx skills add tester-army/e2e to install e2e skills, here the migrate-to-e2e skill."
+D013#install-the-skill,D030#migrate-cypress,Both say npx e2e guide prints the e2e skill and npx e2e guide <topic> prints a topic.
+D013#install-the-skill,D031#migrate-detox,Both say npx e2e guide prints the e2e skill and npx e2e guide <topic> prints a topic.
+D013#install-the-skill,D032#migrate-maestro,Both say npx e2e guide prints the e2e skill and npx e2e guide <topic> prints a topic.
+D013#install-the-skill,D033#migrate-playwright,Both say npx e2e guide prints the e2e skill and npx e2e guide <topic> prints a topic.
+D013#install-the-skill,D034#migrate-selenium,Both say npx e2e guide prints the e2e skill and npx e2e guide <topic> prints a topic.
+D013#install-the-skill,D037#set-up-with-your-coding-agent,Both say npx e2e init installs the e2e skill and npx e2e guide prints it.
+D013#install-the-skill,D040#commands,"Both say init installs SKILL.md into .agents/skills/e2e and .claude/skills/e2e (symlinked), and e2e guide prints the skill."
+D013#install-the-skill,D046#resources,Both say e2e guide prints the agent skill overview and per-topic pages.
+D014#assertions,D001#what-the-model-sees,"Both say assertions see only the instruction, current screen and agent context, not earlier steps, and describe vision true/only modes."
+D014#assertions,D001#how-a-step-ends,Both say too little evidence in an assertion gives ASSERTION_INCONCLUSIVE.
+D014#assertions,D001#what-a-step-costs,"Both say extract fails with ASSERTION_INCONCLUSIVE when data is not on screen, waitFor calls the model only when the screen changes, and screenshots add input tokens."
+D014#assertions,D015#common-errors,Both explain ASSERTION_INCONCLUSIVE for questions the screen does not show and suggest vision: true for pixel answers.
+D014#assertions,D016#vision,Both say vision true adds a masked screenshot for assertions and no pixels are sent after a secret fill.
+D014#assertions,D038#agent-assert,"Both say agent.assert judges the current screen, failing with ASSERTION_FAILED or ASSERTION_INCONCLUSIVE, without seeing earlier steps."
+D014#assertions,D038#agent-waitfor,Both say agent.waitFor waits until a condition holds and calls the model again only when the screen differs.
+D014#assertions,D038#agent-extract,Both say agent.extract reads structured data into a Standard Schema type and throws ASSERTION_INCONCLUSIVE if the screen lacks it.
+D014#assertions,D038#vision,Both describe vision true or only for assertions and that no screenshots are sent after a secret fill.
+D014#assertions,D044#agenterror,Both define ASSERTION_FAILED and ASSERTION_INCONCLUSIVE for agent.assert and agent.extract.
+D014#assertions,D051#screenshots-after-a-secret-fill,Both say screenshots stop being sent to the model after a secret fill.
+D015#watch-it-happen,D008#upload-the-reports,Both say --video adds a video for each target whose engine can record to the .e2e output.
+D015#watch-it-happen,D019#explore,Both mention --headed to watch the agent drive the app.
+D015#watch-it-happen,D026#record-a-run,Both show npx e2e run --video recording every attempt on mobile.
+D015#watch-it-happen,D030#map-each-command,Both say npx e2e run --headed shows the browser while the test runs.
+D015#watch-it-happen,D032#port-the-config,Both say npx e2e run --video records one MP4 of the device per attempt.
+D015#watch-it-happen,D033#browser-timeouts-and-artifacts,Both cover the video modes (--video [mode]) and --headed for watching a run.
+D015#watch-it-happen,D033#map-each-api,Both say --headed shows a visible browser to watch the run.
+D015#watch-it-happen,D035#what-differs-from-the-web,Both say --video writes WebM on web and an MP4 of the device screen on mobile.
+D015#watch-it-happen,D037#add-an-agent-step,Both say --headed lets you watch a web test run.
+D015#watch-it-happen,D040#commands,"Both say --video [mode] chooses which attempts record a video, WebM on a browser engine and MP4 on a device engine."
+D015#watch-it-happen,D041#recording,"Both explain the video recording modes, their precedence (config, target, --video, test option), UNSUPPORTED_ARTIFACT, and using startedAt offsets."
+D015#watch-it-happen,D044#runner-codes,Both say UNSUPPORTED_ARTIFACT fails the run when a video mode is set on a target whose engine cannot record.
+D015#watch-it-happen,D051#artifacts,Both say video is opt-in through video or --video and stored as webm or mp4 under results.
+D015#watch-it-happen,D052#options,"Both say a test's own video option wins over --video, target and config, and UNSUPPORTED_ARTIFACT is raised before any test starts."
+D015#agent-steps,D001#what-a-step-costs,Both say --debug shows the cached share of input tokens per agent step.
+D015#agent-steps,D002#make-the-agent-yours,Both say running with --debug shows the agent step transcript for debugging an agent.
+D015#agent-steps,D007#why-a-step-was-not-replayed,Both say --no-cache runs the agent live instead of replaying recorded steps.
+D015#agent-steps,D007#modes,Both say --no-cache turns the replay cache off for one run.
+D015#agent-steps,D013#how-an-agent-writes-and-runs-a-test,Both say --no-cache runs the live agent when a replay fails.
+D015#agent-steps,D013#how-an-agent-reads-a-failure,"Both say --ai-trace records model-call details read with unbox-ai, and --no-cache captures every model call."
+D015#agent-steps,D015#artifacts,Both say --debug saves agent transcripts as artifacts.
+D015#agent-steps,D018#what-the-context-holds,Both say under --debug the model transcript is attached as an artifact.
+D015#agent-steps,D030#map-each-command,Both say --debug prints the agent step table.
+D015#agent-steps,D033#map-each-api,Both say e2e run --debug prints phase timings and the agent step table.
+D015#agent-steps,D037#add-an-agent-step,Both say --no-cache skips cached actions and runs the agent live.
+D015#agent-steps,D040#commands,"Both describe --debug (phase timings and agent step table) and --ai-trace writing ai-trace.json, opened with unbox-ai."
+D015#agent-steps,D041#output,Both say --ai-trace produces the ai-trace.json file in the output directory.
+D015#agent-steps,D051#artifacts,"Both say ai-trace.json holds every model call, opt-in via --ai-trace, with redacted prompts and image bytes as counts."
+D016#install-and-configure,D016#how-text-gets-typed,Both describe the textModel option of the decision executor and what happens without it.
+D016#install-and-configure,D016#vision,"Both show decisionExecutor configured with typeSafeAi.decisionModel('jev-latest') and a text model, and the OpenAI gpt-6-luna decision model."
+D016#install-and-configure,D016#provider-options,Both show decisionExecutor setup with a decision model and a text model.
+D016#install-and-configure,D036#pick-a-gateway-or-a-provider,Both say to install @ai-sdk/openai and set OPENAI_API_KEY to use OpenAI models.
+D016#install-and-configure,D036#ai-sdk-providers,Both list @ai-sdk/openai with OPENAI_API_KEY as the setup for OpenAI models.
+D016#install-and-configure,D037#use-a-subscription-or-api-key,Both list @ai-sdk/openai with OPENAI_API_KEY as the setup for OpenAI models.
+D016#install-and-configure,D043#model,Both say openai() reads OPENAI_API_KEY.
+D016#what-the-model-can-do,D016#how-text-gets-typed,"Both describe which operations (type, upload, typeSecret) the executor offers to the model."
+D016#what-the-model-can-do,D038#action-tools,"Both list agent action verbs such as double_tap, long_press, scroll_to and dismiss_keyboard."
+D016#what-the-model-can-do,D042#capabilities,"Both name the action verbs double_tap, long_press, scroll_to and dismiss_keyboard offered to the agent."
+D016#what-the-model-can-do,D046#the-catalog,"Both list action tools such as tap, double_tap, long_press, hover, drag, scroll_to and dismiss_keyboard."
+D016#what-the-model-can-do,D047#agent-tools,"Both list mobile agent actions such as tap, double_tap, long_press, drag, scroll_to and dismiss_keyboard."
+D017#pick-an-example,D035#test-ids-by-framework,"Both link the example projects with-expo, with-swiftui, with-compose, with-kotlin-multiplatform, with-flutter and with-maui for each framework."
+D017#next,D021#how-it-works,"Both say you can use your own subscription, API key or local model for agent steps."
+D017#next,D036#models,"Both say models can come from a different provider, a subscription, an API key or a local server."
+D017#next,D037#quickstart,Both point to the quickstart for setting up e2e in your own app.
+D017#next,D055#next,"Both link to the Models page for using an API key, a gateway or a local model instead."
+D019#start-signed-in,D004#sign-in-once-in-a-setup-test,Both say a setup test saves a named session that other runs restore to start signed in.
+D019#start-signed-in,D040#commands,Both say e2e explore --session starts signed in by running only the setup test that saves the named session and restoring it.
+D019#start-signed-in,D044#runner-codes,Both involve e2e explore --session naming a session that must be produced by a setup test.
+D019#start-signed-in,D051#screenshots-after-a-secret-fill,Both say a setup that fills a password leaves later sessions-based runs without screenshots.
+D022#sessions,D005#pick-a-lease-scope,"Both say hosted sessions cost money while they run, so keep workers at what the suite can fill."
+D022#sessions,D022#options,"Both describe maxDurationMinutes and maxIdleTimeMinutes, how long EAS lets a session run or sit idle."
+D022#sessions,D022#when-a-session-fails-to-start,Both say a session that stays queued too long fails and the run's other sessions are stopped.
+D022#sessions,D028#limits,Both say to keep workers times the number of targets within the service's parallel session limit.
+D022#sessions,D035#hosted-devices,Both say each worker leases its own hosted session and to keep workers at what the suite can fill.
+D025#where-it-fits,D023#integrations-index,Both say Lightpanda is an open-source headless browser run on your own machine without Chromium.
+D025#where-it-fits,D025#what-works,"Both describe which kinds of tests run well on Lightpanda: text, state and tree-driven agent steps."
+D025#where-it-fits,D025#what-does-not-work,"Both describe that Lightpanda suits suites light on geometry, since layout, scrolling and canvas drawing are not supported."
+D026#choose-device-options,D005#pick-a-lease-scope,"Both say leases are released on every exit path, including failure and interrupt."
+D026#choose-device-options,D022#options,Both give a maximum session lifetime option for hosted simulator sessions and device selection options.
+D026#choose-device-options,D022#recordings,Both say recordings are written as video/video.mp4 inside each attempt's artifact directory.
+D026#choose-device-options,D028#limits,Both say a hosted device ends on a timeout if the runner disappears before releasing it.
+D026#choose-device-options,D035#hosted-devices,"Both say the hosted device provider releases acquired devices when the run finishes or is interrupted, with Limrun cleaning up devices."
+D027#set-up-the-provider,D005#hosted-browsers,Both name smol() from @e2e-dev/smol as the browser provider running Chromium microVMs on your computer.
+D027#set-up-the-provider,D023#integrations-index,Both name @e2e-dev/smol as Chromium microVMs on your computer.
+D027#set-up-the-provider,D027#run-the-app-in-the-machine,Both say the smol machine can still reach your computer's loopback ports and relate hostPorts to the machine's localhost.
+D027#set-up-the-provider,D027#options,"Both describe the hostPorts option of smol(), whose default is an empty list."
+D027#set-up-the-provider,D051#outbound-connections,"Both say smol machines pull the Playwright image, have unrestricted outbound network access, and reach any loopback port via host.smolvm.internal."
+D030#map-each-command,D003#api-testing,Both say API calls are made from test code with Node fetch.
+D030#map-each-command,D004#sign-in-once-in-a-setup-test,Both say a session is created in test.setup and restored with the session option.
+D030#map-each-command,D005#mock-an-api,Both show mocking a response with browser.route and waiting with browser.waitForResponse.
+D030#map-each-command,D005#handle-a-dialog,Both show browser.onDialog('accept') to handle a confirm dialog.
+D030#map-each-command,D005#read-from-the-page,Both use browser.evaluate to run a function in the page.
+D030#map-each-command,D005#cookies,Both use browser.setCookies to set a cookie.
+D030#map-each-command,D015#watch-it-happen,Both say npx e2e run --headed shows the browser while the test runs.
+D030#map-each-command,D015#agent-steps,Both say --debug prints the agent step table.
+D030#map-each-command,D031#map-each-detox-call,"Both map test commands to e2e equivalents such as doubleTap, toBeHidden and the LOCATOR_AMBIGUOUS single-match rule."
+D030#map-each-command,D032#map-each-command,"Both map test commands to e2e equivalents such as doubleTap, toBeHidden and a fixture from test.extend."
+D030#map-each-command,D033#map-each-api,"Both map framework commands to e2e equivalents such as browser.setCookies, browser.onDialog, browser.setViewport, browser.evaluate, doubleTap and secondaryTap."
+D030#map-each-command,D033#what-differs-on-purpose,"Both say actions and reads need exactly one match, otherwise LOCATOR_AMBIGUOUS."
+D030#map-each-command,D034#map-each-webdriver-call,"Both map legacy test calls to e2e equivalents such as browser.setCookies, browser.onDialog, browser.evaluate and test.extend fixtures."
+D030#map-each-command,D045#locator-matchers,"Both list locator assertions toBeVisible, toHaveText, toContainText, toHaveCount and toHaveValue."
+D030#map-each-command,D045#browser-matchers,Both cover expect(browser).toHaveURL and toHaveTitle.
+D030#map-each-command,D045#strictness,"Both say assertions on several matches fail immediately with LOCATOR_AMBIGUOUS, and toBeHidden accepts a hidden node."
+D030#map-each-command,D050#queries,"Both cover getByTestId, getByText with exact false, and getByRole queries."
+D030#map-each-command,D050#locator-actions,"Both list locator actions tap, doubleTap, secondaryTap, clear, selectOption and setInputFiles, and LOCATOR_AMBIGUOUS on several matches."
+D030#map-each-command,D052#fixtures,Both say test.extend defines custom fixtures for setup and helpers.
+D030#map-each-command,D053#the-browser-fixture,"Both name browser fixture methods setCookies, setViewport, evaluate, waitForResponse, onDialog and route."
+D030#map-each-command,D059#resize-inside-a-test,Both use browser.setViewport to resize the page during a test.
+D031#rewrite-one-spec,D004#the-password-is-a-handle,Both explain that the password in the test comes from configured credentials via credentials.user.
+D031#rewrite-one-spec,D031#map-each-detox-call,"Both map Detox typeText, waitFor withTimeout, by.id and launchApp newInstance calls to e2e fill, expect timeout, getByTestId and app.restart."
+D031#rewrite-one-spec,D032#migrate-maestro,"Both say nothing launches on its own, so a migrated test starts with app.open()."
+D031#rewrite-one-spec,D032#map-each-command,"Both point to mobile({ settle, transition }) as the engine-wide way to handle slow-settling screens and state app.open() must start the test."
+D031#rewrite-one-spec,D034#rewrite-one-flow,Both show a login flow rewritten for e2e with credentials.user and a password taken from configured credentials.
+D031#rewrite-one-spec,D047#engine,Both describe the mobile engine's settle and transition options for screens that take time to settle.
+D032#map-each-command,D030#map-each-command,Both map reusable flows and text reads to a function or test.extend fixture and locator.textContent.
+D032#map-each-command,D031#port-the-config,"Both map launch permissions and launch arguments to app.permissions, app.launchArguments or device.openApp options (grant, deny, reset)."
+D032#map-each-command,D031#map-each-detox-call,"Both map launch/clear state, setLocation, setOrientation, swipe direction (finger vs content), scrollUntilVisible and screenshots to e2e calls."
+D032#map-each-command,D032#rewrite-one-flow,"Both show Maestro launchApp clearState, tapOn, inputText and scrollUntilVisible rewritten as app.clearState, agent.act and screen.scrollUntilVisible."
+D032#map-each-command,D032#rewrite-selectors,"Both state that spatial selectors (below, above, leftOf, rightOf) have no equivalent and that isVisible() replaces optional and runFlow when."
+D032#map-each-command,D033#map-each-api,"Both map framework calls to e2e equivalents, including screenshots, expect.poll, test.extend, hooks, video and the rule that screen, app, agent and expect run on every target."
+D032#map-each-command,D034#map-each-webdriver-call,Both map reusable page-object or flow code to a test.extend fixture.
+D032#map-each-command,D035#launch-arguments-and-permissions,"Both state app.launchArguments and app.permissions apply to every fresh launch with grant, deny and reset values."
+D032#map-each-command,D035#the-device-fixture,"Both describe device.clearKeychain, device.openLink, device.openApp and device.setAirplaneMode behaviour."
+D032#map-each-command,D035#physical-devices,"Both state which device calls (clipboard, keychain, location, permission, appearance, openLink) work on which devices."
+D032#map-each-command,D035#what-differs-from-the-web,Both state app.open() launches the app fresh and device.openLink(url) opens a link.
+D032#map-each-command,D038#unique,Both say unique() around a value in act params keeps the replay cache working.
+D032#map-each-command,D039#restart,Both give app.restart() as the way to restart the app.
+D032#map-each-command,D039#clearstate,Both give app.clearState() as the way to clear app state.
+D032#map-each-command,D039#screenshot,Both say app.screenshot output is redacted and withheld after a secret fill.
+D032#map-each-command,D041#the-app-under-test,Both describe app.launchArguments and app.permissions set on the target and applied to each fresh launch.
+D032#map-each-command,D041#recording,Both say a test option video: 'on' records that test.
+D032#map-each-command,D045#screenshot-matchers,Both cover toHaveScreenshot with maxDiffPixelRatio tolerance.
+D032#map-each-command,D045#polling-a-value,Both give expect.poll for a value that is still changing.
+D032#map-each-command,D047#reference-mobile,Both say a test using device declares requires: ['device'] so other targets skip it.
+D032#map-each-command,D047#engine,"Both cover launchArguments and permissions on fresh launches, app.open fresh launch, and the settle and transition engine options."
+D032#map-each-command,D047#device,"Both list device methods such as clearKeychain, openLink, setClipboard, setLocation, setAirplaneMode, setOrientation and dismissKeyboard."
+D032#map-each-command,D047#device-fixture,Both describe device.openApp relaunch with launchArguments and permissions replacing the target's values for one launch.
+D032#map-each-command,D052#hooks,Both map flow start and complete hooks to beforeEach and afterEach.
+D032#rewrite-selectors,D014#locators,"Both say a locator matching more than one node must be narrowed with filter(), first() or nth()."
+D032#rewrite-selectors,D015#common-errors,"Both name LOCATOR_AMBIGUOUS from multiple matches and fixes such as first(), filter and { visible: true } or exact: false."
+D032#rewrite-selectors,D030#migrate-cypress,Both tell to pass { exact: false } where the old query matched a fragment.
+D032#rewrite-selectors,D030#map-each-command,"Both say several matches fail with LOCATOR_AMBIGUOUS and are narrowed with filter(), first() or nth(), and fragment text uses { exact: false }."
+D032#rewrite-selectors,D031#map-each-detox-call,"Both say actions on several matches fail with LOCATOR_AMBIGUOUS and are narrowed with filter(), first() or nth()."
+D032#rewrite-selectors,D032#map-each-command,"Both state that spatial Maestro selectors (below, above, leftOf, rightOf, containsDescendants) have no equivalent and isVisible() replaces optional and runFlow when."
+D032#rewrite-selectors,D033#migrate-playwright,Both tell to add { exact: false } or a RegExp where the old query matched a fragment.
+D032#rewrite-selectors,D033#map-each-api,"Both state that string names in getByRole, getByText and similar are exact case-sensitive matches and that { visible: true } drops hidden twins."
+D032#rewrite-selectors,D033#what-differs-on-purpose,"Both say string queries match the whole text case-sensitively, with { exact: false } or a RegExp for fragments, and that several matches give LOCATOR_AMBIGUOUS including isVisible()."
+D032#rewrite-selectors,D034#map-each-webdriver-call,"Both say a first-match lookup becomes LOCATOR_AMBIGUOUS in e2e and is narrowed with filter(), first() or nth()."
+D032#rewrite-selectors,D044#agenterror,Both state LOCATOR_AMBIGUOUS is raised when a single-node operation matches several nodes.
+D032#rewrite-selectors,D050#queries,"Both state a string query matches the whole text case-sensitively, { exact: false } gives a case-insensitive substring, and visible: true is accepted."
+D032#rewrite-selectors,D050#refinement,"Both name filter, first() and hasText as ways to narrow several matches."
+D032#rewrite-selectors,D050#match-rules,Both state isVisible() is false on zero matches and LOCATOR_AMBIGUOUS on several.
+D033#browser-timeouts-and-artifacts,D005#emulate-dark-mode-and-reduced-motion,"Both cover web({ colorScheme, reducedMotion }) options."
+D033#browser-timeouts-and-artifacts,D005#cookies,Both cover setting cookies with browser.setCookies.
+D033#browser-timeouts-and-artifacts,D005#pick-a-lease-scope,"Both note that headers, basicAuth, userAgent, locale and timezoneId are web options with limits when connecting."
+D033#browser-timeouts-and-artifacts,D015#traces,"Both say a trace is a markdown page, trace.md, in the test's results directory."
+D033#browser-timeouts-and-artifacts,D025#attach-to-a-running-server,Both show web({ connect: { cdpEndpoint } }) attaching to a running browser over CDP.
+D033#browser-timeouts-and-artifacts,D030#port-the-config,Both name web({ testIdAttribute }) to change the test id attribute.
+D033#browser-timeouts-and-artifacts,D030#map-each-command,Both map setting cookies to browser.setCookies.
+D033#browser-timeouts-and-artifacts,D033#map-each-api,"Both map Playwright storageState, cookies, show-trace trace.md and emulateMedia (colorScheme, reducedMotion) to e2e equivalents."
+D033#browser-timeouts-and-artifacts,D033#what-differs-on-purpose,Both say sessions replace storageState and are per run with no file.
+D033#browser-timeouts-and-artifacts,D033#defaults-that-differ,"Both give the test, action and assertion timeout settings, navigation timeout as the test budget, retries, workers and the trace default for e2e."
+D033#browser-timeouts-and-artifacts,D034#port-the-config,Both say actionTimeout and assertionTimeout set the action and assertion deadlines.
+D033#browser-timeouts-and-artifacts,D034#map-each-webdriver-call,Both name web({ testIdAttribute }) and browser.setCookies as the e2e equivalents.
+D033#browser-timeouts-and-artifacts,D040#commands,"Both list the --trace [mode] values and trace.md location, and --headed."
+D033#browser-timeouts-and-artifacts,D041#top-level,"Both give assertionTimeout, actionTimeout and the trace default of retain-on-failure."
+D033#browser-timeouts-and-artifacts,D041#output,Both say each test's directory under results holds its trace.md page.
+D033#browser-timeouts-and-artifacts,D041#recording,Both describe the trace and video modes and that a trace page is markdown trace.md under the test's results directory.
+D033#browser-timeouts-and-artifacts,D051#site-check,Both say headers go only to the app's site and basicAuth answers a 401 challenge.
+D033#browser-timeouts-and-artifacts,D052#options,"Both list the per-test trace modes (off, on, retain-on-failure, on-first-retry) and video option."
+D033#browser-timeouts-and-artifacts,D053#options,"Both list web() options viewport, browser, testIdAttribute, basicAuth, headers, connect, locale, timezoneId, userAgent, colorScheme and reducedMotion."
+D033#browser-timeouts-and-artifacts,D053#weboptions,"Both describe the web() options such as locale, timezoneId, userAgent, colorScheme, reducedMotion and testIdAttribute."
+D033#browser-timeouts-and-artifacts,D059#protected-previews,Both say headers are sent only to the target's site.
+D033#browser-timeouts-and-artifacts,D059#one-size-per-target,Both say web({ viewport }) sets the size of each attempt.
+D033#map-each-api,D003#api-testing,Both say the Playwright request fixture is replaced by Node fetch for API tests.
+D033#map-each-api,D005#mock-an-api,"Both cover browser.route with fulfill and continue, and browser.waitForResponse."
+D033#map-each-api,D005#handle-a-dialog,Both map page dialog handling to browser.onDialog.
+D033#map-each-api,D005#download-a-file,Both map download waiting to browser.waitForDownload.
+D033#map-each-api,D005#reach-into-an-iframe,Both map frameLocator to browser.frameLocator.
+D033#map-each-api,D005#run-a-script-before-the-page,Both map addInitScript to browser.addInitScript.
+D033#map-each-api,D005#emulate-dark-mode-and-reduced-motion,Both map emulateMedia colorScheme and reducedMotion to browser.emulateMedia.
+D033#map-each-api,D005#cookies,Both map context cookies to browser.setCookies and browser.cookies.
+D033#map-each-api,D008#sharding,Both describe --shard index/total running one slice of the suite.
+D033#map-each-api,D015#traces,Both say there is no trace viewer and the trace is the markdown trace.md page.
+D033#map-each-api,D019#explore,Both describe npx e2e explore as the exploration command that replaces codegen.
+D033#map-each-api,D030#map-each-command,"Both map click/dblclick/rightclick, select, setInputFiles, route, waitForResponse, onDialog and setCookies calls to e2e equivalents."
+D033#map-each-api,D031#map-each-detox-call,"Both map screenshots, toHaveScreenshot, visibility waits and actions to e2e equivalents."
+D033#map-each-api,D032#map-each-command,"Both map screenshots, expect.poll, test.extend, hooks, app.back and retries to e2e equivalents."
+D033#map-each-api,D033#app-targets-and-output,Both map Playwright report output (html reporter) to the markdown reporter's summary.md.
+D033#map-each-api,D033#browser-timeouts-and-artifacts,"Both map Playwright timeouts, trace, video, cookies, storage state and emulation options to e2e equivalents."
+D033#map-each-api,D033#port-page-objects,Both say Playwright page objects and fixtures map to test.extend fixtures.
+D033#map-each-api,D033#what-differs-on-purpose,"Both explain exact case-sensitive string queries, rendered text reads, LOCATOR_AMBIGUOUS, checked-state behaviour and no raw Page in tests."
+D033#map-each-api,D033#defaults-that-differ,"Both state the e2e CLI and trace defaults (retries, workers, trace mode) compared with Playwright."
+D033#map-each-api,D034#map-each-webdriver-call,"Both map back navigation, frames, dialogs, cookies, text reads and page objects to e2e equivalents."
+D033#map-each-api,D038#action-tools,"Both cover agent action tools for select, upload, right click, dragTo and scroll that map to locator actions."
+D033#map-each-api,D040#commands,"Both list the CLI flags --grep, --grep-invert, --tag, --exclude-tag, --shard, --last-failed, --repeat-each, --max-failures, --update-snapshots, --trace and e2e list."
+D033#map-each-api,D041#recording,Both describe trace and video modes and the trace.md page.
+D033#map-each-api,D041#ci,Both state test.only is rejected with ONLY_IN_CI in CI runs.
+D033#map-each-api,D042#actions,"Both list engine action kinds such as selectOption, setInputFiles, secondaryTap, dragTo and modifiers."
+D033#map-each-api,D044#runner-codes,Both name ONLY_IN_CI as the error for a focused test in a CI run.
+D033#map-each-api,D045#locator-matchers,"Both list locator matchers toBeVisible, toBeEnabled, toBeChecked, toHaveText, toHaveCount, toBeAttached and toBeSelected."
+D033#map-each-api,D045#screenshot-matchers,"Both cover toHaveScreenshot with threshold, maxDiffPixels, maxDiffPixelRatio, mask options and the always-viewport behaviour."
+D033#map-each-api,D045#value-matchers,"Both cover value matchers, toContain deep equality and the missing toStrictEqual, toThrow and expect.extend."
+D033#map-each-api,D045#asymmetric-matchers,"Both list asymmetric matchers expect.any, objectContaining, arrayContaining, stringMatching, stringContaining and anything."
+D033#map-each-api,D045#soft-assertions,Both state expect.soft failures fail the attempt once the body settles.
+D033#map-each-api,D045#polling-a-value,Both give expect.poll as the way to re-read a value until a matcher passes.
+D033#map-each-api,D045#text-matching,Both state toHaveText and toContainText compare rendered text and support ignoreCase.
+D033#map-each-api,D047#engine,"Both list device capability notes: dragTo, scrollIntoView, setInputFiles, selectOption and secondaryTap support."
+D033#map-each-api,D048#built-in-reporters,"Both list the reporter ids list, json, junit and markdown, with markdown writing summary.md."
+D033#map-each-api,D049#functions,"Both describe CLI selection filters such as grep, tags and the shard index/total slice."
+D033#map-each-api,D050#queries,"Both describe getByRole, getByLabel, getByText, getByTestId, getByPlaceholder exact string matching and visible: true."
+D033#map-each-api,D050#screen-actions,"Both describe screen.tapAt, screen.swipe({ from, to }) and scrollIntoView-style screen actions."
+D033#map-each-api,D050#locator-actions,"Both describe locator actions tap, doubleTap, secondaryTap, fill, pressSequentially, press, check, selectOption, setInputFiles and tap position or modifiers."
+D033#map-each-api,D050#locator-reads,"Both describe locator reads textContent, inputValue, getAttribute, isVisible, isChecked, boundingBox and allTextContents."
+D033#map-each-api,D050#match-rules,Both state a single-node operation or positive matcher on several matches fails with LOCATOR_AMBIGUOUS.
+D033#map-each-api,D052#members,"Both list test members test.describe, test.only, test.skip, test.extend and beforeEach, with CI rejecting test.only."
+D033#map-each-api,D052#hooks,"Both cover the beforeEach, afterEach, beforeAll and afterAll hooks."
+D033#map-each-api,D052#options,"Both cover per-test options (tags, serial, timeout, skip, trace) and ONLY_IN_CI for only."
+D033#map-each-api,D052#fixtures,Both cover test.extend fixtures and the declared requires for missing fixtures.
+D033#map-each-api,D053#options,"Both cover browser.addInitScript, web({ initScripts }), emulateMedia, setViewport and related web options."
+D033#map-each-api,D053#the-browser-fixture,"Both list the browser fixture methods: back, forward, url, title, waitForURL, locator, frameLocator, evaluate, waitForResponse, waitForDownload, route, onDialog, addInitScript, keyboard, mouse."
+D033#map-each-api,D053#installing-browsers,Both give npx @e2e-dev/web install to install browsers.
+D033#map-each-api,D053#browser-interface,"Both list browser methods such as locator, frameLocator, evaluate, waitForResponse, waitForDownload, onDialog and addInitScript."
+D033#map-each-api,D058#stored-screenshots,Both describe --update-snapshots rewriting stored screenshots.
+D033#what-differs-on-purpose,D004#sign-in-once-in-a-setup-test,Both describe test.setup saving a session that a test restores with the session option.
+D033#what-differs-on-purpose,D004#session-rules,Both describe test.setup sessions saved by name and restored via the session option.
+D033#what-differs-on-purpose,D004#the-password-is-a-handle,Both state a password is a Secret with no string value that the model never sees.
+D033#what-differs-on-purpose,D018#driving-the-page-yourself,Both mention surfaceOf(engine) giving the raw Page for custom executors rather than test code.
+D033#what-differs-on-purpose,D030#map-each-command,"Both say several matches fail with LOCATOR_AMBIGUOUS and are narrowed with filter(), first() or nth()."
+D033#what-differs-on-purpose,D031#map-each-detox-call,"Both say several matches fail with LOCATOR_AMBIGUOUS and are narrowed with filter(), first() or nth()."
+D033#what-differs-on-purpose,D032#rewrite-selectors,"Both state string queries match the whole text in whole case, with { exact: false } or a RegExp for fragments, and LOCATOR_AMBIGUOUS for several matches."
+D033#what-differs-on-purpose,D033#browser-timeouts-and-artifacts,Both say sessions replace storageState and are saved without a file.
+D033#what-differs-on-purpose,D033#map-each-api,"Both state string names are exact case-sensitive, text reads are rendered text, checked state defaults, LOCATOR_AMBIGUOUS, JSON-only evaluate and no raw Page."
+D033#what-differs-on-purpose,D034#map-each-webdriver-call,"Both say first-match lookups become LOCATOR_AMBIGUOUS in e2e and are narrowed with filter(), first() or nth()."
+D033#what-differs-on-purpose,D041#output,Both state encrypted sessions are deleted when the run ends.
+D033#what-differs-on-purpose,D045#locator-matchers,Both state .not.toBeChecked() passes on a node with no checked state such as a button or heading.
+D033#what-differs-on-purpose,D045#text-matching,Both state toHaveText compares rendered text (innerText on the web).
+D033#what-differs-on-purpose,D050#queries,Both state a string query matches the whole text case-sensitively and { exact: false } or a RegExp matches fragments.
+D033#what-differs-on-purpose,D050#locator-reads,Both state textContent() on the web reads rendered text like innerText rather than the DOM textContent.
+D033#what-differs-on-purpose,D050#match-rules,"Both state a single-node operation, isVisible() included, fails with LOCATOR_AMBIGUOUS on several matches."
+D033#what-differs-on-purpose,D051#sessions,Both state a saved session is encrypted state restored by the test.
+D033#what-differs-on-purpose,D053#the-browser-fixture,"Both state browser.evaluate takes and returns JSON values only, with arg passing values in."
+D033#what-differs-on-purpose,D053#surfaceof,Both mention surfaceOf(engine) as the way to reach the raw Page.
+D034#rewrite-one-flow,D004#sign-in-once-in-a-setup-test,"Both show a sign-in flow using credentials.user, app.open('/login'), fill and a toHaveURL('/dashboard') check."
+D034#rewrite-one-flow,D004#the-password-is-a-handle,Both explain the password comes from configured credentials through credentials.user.
+D034#rewrite-one-flow,D013#how-an-agent-writes-and-runs-a-test,Both show a login using credentials.user and state that locator actions wait for their targets so no sleeps are needed.
+D034#rewrite-one-flow,D031#rewrite-one-spec,Both show a login flow rewritten with credentials.user and say the password comes from configured credentials.
+D034#rewrite-one-flow,D034#map-each-webdriver-call,"Both map Selenium driver.get, findElement sendKeys/click, WebDriverWait and getText to e2e app.open, locator actions and assertions."
+D034#rewrite-one-flow,D041#credentials,Both explain credentials.user(name) supplies the username and a password handle from configured credentials.
+D035#expo-development-builds,D032#map-each-command,Both describe launch arguments for a fresh launch and device.openLink for links.
+D035#expo-development-builds,D035#launch-arguments-and-permissions,"Both say the warm-up passes no launch arguments, so each test starts with app.open(), and that launchArguments reach the app process."
+D035#expo-development-builds,D035#the-device-fixture,Both name device.openLink for opening a deep link into the pinned app.
+D035#expo-development-builds,D041#the-app-under-test,"Both show a device target's app with bundleId, launchArguments, command and readyUrl, and note device.openLink for links."
+D035#expo-development-builds,D047#engine,"Both say launchArguments go to the iOS process or Android am start, the warm-up passes none, and device.openLink opens a link."
+D035#expo-development-builds,D047#device,Both name device.openLink for opening a deep link into the app.
+D035#expo-development-builds,D059#let-the-runner-start-it,Both describe app.command starting the dev server with readyUrl probing readiness.
+D035#hosted-devices,D005#write-a-provider,"Both give a provider contract with acquire, release and optional record, and an example provider calling a session API."
+D035#hosted-devices,D005#pick-a-lease-scope,"Both say a hosted session costs money while it runs, so workers should be kept at what the suite can fill, and release runs within cleanupTimeout."
+D035#hosted-devices,D005#recording-on-the-provider,Both describe an optional record that returns a ProviderRecording with a file or url.
+D035#hosted-devices,D008#mobile-jobs,Both say recordings made locally replay on hosted devices because the replay cache key holds the app.
+D035#hosted-devices,D022#integrations-eas,Both name easSimulators() as the device provider for EAS Simulators.
+D035#hosted-devices,D022#sessions,"Both say each worker leases its own session, so workers should match what the suite can fill."
+D035#hosted-devices,D023#integrations-index,"Both point to Limrun, EAS Simulators and TestMu AI as hosted device services."
+D035#hosted-devices,D023#use-a-service-with-no-integration,Both say a service with no integration is used by writing a DeviceProvider for the mobile engine.
+D035#hosted-devices,D026#integrations-limrun,Both point to Limrun for hosted iOS simulators and Android emulators with automatic app installation.
+D035#hosted-devices,D028#integrations-testmu,Both name testmu() as the device provider for TestMu AI.
+D035#hosted-devices,D041#recording,Both describe a provider's own recording through DeviceProvider.record.
+D035#hosted-devices,D042#artifacts,Both describe DeviceProvider.record and the ProviderRecording a provider returns for a hosted recording.
+D035#hosted-devices,D047#engine,"Both describe a DeviceProvider leasing one device per worker slot, releasing leases at run end within cleanupTimeout, and installing the build on the leased device."
+D035#hosted-devices,D047#exported-types,"Both name the DeviceProvider, DeviceLease, DeviceRequest and DeviceReleaseContext types."
+D036#ai-sdk-providers,D008#model-credentials,Both state the gateway credential AI_GATEWAY_API_KEY must be available to the run.
+D036#ai-sdk-providers,D036#pick-a-gateway-or-a-provider,"Both explain how to pick the model for a gateway, OpenRouter, OpenAI-compatible endpoint or Ollama and set it as agents.default."
+D036#ai-sdk-providers,D036#vercel-oidc-instead-of-a-key,Both say the Vercel gateway can use a Vercel OIDC token instead of AI_GATEWAY_API_KEY and that process.loadEnvFile() can load credentials.
+D036#ai-sdk-providers,D036#pick-a-model-by-the-key-that-is-set,"Both show setting the model from the API key variable that is set, with gateway() as fallback via OIDC."
+D036#ai-sdk-providers,D037#use-a-subscription-or-api-key,"Both list the same AI SDK providers with their packages, environment variables, imports and example model IDs."
+D036#ai-sdk-providers,D040#commands,"Both name the gateway choices vercel, openrouter and openai-compatible for the agent model."
+D036#ai-sdk-providers,D041#agents,"Both state any AI SDK provider that supports tool calls works and list gateway, OpenRouter and OpenAI-compatible model setups with their variables."
+D036#ai-sdk-providers,D043#model,"Both state gateway() reads AI_GATEWAY_API_KEY, openrouter() reads OPENROUTER_API_KEY, openai() reads OPENAI_API_KEY, and OIDC is the fallback."
+D036#ai-sdk-providers,D055#set-up,"Both show installing ai plus a provider package such as @ai-sdk/openai-compatible, @ai-sdk/anthropic or @ai-sdk/xai and setting ANTHROPIC_API_KEY."
+D037#use-a-subscription-or-api-key,D008#model-credentials,Both state the provider credential such as AI_GATEWAY_API_KEY must be set where e2e runs.
+D037#use-a-subscription-or-api-key,D030#migrate-cypress,"Both list the ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription choices for the agent model."
+D037#use-a-subscription-or-api-key,D031#migrate-detox,"Both list the ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription choices for the agent model."
+D037#use-a-subscription-or-api-key,D032#migrate-maestro,"Both list the ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription choices for the agent model."
+D037#use-a-subscription-or-api-key,D033#migrate-playwright,"Both list the ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription choices for the agent model."
+D037#use-a-subscription-or-api-key,D034#migrate-selenium,"Both list the ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription choices for the agent model."
+D037#use-a-subscription-or-api-key,D036#pick-a-gateway-or-a-provider,"Both explain choosing the gateway, OpenRouter or OpenAI-compatible provider and setting it as agents.default."
+D037#use-a-subscription-or-api-key,D036#vercel-oidc-instead-of-a-key,Both say a Vercel OIDC token from a linked project can replace AI_GATEWAY_API_KEY.
+D037#use-a-subscription-or-api-key,D036#ai-sdk-providers,"Both list the same AI SDK providers with their packages, environment variables, imports and example model IDs."
+D037#use-a-subscription-or-api-key,D037#set-up-with-your-coding-agent,"Both list the model choices of a ChatGPT, GitHub Copilot, OpenCode Console or SuperGrok subscription or an API key."
+D037#use-a-subscription-or-api-key,D037#run-your-first-test,"Both describe the init wizard choice between a subscription, a model provider or None."
+D037#use-a-subscription-or-api-key,D040#commands,"Both give the npx e2e login commands for each subscription and the Copilot GitHub CLI login, and the init gateway choices."
+D037#use-a-subscription-or-api-key,D041#agents,"Both list model setup for the Vercel AI Gateway, OpenRouter and OpenAI-compatible endpoints with their packages and variables."
+D037#use-a-subscription-or-api-key,D043#model,Both state which API key variable each provider reads and that Vercel OIDC replaces AI_GATEWAY_API_KEY.
+D037#use-a-subscription-or-api-key,D055#subscriptions,"Both list the subscription plans and their npx e2e login commands (openai, github-copilot, opencode-console, spacexai) and Claude Max or Team API credits."
+D037#use-a-subscription-or-api-key,D055#set-up,"Both give the npx e2e login commands for ChatGPT, Copilot, OpenCode Console and SuperGrok subscriptions."
+D037#use-a-subscription-or-api-key,D055#sign-in-help,Both say Copilot uses the GitHub CLI login.
+D037#add-an-agent-step,D001#what-a-step-costs,Both refer to the atomic goal for each agent.act call.
+D037#add-an-agent-step,D007#what-must-match,Both show agent.act goals with {name} placeholders filled by params and --no-cache for a live run.
+D037#add-an-agent-step,D008#gate-pull-requests,Both say to give each agent.act one atomic goal.
+D037#add-an-agent-step,D013#how-an-agent-writes-and-runs-a-test,"Both say one agent.act per atomic goal, then an assertion, and --no-cache runs the live agent."
+D037#add-an-agent-step,D014#goals,Both say to give agent.act one atomic goal per call and check the result before the next.
+D037#add-an-agent-step,D014#assertions,Both say agent.assert judges the screen while expect checks exact values.
+D037#add-an-agent-step,D015#watch-it-happen,Both say --headed shows a web test run in a visible browser.
+D037#add-an-agent-step,D015#agent-steps,Both give --no-cache to run the agent live instead of replaying.
+D037#add-an-agent-step,D035#write-a-device-test,Both show a device test using agent.act and device.locator with agent-device selectors.
+D037#add-an-agent-step,D035#the-device-fixture,Both say device.locator takes agent-device selectors.
+D037#add-an-agent-step,D037#run-your-first-test,Both mention choosing None in the wizard means a model must be added and running a test with npx e2e run.
+D037#add-an-agent-step,D038#agent-act,Both show agent.act with {placeholders} filled from params.
+D037#add-an-agent-step,D038#agent-assert,Both show agent.assert judging the current screen against a statement.
+D037#add-an-agent-step,D040#commands,"Both give npx e2e run, --headed and --no-cache for running a test."
+D037#add-an-agent-step,D041#cache,Both say --no-cache disables caching for the run.
+D037#add-an-agent-step,D047#engine,Both say app.open() launches the app fresh and without it a test starts where the previous one left the app.
+D038#agent-act,D001#what-the-model-may-do,Both say the model sees a Secret only as a name and purpose and the runner fills it.
+D038#agent-act,D001#how-a-step-ends,"Both describe failed versus blocked act verdicts and the codes for credentials, environment, seed data and budget limits."
+D038#agent-act,D002#define-named-agents,Both say maxSteps caps the actions of one step and maxModelCalls its model calls.
+D038#agent-act,D004#the-password-is-a-handle,Both say a Secret password param needs a password field and the model never sees the value.
+D038#agent-act,D007#fail-on-a-stale-recording,Both state REPLAY_STALE is raised under a strict cache when a recording no longer replays.
+D038#agent-act,D014#goals,Both show agent.act('invite {email} as an editor') with params.
+D038#agent-act,D015#common-errors,"Both state that STEP_BUDGET_EXHAUSTED and STEP_TIMEOUT mean the agent ran out of actions, model calls or time."
+D038#agent-act,D038#agent-waitfor,"Both give the per-call options timeout, maxModelCalls and agent with the agent's default maxModelCalls of 25."
+D038#agent-act,D038#budgets,"Both give the act defaults: maxModelCalls 25, maxSteps 25 and a 120000 ms timeout."
+D038#agent-act,D038#types,Both describe act options and the ActResult returned by agent.act.
+D038#agent-act,D038#unique,Both say params values that differ on every run are wrapped in unique().
+D038#agent-act,D040#commands,Both mention the --max-steps and --max-model-calls limits (1 to 100) and step budgets.
+D038#agent-act,D041#agents,Both give the maxSteps and maxModelCalls defaults of 25 per agent.
+D038#agent-act,D041#credentials,Both show credentials.user supplying the username and password handle to agent.act params.
+D038#agent-act,D044#agenterror,"Both list the act error codes such as STEP_BUDGET_EXHAUSTED, STEP_TIMEOUT, STEP_NO_CONCLUSION, CONTEXT_OVERFLOW, MODEL_OUTPUT_INVALID, REPLAY_STALE, APP_NOT_OPEN and credential and seed-data codes."
+D038#agent-act,D051#secret-fills,"Both state the runner checks the target is an enabled, editable input (a password field for a password) before filling a Secret."
+D038#agent-waitfor,D001#what-the-model-sees,"Both say waitFor judgments see the instruction, the current screen and the agent's context."
+D038#agent-waitfor,D001#what-a-step-costs,Both say waitFor makes no model call while the screen stays the same.
+D038#agent-waitfor,D014#assertions,Both say agent.waitFor waits until a condition is true and calls the model only when the screen changes.
+D038#agent-waitfor,D038#agent-assert,Both say judgments follow the assert rules and add a vision hint when an inconclusive judgment used the tree alone.
+D038#agent-waitfor,D038#budgets,"Both give the waitFor budget: maxModelCalls 25, no action steps and a 30000 ms judgmentTimeout."
+D038#agent-waitfor,D038#types,"Both describe the waitFor options, a judgment at most once per interval until timeout."
+D038#agent-waitfor,D041#agents,Both give the judgmentTimeout default of 30000 ms.
+D038#agent-waitfor,D044#agenterror,Both say STEP_TIMEOUT and STEP_BUDGET_EXHAUSTED carry the last judgment.
+D039#restart,D005#mock-an-api,Both say a registered route survives app.restart().
+D039#restart,D005#emulate-dark-mode-and-reduced-motion,Both say emulated media values hold through app.restart().
+D039#restart,D031#map-each-detox-call,Both give app.restart() for Detox's launchApp newInstance.
+D039#restart,D032#map-each-command,Both give app.restart() for stopping and relaunching the app.
+D039#restart,D033#map-each-api,Both say app.restart() recreates the context.
+D039#restart,D035#point-at-your-app,Both list app.restart() as launching the app.
+D039#restart,D039#clearstate,Both say the call recreates the execution context and reopens the app at its base URL when the target declares one.
+D039#restart,D039#types,Both describe app.restart() recreating the execution context while preserving persisted state.
+D039#restart,D041#the-app-under-test,Both list app.restart() as a fresh launch that carries launch arguments and permissions.
+D039#restart,D042#capabilities,Both map app.restart() to the engine session.restart capability.
+D039#restart,D042#session,Both map the engine session restart() to app.restart().
+D039#restart,D047#engine,Both list app.restart() as a fresh launch of the pinned app that carries launch arguments and permissions.
+D039#restart,D053#the-browser-fixture,Both say routes and viewport size survive app.restart().
+D039#restart,D059#resize-inside-a-test,Both say a browser.setViewport size holds through app.restart().
+D039#restart,D060#capabilities,Both list app.restart() as served by the engine session restart hook.
+D039#clearstate,D005#emulate-dark-mode-and-reduced-motion,Both say emulated media values hold through app.restart() and app.clearState().
+D039#clearstate,D005#pick-a-lease-scope,Both say app.clearState() is UNSUPPORTED_CAPABILITY on a connected lease scope.
+D039#clearstate,D031#map-each-detox-call,Both give app.clearState() for Detox's launchApp delete.
+D039#clearstate,D032#map-each-command,Both give app.clearState() for Maestro's launchApp clearState.
+D039#clearstate,D033#map-each-api,Both say app.clearState() clears storage and other persisted state and recreates the context.
+D039#clearstate,D035#launch-arguments-and-permissions,Both say app.clearState() resets app permissions with the data.
+D039#clearstate,D035#the-device-fixture,"Both say app.clearState() leaves the simulator keychain alone, so device.clearKeychain() is needed."
+D039#clearstate,D039#restart,Both say the call recreates the execution context and reopens the app at its base URL when the target declares one.
+D039#clearstate,D039#types,"Both describe app.clearState() clearing persisted client state, recreating the context and reopening the app at the base URL."
+D039#clearstate,D041#the-app-under-test,Both say launch arguments and permissions apply to every fresh launch including app.clearState().
+D039#clearstate,D042#capabilities,Both map app.clearState() to the engine session.reset capability.
+D039#clearstate,D042#session,Both map the engine session reset() to app.clearState().
+D039#clearstate,D047#engine,Both say clearState resets permissions with the data and is one of the fresh launches that carry launch arguments.
+D039#clearstate,D047#device,Both say clearState leaves the simulator keychain (session token) behind.
+D039#clearstate,D053#options,Both say app.clearState fails with UNSUPPORTED_CAPABILITY on a persistent context while app.restart remains available.
+D039#clearstate,D053#the-browser-fixture,Both say routes and viewport size survive app.clearState().
+D039#clearstate,D059#resize-inside-a-test,Both say a browser.setViewport size holds through app.clearState().
+D039#clearstate,D060#capabilities,Both list app.clearState() as served by the engine session reset hook.
+D040#commands,D006#install-the-skill,Both describe installing the agent skill with e2e init or npx skills add.
+D040#commands,D007#why-a-step-was-not-replayed,"Both describe --strict-cache and REPLAY_STALE, and e2e cache clear."
+D040#commands,D007#share-the-cache-across-checkouts,Both describe --cache-dir and E2E_CACHE_DIR.
+D040#commands,D007#inspect-the-cache,"Both describe e2e cache ls, stats and clear."
+D040#commands,D008#gate-pull-requests,Both describe --max-failures and --max-duration limits and non-zero exit codes.
+D040#commands,D008#sharding,"Both describe --shard index/total, --pass-with-no-tests and the per-shard report files."
+D040#commands,D008#rerunning-failures,Both describe --last-failed reading the previous report.json.
+D040#commands,D013#install-the-skill,"Both describe e2e init installing the skill to .agents/skills and .claude/skills, with npx skills add as an alternative."
+D040#commands,D013#how-an-agent-reads-a-failure,Both describe --ai-trace and unbox-ai for reading an agent run.
+D040#commands,D015#read-the-failure,Both describe exit codes and flaky tests and the --last-failed rerun.
+D040#commands,D015#artifacts,"Both describe results directories, --last-failed and --debug outputs."
+D040#commands,D015#agent-steps,"Both describe --ai-trace and unbox-ai, and --debug phase timings."
+D040#commands,D019#explore,Both describe e2e explore running the agent against the app with a goal instead of a test file.
+D040#commands,D019#start-an-exploration,Both show running e2e explore with a goal.
+D040#commands,D019#read-the-results,"Both describe exploration findings, issues and warnings with severity and the report."
+D040#commands,D019#start-signed-in,Both describe e2e explore --session starting signed in via a setup test.
+D040#commands,D019#if-the-run-stops-too-early,"Both give --max-steps up to 12 and --timeout up to 900000 for explore, default 8 steps and 10 minutes."
+D040#commands,D019#choose-the-target-and-agent,Both say explore uses --target (first target by default) and --agent.
+D040#commands,D020#rerunning-the-failed-tests,Both describe --last-failed rerunning failed tests and those stopped by --max-failures or --max-duration.
+D040#commands,D029#set-it-up,Both describe registering the MCP server in .mcp.json.
+D040#commands,D032#port-the-config,"Both cover --exclude-tag, --shard and --tag, and the markdown reporter's summary.md with trace pages."
+D040#commands,D033#map-each-api,"Both list CLI flags --grep, --tag, --shard, --last-failed, --repeat-each, --max-failures, --update-snapshots, --trace, --reporter and e2e list, explore, mcp."
+D040#commands,D035#set-up,Both say the mobile wizard selects iOS on macOS and Android elsewhere and targets the Settings app.
+D040#commands,D037#set-up-with-your-coding-agent,Both describe e2e init and e2e guide for setting up with a coding agent.
+D040#commands,D037#run-your-first-test,"Both describe the e2e init wizard choosing engine and model, writing a config and an example test."
+D040#commands,D037#use-a-subscription-or-api-key,Both give the npx e2e login commands per subscription and the init gateway choices.
+D040#commands,D040#exit-codes,"Both give the CLI exit codes 0, 1, 2, 3, 4 and 130, and the precedence 130 > 4 > 3 > 2 > 1 > 0."
+D040#commands,D041#top-level,"Both describe --max-duration, --last-failed, NO_TESTS and the markdown and junit reporter files."
+D040#commands,D041#output,"Both describe the output directory: report.json, summary.md, junit.xml, results/ trace pages, --cache-dir and --ai-trace."
+D040#commands,D041#cache,"Both describe --no-cache, --strict-cache and --cache-dir for the replay cache."
+D040#commands,D041#ci,Both describe exit codes in CI.
+D040#commands,D043#model,"Both describe the stored login in oauth.json and that e2e login, logout and models use it."
+D040#commands,D043#replay-cache,Both describe --cache-dir and E2E_CACHE_DIR choosing the replay cache directory.
+D040#commands,D043#diagnostics,Both describe --debug and --ai-trace as flags and the init wordmark.
+D040#commands,D043#telemetry,"Both describe E2E_TELEMETRY_DISABLED, DO_NOT_TRACK and E2E_TELEMETRY_DEBUG."
+D040#commands,D044#reference-errors,"Both describe exit codes and login, logout and models failures."
+D040#commands,D044#exit-codes,"Both give exit codes by error class (test 1, configuration 2, infrastructure 3, internal 4, interrupted 130) and that login, logout and models exit 1 or 130."
+D040#commands,D044#runner-codes,"Both name runner codes such as NO_TESTS, INVALID_GLOB, UNKNOWN_TARGET, CONFIG_NOT_FOUND, NO_LAST_RUN, COLLECTION_ERROR and RUN_TIMEOUT."
+D040#commands,D046#flags,"Both describe e2e mcp flags --config, --target, --headed and --max-sessions (default 4)."
+D040#commands,D046#setup,Both describe registering e2e mcp in .mcp.json.
+D040#commands,D046#several-sessions,Both describe --max-sessions and open_session for several sessions.
+D040#commands,D048#built-in-reporters,"Both list reporter ids and files (list, json, junit, markdown with summary.md) and --last-failed folding."
+D040#commands,D049#functions,"Both describe run and list selection: positionals, tag, grep, last-failed, shard filters and NO_TESTS."
+D040#commands,D051#outbound-connections,"Both describe e2e feedback, e2e models and --ai-trace network use."
+D040#commands,D055#subscriptions,Both give the e2e login commands for each subscription.
+D040#commands,D055#set-up,Both give the e2e login commands for each subscription.
+D040#commands,D055#pick-a-model,Both describe e2e models listing models and OPENCODE_API_KEY.
+D040#commands,D055#sign-in-help,"Both describe Copilot --from-gh, --device and --enterprise-url, and e2e logout."
+D040#commands,D056#opt-out,"Both describe e2e telemetry disable, E2E_TELEMETRY_DISABLED and DO_NOT_TRACK."
+D040#commands,D056#see-what-would-be-sent,Both say E2E_TELEMETRY_DEBUG=1 prints events and sends nothing.
+D040#commands,D056#what-is-sent,"Both describe telemetry properties from init (engine, gateway), explore end reasons and e2e cache or telemetry commands."
+D040#commands,D056#feedback,Both describe e2e feedback and its dry-run.
+D040#commands,D056#the-notice,Both say a one-time notice is printed on the first command other than init and telemetry.
+D041#top-level,D007#share-the-cache-across-checkouts,Both say projectId falls back to the package.json name.
+D041#top-level,D008#gate-pull-requests,Both say --max-duration limits test-running time and the clock starts with the tests.
+D041#top-level,D020#rerunning-the-failed-tests,Both say tests stopped by maxDuration are run next by --last-failed.
+D041#top-level,D033#app-targets-and-output,"Both describe tests globs with ! exclusions, maxDuration (clock starts with tests) and reporters list/junit/json/markdown."
+D041#top-level,D033#browser-timeouts-and-artifacts,"Both give assertionTimeout, actionTimeout, retries, workers, timeout and the trace/video modes."
+D041#top-level,D033#defaults-that-differ,"Both give default action timeout 30 s, assertion timeout 5 s, retries 1 in CI, and workers half the cores."
+D041#top-level,D039#reference,Both state actionTimeout defaults to 30000 ms and bounds engine operations.
+D041#top-level,D040#commands,"Both describe overriding retries, workers and maxDuration per run (--retries 0-10, --workers 1-1024, --max-duration) and INVALID_GLOB test globs."
+D041#top-level,D041#output,Both list output default .e2e and the junit and markdown reporter files.
+D041#top-level,D041#ci,"Both give the retries default 1 in CI and workers default 1 in CI, half the cores locally."
+D041#top-level,D041#e2econfig,"Both list the config options with defaults for timeouts, retries, projectId, trace, video."
+D041#top-level,D042#lifecycle,"Both describe launchTimeout bounding engine init and attempt start, cleanupTimeout bounding cleanup, workers capped by engine."
+D041#top-level,D044#runner-codes,"Both describe INVALID_GLOB, RUN_TIMEOUT from maxDuration with time-limit skips, LAUNCH_TIMEOUT and CLEANUP_TIMEOUT."
+D041#top-level,D045#polling-a-value,Both give the default assertion timeout of 5000 ms from assertionTimeout.
+D041#top-level,D045#timeouts-and-failures,Both state expect's default timeout is assertionTimeout.
+D041#top-level,D047#engine,Both state workers cannot exceed what the engine declares.
+D041#top-level,D048#built-in-reporters,"Both list built-in reporters list, junit, markdown, json and that json with list is INVALID_CONFIG."
+D041#top-level,D052#members,Both describe failOnSkippedFailure failing the run when a retry is skipped after a failed attempt.
+D041#top-level,D058#when-it-fails,Both state the assertionTimeout default of 5 s.
+D041#output,D008#upload-the-reports,"Both list report.json, junit.xml and results/ under the output directory, which the output option moves."
+D041#output,D015#artifacts,"Both describe per-test results/ directories, cleared at run start, with --last-failed reruns in rerun-<n>/."
+D041#output,D032#port-the-config,Both state junit writes .e2e/junit.xml and markdown writes .e2e/summary.md.
+D041#output,D033#app-targets-and-output,Both state output (outputDir) defaults to .e2e and holds results/ cleared when a run starts.
+D041#output,D033#map-each-api,Both map Playwright outputDir/--output to the results directory holding each test's trace page.
+D041#output,D040#commands,"Both describe --output overriding the output directory, the removed --artifacts flag mapping to --output, NO_LAST_RUN and gitignore entries."
+D041#output,D041#cache,"Both state the replay cache stays in cache.dir whatever output says, and .gitignore handling of .e2e paths."
+D041#output,D044#runner-codes,"Both describe NO_LAST_RUN, NO_TESTS and UNSUPPORTED_ARTIFACT stops that leave the previous run's files."
+D041#output,D046#sessions,Both describe e2e mcp session artifacts under results/mcp/ and videos/ in the output directory.
+D041#output,D048#built-in-reporters,Both state the junit and markdown reporters write junit.xml and summary.md in the output directory.
+D041#output,D051#sessions,Both say encrypted sessions are stored under sessions/ in the output directory.
+D041#output,D051#artifacts,"Both list files written under the output directory (report.json, results/, ai-trace.json, sessions/)."
+D041#artifacts,D041#recording,Both say trace and video choose the recordings and describe a provider's own recording handled as a link.
+D041#artifacts,D041#e2econfig,Both declare the artifacts option with a host store.
+D041#artifacts,D041#artifactsconfig,"Both declare artifacts.store with put and optional putLink returning a ref, and the redaction label of stored artifacts."
+D041#artifacts,D042#artifacts,Both cover provider-hosted video as a link and the incomplete redaction state of an artifact.
+D041#artifacts,D044#runner-codes,"Both say the removed artifacts kinds list, artifacts.trace and artifacts.video forms fail with INVALID_CONFIG naming the trace or video option."
+D041#artifacts,D051#screenshots-after-a-secret-fill,Both say a failure screenshot is never captured after a secret fill.
+D041#artifacts,D051#artifacts,"Both say what is or is not handed to artifacts.store, and which artifacts stay local."
+D041#recording,D005#recording-on-the-provider,"Both describe a provider's own recording stored as video/<file> or a link, in place of the screencast."
+D041#recording,D008#upload-the-reports,Both say results/ holds a video per target whose engine can record when --video is used.
+D041#recording,D015#watch-it-happen,Both describe --video with optional recording mode and the WebM/MP4 files written per attempt.
+D041#recording,D022#recordings,Both state mobile recordings go through agent-device to video/video.mp4.
+D041#recording,D024#recordings,Both state a Kernel provider recording is saved as video/replay.mp4.
+D041#recording,D033#browser-timeouts-and-artifacts,"Both list the trace and video modes (off, on, retain-on-failure, on-first-retry, on-all-retries) and where they can be set."
+D041#recording,D033#defaults-that-differ,Both give the default trace mode as retain-on-failure.
+D041#recording,D035#what-differs-from-the-web,Both state --video writes WebM on web and MP4 on mobile devices or a provider's recording.
+D041#recording,D040#commands,"Both describe --trace and --video flags, their modes, bare flag meaning on, and overriding config and targets."
+D041#recording,D041#top-level,Both list the trace and video options with defaults retain-on-failure and off.
+D041#recording,D041#artifacts,"Both describe provider-hosted recordings handed over as links, and trace and video choosing the recordings."
+D041#recording,D041#target,Both say a target's trace and video replace the config's trace and video.
+D041#recording,D041#artifactsconfig,"Both state a recording masks nothing so a provider link is incomplete, and carry startedAt for segments."
+D041#recording,D042#capabilities,Both state a video mode on an engine without video recording prints a notice and records no video.
+D041#recording,D042#artifacts,Both describe video segments with startedAt and incomplete redaction.
+D041#recording,D044#runner-codes,Both state UNSUPPORTED_ARTIFACT when a target's engine cannot record a requested video mode.
+D041#recording,D046#the-catalog,Both describe e2e mcp start_recording and stop_recording as the way an MCP session records video.
+D041#recording,D046#sessions,Both say an e2e mcp session's videos go under the output videos directory.
+D041#recording,D047#engine,Both state mobile video is written as video/video.mp4 when the attempt's video mode records.
+D041#recording,D051#artifacts,Both say video is opt-in through video or --video and recorded as incomplete redaction.
+D041#recording,D052#options,"Both describe a test's own trace and video option taking a recording mode, with innermost winning."
+D041#recording,D052#testoptions,"Both state a test's trace and video options use the config's recording modes, innermost winning."
+D041#recording,D053#options,Both describe the web engine screencast option setting frame size and quality for recorded video.
+D041#recording,D056#what-is-sent,"Both list the recording modes off, on, retain-on-failure, on-first-retry, on-all-retries."
+D041#secrets,D004#secrets-that-are-not-passwords,"Both explain secrets.get() returns a handle accepted by fill and agent params, SECRET_UNAVAILABLE, and use in engine options."
+D041#secrets,D004#override-a-value-per-run,Both state E2E_SECRET_<NAME> overrides a configured secret value.
+D041#secrets,D041#the-app-under-test,Both state a secrets.get() reference in app.command args or env throws INVALID_CONFIG.
+D041#secrets,D041#credentials,Both state a provider function runs on every authorized fill and the 6-character minimum for redaction.
+D041#secrets,D041#environment-variables,Both mention E2E_SECRET_<NAME> overriding a secrets entry.
+D041#secrets,D042#engine,"Both state an engine declares the secrets.get() handles its options hold, resolved per attempt, digest records names only."
+D041#secrets,D042#lifecycle,"Both state an engine resolves only declared secrets per attempt, undeclared ones are SECRET_UNAVAILABLE."
+D041#secrets,D042#shared-semantics,Both mention an engine option telling a secrets.get() handle from a string and resolving it.
+D041#secrets,D043#credentials-and-secrets,Both state E2E_SECRET_<NAME> replaces a secret and that values need at least 6 characters; colliding names are rejected.
+D041#secrets,D044#agenterror,Both state SECRET_UNAVAILABLE for an unconfigured secret or a provider value under 6 characters.
+D041#secrets,D051#secret-fills,"Both state a Secret is an opaque handle accepted only by fill and agent step params, resolved by the runner."
+D041#secrets,D051#secrets-in-engine-options,"Both describe secrets.get() in engine options such as basicAuth, resolved by the engine, protected as text only."
+D041#secrets,D051#redaction,Both state secret values are redacted as <secret:name> and values under 6 characters are INVALID_CONFIG.
+D041#secrets,D053#options,Both show basicAuth password via secrets.get resolved when each attempt starts and redacted like a secret.
+D041#secrets,D054#how-secrets-stay-out-of-the-model,Both state a Secret has no plaintext accessor and values are redacted as <secret:name>.
+D041#secrets,D059#protected-previews,Both show basicAuth with a password declared under secrets and passed via secrets.get(name).
+D041#cache,D007#cache,Both say the replay cache records an agent.act() only after a later verification passes.
+D041#cache,D007#why-a-step-was-not-replayed,"Both describe cache.strict, --strict-cache and --no-cache."
+D041#cache,D007#modes,"Both describe the cache modes read-write, read-only and off, the CI default and --no-cache."
+D041#cache,D007#share-the-cache-across-checkouts,Both describe --cache-dir and E2E_CACHE_DIR and cache.strict.
+D041#cache,D007#commit-the-replay-cache,Both say e2e init gitignores .e2e/cache/ so committing entries is opt-in and CI stays read-only unless read-write is set.
+D041#cache,D007#fail-on-a-stale-recording,Both describe cache.strict and --strict-cache failing with REPLAY_STALE.
+D041#cache,D008#what-ci-changes,Both state the cache is read-only in CI unless read-write is set.
+D041#cache,D008#mobile-jobs,Both refer to committing the replay cache.
+D041#cache,D008#gate-pull-requests,Both say to commit the replay cache for CI.
+D041#cache,D014#goals,Both say a goal is recorded only after a later check passes.
+D041#cache,D040#commands,"Both describe --no-cache, --strict-cache, --cache-dir and the .gitignore entry for the cache."
+D041#cache,D041#top-level,Both list the cache option and its CacheMode.
+D041#cache,D041#output,Both say the cache directory stays at cache.dir and is gitignored.
+D041#cache,D041#ci,Both state the cache is read-only in CI unless read-write is set.
+D041#cache,D041#e2econfig,Both declare the cache option and CacheMode.
+D041#cache,D041#cacheconfig,"Both declare the cache options mode, store, dir and strict with their defaults."
+D041#cache,D043#replay-cache,"Both describe E2E_CACHE_DIR, --cache-dir, a custom cache.store and --no-cache."
+D041#cache,D044#agenterror,Both describe REPLAY_STALE under cache.strict or --strict-cache.
+D041#cache,D051#cache-trust,Both cover read-only cache mode and cache.store trust.
+D041#run-limits,D041#agents,"Both give the fixed 16384-byte agent context, 8192-byte ledger and 1000-event limits, and the observation and input-token budgets."
+D041#run-limits,D041#agentconfig,Both give the agent context limit of 16384 bytes and the maxObservationBytes and maxInputTokens budgets.
+D041#module-format,D040#reference-cli,Both mention how .cts files are loaded.
+D041#target,D003#without-a-browser,Both describe a target without an engine opening nothing and supporting agent tools only.
+D041#target,D041#targets,"Both describe a target's name, platform, engine, app, and per-target trace/video overriding the config, and engine-less targets running agent tools only."
+D041#target,D041#recording,Both say a target's trace and video modes replace the config's top-level modes.
+D041#target,D041#e2econfig,Both declare target trace and video recording modes and the config-level defaults retain-on-failure and off.
+D041#commandconfig,D006#before-you-start,Both mention reuseExisting: true on the target's app.command.
+D041#commandconfig,D008#what-ci-changes,Both say command.reuseExisting is ignored in CI.
+D041#commandconfig,D015#common-errors,Both cover app.command never becoming ready (startupTimeout) and reuseExisting for an app already running.
+D041#commandconfig,D029#run-tests-next-to-a-session,Both mention reuseExisting: true to share the app.
+D041#commandconfig,D033#app-targets-and-output,Both map reuseExistingServer to app.command reuseExisting.
+D041#commandconfig,D040#commands,Both mention reuseExisting on the command to keep a dev server up.
+D041#commandconfig,D041#the-app-under-test,"Both list the app.command options executable, args with {port}, cwd, env, inheritEnv, startupTimeout, shutdownTimeout, log and reuseExisting."
+D041#commandconfig,D041#ci,Both say command.reuseExisting is ignored in CI.
+D041#commandconfig,D043#run-mode,Both say reuseExisting on an app command is ignored in CI.
+D041#commandconfig,D043#what-app-processes-inherit,Both describe command.inheritEnv selecting variables the app process inherits.
+D041#commandconfig,D044#agenterror,Both cover APP_UNREACHABLE when the app command exceeds startupTimeout and APP_ALREADY_RUNNING with reuseExisting.
+D041#commandconfig,D051#where-redaction-stops,Both describe command.log as the app's stdout and stderr captured verbatim.
+D041#commandconfig,D051#artifacts,Both describe the command.log path for the app's output.
+D041#commandconfig,D054#what-can-still-leak,Both describe command.log holding the app's stdout and stderr verbatim.
+D041#commandconfig,D059#let-the-runner-start-it,"Both describe command executable, args, env, inheritEnv, startupTimeout and the readiness probe."
+D041#commandconfig,D059#let-the-runner-pick-the-port,Both say {port} is replaced in the command's args and env.
+D041#modelinstance,D036#ai-sdk-providers,Both say a model provider implementing the AI SDK language model specification works.
+D041#modelinstance,D041#agents,Both say the model option is an AI SDK model instance with no implicit default.
+D041#modelinstance,D041#agentconfig,Both declare the model as an AI SDK ModelInstance.
+D041#modelinstance,D044#agenterror,Both refer to the agent's model being an AI SDK model instance (MODEL_UNAVAILABLE when none).
+D042#defineengine,D042#engine,"Both state spiVersion is 1 and list the engine members (perform, actions, performAt, pointerActions, tapModifiers, secrets) that decide capabilities."
+D042#defineengine,D042#capabilities,"Both state the dependencies between engine members, such as perform and locate needing observe, and tapModifiers needing perform."
+D042#defineengine,D042#actions,Both reference LOCATOR_ACTION_KINDS and POINTER_ACTION_KINDS as the allowed action and pointer kinds.
+D042#defineengine,D042#exported-names,Both name LOCATOR_ACTION_KINDS and POINTER_ACTION_KINDS exported from e2e/engine.
+D042#capabilities,D038#action-tools,"Both say the agent offers only the verbs the engine declares, with their required members (tapModifiers, scrollIntoView, keyboard.dismiss)."
+D042#capabilities,D038#pixel-tools-screenshot-and-the-point-verbs,"Both say tap_at needs actions or pointerActions with tap, and type_at needs fill or keyboard."
+D042#capabilities,D039#reference-app,"Both state app.open, back, restart and clearState need session members, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D039#open,"Both state app.open needs session.open or session.restart, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D039#restart,"Both state app.restart needs session.restart, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D039#clearstate,"Both state app.clearState needs session.reset, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D039#back,"Both state app.back needs session.back, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D039#screenshot,Both state app.screenshot and failure screenshots need the artifacts capability.
+D042#capabilities,D042#defineengine,Both give validation rules such as tapModifiers needing perform and performAt needing pointerActions.
+D042#capabilities,D042#engine,"Both list engine members (tapModifiers, performAt, pointerActions, state) and that unsupported calls fail with UNSUPPORTED_CAPABILITY."
+D042#capabilities,D042#actions,"Both say perform kinds in actions and performAt kinds in pointerActions set what is supported, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D042#contributed-fixtures,Both state a contributed fixture is a capability name that tests can require.
+D042#capabilities,D046#the-catalog,Both state an undeclared verb is absent from the MCP catalog and modifiers need tapModifiers.
+D042#capabilities,D047#engine,"Both state a target with bundleId or appPath is a native-app target and show what the mobile engine declares (perform, performAt, keyboard)."
+D042#capabilities,D047#agent-tools,"Both describe which agent verbs (scroll_to, dismiss_keyboard, type_at, press_at) the mobile engine's declarations unlock."
+D042#capabilities,D050#screen-actions,Both state tap position and swipe need the engine's pointer or swipe actions else UNSUPPORTED_CAPABILITY.
+D042#capabilities,D050#locator-actions,Both state modifiers need tapModifiers and unlisted action kinds fail with UNSUPPORTED_CAPABILITY before the engine.
+D042#capabilities,D052#options,Both state requires: ['native-app'] selects targets with app.bundleId or app.appPath.
+D042#capabilities,D052#fixtures,"Both state a test needing a missing fixture is skipped via requires, else UNSUPPORTED_CAPABILITY."
+D042#capabilities,D060#capabilities,Both list which engine members unlock which APIs and state a missing one fails with UNSUPPORTED_CAPABILITY.
+D042#capabilities,D060#keyboard,Both say locator.pressSequentially uses the keyboard hook after a focus action and keys may fail UNSUPPORTED_CAPABILITY.
+D042#capabilities,D060#vision-only-surfaces,"Both describe performAt with pointerActions for point-addressed actions, used by tap_at."
+D042#lifecycle,D005#write-a-provider,Both describe slot and slots for a worker and cleanup within cleanupTimeout.
+D042#lifecycle,D035#hosted-devices,"Both describe provider slot/slots handed per worker and release running after the last worker, within cleanupTimeout."
+D042#lifecycle,D041#top-level,Both state init/startAttempt run within launchTimeout and cleanup hooks within cleanupTimeout.
+D042#lifecycle,D042#engine,"Both describe the engine lifecycle hooks, EnginePrepareResult, and that init must work on a disposed engine and finish releases what prepare acquired."
+D042#lifecycle,D042#app,"Both describe EngineAppInfo handed to prepare and init, and init never learning the app URL."
+D042#lifecycle,D047#engine,"Both state devices boot in prepare, once per run before the run's clock starts, not charged to launchTimeout."
+D042#lifecycle,D060#lifecycle,"Both list the engine hooks prepare, init, startAttempt, settleAttempt, endAttempt, dispose and finish with when each runs."
+D042#lifecycle,D060#handle-secrets,Both say to read a declared secret in startAttempt with context.resolveSecret and redact derived values under its name.
+D042#app,D041#the-app-under-test,"Both describe the app under test declared on the target and runner-started command and readyUrl, which the engine never receives."
+D042#app,D042#defineengine,Both say the app is declared on the target and checked in validateApp.
+D042#app,D042#engine,Both list validateApp and EngineAppDeclaration as the engine's config-load check of the target's app.
+D042#app,D042#capabilities,"Both state validateApp is a config-load check of the target's app, and app.url or bundleId decide capabilities."
+D042#app,D042#lifecycle,"Both describe EngineAppInfo handed to prepare and init, and that init never learns the app URL."
+D042#app,D042#shared-semantics,Both describe siteOf and sameSite applied to EngineAppInfo.site.
+D042#app,D047#engine,"Both state a device target needs app.bundleId or app.appPath, which the mobile engine's validateApp enforces and refuses url."
+D042#app,D060#the-shape-of-an-engine,"Both show a validateApp example throwing INVALID_CONFIG for a missing app field, with info.app in init."
+D042#app,D060#capabilities,Both state validateApp checks the target's app at config load and throws INVALID_CONFIG naming the target.
+D042#errors,D042#engine,Both explain NODE_STALE as retryable and ACTION_MAY_HAVE_COMMITTED for input that may have reached the app.
+D042#errors,D042#lifecycle,Both map EngineError CANCELLED to a cancellation and other errors to infrastructure ENGINE_FAILURE.
+D042#errors,D042#observation,Both describe INVALID_STATE being thrown by an engine.
+D042#errors,D042#shared-semantics,Both state an OPERATION_TIMEOUT ends a poll under the deadline rules and describe pollCondition and TestError use.
+D042#errors,D042#exported-names,Both name ENGINE_ERROR_CODES and RETRYABLE_ENGINE_ERROR_CODES as exports.
+D042#errors,D060#nodes-and-refs,Both state a retryable NODE_STALE is thrown when a node no longer exists.
+D042#errors,D060#errors,"Both list engine error codes, that only NODE_STALE and FRAME_NOT_FOUND can be retryable, and the mapping of INVALID_STATE to APP_NOT_OPEN."
+D042#shared-semantics,D041#the-app-under-test,"Both explain the site of a URL is its registrable domain, used to scope headers and frames."
+D042#shared-semantics,D042#app,Both describe siteOf and sameSite use with EngineAppInfo.site.
+D042#shared-semantics,D042#errors,"Both describe the OPERATION_TIMEOUT deadline rule that ends a pollCondition poll, and TestError use."
+D042#shared-semantics,D042#exported-names,"Both name WithoutUndefined, PollConditionOptions and ResolveExpressionOptions as exports."
+D042#shared-semantics,D045#browser-matchers,Both describe toHaveURL comparison of a current URL with an expected string or RegExp and ignoreCase.
+D042#shared-semantics,D047#engine,Both state text and label queries answer with the innermost match when a container echoes a descendant's text.
+D042#shared-semantics,D050#queries,"Both state getByText answers with the innermost matching node, not a container echoing it."
+D042#shared-semantics,D051#site-check,Both state engine headers go only to requests on the app's site.
+D042#shared-semantics,D052#options,Both say an unknown option key error names the nearest known key when it is a likely typo.
+D042#shared-semantics,D053#options,"Both say an unknown option key is INVALID_CONFIG naming the nearest known key for a likely typo, such as viewprt for viewport."
+D042#artifacts,D005#recording-on-the-provider,Both describe a provider's record returning a ProviderRecording whose stop yields a video/<file> or a url and mediaType link.
+D042#artifacts,D024#recordings,Both describe a provider's replay saved as video/replay.mp4 in the attempt's artifact directory.
+D042#artifacts,D035#hosted-devices,Both describe DeviceProvider.record returning a ProviderRecording kept as video/<file> or a linked url and mediaType.
+D042#artifacts,D039#screenshot,Both state a screenshot is an attempt artifact under screenshots/ with a returned path.
+D042#artifacts,D041#artifacts,Both describe provider-hosted video links handed over after the attempt stopped the recording.
+D042#artifacts,D041#recording,"Both describe provider recordings stored as video/<file> or a link, per-attempt video segments with startedAt, and incomplete redaction."
+D042#artifacts,D041#artifactsconfig,"Both define a provider-hosted video link and its startedAt, mediaType and incomplete redaction."
+D042#artifacts,D042#capabilities,Both state the artifacts capability covers screenshots and videos and is required by a video mode.
+D042#artifacts,D047#engine,Both describe redacted screenshots under screenshots/ and mobile video written to the attempt's artifact directory.
+D042#artifacts,D051#artifacts,Both state screenshots mask secure fields and videos are recorded with incomplete redaction.
+D042#semanticnode,D042#observation,"Both describe secure nodes, the viewport rect space in CSS pixels, and truncated trees."
+D042#semanticnode,D042#exported-names,"Both name OBSERVED_NAME_LIMIT and OBSERVED_TEXT_LIMIT, NodeRef and ViewportPoint."
+D042#semanticnode,D042#observed-field-limits,"Both state name and text are cut at OBSERVED_NAME_LIMIT and OBSERVED_TEXT_LIMIT, also applying to value and selection."
+D042#semanticnode,D042#queries,"Both describe the testId query and platform-native selector, and states such as hidden."
+D042#semanticnode,D051#model-input,Both state secure field values are not reported to the model.
+D042#semanticnode,D060#nodes-and-refs,"Both say test identifiers go in testId (document attribute, iOS identifier, Android resource id) matched by the testId query."
+D043#credentials-and-secrets,D004#credentials,Both state a credential password shorter than 6 characters is INVALID_CONFIG.
+D043#credentials-and-secrets,D004#override-a-value-per-run,"Both map credentials and secrets to E2E_USER_<NAME>_* and E2E_SECRET_<NAME> variables, with non-alphanumerics replaced by underscore."
+D043#credentials-and-secrets,D041#credentials,"Both state E2E_USER_<NAME>_* overrides, svc-a and svc_a colliding as INVALID_CONFIG, and the 6-character password minimum."
+D043#credentials-and-secrets,D041#secrets,"Both state E2E_SECRET_<NAME> overrides a secret, api-key and api_key collide, and values need at least 6 characters."
+D043#credentials-and-secrets,D041#environment-variables,Both state E2E_USER_<NAME>_USERNAME/PASSWORD override a credential and E2E_SECRET_<NAME> a secret.
+D043#credentials-and-secrets,D041#resolution-order,Both state the E2E_USER_* variable wins over the config value for credentials.
+D043#credentials-and-secrets,D044#agenterror,Both state a password or secret provider value shorter than 6 characters is rejected.
+D043#credentials-and-secrets,D051#redaction,Both state a secret value shorter than 6 characters is INVALID_CONFIG because redaction would take ordinary text.
+D043#reporters,D012#pull-request-comments,Both state the reporter needs GITHUB_TOKEN and a fork's pull_request token is read-only so nothing is posted.
+D043#reporters,D020#setup,Both describe GITHUB_TOKEN and GITHUB_WORKSPACE for the GitHub reporter and source links.
+D043#reporters,D020#when-nothing-is-posted,"Both describe GITHUB_TOKEN/GH_TOKEN, read-only fork tokens, job summary fallback and GITHUB_SERVER_URL for Enterprise."
+D044#runner-codes,D004#session-rules,"Both state SESSION_CONTRACT when a setup test saves a session twice, an undeclared name, or not a declared one."
+D044#runner-codes,D008#what-ci-changes,Both state .only is rejected in CI with ONLY_IN_CI.
+D044#runner-codes,D008#sharding,Both state a shard with no test fails with NO_TESTS.
+D044#runner-codes,D014#core-concepts,Both state a step started without await fails with STEP_NOT_AWAITED.
+D044#runner-codes,D015#watch-it-happen,Both describe UNSUPPORTED_ARTIFACT for --video on an engine that cannot record.
+D044#runner-codes,D039#open,Both describe APP_URL_REQUIRED and UNSUPPORTED_CAPABILITY for app.open.
+D044#runner-codes,D040#commands,"Both describe NO_TESTS, NO_LAST_RUN, INVALID_GLOB, UNKNOWN_TARGET and CONFIG_NOT_FOUND causes for the CLI."
+D044#runner-codes,D040#exit-codes,Both give the exit code per error class and the 130 interrupted code.
+D044#runner-codes,D041#top-level,"Both describe INVALID_GLOB, NO_TESTS, RUN_TIMEOUT and INVALID_CONFIG."
+D044#runner-codes,D041#the-app-under-test,"Both describe APP_URL_REQUIRED for app.command without url or readyUrl, and INVALID_APP_URL for port 0."
+D044#runner-codes,D041#output,"Both describe NO_TESTS, NO_LAST_RUN and UNSUPPORTED_ARTIFACT stops."
+D044#runner-codes,D041#recording,"Both state UNSUPPORTED_ARTIFACT for a video mode the engine cannot record, and LAUNCH_TIMEOUT."
+D044#runner-codes,D041#ci,"Both state test.only is rejected in CI with ONLY_IN_CI, exit code 2."
+D044#runner-codes,D041#finding-the-config-file,Both state both e2e.config.ts and e2e.config.mts in one directory is CONFIG_AMBIGUOUS.
+D044#runner-codes,D042#capabilities,"Both describe UNSUPPORTED_CAPABILITY for a fixture, action or tier the engine does not declare."
+D044#runner-codes,D043#run-mode,Both state a focused test is ONLY_IN_CI.
+D044#runner-codes,D044#exit-codes,"Both give the exit code per error class (configuration 2, infrastructure 3, interrupted 130)."
+D044#runner-codes,D045#polling-a-value,"Both describe STEP_NOT_AWAITED for an expect.poll still running when the phase returned, and HOOK_FAILED in suite hooks."
+D044#runner-codes,D046#flags,Both state several targets and no name is TARGET_REQUIRED.
+D044#runner-codes,D046#the-catalog,Both state UNKNOWN_TOOL for a name not in the session's catalog.
+D044#runner-codes,D046#sessions,Both describe NO_SESSION for a call before open_session or after the session ended.
+D044#runner-codes,D046#several-sessions,"Both define the MCP codes SESSION_REQUIRED, NO_SESSION, SESSION_OPEN, CONFIG_IN_USE and ENGINE_IN_USE."
+D044#runner-codes,D049#functions,"Both describe RUNNER_BUSY when another suite is running or a host is open, and NO_TESTS and exit codes."
+D044#runner-codes,D049#host,Both describe WORKER_PROTOCOL for overlapping hosted attempts or a closed host.
+D044#runner-codes,D051#tool-calls,Both state a defineTool without execute is rejected at config load.
+D044#runner-codes,D052#members,Both describe ONLY_IN_CI and SESSION_CONTRACT for sessions not saved or saved twice.
+D044#runner-codes,D052#hooks,"Both describe HOOK_FAILED when a beforeAll/afterAll hook throws, skipping the suite's tests."
+D044#runner-codes,D052#options,"Both describe COLLECTION_ERROR for an unknown test option key naming the nearest key, and UNSUPPORTED_ARTIFACT."
+D044#runner-codes,D053#the-browser-fixture,"Both describe APP_URL_REQUIRED for a relative URL without app.url, and EVALUATE_FAILED when evaluate throws."
+D044#runner-codes,D056#what-is-sent,Both mention CONFIG_NOT_FOUND and INVALID_CONFIG as runner codes that stop a command.
+D045#locator-matchers,D033#map-each-api,"Both state the Playwright matchers map the same, toBeChecked passing negated on non-checkable nodes, and toHaveText/toContainText list semantics."
+D045#locator-matchers,D033#what-differs-on-purpose,Both state .not.toBeChecked() passes on a button or heading and text matchers compare rendered text.
+D045#locator-matchers,D035#known-device-limitations,Both note toBeAttached and toHaveCount(0)/toBeHidden behaviour for matchers on devices.
+D045#locator-matchers,D045#strictness,"Both state toBeHidden, toBeAttached({attached:false}) accept zero matches, and describe toHaveCount and list forms of toHaveText."
+D045#locator-matchers,D045#text-matching,"Both state toHaveText/toContainText compare normalized text, ignoreCase, and toHaveValue compares as-is."
+D045#locator-matchers,D045#secure-fields,"Both list which matchers (toHaveValue, toHaveText, toHaveAttribute, state matchers) work on secure fields."
+D045#locator-matchers,D045#option-validation,Both relate to options such as toBeChecked or useInnerText on toHaveText being validated.
+D045#locator-matchers,D045#asyncexpectation-and-textmatcheroptions,"Both list the locator matchers and their options (visible, attached, enabled, checked, timeout)."
+D045#locator-matchers,D050#queries,Both explain fieldset/legend accessible names and visible checks tied to toBeVisible and toHaveAccessibleName.
+D045#locator-matchers,D050#locator-reads,Both describe toHaveValue reading a checkbox/radio value like inputValue().
+D045#locator-matchers,D051#policy-denials,"Both state toHaveValue, toHaveText, toContainText and toHaveAttribute on a secure field are POLICY_DENIED."
+D045#screenshot-matchers,D033#map-each-api,"Both map toHaveScreenshot options (maxDiffPixels, threshold, maskColor, mask) and unsupported fullPage."
+D045#screenshot-matchers,D040#commands,Both describe -u/--update-snapshots writing missing or different stored screenshots.
+D045#screenshot-matchers,D045#locator-matchers,Both list toHaveScreenshot as a locator matcher comparing with a stored screenshot.
+D045#screenshot-matchers,D045#screenexpectation-and-screenshotoptions,"Both define the screenshot options threshold, maxDiffPixels, maxDiffPixelRatio, mask, maskColor and timeout."
+D045#screenshot-matchers,D051#policy-denials,Both state toHaveScreenshot is denied after a Secret was filled.
+D045#screenshot-matchers,D051#screenshots-after-a-secret-fill,Both state toHaveScreenshot fails with POLICY_DENIED after a secret fill.
+D045#screenshot-matchers,D058#visual-testing,Both describe stored screenshot file paths and --update-snapshots writing missing screenshots.
+D045#screenshot-matchers,D058#stored-screenshots,"Both give where stored screenshots live (-snapshots folder, name-target-os.png) and --update-snapshots writing missing ones."
+D045#screenshot-matchers,D058#in-ci,Both state that without --update-snapshots a CI run saves a missing screenshot in results/snapshots instead of writing into the project.
+D045#screenshot-matchers,D058#when-it-fails,"Both describe a mismatch failing with -expected, -actual and -diff images and run with --update-snapshots."
+D045#screenshot-matchers,D058#tolerance-and-masks,"Both give the screenshot tolerance options threshold 0.2, maxDiffPixels, maxDiffPixelRatio and maskColor #ff00ff."
+D045#expectcall-softexpectcall-and-expect,D042#contributed-fixtures,Both describe Expectable: expect(fixture) returns matchers attached via expectable.
+D045#expectcall-softexpectcall-and-expect,D045#asymmetric-matchers,"Both list the asymmetric matchers such as expect.objectContaining, any, anything, arrayContaining, stringContaining."
+D045#expectcall-softexpectcall-and-expect,D045#soft-assertions,Both describe expect.soft taking what expect takes and keeping a failure instead of throwing.
+D045#expectcall-softexpectcall-and-expect,D045#polling-a-value,Both describe expect.poll re-reading a value until a matcher passes or timeout.
+D045#expectcall-softexpectcall-and-expect,D045#valueexpectation,Both describe the value expectation for expect.soft(value) and expect(value).
+D045#expectcall-softexpectcall-and-expect,D045#asymmetricmatcher,Both describe AsymmetricMatcher as used by expect.objectContaining.
+D045#expectcall-softexpectcall-and-expect,D045#polloptions-and-pollexpectation,Both describe expect.poll options and the poll expectation with a negated form.
+D045#expectcall-softexpectcall-and-expect,D053#browser-interface,"Both show the browser fixture as Expectable, so expect(browser) returns matchers."
+D045#expectcall-softexpectcall-and-expect,D060#contributed-fixtures,"Both state expectable(target, factory) makes expect(fixture) return matchers."
+D046#exit-codes,D040#exit-codes,"Both define CLI exit codes by error category (0, 1, 2, 3, 4, 130); the MCP server reuses the category code for startup failures."
+D046#exit-codes,D044#exit-codes,"Both relate exit codes to error class (test 1, configuration 2, infrastructure 3, interrupted 130)."
+D046#exit-codes,D044#runner-codes,Both state that config and engine failures carry the same runner codes and exit codes as the CLI.
+D047#engine,D007#what-must-match,Both state app.identity keeps one cache identity when the build path changes.
+D047#engine,D008#mobile-jobs,Both state the engine installs nothing on its own and appPath needs device.installApp().
+D047#engine,D022#setup,Both show videoTouches: false with a hosted device provider and workers.
+D047#engine,D022#options,Both describe selecting an iOS device by name or UDID.
+D047#engine,D022#recordings,Both state videoTouches false stops agent-device drawing touches into the recording.
+D047#engine,D031#port-the-config,"Both state appPath plus one device.installApp() per device, launchArguments, and workers per device."
+D047#engine,D032#port-the-config,"Both state a device list is a pool, one worker per device, with workers."
+D047#engine,D035#set-up,Both state device boot happens before test timing and is not charged to launch timeout.
+D047#engine,D035#point-at-your-app,"Both state a device target needs bundleId or appPath, the engine installs only via device.installApp, and launch arguments apply to every fresh launch."
+D047#engine,D035#launch-arguments-and-permissions,"Both describe app.launchArguments and app.permissions on every fresh launch, identity, and device.openApp for one launch."
+D047#engine,D035#several-devices,"Both describe a device list as a pool with one worker each, booted devices used when device is omitted, and no two workers on one device."
+D047#engine,D035#physical-devices,"Both describe device selection by name, UDID or serial, and appPath for physical devices."
+D047#engine,D035#hosted-devices,"Both describe a DeviceProvider leasing hosted devices, one per worker slot."
+D047#engine,D035#what-differs-from-the-web,Both state videoTouches false hides touches in the MP4 and no test.setup sessions on devices.
+D047#engine,D035#troubleshooting,"Both describe boot, runner timeouts and wedged iOS automation runner recovery."
+D047#engine,D041#the-app-under-test,"Both describe bundleId, appPath, launchArguments, permissions, identity for mobile targets."
+D047#engine,D042#capabilities,Both describe native-app targets and which capabilities the mobile engine declares.
+D047#engine,D047#device,"Both describe device.openApp, installApp and openLink behaviour."
+D047#engine,D047#agent-tools,Both describe the agent tools the mobile engine supports and open_app.
+D047#engine,D047#replay-cache-on-a-device,Both describe the location anchor and replay behaviour on a device.
+D047#engine,D047#engine-options,"Both reference LaunchPermissions and permission state grant, deny or reset."
+D047#engine,D047#device-fixture,"Both describe OpenAppOptions relaunch, launchArguments and permissions."
+D047#engine,D051#navigation,"Both state device.openLink takes any absolute URL and device.openApp takes an app id, never a link."
+D047#device,D031#map-each-detox-call,"Both give device.setLocation, setOrientation, enrollBiometrics, setBiometrics, home, back, and locator forms."
+D047#device,D032#map-each-command,"Both map device.openApp, closeApp, clearKeychain (iOS only), openLink and locator, with launch arguments and permissions."
+D047#device,D035#launch-arguments-and-permissions,"Both describe device.openApp with relaunch, launchArguments and permissions for one launch."
+D047#device,D035#expo-development-builds,Both describe opening an Expo build with device.openLink.
+D047#device,D035#write-a-device-test,Both show device.setAppearance and device.locator inside a device test.
+D047#device,D035#the-device-fixture,"Both describe the device fixture: locator with agent-device selectors, installApp reinstall, openApp taking an app id not a link."
+D047#device,D035#physical-devices,"Both state which device methods (setPermission, setLocation, setAppearance, biometrics, clearKeychain, clipboard, fold) work or not on physical devices."
+D047#device,D035#what-differs-from-the-web,Both mention device.openLink opening a link into the app and foregroundApp/home/fold behaviour.
+D047#device,D035#known-device-limitations,"Both note device.foregroundApp still naming the app after home on iOS, fold, and locator for scroll-area."
+D047#device,D035#troubleshooting,Both describe device.installApp on Android failing to report a bundle id or package.
+D047#device,D047#engine,"Both describe device.openApp with relaunch, launchArguments and permissions, openLink, installApp, and closeApp ending the session."
+D047#device,D047#agent-tools,Both state open_app / device.openApp take an app id and refuse a link.
+D047#device,D047#replay-cache-on-a-device,Both state a step recorded after device.openLink replays when the link matches.
+D047#device,D047#device-fixture,"Both define the device fixture's method signatures and types (fold, installApp, openApp, biometrics)."
+D047#device,D051#navigation,"Both state device.openLink takes any absolute URL and device.openApp an app id, never a link."
+D047#engine-options,D032#map-each-command,"Both map Maestro permissions to grant, deny, reset."
+D047#engine-options,D035#launch-arguments-and-permissions,"Both state permissions are grant, deny or reset, set before every fresh launch."
+D047#engine-options,D041#the-app-under-test,"Both state each app permission is grant, deny or reset."
+D047#engine-options,D047#engine,"Both state each permission is grant, deny or reset, and app.permissions names a DevicePermission."
+D047#engine-options,D047#device,"Both define device permissions for setPermission/openApp as grant, deny or reset."
+D047#engine-options,D047#device-fixture,"Both define LaunchPermissions, DevicePermission and the grant/deny/reset permission state."
+D047#engine-options,D047#exported-types,"Both list LaunchPermissions, PermissionState and DevicePermission as exported types."
+D047#device-fixture,D031#map-each-detox-call,Both give orientation values (landscape-left) and Face ID biometric values.
+D047#device-fixture,D032#map-each-command,"Both give the permission states grant, deny, reset and openApp relaunch options."
+D047#device-fixture,D035#launch-arguments-and-permissions,"Both describe openApp with relaunch, launchArguments and permissions for one launch."
+D047#device-fixture,D035#the-device-fixture,"Both describe installApp with reinstall, openApp, and fold poses."
+D047#device-fixture,D035#physical-devices,Both describe installApp reinstall and device methods on physical devices.
+D047#device-fixture,D047#engine,"Both describe launch arguments and permissions per launch with grant, deny or reset, and installApp."
+D047#device-fixture,D047#device,"Both define device.openApp options (relaunch, launchArguments, permissions), installApp reinstall, FoldPose, orientations and biometric sensors."
+D047#device-fixture,D047#engine-options,"Both define LaunchPermissions, PermissionState and DevicePermission names."
+D047#device-fixture,D047#exported-types,"Both list DevicePermission, FoldPose, InstallAppOptions, InstalledApp and OpenAppOptions as exported types."
+D048#step-progress,D001#how-a-step-ends,"Both define step end statuses such as passed, failed, blocked; blocked is not necessarily a product failure."
+D048#step-progress,D048#tests-and-attempts,Both say step progress identity distinguishes retries and serial members.
+D048#step-progress,D049#host,"Both describe the onStep feed delivering StepProgress phases start, event, activity, replay and end with status, durationMs and modelCalls."
+D048#step-progress,D049#session,"Both list step statuses failed, blocked, timed-out and cancelled."
+D048#what-reporter-does-to-reporter-objects,D040#commands,Both state that --reporter replaces only built-in reporter IDs and configured reporter objects keep running.
+D048#what-reporter-does-to-reporter-objects,D041#top-level,Both state that a Reporter object in the config runs beside built-ins and --reporter never removes it.
+D049#functions,D008#sharding,Both cover a shard with no tests failing with NO_TESTS unless pass-with-no-tests is set.
+D049#functions,D040#commands,"Both describe the list and run selection options: files, tags, grep, last-failed, shard, target, pass-with-no-tests, NO_TESTS."
+D049#functions,D040#exit-codes,"Both list the exit codes 0, 1, 2, 3, 4 and 130 a run can return."
+D049#functions,D044#exit-codes,Both list the exit code classes 0 to 4 and 130 with interrupted runs as 130.
+D049#functions,D044#runner-codes,"Both define RUNNER_BUSY, UNKNOWN_TARGET, TARGET_REQUIRED and NO_TESTS conditions for run, list and openHost."
+D049#functions,D048#custom-reporters,Both describe reportPath and aiTracePath as absent or undefined when the file was not written.
+D049#functions,D048#events,"Both give the finished-run fields exitCode, status, reportPath and aiTracePath."
+D049#functions,D049#host,Both describe openHost returning a host whose openSession opens a fresh test attempt per test.
+D049#functions,D049#types,"Both name RunOptions, RunResult, ListOptions, ListResult and the host and session types of e2e/runner."
+D049#functions,D049#playwright-test-fixtures,Both advise a worker-scoped host with a test-scoped session when using openHost with an external runner.
+D049#functions,D056#opt-out,Both say run() telemetry follows the same opt-outs as the CLI.
+D049#functions,D056#what-is-sent,Both state run() sends one anonymous e2e_run_completed event per run that returns a report.
+D049#functions,D056#the-notice,Both say the first run() call can print the telemetry notice on stderr.
+D049#host,D044#runner-codes,Both describe WORKER_PROTOCOL for overlapping hosted attempts or use of a closed host.
+D049#host,D048#step-progress,"Both describe StepProgress phases start, event, activity and end with status, durationMs and modelCalls."
+D049#host,D049#functions,Both describe openHost and that a host opens sessions as separate test attempts.
+D049#host,D049#session,Both describe that host and session are AsyncDisposable and close returns failures aggregated in AggregateError.
+D049#host,D049#types,"Both name OpenSessionOptions, E2ESession, StepProgress and the onStep progress event."
+D049#host,D049#playwright-test-fixtures,Both show a worker-scoped host opening test-scoped sessions with onStep and AggregateError on close failures.
+D049#session,D015#artifacts,Both place trace.md in the results directory of the attempt.
+D049#session,D044#runner-codes,Both define TEST_TIMEOUT as the outcome when the attempt deadline passes.
+D049#session,D045#soft-assertions,Both describe expect.soft failures collected for the whole session or attempt and reported at close.
+D049#session,D045#polling-a-value,Both say expect.poll is capped by the remaining session or attempt deadline.
+D049#session,D048#custom-reporters,Both say the runner writes trace.md for each result through redacted report formatting.
+D049#session,D049#host,"Both describe host.openSession options, host and session close behaviour and AsyncDisposable."
+D049#session,D049#types,"Both name E2ESession, StepRecord and the steps returned by steps()."
+D049#session,D049#playwright-test-fixtures,Both show attaching session.tracePath and failing on the failures returned by session.close.
+D049#session,D051#artifacts,Both state trace.md pages are written from the redacted report.
+D050#refinement,D014#locators,"Both show filter({ hasText }) and say first(), nth() or filter() narrow a locator matching several nodes."
+D050#refinement,D030#map-each-command,"Both map Cypress contains, first and eq to filter({ hasText }), first() and nth(n)."
+D050#refinement,D031#map-each-detox-call,"Both map atIndex to nth(n) and say to narrow multiple matches with filter, first or nth."
+D050#refinement,D032#map-each-command,Both use nth(index) to select one match by zero-based position.
+D050#refinement,D032#rewrite-selectors,"Both describe filter({ has, hasText }) and first() for narrowing locator matches."
+D050#refinement,D033#map-each-api,"Both say filter takes hasText and has, hasNot and hasNotText are not supported (INVALID_LOCATOR), and first, last, nth exist."
+D050#refinement,D033#what-differs-on-purpose,"Both say a locator with several matches must be narrowed with filter, first or nth."
+D050#refinement,D034#map-each-webdriver-call,"Both use nth(n) to pick one of several matches and say to narrow with filter, first or nth."
+D050#refinement,D050#queries,"Both cover case-insensitive substring text matching and combining first, last and nth with scopes and filter."
+D050#refinement,D053#the-browser-fixture,Both describe filter({ has }) to find an element that contains another and filter({ hasText }).
+D050#locator-actions,D015#common-errors,"Both explain LOCATOR_NOT_FOUND, LOCATOR_AMBIGUOUS and ACTION_FAILED causes for an action."
+D050#locator-actions,D018#what-the-context-holds,"Both say tapModifiers is true when tap, doubleTap and secondaryTap accept modifiers."
+D050#locator-actions,D030#map-each-command,"Both show doubleTap/dblclick, secondaryTap, selectOption and setInputFiles as the click, select and file actions."
+D050#locator-actions,D031#map-each-detox-call,"Both describe tap, doubleTap, longPress and fill replacing content."
+D050#locator-actions,D032#map-each-command,Both describe longPress with a duration option and fill replacing content.
+D050#locator-actions,D033#map-each-api,"Both say Playwright trial, force and noWaitAfter options are rejected as INVALID_ARGUMENT, and describe fill, pressSequentially and secondaryTap."
+D050#locator-actions,D034#map-each-webdriver-call,Both show selectOption by label and dragTo for dragging to a target.
+D050#locator-actions,D035#write-a-device-test,"Both say the mobile engine lacks selectOption, setInputFiles, scrollIntoView, secondaryTap and tap modifiers."
+D050#locator-actions,D038#action-tools,"Both say modifiers on tap, doubleTap and secondaryTap need tapModifiers and map actions to fill, selectOption and scrollIntoView."
+D050#locator-actions,D042#capabilities,Both describe tapModifiers and the tap pointer action capability needed for modifiers and position.
+D050#locator-actions,D042#actions,"Both list the node actions (tap, doubleTap, secondaryTap, longPress, fill, selectOption, setInputFiles, dragTo, scrollIntoView) and longPress duration."
+D050#locator-actions,D042#errors,"Both map not-actionable, may-have-committed and timeout failures to ACTION_FAILED and unsupported actions to UNSUPPORTED_CAPABILITY."
+D050#locator-actions,D044#agenterror,"Both define LOCATOR_NOT_FOUND, LOCATOR_AMBIGUOUS and ACTION_FAILED, including an action that may already have committed."
+D050#locator-actions,D046#the-catalog,"Both list the modifiers Shift, Control, Alt, Meta, ControlOrMeta held for a click when the engine declares tapModifiers."
+D050#locator-actions,D047#engine,"Both describe mobile longPress default hold time and delayLongPress, plus modifiers unsupported on mobile."
+D050#locator-actions,D050#screen-actions,Both describe tap position versus screen.tapAt and swipe parameters and action timeout.
+D050#locator-actions,D050#locator-reads,Both say the timeout defaults to config.actionTimeout and several matches give LOCATOR_AMBIGUOUS.
+D050#locator-actions,D050#types,"Both define TapOptions, ClickOptions modifiers, LongPressOptions duration 100 to 10000 ms, PressSequentiallyOptions delay and SelectOption."
+D050#locator-actions,D060#keyboard,Both say pressSequentially types through the engine keyboard hook so key events reach the app.
+D050#types,D032#rewrite-selectors,Both say visible: true handles a hidden twin of a node.
+D050#types,D033#map-each-api,Both say a role query never matches hidden nodes and visible: true drops hidden twins on other queries.
+D050#types,D042#capabilities,"Both say modifiers on click actions require tapModifiers, else UNSUPPORTED_CAPABILITY."
+D050#types,D042#actions,"Both define ScrollDirection, Momentum, swipe direction and momentum and long-press duration."
+D050#types,D042#exported-names,"Both name KeyModifier, ScrollDirection, Momentum, SelectOption and ViewportPoint types."
+D050#types,D042#semanticnode,Both describe heading level 1 through 6 for heading nodes.
+D050#types,D050#queries,"Both define the role vocabulary, the img alias, exact versus substring text matching, and visible: true to drop hidden twins."
+D050#types,D050#screen-actions,"Both define swipe direction and momentum options, swipe along a path with from, to and duration, and Point coordinates."
+D050#types,D050#locator-actions,"Both define TapOptions position, ClickOptions modifiers, LongPressOptions duration 100 to 10000 ms, delay and SelectOption."
+D051#policy-denials,D001#what-the-model-may-do,Both describe type_secret limited to declared secrets with the runner checking the target field.
+D051#policy-denials,D005#cookies,Both say a cookie URL with a scheme other than http or https is POLICY_DENIED.
+D051#policy-denials,D016#how-text-gets-typed,Both say only typeSecret fills a secret and password fields never reach the text model.
+D051#policy-denials,D018#what-the-context-holds,Both say upload refuses a path outside the project root or a hidden one with POLICY_DENIED.
+D051#policy-denials,D038#agent-act,Both say the runner checks the model-picked field is an enabled editable input and a password field for a password.
+D051#policy-denials,D038#action-tools,"Both say upload refuses a file outside the project root, a hidden file or a file under a hidden directory with POLICY_DENIED."
+D051#policy-denials,D038#vision,"Both say pixels are withheld, so vision only has nothing to fall back to, after a secret fill (PIXEL_TAINTED)."
+D051#policy-denials,D039#open,Both say a URL whose scheme is not http or https (about:blank allowed) is POLICY_DENIED.
+D051#policy-denials,D039#screenshot,Both say app.screenshot is POLICY_DENIED when a Secret was filled earlier.
+D051#policy-denials,D041#the-app-under-test,"Both say only http(s) URLs and about:blank may be opened, and file:, data:, javascript:, view-source: are refused."
+D051#policy-denials,D041#secretconfig,Both say a password secret goes only into a password field while a generic secret fills any editable input.
+D051#policy-denials,D042#contributed-fixtures,Both say app.resolveUrl rejects any scheme but http and https with POLICY_DENIED.
+D051#policy-denials,D045#secure-fields,"Both say reading value, text or attribute of a secure field via getters or matchers is POLICY_DENIED."
+D051#policy-denials,D046#the-catalog,"Both say upload refuses paths outside the project, hidden files and hidden directories with POLICY_DENIED."
+D051#policy-denials,D047#device,"Both list file:, data:, javascript:, view-source: links as POLICY_DENIED for device links."
+D051#policy-denials,D050#locator-reads,"Both say textContent, inputValue and getAttribute on a secure field throw POLICY_DENIED."
+D051#policy-denials,D051#navigation,"Both list navigation schemes other than http, https and about:blank (file, data, javascript, view-source) as denied."
+D051#policy-denials,D051#secret-fills,"Both state type_secret checks: declared secret, editable input, and a password goes only into a password field."
+D051#policy-denials,D051#screenshots-after-a-secret-fill,Both say app.screenshot() and toHaveScreenshot() fail with POLICY_DENIED after a secret fill.
+D051#policy-denials,D053#the-browser-fixture,Both state a forbidden URL scheme in goto or a cookie URL is POLICY_DENIED.
+D051#policy-denials,D058#tolerance-and-masks,Both say toHaveScreenshot fails with POLICY_DENIED after a test fills a secret.
+D051#sessions,D004#session-rules,"Both say a session lasts one run, is encrypted with an in-memory key and deleted at cleanup."
+D051#sessions,D033#what-differs-on-purpose,"Both say the saved session file is encrypted and deleted at cleanup, with no reusable auth file."
+D051#sessions,D041#output,"Both say the sessions directory holds the run's encrypted test.setup sessions, deleted when the run ends."
+D051#sessions,D042#engine,Both say a saved session never restores across engine versions.
+D051#sessions,D042#state,"Both describe a per-run AES-256-GCM key never touching disk, binding a session to run, target, engine and app, and expiry."
+D051#sessions,D044#runner-codes,Both say a stored session past its expiry or mismatched is refused (SESSION_EXPIRED).
+D051#sessions,D051#screenshots-after-a-secret-fill,Both say a restored session whose setup filled a secret keeps redaction and withheld pixels.
+D051#sessions,D051#artifacts,Both list sessions/<runId>/ as encrypted and deleted at cleanup.
+D051#sessions,D060#the-shape-of-an-engine,Both say a saved session restores only under the engine version that saved it.
+D051#outbound-connections,D001#what-a-step-costs,Both say replayed agent steps make no model call.
+D051#outbound-connections,D007#how-a-replay-works,Both say a replayed step finishes without a model call.
+D051#outbound-connections,D014#locators,Both say locators and deterministic tests make no model call.
+D051#outbound-connections,D015#agent-steps,"Both say a replayed step makes no model call, and --ai-trace is the opt-in trace."
+D051#outbound-connections,D022#authenticate,Both say EAS simulators sign in with EXPO_TOKEN or the eas-cli login in ~/.expo/state.json.
+D051#outbound-connections,D027#set-up-the-provider,"Both warn the smol machines have unrestricted network access and reach host loopback ports, not only hostPorts."
+D051#outbound-connections,D040#commands,"Both describe e2e feedback --dry-run, --allow-outdated and the npm registry check for a newer release."
+D051#outbound-connections,D041#the-app-under-test,Both describe the readyUrl readiness probe of an app the runner starts.
+D051#outbound-connections,D043#telemetry,Both describe E2E_TELEMETRY_DEBUG and E2E_TELEMETRY_DISABLED/DO_NOT_TRACK controlling telemetry sending.
+D051#outbound-connections,D043#engines,Both give LIMRUN_BASE_URL as the Limrun API host defaulting to api.limrun.com.
+D051#outbound-connections,D051#artifacts,"Both say --ai-trace is opt-in, writes a local file and is not uploaded."
+D051#outbound-connections,D053#installing-browsers,Both say a missing Playwright browser is downloaded once.
+D051#outbound-connections,D054#what-leaves-your-computer,"Both list the destinations a run contacts: model provider, app under test, PostHog telemetry, and npm registry only for e2e feedback."
+D051#outbound-connections,D056#opt-out,Both say telemetry is skipped under E2E_TELEMETRY_DISABLED or DO_NOT_TRACK.
+D051#outbound-connections,D056#see-what-would-be-sent,Both mention E2E_TELEMETRY_DEBUG preventing telemetry from being sent.
+D051#outbound-connections,D056#what-is-sent,"Both state telemetry is one request per CLI invocation or run() that returns a report, plus MCP sessions."
+D051#outbound-connections,D056#where-it-goes,Both name eu.i.posthog.com as the telemetry destination.
+D051#outbound-connections,D056#feedback,"Both describe e2e feedback sending one event to PostHog, with dry-run and opt-out exceptions."
+D051#outbound-connections,D059#let-the-runner-start-it,Both describe readyUrl as the health endpoint the runner probes for a started app.
+D052#hooks,D033#map-each-api,Both say beforeAll and afterAll have platform as the only fixture.
+D052#hooks,D040#commands,Both describe tests skipped by a failed beforeAll or afterAll and afterEach hooks running on interrupt.
+D052#hooks,D041#top-level,Both state cleanupTimeout is the budget of each afterEach hook.
+D052#hooks,D044#runner-codes,Both describe HOOK_FAILED for beforeAll/afterAll and the worker being killed for a blocked event loop after cleanupTimeout.
+D052#hooks,D045#polling-a-value,Both cap the deadline of hook-time operations by the hook's cleanupTimeout.
+D052#hooks,D052#members,Both describe the per-test hooks and their typed fixtures.
+D052#hooks,D052#fixtures,Both say teardown runs after failure with its own cleanupTimeout budget and hooks share the test timeout.
+D052#hooks,D052#testapi,"Both list beforeEach, afterEach, beforeAll and afterAll and their fixtures."
+D052#hooks,D052#function-types,Both describe the beforeEach/afterEach body and beforeAll/afterAll body hook types.
+D052#options,D002#instructions-and-vocabulary,Both describe agentContext as extra per-test context for agent steps.
+D052#options,D002#one-flow-several-personas,Both say an agent list runs the test once per agent and a serial group runs once per agent.
+D052#options,D004#session-rules,"Both state sessions declared by a setup test must be saved, else SESSION_CONTRACT."
+D052#options,D008#what-ci-changes,Both say .only is rejected with ONLY_IN_CI.
+D052#options,D014#organize-tests,"Both show tags, retries, timeout and serial: true options on groups and tests."
+D052#options,D015#artifacts,Both say a serial group's tests share one result directory.
+D052#options,D039#clearstate,Both say a serial group shares app state.
+D052#options,D041#recording,Both describe trace and video recording modes with innermost value winning and serial groups recording as one unit.
+D052#options,D041#agents,"Both say a test with agent: ['buyer', 'admin'] runs once for each agent."
+D052#options,D041#run-limits,Both limit an agent's context and a test's agentContext in bytes.
+D052#options,D041#ci,Both say test.only is rejected with ONLY_IN_CI in CI.
+D052#options,D043#run-mode,Both say a focused test is ONLY_IN_CI.
+D052#options,D044#runner-codes,Both describe UNSUPPORTED_ARTIFACT for a video mode and COLLECTION_ERROR for forbidden serial options.
+D052#options,D048#tests-and-attempts,Both say a test pinned to several agents runs once per agent.
+D052#options,D052#members,"Both describe test.only being rejected with ONLY_IN_CI and tags, retries and timeout options."
+D052#options,D052#testoptions,"Both list the test options timeout, retries, tags, skip, only, platforms, requires, session, agentContext, agent, trace and video."
+D052#fixtures,D005#browser,Both advise requires: ['browser'] on tests in suites with device targets.
+D052#fixtures,D014#organize-tests,Both say to use test.extend for setup and cleanup and that fixtures hold per-test data.
+D052#fixtures,D033#map-each-api,Both say a fixture needing another goes in a chained extend and every fixture of the chain sets up for every test.
+D052#fixtures,D033#port-page-objects,Both say reaching for a browser fixture on a target without it fails with UNSUPPORTED_CAPABILITY; use requires: ['browser'].
+D052#fixtures,D041#top-level,Both describe cleanupTimeout as the budget of each afterEach hook and fixture teardown.
+D052#fixtures,D042#contributed-fixtures,"Both say the target's engine contributes fixtures such as browser or device, and requires skips tests lacking one."
+D052#fixtures,D044#agenterror,"Both say a test.extend fixture returning without use(), calling it twice, or redefining an engine fixture is TEST_SETUP_FAILED."
+D052#fixtures,D044#runner-codes,Both cover COLLECTION_ERROR for an invalid fixture definition and timeouts of abandoned bodies.
+D052#fixtures,D049#session,"Both list the fixtures agent, app, screen and platform that a test or session receives."
+D052#fixtures,D052#members,"Both describe test.extend returning a typed test with fixtures, and the core fixtures typed on hooks."
+D052#fixtures,D052#hooks,Both say fixture teardown and afterEach hooks each get their own cleanupTimeout budget after a failure.
+D052#fixtures,D052#testfixtures,"Both list the core fixtures agent, app, screen, platform, and session for setup tests."
+D052#fixtures,D052#fixturedefinitions,Both describe test.extend fixture definitions where code before use() is setup and code after is teardown.
+D052#fixtures,D053#the-browser-fixture,Both say a suite also running on other targets declares requires: ['browser'] to skip tests lacking the browser fixture.
+D052#testoptions,D002#instructions-and-vocabulary,Both describe agentContext as extra per-test context for agent steps.
+D052#testoptions,D008#what-ci-changes,Both say only is rejected with ONLY_IN_CI.
+D052#testoptions,D041#recording,"Both say trace and video options override the run's, innermost wins, and serial groups use the group's value."
+D052#testoptions,D041#agents,Both say a test with agent list runs once for each agent.
+D052#testoptions,D041#ci,Both say test.only is rejected in CI with ONLY_IN_CI.
+D052#testoptions,D044#runner-codes,Both describe COLLECTION_ERROR for malformed options and nested serial groups.
+D052#testoptions,D052#options,"Both list the test options with defaults, ranges and the innermost-wins resolution."
+D053#options,D005#run-a-script-before-the-page,Both describe web({ initScripts }) and browser.addInitScript forms and the next-navigation rule.
+D053#options,D005#emulate-dark-mode-and-reduced-motion,"Both describe web({ colorScheme, reducedMotion }) and browser.emulateMedia before the page opens."
+D053#options,D005#hosted-browsers,Both say viewport: null fills a hosted browser's live view window.
+D053#options,D005#write-a-provider,Both describe cdpEndpoint and reconnectEndpoint for attaching to a browser over CDP.
+D053#options,D005#pick-a-lease-scope,"Both describe the persistent default context of attempt-scope hosted browsers and its limits on headers, userAgent, locale and timezoneId."
+D053#options,D005#recording-on-the-provider,Both describe the screencast recording options and which attempts record video.
+D053#options,D033#browser-timeouts-and-artifacts,"Both map testIdAttribute, viewport, browser, basicAuth, locale, timezoneId, colorScheme, reducedMotion and userAgent options to web()."
+D053#options,D041#secrets,Both show web({ basicAuth }) taking a secrets.get password.
+D053#options,D050#queries,Both describe testIdAttribute and the getByTestId data-testid default.
+D053#options,D051#secrets-in-engine-options,Both describe basicAuth with secrets.get as text-only protection that withholds no pixels.
+D053#options,D053#installing-browsers,"Both describe the browser option choosing chromium, firefox or webkit."
+D053#options,D053#weboptions,"Both list the web() options with defaults: browser, viewport, screencast, connect, headers, basicAuth, testIdAttribute, userAgent, locale, timezoneId."
+D053#options,D054#what-can-still-leak,Both warn basicAuth answers a 401 from any origin and headers reach hosts of the app's site.
+D053#options,D059#protected-previews,"Both say headers reach only the app's site, turn off the HTTP cache and block service workers, and basicAuth answers HTTP basic authentication."
+D053#options,D059#viewports,"Both describe the viewport option as the initial size of each attempt, default 1280 by 720."
+D053#options,D059#fill-the-window,Both say viewport: null emulates no size so the page fills the window and setViewport still fixes one.
+D053#the-browser-fixture,D003#signed-in-requests,Both mention browser.cookies() returning cookies of the current context.
+D053#the-browser-fixture,D005#mock-an-api,"Both describe browser.route handlers calling exactly one of fulfill, continue, fallback or abort, newest first, surviving restarts."
+D053#the-browser-fixture,D005#handle-a-dialog,"Both describe onDialog handlers 'accept', 'dismiss' or a function that must call accept or dismiss."
+D053#the-browser-fixture,D005#download-a-file,"Both say waitForDownload saves a download artifact and absolutePath reads it, including on hosted browsers."
+D053#the-browser-fixture,D005#reach-into-an-iframe,Both describe frameLocator scoping queries to a frame and locator inside a frame taking CSS or XPath.
+D053#the-browser-fixture,D005#read-from-the-page,Both say evaluate cannot use test variables and takes data as an argument.
+D053#the-browser-fixture,D005#run-a-script-before-the-page,Both describe addInitScript running before the page's own scripts.
+D053#the-browser-fixture,D005#emulate-dark-mode-and-reduced-motion,Both describe emulateMedia before the page opens for colorScheme and reducedMotion.
+D053#the-browser-fixture,D005#cookies,Both say a cookie URL that does not parse or has a scheme other than http or https is POLICY_DENIED.
+D053#the-browser-fixture,D005#downloads-on-the-provider,Both say a hosted browser's download comes back through the provider's downloads option.
+D053#the-browser-fixture,D005#shadow-dom,Both say locator and filter({ hasText }) stop at a closed shadow root while screen queries reach into it.
+D053#the-browser-fixture,D015#common-errors,Both point to browser.frameLocator for elements inside an iframe.
+D053#the-browser-fixture,D024#downloads,Both say waitForDownload works as it does locally on Kernel browsers.
+D053#the-browser-fixture,D030#map-each-command,"Both map Cypress intercept, visit and cookie commands to browser.route, goto and setCookies."
+D053#the-browser-fixture,D033#map-each-api,"Both map page.route, waitForResponse, onDialog, waitForDownload, evaluate, cookies and setViewport to the browser fixture."
+D053#the-browser-fixture,D033#port-page-objects,Both say browser.keyboard types plain text only and requires: ['browser'] guards other targets.
+D053#the-browser-fixture,D034#map-each-webdriver-call,"Both map WebDriver navigation, frame and dialog calls to browser.goto, frameLocator and onDialog."
+D053#the-browser-fixture,D039#open,"Both say a relative URL needs the target's app.url, else APP_URL_REQUIRED, and a non-http scheme is POLICY_DENIED."
+D053#the-browser-fixture,D044#runner-codes,Both define EVALUATE_FAILED and APP_URL_REQUIRED.
+D053#the-browser-fixture,D045#browser-matchers,"Both describe expect(browser) matchers toHaveURL, toHaveTitle and toHaveClass."
+D053#the-browser-fixture,D050#locator-reads,Both mention frame and locator errors such as LOCATOR_NOT_FOUND and LOCATOR_AMBIGUOUS.
+D053#the-browser-fixture,D051#navigation,"Both say browser.goto allows only http, https and about:blank."
+D053#the-browser-fixture,D053#browser-interface,"Both describe the Browser methods, active tab scope, keyboard and mouse input and evaluate."
+D053#the-browser-fixture,D059#resize-inside-a-test,Both say setViewport resizes the page for the rest of the attempt.
+D053#weboptions,D005#run-a-script-before-the-page,Both describe initScripts as scripts run before the page's own scripts.
+D053#weboptions,D005#emulate-dark-mode-and-reduced-motion,Both describe colorScheme and reducedMotion setting prefers-color-scheme and prefers-reduced-motion.
+D053#weboptions,D005#pick-a-lease-scope,"Both say a persistent context makes headers, userAgent, locale and timezoneId invalid."
+D053#weboptions,D033#browser-timeouts-and-artifacts,"Both map Playwright use options to web({ viewport, browser, testIdAttribute, basicAuth, locale, timezoneId, colorScheme, reducedMotion, userAgent })."
+D053#weboptions,D050#queries,"Both describe testIdAttribute for screen.getByTestId, default data-testid."
+D053#weboptions,D051#secrets-in-engine-options,"Both describe basicAuth credentials answering a 401 challenge, with secrets handled as text only."
+D053#weboptions,D053#options,"Both list the web() options with defaults, errors and the persistent-context restrictions."
+D053#weboptions,D059#protected-previews,"Both say headers reach only the app's site, disable the HTTP cache and block service workers."
+D053#weboptions,D059#fill-the-window,Both say viewport: null emulates no size so the page fills the window.
+D053#browser-interface,D005#mock-an-api,"Both describe browser.route handlers, waitForResponse and unroute for mocking network requests."
+D053#browser-interface,D005#handle-a-dialog,"Both describe browser.onDialog registering an accept, dismiss or function handler with an unsubscribe function."
+D053#browser-interface,D005#download-a-file,"Both describe browser.waitForDownload returning path, absolutePath and suggestedFilename."
+D053#browser-interface,D005#reach-into-an-iframe,Both describe frameLocator creating a query scope inside one iframe.
+D053#browser-interface,D005#read-from-the-page,Both say browser.evaluate runs a serialized function in the page and takes data through an argument.
+D053#browser-interface,D005#run-a-script-before-the-page,Both describe browser.addInitScript running before the page's own scripts.
+D053#browser-interface,D005#emulate-dark-mode-and-reduced-motion,Both describe emulateMedia for colorScheme and reducedMotion.
+D053#browser-interface,D005#cookies,Both describe browser.setCookies validating cookie URLs.
+D053#browser-interface,D033#map-each-api,"Both map Playwright page/context calls to browser.route, onDialog, waitForDownload, keyboard, mouse, evaluate and setViewport."
+D053#browser-interface,D033#port-page-objects,"Both describe browser.keyboard press and type, plain text only, never a Secret."
+D053#browser-interface,D053#options,"Both describe emulateMedia, addInitScript and the init script forms, and setViewport for the attempt."
+D053#browser-interface,D053#the-browser-fixture,"Both describe browser methods (goto, reload, evaluate, route, cookies, setViewport, emulateMedia, onDialog, waitForDownload, keyboard, mouse) and active-tab versus whole-browser scope."
+D053#browser-interface,D059#resize-inside-a-test,Both describe browser.setViewport for the rest of the attempt.
+D054#what-can-still-leak,D004#the-password-is-a-handle,Both say redaction matches strings so a transformed value such as the last four characters passes through.
+D054#what-can-still-leak,D007#cache,"Both say the replay cache stores typed values as typed except secret fills, so recordings should be reviewed before sharing."
+D054#what-can-still-leak,D015#artifacts,Both say videos mask nothing and point to where redaction stops.
+D054#what-can-still-leak,D051#site-check,Both mention a shared hosting domain such as vercel.app being treated as one site.
+D054#what-can-still-leak,D051#secrets-in-engine-options,Both say basicAuth secret protection is text only and withholds no pixels.
+D054#what-can-still-leak,D051#redaction,"Both say a secret passed as a plain string is not a secret fill, so screenshots stay on."
+D054#what-can-still-leak,D051#where-redaction-stops,"Both list what passes through redaction: transformed values, video that masks nothing, and command.log written verbatim."
+D054#what-can-still-leak,D051#artifacts,Both say video is not masked (incomplete) and command.log holds the app's stdout and stderr verbatim.
+D054#what-can-still-leak,D053#options,Both say basicAuth answers a 401 from any origin and its secret protection is text only.
+D054#what-can-still-leak,D059#protected-previews,Both say headers reach every host under a shared suffix such as vercel.app.
+D055#ci,D037#use-a-subscription-or-api-key,Both say Claude Max or Team use an API key from the plan's credits.
+D055#ci,D043#model,"Both say E2E_OAUTH_CREDENTIALS gives stored logins to CI without writing refreshed tokens back, and describe OPENCODE_API_KEY."
+D055#ci,D055#pick-a-model,Both describe OPENCODE_API_KEY as the OpenCode Console key used in place of the login.
+D056#what-is-sent,D040#commands,"Both mention the e2e feedback command sending an event with anonymous machine facts, and the flag names recorded."
+D056#what-is-sent,D043#telemetry,"Both describe E2E_TELEMETRY_FLEET, the preferences file, and package_manager and coding agent properties."
+D056#what-is-sent,D051#outbound-connections,"Both state when telemetry requests are sent: per CLI invocation, per run() and per MCP session."
+D056#what-is-sent,D054#what-leaves-your-computer,Both say a run sends telemetry to eu.i.posthog.com unless you opt out.
+D056#what-is-sent,D056#in-ci,"Both say CI runs count as the CI vendor (ci:<vendor>), with no preferences file."
+D056#what-is-sent,D056#in-a-fleet,Both say a fleet's events count as fleet:<name> via E2E_TELEMETRY_FLEET.
+D056#what-is-sent,D056#where-it-goes,Both say events go to PostHog which keeps no person profile and skips GeoIP.
+D056#what-is-sent,D056#feedback,Both describe the e2e_feedback event sent to the same PostHog project with the machine facts.
+D056#what-is-sent,D056#the-notice,Both say the first run() from e2e/runner prints the telemetry notice on stderr.
+D057#declare-what-a-tool-does,D018#keep-the-loop-change-the-vocabulary,Both say a mutating tool takes an action slot of the step's budget and cannot be replayed from the cache.
+D057#declare-what-a-tool-does,D041#agentconfig,Both define tool annotations mutates and platforms.
+D057#declare-what-a-tool-does,D057#add-a-tool,Both show defineTool with the mutates annotation true for a state-changing tool.
+D057#declare-what-a-tool-does,D057#observe-from-a-tool,Both say a mutates: false tool is read-only and observation is not allowed in a mutates: true tool.
+D057#declare-what-a-tool-does,D060#ship-a-tool-pack,Both say project tools use platforms to offer a tool only on matching platforms.
+D058#stored-screenshots,D033#map-each-api,Both map Playwright toHaveScreenshot update-snapshots behaviour and the -snapshots storage directory.
+D058#stored-screenshots,D040#commands,"Both describe -u/--update-snapshots writing each stored screenshot that is missing or different, and writing a missing one then failing."
+D058#stored-screenshots,D045#screenshot-matchers,"Both describe toHaveScreenshot writing a missing baseline and failing, and update-snapshots rewriting differing ones."
+D058#stored-screenshots,D058#in-ci,Both say a missing screenshot fails the test and --update-snapshots writes all of them.
+D058#stored-screenshots,D058#when-it-fails,Both mention the stored snapshot file names and running with --update-snapshots to keep a changed screenshot.
+D059#limits,D005#recording-on-the-provider,Both describe a recording browser provider recording the whole screen instead.
+D059#limits,D024#recordings,Both describe a Kernel browser recording the whole screen instead of the page.
+D059#limits,D053#options,Both describe screencast size for videos and web({ screencast: { size } }).
+D060#capabilities,D042#engine,"Both state that a missing optional engine method gives UNSUPPORTED_CAPABILITY and pointer, keyboard require observe."
+D060#capabilities,D042#capabilities,"Both list optional engine methods (observe, perform, locate, validateApp, session) and the capabilities they unlock."
+D060#capabilities,D050#locator-actions,Both say a node action the engine does not declare throws UNSUPPORTED_CAPABILITY.
