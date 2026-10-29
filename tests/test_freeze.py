@@ -282,3 +282,45 @@ def test_overlap_file_is_recorded_when_present(corpus, main_catalogue, pilot, tm
         overlap_file=overlap,
     )
     assert record["sha256"]["catalogue_overlap.csv"] == sha256_of(overlap)
+
+
+def test_check_reports_an_overlap_file_with_unknown_sections(
+    corpus, main_catalogue, pilot, tmp_path
+):
+    from catalogue import check
+
+    questions, truth, _, _ = main_catalogue
+    overlap = tmp_path / "catalogue_overlap.csv"
+    overlap.write_text(
+        "section_id,related_section_id,note\nD999#gone,D001#ref,Same.\n", encoding="utf-8"
+    )
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot,
+        write_plan_for(tmp_path, valid_rows()),
+        tmp_path / "catalogue_review.csv",
+        fresh_plan_for(valid_rows()),
+        overlap_file=overlap,
+    )
+    assert any("D999#gone" in e for e in report.errors)
+
+
+def test_check_reports_a_malformed_overlap_file(corpus, main_catalogue, pilot, tmp_path):
+    from catalogue import check
+
+    questions, truth, _, _ = main_catalogue
+    overlap = tmp_path / "catalogue_overlap.csv"
+    overlap.write_text("section_id,related_section_id,note\nD001#ref,D001#ref,Same.\n")
+    report = check(
+        corpus,
+        questions,
+        truth,
+        pilot,
+        write_plan_for(tmp_path, valid_rows()),
+        tmp_path / "catalogue_review.csv",
+        fresh_plan_for(valid_rows()),
+        overlap_file=overlap,
+    )
+    assert any("itself" in e for e in report.errors)

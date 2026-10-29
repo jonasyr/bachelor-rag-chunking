@@ -22,11 +22,13 @@ Wir werden dem Editor fünf Hilfen geben, die weder Frage noch Antwort, Typ oder
 
 1. **Wörtliche Doppelungen**: Der Editor zeigt mechanisch alle Abschnitte, deren eigener Text mit dem Ausgangsabschnitt
    eine Wortfolge von mindestens `config.CATALOGUE_DUPLICATE_MIN_WORDS` Wörtern teilt; Folgen in mehr als
-   `config.CATALOGUE_DUPLICATE_MAX_SECTIONS` Abschnitten gelten als Vorlage (Config-Codeblock, Linktext).
+   `config.CATALOGUE_DUPLICATE_MAX_SECTIONS` Abschnitten gelten als Vorlage (Config-Codeblock, Linktext), ebenso
+   Folgen ganz in TypeScript-/JavaScript-Beispielblöcken (`config.CATALOGUE_DUPLICATE_SKIP_FENCES`); Shell-Befehle
+   zählen weiter.
 2. **Inhaltliche Überschneidungen**: Claude erstellt einmal für alle Plan- und Reserveabschnitte
    `data/evaluation/catalogue_overlap.csv` durch Lesen und Suchen im Korpus (nicht über Chunks oder Retrieval), je
    Zeile mit einer neutralen Notiz, was beide Abschnitte gemeinsam haben, nie eine Frageidee. Die Liste hängt nur am
-   Abschnitt, wird versioniert und beim Einfrieren mitgehasht.
+   Abschnitt, wird versioniert, von `catalogue.py check` geprüft (Format, bekannte IDs) und beim Einfrieren mitgehasht.
 3. **Leitfragen je Klasse** (`config.CATALOGUE_CLASS_GUIDE`), für jeden Abschnitt gleich.
 4. **Typvorschlag** aus dem Wortlaut der fertigen Frage nach festen Regeln (`config.QUESTION_TYPE_HINTS`); der Typ
    startet leer und wird erst durch Jonas' Klick gesetzt. Speichern ist gesperrt, solange eine Prüfung nicht erfüllt

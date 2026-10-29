@@ -147,6 +147,7 @@ Regeln des Katalogs: [Fragenkatalog](question-catalogue.md).
 | `CATALOGUE_PREFIX_MIN`, `CATALOGUE_PREFIX_SLACK` | `4`, `3` | gleicher Anfang von mindestens max(4, kürzere Länge − 3) Zeichen gilt als gleiches Wort | [ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md) |
 | `CATALOGUE_DUPLICATE_MIN_WORDS`, `CATALOGUE_DUPLICATE_EXCERPT_WORDS` | `8`, `24` | Editor: geteilte Wortfolge ab so vielen Wörtern gilt als wörtliche Doppelung; Länge des Ausschnitts | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `CATALOGUE_DUPLICATE_MAX_SECTIONS` | `8` | eine Wortfolge in mehr Abschnitten gilt als Vorlage, nicht als Doppelung | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
+| `CATALOGUE_DUPLICATE_SKIP_FENCES` | `("ts", "tsx", "js", "jsx", "mjs", "cjs", "typescript", "javascript")` | Wortfolgen ganz in Codeblöcken dieser Sprachen zählen nicht als Doppelung (Beispiele); Shell-Befehle zählen | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `CATALOGUE_DUPLICATE_VISIBLE` | `10` | Treffer im Kasten „Also covered elsewhere“ vor „Show all“ | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `QUESTION_TYPE_HINTS` | geordnete Paare (Typ, Regex) | Typvorschlag aus dem Wortlaut der Frage; erster Treffer gilt, Jonas bestätigt | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |
 | `CATALOGUE_CLASS_GUIDE` | je Klasse `rule` und 2–3 `prompts` | Leitfragen über dem Formular, für jeden Abschnitt gleich | [ADR 0049](../adr/0049-schreibhilfen-im-editor.md) |

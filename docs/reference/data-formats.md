@@ -200,7 +200,8 @@ section_id,related_section_id,note
 D037#use-a-subscription-or-api-key,D055#subscriptions,Both list the npx e2e login command for each subscription plan.
 ```
 `note` = ein neutraler Satz, was beide Abschnitte gemeinsam haben (nie eine Frageidee); leere `note`, Selbstbezug und
-doppelte Paare sind Fehler (`catalogue_overlap.read_overlap`). Fehlt die Datei, zeigt der Editor nur wörtliche
+doppelte Paare sind Fehler (`catalogue_overlap.read_overlap`); `catalogue.py check` meldet sie und unbekannte
+Abschnitts-IDs als `ERROR`, der Freeze verweigert dann. Fehlt die Datei, zeigt der Editor nur wörtliche
 Doppelungen.
 
 **`closed_book_screen.csv`** (`data/evaluation/`, nur für den Hauptkatalog; `catalogue.py screen` schreibt Antworten,

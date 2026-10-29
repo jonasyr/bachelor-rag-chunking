@@ -261,6 +261,18 @@ CATALOGUE_DUPLICATE_MIN_WORDS = 8
 CATALOGUE_DUPLICATE_EXCERPT_WORDS = 24
 # A run found in more sections than this is a template (config snippet, link text), not a duplicate
 CATALOGUE_DUPLICATE_MAX_SECTIONS = 8
+# Runs entirely inside code blocks of these languages are examples, not duplicate facts (shell
+# commands still count)
+CATALOGUE_DUPLICATE_SKIP_FENCES = (
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "mjs",
+    "cjs",
+    "typescript",
+    "javascript",
+)
 CATALOGUE_DUPLICATE_VISIBLE = 10  # "Also covered elsewhere": rows shown before "Show all"
 # Type suggested from the written question: (type, pattern) in order, first match wins; matched
 # against the lowercased question with typographic apostrophes straightened. Jonas confirms it.

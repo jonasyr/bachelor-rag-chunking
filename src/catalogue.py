@@ -23,6 +23,7 @@ from pathlib import Path
 
 import closed_book
 import tokens
+from catalogue_overlap import overlap_section_ids, read_overlap
 from catalogue_plan import (
     draw_plan,
     plan_findings,
@@ -39,6 +40,7 @@ from config import (
     CATALOGUE_DUPLICATE_EXCERPT_WORDS,
     CATALOGUE_DUPLICATE_MAX_SECTIONS,
     CATALOGUE_DUPLICATE_MIN_WORDS,
+    CATALOGUE_DUPLICATE_SKIP_FENCES,
     CATALOGUE_EXCERPT_CHARS,
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_FREEZE_FILE,
@@ -229,16 +231,36 @@ def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
     return hits
 
 
+def _words_and_examples(text: str) -> tuple[list[str], list[bool]]:
+    """Lowercase words of the text and, per word, whether it lies in a code example block
+    (config.CATALOGUE_DUPLICATE_SKIP_FENCES); same words in the same order as WORD_RE."""
+    words, example, fence = [], [], None
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            info = stripped[3:].split()
+            fence = None if fence is not None else (info[0].lower() if info else "")
+        found = WORD_RE.findall(line.lower())
+        words += found
+        example += [fence in CATALOGUE_DUPLICATE_SKIP_FENCES] * len(found)
+    return words, example
+
+
+def _counts(example: list[bool], i: int, n: int) -> bool:
+    """A run counts unless all its words lie in a code example."""
+    return not all(example[i : i + n])
+
+
 def _duplicate_index(corpus: Corpus, min_words: int) -> tuple[dict, dict]:
-    """Words of every section's own text and the sections containing each run of min_words."""
+    """Words of every section's own text (with their example flags) and the sections containing
+    each counting run of min_words."""
     if min_words not in corpus._duplicates:
-        words = {
-            s["section_id"]: WORD_RE.findall(own_text(corpus, s).lower()) for s in corpus.sections
-        }
+        words = {s["section_id"]: _words_and_examples(own_text(corpus, s)) for s in corpus.sections}
         index: dict[tuple[str, ...], set[str]] = {}
-        for sid, ws in words.items():
+        for sid, (ws, example) in words.items():
             for i in range(len(ws) - min_words + 1):
-                index.setdefault(tuple(ws[i : i + min_words]), set()).add(sid)
+                if _counts(example, i, min_words):
+                    index.setdefault(tuple(ws[i : i + min_words]), set()).add(sid)
         corpus._duplicates[min_words] = (words, index)
     return corpus._duplicates[min_words]
 
@@ -258,11 +280,13 @@ def shared_passages(
     """
     seed = corpus.by_id[section_id]
     words, index = _duplicate_index(corpus, min_words)
-    ws = words[section_id]
+    ws, example = words[section_id]
     own = own_text(corpus, seed)
     spans = [m.span() for m in WORD_RE.finditer(own.lower())]  # same words as ws, with positions
     positions: dict[str, list[int]] = {}
     for i in range(len(ws) - min_words + 1):
+        if not _counts(example, i, min_words):
+            continue
         holders = index.get(tuple(ws[i : i + min_words]), set())
         if len(holders) > max_sections:
             continue
@@ -480,9 +504,17 @@ def check(
     review_file: Path = CATALOGUE_REVIEW_FILE,
     fresh_plan: list[dict] | None = None,
     closed_book_file: Path | None = None,
+    overlap_file: Path | None = None,
 ) -> Report:
     """Coverage check of the catalogue (ADR 0029); never reads retrieval results."""
     report = Report()
+    overlap_file = overlap_file or CATALOGUE_OVERLAP_FILE
+    try:
+        unknown = overlap_section_ids(read_overlap(overlap_file)) - set(corpus.by_id)
+        if unknown:
+            report.errors.append(f"{overlap_file.name}: unknown section IDs {sorted(unknown)}")
+    except ValueError as error:
+        report.errors.append(str(error))
     if not _has_rows(questions_file):
         report.errors.append(f"{questions_file.name} has no questions yet")
         return report
@@ -649,6 +681,7 @@ def freeze_catalogue(
         review_file,
         fresh_plan,
         closed_book_file=closed_book_file,
+        overlap_file=overlap_file,
     )
     if exit_code(report, draft=False):
         raise ValueError(

@@ -718,3 +718,19 @@ def test_shared_passages_excerpt_keeps_the_original_text(tmp_path):
     corpus = load_corpus(*build_corpus(tmp_path, pages))
     [(_, excerpt)] = catalogue.shared_passages(corpus, "D001#seed")
     assert "`npx e2e init` again After You Upgrade" in excerpt
+
+
+def test_shared_passages_ignores_typescript_examples_but_keeps_shell_commands(tmp_path):
+    ts = (
+        "```ts\nexport default { targets: [{ engine: web(), "
+        "app: { url: 'http://localhost:3000' } }] }\n```"
+    )
+    sh = "```bash\nnpx e2e login openai then npx e2e login github-copilot for each plan\n```"
+    pages = {
+        "a/one.md": f"# One {{#one}}\n\n## Seed {{#seed}}\n\nIntro.\n\n{ts}\n\n{sh}\n",
+        "b/two.md": f"# Two {{#two}}\n\n## Config {{#config}}\n\nOther.\n\n{ts}\n",
+        "c/three.md": f"# Three {{#three}}\n\n## Login {{#login}}\n\nMore.\n\n{sh}\n",
+    }
+    corpus = load_corpus(*build_corpus(tmp_path, pages))
+    ids = [s["section_id"] for s, _ in catalogue.shared_passages(corpus, "D001#seed")]
+    assert ids == ["D003#login"]
