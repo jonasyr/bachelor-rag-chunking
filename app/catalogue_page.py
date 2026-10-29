@@ -138,10 +138,11 @@ def render_checks(items: list[tuple[bool, str]]) -> None:
     st.markdown(f'<ul class="checks">{lis}</ul>', unsafe_allow_html=True)
 
 
-def class_guide(cls: str) -> None:
-    """The class rule and its prompts; the same for every section, so they suggest no content."""
+def class_guide(cls: str, open_: bool) -> None:
+    """The class rule and its prompts; the same for every section, so they suggest no content.
+    Open until the slot has a question, then folded so the section gets the room."""
     guide = CATALOGUE_CLASS_GUIDE[cls]
-    with st.expander(f"How to write a {cls} question", expanded=True):
+    with st.expander(f"How to write a {cls} question", expanded=open_):
         prompts = "".join(f"<li>{html.escape(p)}</li>" for p in guide["prompts"])
         st.html(
             f'<div class="guide"><p class="guide-rule">{html.escape(guide["rule"])}</p>'
@@ -224,7 +225,7 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
 
     if "goto" in st.session_state:  # set by Save/Skip; allowed before the widget exists
         st.session_state["slot"] = st.session_state.pop("goto")
-    title, picker = st.columns([7, 5], vertical_alignment="bottom", gap="large")
+    title, picker = st.columns([2, 1], vertical_alignment="bottom", gap="large")
     with picker:
         sid = (
             st.selectbox(
@@ -238,7 +239,8 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
     saved_q = next((q for q in questions if q["question_id"] == qid), None)
     saved_t = truth.get(qid or "", {})
     title.html(f'<h2 class="slot-title">Slot {sid} <span>{row["area"]}, {row["class"]}</span></h2>')
-    class_guide(row["class"])
+    drafted = st.session_state.get(f"question_{sid}", saved_q["question"] if saved_q else "")
+    class_guide(row["class"], open_=not str(drafted).strip())
 
     # Reload the form when the saved rows changed on disk (hand edit, review decision).
     fingerprint = (row["section_id"], tuple((saved_q or {}).values()), tuple(saved_t.values()))
@@ -253,8 +255,8 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
 
     # Two rows in working order; on narrow screens they stack as section, form, other sections,
     # relevant sections and save, search.
-    left, right = st.columns([7, 5], gap="large")
-    left_b, right_b = st.columns([7, 5], gap="large")
+    left, right = st.columns([2, 1], gap="large")
+    left_b, right_b = st.columns([2, 1], gap="large")
     with right:
         question = (
             st.text_area(

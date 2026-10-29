@@ -83,6 +83,7 @@ from run_log import append_generation_run, sha256_of
 WORD_RE = re.compile(CATALOGUE_WORD_PATTERN)
 CAMEL_RE = re.compile(CATALOGUE_CAMEL_BOUNDARY)
 STOPWORDS = frozenset(CATALOGUE_STOPWORDS)
+LINK_TARGET_RE = re.compile(r"\]\([^)]*\)|https?://\S+")  # Markdown link targets and bare URLs
 
 
 class Corpus:
@@ -231,19 +232,25 @@ def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
     return hits
 
 
-def _words_and_examples(text: str) -> tuple[list[str], list[bool]]:
-    """Lowercase words of the text and, per word, whether it lies in a code example block
-    (config.CATALOGUE_DUPLICATE_SKIP_FENCES); same words in the same order as WORD_RE."""
-    words, example, fence = [], [], None
+def _words_and_examples(text: str) -> tuple[list[str], list[bool], list[tuple[int, int]]]:
+    """Lowercase words of the text, per word whether it lies in a code example block
+    (config.CATALOGUE_DUPLICATE_SKIP_FENCES), and its character span. Words of link targets and
+    URLs are left out: an address is never a duplicate fact."""
+    words, example, spans, fence, offset = [], [], [], None, 0
     for line in text.split("\n"):
         stripped = line.strip()
         if stripped.startswith("```"):
             info = stripped[3:].split()
             fence = None if fence is not None else (info[0].lower() if info else "")
-        found = WORD_RE.findall(line.lower())
-        words += found
-        example += [fence in CATALOGUE_DUPLICATE_SKIP_FENCES] * len(found)
-    return words, example
+        links = [m.span() for m in LINK_TARGET_RE.finditer(line)]
+        for match in WORD_RE.finditer(line.lower()):
+            if any(x <= match.start() < y for x, y in links):
+                continue
+            words.append(match.group())
+            example.append(fence in CATALOGUE_DUPLICATE_SKIP_FENCES)
+            spans.append((offset + match.start(), offset + match.end()))
+        offset += len(line) + 1
+    return words, example, spans
 
 
 def _counts(example: list[bool], i: int, n: int) -> bool:
@@ -257,7 +264,7 @@ def _duplicate_index(corpus: Corpus, min_words: int) -> tuple[dict, dict]:
     if min_words not in corpus._duplicates:
         words = {s["section_id"]: _words_and_examples(own_text(corpus, s)) for s in corpus.sections}
         index: dict[tuple[str, ...], set[str]] = {}
-        for sid, (ws, example) in words.items():
+        for sid, (ws, example, _) in words.items():
             for i in range(len(ws) - min_words + 1):
                 if _counts(example, i, min_words):
                     index.setdefault(tuple(ws[i : i + min_words]), set()).add(sid)
@@ -280,9 +287,8 @@ def shared_passages(
     """
     seed = corpus.by_id[section_id]
     words, index = _duplicate_index(corpus, min_words)
-    ws, example = words[section_id]
+    ws, example, spans = words[section_id]
     own = own_text(corpus, seed)
-    spans = [m.span() for m in WORD_RE.finditer(own.lower())]  # same words as ws, with positions
     positions: dict[str, list[int]] = {}
     for i in range(len(ws) - min_words + 1):
         if not _counts(example, i, min_words):

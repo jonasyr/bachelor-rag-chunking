@@ -734,3 +734,16 @@ def test_shared_passages_ignores_typescript_examples_but_keeps_shell_commands(tm
     corpus = load_corpus(*build_corpus(tmp_path, pages))
     ids = [s["section_id"] for s, _ in catalogue.shared_passages(corpus, "D001#seed")]
     assert ids == ["D003#login"]
+
+
+def test_shared_passages_ignores_words_inside_link_targets(tmp_path):
+    link = "[AI SDK provider page](https://ai-sdk.dev/providers/ai-sdk-providers/ai-gateway/setup)"
+    pages = {
+        "a/one.md": f"# One {{#one}}\n\n## Seed {{#seed}}\n\nSee the {link} first.\n",
+        "b/two.md": f"# Two {{#two}}\n\n## Other {{#other}}\n\nRead {link} too.\n",
+        "c/three.md": "# Three {#three}\n\n## Bare {#bare}\n\n"
+        "Go to https://ai-sdk.dev/providers/ai-sdk-providers/ai-gateway/setup now.\n",
+    }
+    corpus = load_corpus(*build_corpus(tmp_path, pages))
+    assert catalogue.shared_passages(corpus, "D003#bare") == []
+    assert catalogue.shared_passages(corpus, "D001#seed") == []  # "ai sdk provider page" is 4 words

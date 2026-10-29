@@ -22,7 +22,8 @@ CSS = """
 @media (min-width: 640px) {
   .formatted, .source {max-height: 75vh; overflow-y: auto;
     scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
-  .st-key-reader .formatted, .st-key-reader .source {max-height: 62vh;}
+  [data-testid="stMainBlockContainer"] {padding-left: 2.5rem; padding-right: 2.5rem;}
+  .st-key-reader .formatted, .st-key-reader .source {max-height: 80vh; min-height: 24rem;}
   .st-key-also .formatted, .st-key-also .source {max-height: 50vh;}
 }
 .formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
@@ -44,7 +45,12 @@ CSS = """
   border-radius: 6px; overflow-x: auto; line-height: 1.5;}
 .formatted pre code {background: none; padding: 0; font-size: 0.86rem; overflow-wrap: normal;}
 .formatted table {border-collapse: collapse; display: block; overflow-x: auto;}
-.formatted th, .formatted td {border: 1px solid var(--line); padding: 0.3rem 0.6rem;}
+.formatted th, .formatted td {border: 1px solid var(--line); padding: 0.3rem 0.6rem;
+  vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 6rem;
+  max-width: 26rem;}
+/* wide tables keep whole words and scroll sideways inside the section box */
+.formatted > table, .formatted > pre, .formatted > *:has(table, pre) {max-width: 100%;}
+.formatted td code, .formatted th code {white-space: normal; overflow-wrap: normal;}
 .formatted a {color: var(--accent);}
 .source .code {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.88rem;
   line-height: 1.55;}
