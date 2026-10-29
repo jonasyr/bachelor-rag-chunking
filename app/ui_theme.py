@@ -17,19 +17,13 @@ CSS = """
 .slot-title {font-family: "Source Sans", "Source Sans 3", sans-serif; font-size: 1.5rem;
   font-weight: 600; line-height: 1.25; margin: 0; color: var(--ink);}
 .slot-title span {color: var(--muted); font-weight: 400;}
-/* Two columns (640 px and up): the starting section fills the height of the form beside it
-   and scrolls inside; a found section scrolls within most of the window. */
+/* Two columns (640 px and up): every section view scrolls inside its own box; the starting
+   section keeps most of the window so "Also covered elsewhere" starts right below it. */
 @media (min-width: 640px) {
   .formatted, .source {max-height: 75vh; overflow-y: auto;
     scrollbar-width: thin; scrollbar-color: var(--line) transparent;}
-  [data-testid="stColumn"]:has(.st-key-reader) {display: flex; flex-direction: column;}
-  [data-testid="stColumn"]:has(.st-key-reader) > [data-testid="stVerticalBlock"],
-  [data-testid="stLayoutWrapper"]:has(> .st-key-reader),
-  .st-key-reader, .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source),
-  .st-key-reader .stHtml:has(.formatted, .source) {
-    flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;}
-  .st-key-reader [data-testid="stElementContainer"]:has(.formatted, .source) {min-height: 20rem;}
-  .st-key-reader .formatted, .st-key-reader .source {flex: 1 1 0; min-height: 0; max-height: none;}
+  .st-key-reader .formatted, .st-key-reader .source {max-height: 62vh;}
+  .st-key-also .formatted, .st-key-also .source {max-height: 50vh;}
 }
 .formatted {font-family: "Source Serif", "Source Serif 4", Georgia, serif;
   font-size: 1.02rem; line-height: 1.7; color: var(--ink); background: var(--surface);
@@ -76,9 +70,19 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
 .dup-badge.is-added {color: var(--ok); border-color: var(--ok);}
 .dup-id {font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.8rem;
   color: var(--muted);}
-.dup-excerpt {color: var(--muted); font-size: 0.92rem; border-left: 2px solid var(--line);
+.dup-excerpt {color: var(--muted); font-size: 0.92rem; border-left: 1px solid var(--line);
   padding-left: 0.7rem; overflow-wrap: anywhere;}
 .st-key-also {margin-top: 1rem;}
+.rel-path {color: var(--ink); line-height: 1.35; overflow-wrap: anywhere;}
+/* captions: the theme's own text colour, slightly lighter (Streamlit's grey fails 4.5:1) */
+[data-testid="stCaptionContainer"] {color: color-mix(in srgb, currentColor 76%, transparent);}
+[data-testid="stCaptionContainer"] p {color: inherit;}
+[data-testid="stMainBlockContainer"] p, .guide-prompts li {text-wrap: pretty;}
+.st-key-search {margin-top: 1.25rem;}
+.st-key-use_type button, .st-key-use_type button p {color: var(--accent); font-weight: 600;}
+/* "Read section" and "Add" stay side by side on a phone */
+.st-key-also [data-testid="stHorizontalBlock"] {flex-wrap: nowrap;}
+.st-key-also [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {min-width: 0;}
 @media (max-width: 639px) {
   .slot-title span {display: block; font-size: 1rem; margin-top: 0.2rem;}
   .formatted, .source {max-height: 60vh; overflow-y: auto;}

@@ -29,3 +29,10 @@ def test_save_blocker_order():
     failing = [(False, "too long")]
     assert save_blocker("q?", "a", "factual", failing, [], None) == "Not met: too long"
     assert save_blocker("q?", "a", "factual", ok, [], None) is None
+
+
+def test_plain_excerpt_drops_table_rules_pipes_and_link_targets():
+    from catalogue_aids import plain_excerpt
+
+    raw = "Provider | Group | |---|---| | [Vercel AI Gateway](https://ai-sdk.dev/x) | AI SDK |"
+    assert plain_excerpt(raw) == "Provider · Group · Vercel AI Gateway · AI SDK"

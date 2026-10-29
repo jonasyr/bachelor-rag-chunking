@@ -707,3 +707,14 @@ def test_shared_passages_longest_shared_text_first(tmp_path):
     corpus = load_corpus(*build_corpus(tmp_path, pages))
     ids = [s["section_id"] for s, _ in catalogue.shared_passages(corpus, "D003#seed")]
     assert ids == ["D002#long", "D001#short"]
+
+
+def test_shared_passages_excerpt_keeps_the_original_text(tmp_path):
+    shared = "Run `npx e2e init` again After You Upgrade, so the Skill stays current."
+    pages = {
+        "a/one.md": f"# One {{#one}}\n\n## Seed {{#seed}}\n\nIntro. {shared}\n",
+        "b/two.md": f"# Two {{#two}}\n\n## Copy {{#copy}}\n\nOther. {shared}\n",
+    }
+    corpus = load_corpus(*build_corpus(tmp_path, pages))
+    [(_, excerpt)] = catalogue.shared_passages(corpus, "D001#seed")
+    assert "`npx e2e init` again After You Upgrade" in excerpt

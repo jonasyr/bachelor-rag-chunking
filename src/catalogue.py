@@ -259,6 +259,8 @@ def shared_passages(
     seed = corpus.by_id[section_id]
     words, index = _duplicate_index(corpus, min_words)
     ws = words[section_id]
+    own = own_text(corpus, seed)
+    spans = [m.span() for m in WORD_RE.finditer(own.lower())]  # same words as ws, with positions
     positions: dict[str, list[int]] = {}
     for i in range(len(ws) - min_words + 1):
         holders = index.get(tuple(ws[i : i + min_words]), set())
@@ -276,9 +278,11 @@ def shared_passages(
             run_start, run_len = (run_start, run_len + 1) if cur == prev + 1 else (cur, 1)
             if run_len > best_len:
                 best_start, best_len = run_start, run_len
-        run = ws[best_start : best_start + best_len + min_words - 1]
-        excerpt = " ".join(run[:excerpt_words]) + (" …" if len(run) > excerpt_words else "")
-        hits.append((len(run), s, excerpt))
+        length = best_len + min_words - 1
+        shown = min(length, excerpt_words)
+        a, b = spans[best_start][0], spans[best_start + shown - 1][1]
+        excerpt = " ".join(own[a:b].split()) + (" …" if length > excerpt_words else "")
+        hits.append((length, s, excerpt))
     hits.sort(key=lambda h: -h[0])  # stable: equal lengths stay in sections.jsonl order
     return [(s, excerpt) for _, s, excerpt in hits]
 

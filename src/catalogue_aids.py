@@ -2,6 +2,8 @@
 blocks saving. They never set a question, answer, type or relevance judgement themselves.
 """
 
+import re
+
 from catalogue import Corpus, nested, shared_passages
 from config import QUESTION_TYPES
 
@@ -58,6 +60,16 @@ def save_blocker(
     problem = next((text for ok, text in items if not ok), None)
     if problem:
         return f"Not met: {problem}"
-    if type_quota_left(questions, qtype, qid) <= 0:
-        return f"The {qtype} quota is full ({QUESTION_TYPES[qtype]} of {QUESTION_TYPES[qtype]})"
+    left = type_quota_left(questions, qtype, qid)
+    if left <= 0:
+        used = QUESTION_TYPES[qtype] - left
+        return f"The {qtype} quota is full ({used} of {QUESTION_TYPES[qtype]} written)"
     return None
+
+
+def plain_excerpt(text: str) -> str:
+    """A shared passage made readable: link text without targets, table cells joined by "·"."""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r":?-{3,}:?", "", text)
+    cells = [c.strip() for c in text.split("|")]
+    return " · ".join(c for c in cells if c)

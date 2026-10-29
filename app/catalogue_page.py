@@ -157,11 +157,15 @@ def also_covered_box(corpus, seed, overlap, ids: list[str], extra_key: str, view
         st.markdown(f"**Also covered elsewhere** ({len(rows)})")
         st.caption(
             "Add every section that holds a part your answer needs. "
-            + (
-                "Same text is found by comparing words; related sections were listed by Claude."
-                if rows
-                else "No other section shares text with this one; use the search below."
+            + " ".join(
+                text
+                for kind, text in (
+                    ("same text", "Same text: found by comparing words."),
+                    ("related", "Related: listed beforehand by Claude, with what both share."),
+                )
+                if any(r["kind"] == kind for r in rows)
             )
+            + ("" if rows else "No other section shares text with this one; use the search.")
         )
         visible = rows[:CATALOGUE_DUPLICATE_VISIBLE]
         if len(rows) > CATALOGUE_DUPLICATE_VISIBLE and st.toggle(
@@ -182,11 +186,11 @@ def also_covered_box(corpus, seed, overlap, ids: list[str], extra_key: str, view
                 )
                 if row["note"]:
                     st.caption(row["note"])
-                if row["kind"] == "same text":
-                    st.html(f'<div class="dup-excerpt">“{html.escape(row["detail"])}”</div>')
+                if row["kind"] == "same text" and not row["note"]:
+                    excerpt = html.escape(aids.plain_excerpt(row["detail"]))
+                    st.html(f'<div class="dup-excerpt">“{excerpt}”</div>')
                 read, add = st.columns([3, 1], vertical_alignment="center")
-                with read.expander("Read section"):
-                    source_page(corpus, section, [], f"dup_{sid}", view)
+                shown = read.toggle("Read section", key=f"read_{sid}")
                 if add.button(
                     "Added" if added else "Add",
                     key=f"add_dup_{sid}",
@@ -195,6 +199,8 @@ def also_covered_box(corpus, seed, overlap, ids: list[str], extra_key: str, view
                 ):
                     st.session_state[extra_key].append(sid)
                     st.rerun()
+                if shown:  # rendered only when open: the box reruns on every keystroke
+                    source_page(corpus, section, [], f"dup_{sid}", view)
 
 
 def next_open(after: str) -> str:
@@ -245,7 +251,10 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
         saved_ids = saved_t.get("relevant_section_ids", "").split(ID_SEPARATOR) if saved_t else []
         st.session_state[extra_key] = [s for s in saved_ids if s and s != seed["section_id"]]
 
+    # Two rows in working order; on narrow screens they stack as section, form, other sections,
+    # relevant sections and save, search.
     left, right = st.columns([7, 5], gap="large")
+    left_b, right_b = st.columns([7, 5], gap="large")
     with right:
         question = (
             st.text_area(
@@ -258,25 +267,27 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
         )
         types = list(QUESTION_TYPES)
         type_key = f"qtype_{sid}"
-        if "pending_type" in st.session_state:  # set by "Use …"; applied before the widget exists
-            st.session_state[type_key] = st.session_state.pop("pending_type")
         qtype = st.selectbox(
             "Type",
             types,
             key=type_key,
-            index=types.index(saved_q["type"]) if saved_q else None,
+            index=(
+                types.index(saved_q["type"])
+                if saved_q and saved_q["type"] in types and type_key not in st.session_state
+                else None
+            ),
             placeholder="Choose a type",
             format_func=lambda t: f"{t} · {aids.type_quota_left(questions, t, qid)} left",
         )
         hint = catalogue.suggest_type(question)
         if hint and hint[0] != qtype:
-            note, use = st.columns([3, 1], vertical_alignment="center")
-            note.caption(f"Looks like {hint[0]} (“{hint[1]}”)")
-            if use.button(
-                f"Use {hint[0]}", key="use_type", disabled=frozen, use_container_width=True
-            ):
-                st.session_state["pending_type"] = hint[0]
-                st.rerun()
+            st.button(
+                f"Looks like {hint[0]} (“{hint[1]}”) · use it",
+                key="use_type",
+                disabled=frozen,
+                type="tertiary",
+                on_click=lambda k=type_key, t=hint[0]: st.session_state.update({k: t}),
+            )
         answer = (
             st.text_area(
                 "Reference answer",
@@ -290,14 +301,18 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
             st.text_input("Notes", value=saved_q["notes"] if saved_q else "", key=f"notes_{sid}")
             or ""
         )
+    with right_b:
         ids = [seed["section_id"], *st.session_state[extra_key]]
         sections = [corpus.by_id[s] for s in ids]
-        st.markdown("**Relevant sections**")
+        st.markdown(f"**Relevant sections** ({len(sections)})")
         for s in sections:
-            cols = st.columns([5, 1])
-            cols[0].markdown(f"`{s['section_id']}` {corpus.heading_path(s)}")
+            cols = st.columns([5, 1], vertical_alignment="center")
+            cols[0].html(
+                f'<div class="rel-path">{html.escape(corpus.heading_path(s))}</div>'
+                f'<div class="dup-id">{html.escape(s["section_id"])}</div>'
+            )
             if s["section_id"] != seed["section_id"] and cols[1].button(
-                "Remove", key=f"remove_{s['section_id']}", disabled=frozen
+                "Remove", key=f"remove_{s['section_id']}", disabled=frozen, type="tertiary"
             ):
                 st.session_state[extra_key].remove(s["section_id"])
                 st.rerun()
@@ -362,12 +377,11 @@ def write_tab(corpus, plan, questions, truth, overlap, frozen: bool) -> None:
             or VIEWS[0]
         )
         source_page(corpus, seed, words, "seed", view)
-    with left:
+    with left_b:
         also_covered_box(corpus, seed, overlap, ids, extra_key, view, frozen)
 
-    # Second row: on narrow screens the search follows the question and its checks.
-    search, _ = st.columns([7, 5], gap="large")
-    with search:
+    # Search below the form: next to the relevant sections on wide screens, last on narrow ones.
+    with right_b, st.container(key="search"):
         term = st.text_input(
             "Find more sections", key="find", placeholder="Search the documentation"
         )
