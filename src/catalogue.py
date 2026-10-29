@@ -36,6 +36,9 @@ from catalogue_review import ensure_review_file, read_review, review_errors, rev
 from config import (
     AREA_MIN_QUESTIONS,
     CATALOGUE_CAMEL_BOUNDARY,
+    CATALOGUE_DUPLICATE_EXCERPT_WORDS,
+    CATALOGUE_DUPLICATE_MAX_SECTIONS,
+    CATALOGUE_DUPLICATE_MIN_WORDS,
     CATALOGUE_EXCERPT_CHARS,
     CATALOGUE_FOLD_MIN_LENGTH,
     CATALOGUE_FREEZE_FILE,
@@ -55,6 +58,7 @@ from config import (
     MULTI_SECTION_MIN_SECTIONS,
     PILOT_DIR,
     QUESTION_CLASSES,
+    QUESTION_TYPE_HINTS,
     QUESTION_TYPES,
     QUESTIONS_FILE,
     SECTION_INDEX_FILE,
@@ -87,6 +91,7 @@ class Corpus:
         self.by_id = {s["section_id"]: s for s in sections}
         self._h1 = {s["doc_id"]: s for s in sections if s["level"] == 1}
         self._starts: dict[str, list[int]] = {}
+        self._duplicates: dict[int, tuple[dict, dict]] = {}  # shared_passages index per run length
 
     def char_span(self, section: dict) -> tuple[int, int]:
         """Character range of the section in its document text (same slice as the chunks)."""
@@ -170,6 +175,38 @@ def _excerpt(text: str, start: int, end: int, lower: int, upper: int) -> str:
     return " ".join(window.split())
 
 
+def nested(a: dict, b: dict) -> bool:
+    """True if one of the two sections lies inside the other (same document)."""
+    if a["doc_id"] != b["doc_id"]:
+        return False
+    inside = a["start_token"] <= b["start_token"] and b["end_token"] <= a["end_token"]
+    return inside or (b["start_token"] <= a["start_token"] and a["end_token"] <= b["end_token"])
+
+
+def own_spans(corpus: Corpus, section: dict) -> list[tuple[int, int]]:
+    """Character ranges of the section's own text: its range minus its subsections."""
+    start, end = corpus.char_span(section)
+    children = sorted(
+        corpus.char_span(c)
+        for c in corpus.sections
+        if c["level"] > section["level"] and c is not section and nested(section, c)
+    )
+    spans, at = [], start
+    for a, b in children:
+        if a > at:
+            spans.append((at, a))
+        at = max(at, b)
+    if at < end:
+        spans.append((at, end))
+    return spans
+
+
+def own_text(corpus: Corpus, section: dict) -> str:
+    """The section's text without its subsections (what `find` searches)."""
+    text = corpus.docs[section["doc_id"]]["text"]
+    return "\n".join(text[a:b] for a, b in own_spans(corpus, section))
+
+
 def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
     """Sections whose own text contains term (literal, case-insensitive), with an excerpt.
 
@@ -182,20 +219,77 @@ def find(corpus: Corpus, term: str) -> list[tuple[dict, str]]:
     hits = []
     for s in corpus.sections:
         start, end = corpus.char_span(s)
-        children = [
-            corpus.char_span(c)
-            for c in corpus.sections
-            if c["doc_id"] == s["doc_id"]
-            and c["level"] > s["level"]
-            and s["start_token"] <= c["start_token"]
-            and c["end_token"] <= s["end_token"]
-        ]
         text = corpus.docs[s["doc_id"]]["text"]
-        for match in pattern.finditer(text, start, end):
-            if not any(a <= match.start() < b for a, b in children):
+        for a, b in own_spans(corpus, s):
+            match = pattern.search(text, a, b)
+            if match:
                 hits.append((s, _excerpt(text, match.start(), match.end(), start, end)))
                 break
     return hits
+
+
+def _duplicate_index(corpus: Corpus, min_words: int) -> tuple[dict, dict]:
+    """Words of every section's own text and the sections containing each run of min_words."""
+    if min_words not in corpus._duplicates:
+        words = {
+            s["section_id"]: WORD_RE.findall(own_text(corpus, s).lower()) for s in corpus.sections
+        }
+        index: dict[tuple[str, ...], set[str]] = {}
+        for sid, ws in words.items():
+            for i in range(len(ws) - min_words + 1):
+                index.setdefault(tuple(ws[i : i + min_words]), set()).add(sid)
+        corpus._duplicates[min_words] = (words, index)
+    return corpus._duplicates[min_words]
+
+
+def shared_passages(
+    corpus: Corpus,
+    section_id: str,
+    min_words: int = CATALOGUE_DUPLICATE_MIN_WORDS,
+    excerpt_words: int = CATALOGUE_DUPLICATE_EXCERPT_WORDS,
+    max_sections: int = CATALOGUE_DUPLICATE_MAX_SECTIONS,
+) -> list[tuple[dict, str]]:
+    """Other sections whose own text shares a run of at least min_words words with this one.
+
+    A run found in more than max_sections sections is a template and does not count. One row
+    per section with the longest shared run as excerpt, longest first; sections that contain this
+    one or lie inside it do not count (ADR 0029: they add no text).
+    """
+    seed = corpus.by_id[section_id]
+    words, index = _duplicate_index(corpus, min_words)
+    ws = words[section_id]
+    positions: dict[str, list[int]] = {}
+    for i in range(len(ws) - min_words + 1):
+        holders = index.get(tuple(ws[i : i + min_words]), set())
+        if len(holders) > max_sections:
+            continue
+        for other in holders:
+            positions.setdefault(other, []).append(i)
+    hits = []
+    for s in corpus.sections:
+        found = positions.get(s["section_id"])
+        if not found or s is seed or nested(seed, s):
+            continue
+        best_start, best_len, run_start, run_len = found[0], 1, found[0], 1
+        for prev, cur in zip(found, found[1:], strict=False):
+            run_start, run_len = (run_start, run_len + 1) if cur == prev + 1 else (cur, 1)
+            if run_len > best_len:
+                best_start, best_len = run_start, run_len
+        run = ws[best_start : best_start + best_len + min_words - 1]
+        excerpt = " ".join(run[:excerpt_words]) + (" …" if len(run) > excerpt_words else "")
+        hits.append((len(run), s, excerpt))
+    hits.sort(key=lambda h: -h[0])  # stable: equal lengths stay in sections.jsonl order
+    return [(s, excerpt) for _, s, excerpt in hits]
+
+
+def suggest_type(question: str) -> tuple[str, str] | None:
+    """The question type the wording points to and the phrase that did (config hints), or None."""
+    text = question.replace("\u2019", "'").lower().strip()
+    for qtype, pattern in QUESTION_TYPE_HINTS:
+        match = re.search(pattern, text)
+        if match:
+            return qtype, match.group(0)
+    return None
 
 
 def show(corpus: Corpus, section_id: str) -> str:

@@ -594,3 +594,116 @@ def test_cli_screen_refuses_after_the_freeze(cli, tmp_path, capsys):
     (tmp_path / "freeze.json").write_text("{}", encoding="utf-8")  # cli's CATALOGUE_FREEZE_FILE
     assert catalogue.run_screen(completer=FakeCompleter(), runs_file=tmp_path / "r.jsonl") == 1
     assert "frozen" in capsys.readouterr().err
+
+
+DUPLICATE_PAGES = {
+    "a/one.md": (
+        "# One {#one}\n\n## Alpha {#alpha}\n\n"
+        "Shared: the plugin installs all three skills for every project today. "
+        "Then the cache keys on bundle id so recordings replay everywhere. Unique alpha text.\n\n"
+        "### Inner {#inner}\n\n"
+        "Again the plugin installs all three skills for every project today.\n"
+    ),
+    "b/two.md": (
+        "# Two {#two}\n\n## Beta {#beta}\n\n"
+        "Note that the plugin installs all three skills for every project today. "
+        "Also the cache keys on bundle id so recordings replay everywhere.\n\n"
+        "## Gamma {#gamma}\n\nGamma says plugin installs all three skills for every page.\n"
+    ),
+}
+
+
+@pytest.fixture
+def duplicate_corpus(tmp_path):
+    return load_corpus(*build_corpus(tmp_path, DUPLICATE_PAGES))
+
+
+def test_own_text_excludes_subsections(duplicate_corpus):
+    own = catalogue.own_text(duplicate_corpus, duplicate_corpus.by_id["D001#alpha"])
+    assert "Unique alpha text" in own
+    assert "Again" not in own
+
+
+def test_shared_passages_finds_text_shared_with_another_section(duplicate_corpus):
+    hits = catalogue.shared_passages(duplicate_corpus, "D001#alpha")
+    assert [s["section_id"] for s, _ in hits] == ["D002#beta"]
+    assert "plugin installs all three skills for every project today" in hits[0][1]
+
+
+def test_shared_passages_ignores_ancestors_and_descendants(duplicate_corpus):
+    assert "D001#alpha" not in [
+        s["section_id"] for s, _ in catalogue.shared_passages(duplicate_corpus, "D001#inner")
+    ]
+    assert "D001#inner" not in [
+        s["section_id"] for s, _ in catalogue.shared_passages(duplicate_corpus, "D001#alpha")
+    ]
+
+
+def test_shared_passages_one_row_per_section(duplicate_corpus):
+    hits = catalogue.shared_passages(duplicate_corpus, "D002#beta")
+    ids = [s["section_id"] for s, _ in hits]
+    assert ids.count("D001#alpha") == 1
+
+
+def test_shared_passages_below_threshold_is_not_a_hit(duplicate_corpus):
+    assert catalogue.shared_passages(duplicate_corpus, "D002#gamma") == []
+
+
+def test_shared_passages_excerpt_is_capped(duplicate_corpus):
+    hits = catalogue.shared_passages(duplicate_corpus, "D001#alpha", excerpt_words=5)
+    assert hits[0][1].endswith("…")
+    assert len(hits[0][1].split()) == 6  # five words and the ellipsis
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("How do I install the plugin?", "procedural"),
+        ("What is the difference between X and Y?", "comparative"),
+        ("Why does e2e retry a step?", "conceptual"),
+        ("Which models can’t use the forced tool choice?", "limitation"),
+        ("What does init write?", "factual"),
+        ("Install it", None),
+    ],
+)
+def test_suggest_type(question, expected):
+    found = catalogue.suggest_type(question)
+    assert (found[0] if found else None) == expected
+
+
+def test_suggest_type_names_the_matched_phrase():
+    assert catalogue.suggest_type("HOW DO I install it?") == ("procedural", "how do i")
+
+
+def test_class_guide_covers_every_class():
+    from config import CATALOGUE_CLASS_GUIDE
+
+    assert set(CATALOGUE_CLASS_GUIDE) == set(QUESTION_CLASSES)
+    assert all(g["rule"] and 2 <= len(g["prompts"]) <= 3 for g in CATALOGUE_CLASS_GUIDE.values())
+
+
+def test_shared_passages_skips_text_found_in_too_many_sections(duplicate_corpus):
+    # alpha, beta and inner share "plugin installs all three skills …": three sections > 2
+    hits = catalogue.shared_passages(duplicate_corpus, "D002#beta", max_sections=2)
+    assert all("plugin installs" not in excerpt for _, excerpt in hits)
+    assert [s["section_id"] for s, _ in hits] == ["D001#alpha"]  # still shares the cache sentence
+
+
+def test_shared_passages_longest_shared_text_first(tmp_path):
+    pages = {
+        "a/one.md": (
+            "# One {#one}\n\n## Short {#short}\n\none two three four five six seven eight\n"
+        ),
+        "b/two.md": (
+            "# Two {#two}\n\n## Long {#long}\n\n"
+            "red green blue cyan teal pink gold gray navy lime\n"
+        ),
+        "c/three.md": (
+            "# Three {#three}\n\n## Seed {#seed}\n\n"
+            "one two three four five six seven eight. "
+            "red green blue cyan teal pink gold gray navy lime\n"
+        ),
+    }
+    corpus = load_corpus(*build_corpus(tmp_path, pages))
+    ids = [s["section_id"] for s, _ in catalogue.shared_passages(corpus, "D003#seed")]
+    assert ids == ["D002#long", "D001#short"]

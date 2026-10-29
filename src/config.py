@@ -254,6 +254,55 @@ CATALOGUE_STOPWORDS = (
     "to", "under", "was", "we", "were", "what", "when", "where", "which", "who", "whom",
     "whose", "why", "will", "with", "without", "would", "you", "your",
 )  # fmt: skip
+# Editor aids (ADR 0049). Literal duplicates: another section's own text shares a run of at least
+# this many words (lowercase, CATALOGUE_WORD_PATTERN); the excerpt shows at most this many words.
+CATALOGUE_DUPLICATE_MIN_WORDS = 8
+CATALOGUE_DUPLICATE_EXCERPT_WORDS = 24
+# A run found in more sections than this is a template (config snippet, link text), not a duplicate
+CATALOGUE_DUPLICATE_MAX_SECTIONS = 8
+CATALOGUE_DUPLICATE_VISIBLE = 10  # "Also covered elsewhere": rows shown before "Show all"
+# Type suggested from the written question: (type, pattern) in order, first match wins; matched
+# against the lowercased question with typographic apostrophes straightened. Jonas confirms it.
+QUESTION_TYPE_HINTS = (
+    ("comparative", r"\b(difference|differ|versus|vs\.?|compared?|instead of)\b"),
+    ("limitation", r"\b(can't|cannot|not support\w*|unsupported|limits?|limitations?|fails?)\b"),
+    ("procedural", r"\b(how (do|can|should) (i|you|we)|how to)\b"),
+    ("conceptual", r"\b(why|purpose|when should)\b"),
+    ("factual", r"^(what|which|where|when|who|does|do|is|are|can)\b"),
+)
+# Guide per construction class (D29), shown above the form: the rule in one sentence and prompts
+# that are the same for every section, so they never suggest content.
+CATALOGUE_CLASS_GUIDE = {
+    "single": {
+        "rule": "The answer is the main content of this one section; no other section holds it.",
+        "prompts": (
+            "What is the one thing this section is mainly about?",
+            "What would a developer need it for, in a sentence of your own?",
+        ),
+    },
+    "multi-section": {
+        "rule": "The answer needs at least two sections, and every one of them adds a part.",
+        "prompts": (
+            "Which part of this section only makes sense together with another section?",
+            "Which other section completes it? Add it under Relevant sections.",
+            "Does your answer contain a part from every listed section?",
+        ),
+    },
+    "detail": {
+        "rule": "One section, one single fact; the answer has at most 30 words.",
+        "prompts": (
+            "Which single value, name, limit or default does this section state?",
+            "Is that fact stated only here? Check Also covered elsewhere.",
+        ),
+    },
+    "paraphrase": {
+        "rule": "One section; the question shares no content word with its heading or page title.",
+        "prompts": (
+            "What does this section say, put into your own everyday words?",
+            "Which words of the headings must your question avoid? The checks show them.",
+        ),
+    },
+}
 
 # ---------------------------------------------------------------------------
 # LLM / Embedding (D15, D16)
