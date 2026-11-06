@@ -3,7 +3,8 @@
 ## Status
 
 Angenommen (14.10.2026; präzisiert [ADR 0005](0005-drei-chunking-strategien.md)); Auswertung einer C4 festgelegt im
-[Nachtrag 22.10.2026](#nachtrag-22102026-c4-nur-deskriptiv) (Jonas)
+[Nachtrag 22.10.2026](#nachtrag-22102026-c4-nur-deskriptiv) (Jonas); C4 entfällt laut
+[Nachtrag 06.11.2026](#nachtrag-06112026-c4-entfällt)
 
 ## Kontext
 
@@ -32,3 +33,10 @@ Von Jonas entschieden; ändert die Bedingung oben nicht. Kommt C4, wird sie nur 
 Testplans von [ADR 0044](0044-statistische-auswertung.md) (Friedman und Wilcoxon bleiben bei C1–C3), ohne Zweitbewertung
 ([ADR 0046](0046-zweitbewertung.md)) und ohne RAGAS ([ADR 0047](0047-ragas-als-triangulation.md)). Diese ADRs und die
 Invarianten in `AGENTS.md` bleiben damit unverändert.
+
+## Nachtrag 06.11.2026: C4 entfällt
+
+Von Jonas entschieden. Am 06.11.2026 hatte der Hauptkatalog 1 von 48 Fragen; der Meilenstein „Ground Truth
+eingefroren“ ist nicht bis zum 09.11.2026 erreichbar und wurde auf den 13.11.2026 verschoben
+([Plan](../plan.md#zeitplan)). Damit ist die Bedingung oben nicht erfüllt: C4 wird nicht umgesetzt und nicht berichtet.
+Das Experiment bleibt bei C1–C3 mit den Kontrollen K1 und K0.

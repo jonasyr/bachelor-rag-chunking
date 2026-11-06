@@ -69,7 +69,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0025](0025-korpus-guide-api-styleguide.md) | Korpus: Guide, API-Referenz (Composition) und Style Guide auf `40aa88a` | Ersetzt durch 0038 |
 | [0026](0026-c3-vergleichbarkeit.md) | C3-Vergleichbarkeit: Größenkontrolle K1 und faire Sensitivitätsregel | Angenommen; ändert die Sensitivitätsregel von 0019; Hinweis: Zahlen vom Vue-Korpus, K1-Wert korpusabhängig |
 | [0027](0027-blinde-annotation.md) | Relevanz-Annotation blind vor jedem Retrieval; nachträgliche Ergänzungen nur als Sensitivität | Angenommen; technisch umgesetzt durch 0030 |
-| [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen; Nachtrag 22.10.2026 (C4 nur deskriptiv) |
+| [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen; Nachträge 22.10.2026 (C4 nur deskriptiv), 06.11.2026 (C4 entfällt) |
 | [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragetypen, Konstruktionsklassen und Quoten des Fragenkatalogs | Angenommen; ergänzt durch 0031; Bereichsuntergrenzen ersetzt und Stoppwörter angepasst durch 0039; Hinweis: Quelle des Verhältnisses 2:2:2:1:1 |
 | [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre | Angenommen; erweitert durch 0031; ergänzt durch 0040 |
 | [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen; Slotzahlen ersetzt durch 0039; ergänzt durch 0040 |
