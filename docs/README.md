@@ -37,6 +37,7 @@ Bei Widersprüchen gelten die [ADRs](adr/README.md), danach die Seiten unter „
 | [reference/corpus-selection.md](reference/corpus-selection.md) | Korpusauswahl: Vorgehen, Ergebnis, Grenzen, Dateien und Befehle |
 | [reference/data-formats.md](reference/data-formats.md) | Formate aller Datenartefakte, Laufprotokoll, Auswertung, Pilot-Sets; versioniert und ignoriert |
 | [reference/question-catalogue.md](reference/question-catalogue.md) | Fragenkatalog: Umfang, Typen, Konstruktionsklassen, Regeln für Annotation und Aufbau |
+| [reference/question-writing-guide.md](reference/question-writing-guide.md) | Schreibleitfaden (englisch): Fragetypen, Klassen, Frage- und Referenzantwort-Regeln, Checkliste vor dem Speichern |
 | [reference/evaluation.md](reference/evaluation.md) | Metriken, Kontrollen K1 und K0, Rubrik, regelbasierte und blinde Bewertung, Triangulation mit RAGAS, Zweitbewertung, Kosten, Statistik, Abbildungen |
 | [reference/prompts.md](reference/prompts.md) | Prompt-Vorlagen (mit Kontext; Closed-Book für Prüfung und K0) und Parameter |
 | [reference/literature.md](reference/literature.md) | Literaturbasis, technische Webquellen, Methodenquellen der Bewertung |
