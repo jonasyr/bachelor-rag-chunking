@@ -1,1 +1,16 @@
 question_id,expected_answer,relevant_doc_ids,relevant_section_ids
+Q001,"Install it using the plugin marketplace:
+
+```bash
+claude plugin marketplace add tester-army/e2e
+claude plugin install e2e@e2e
+```
+
+Then start a new session after installing.",D013,D013#install-the-skill
+Q002,"When no reference screenshot exists, the first test run creates one but fails, so developers should inspect and commit the image before rerunning. Screenshot files should be committed alongside the corresponding tests. Each target and operating system uses separate snapshot files because fonts and rendering differ.",D058,D058#stored-screenshots
+Q003,DeepSeek V4 and Meta Muse Spark.,D036,D036#ai-sdk-providers
+Q004,"The authentication token should be read from `request.env` provided to `DeviceProvider.acquire`, rather than directly from `process.env`.",D035,D035#hosted-devices
+Q005,"For local development, developers can authenticate using an existing subscription, such as ChatGPT Plus or Pro, by running `npx e2e login openai`, or configure an AI SDK provider with the required API credentials. In CI environments, authentication should use API keys provided through environment variables. These credentials should be stored as CI secrets. API keys should only be made available to trusted builds to prevent unauthorized access.",D037;D036;D008;D055;D040,D037#use-a-subscription-or-api-key;D036#ai-sdk-providers;D008#model-credentials;D055#ci;D055#set-up;D040#commands
+Q006,"For an iOS Expo development build, developers can configure `app.launchArguments` with `--initialUrl` pointing to the development server. Camera access can be granted through `app.permissions` by setting `camera: 'grant'`, which prevents a system permission prompt. Each test should begin with `app.open()` because the initial warm-up does not apply the configured launch arguments or permissions.",D035;D047,D035#expo-development-builds;D035#launch-arguments-and-permissions;D047#engine
+Q007,"Developers can start an authenticated exploration using `npx e2e explore --session admin 'Explore the admin settings'`, provided a setup test saves the named session. The explorer runs only the corresponding setup test and restores its session before starting. To keep screenshots available, the setup can authenticate through a session cookie using `browser.setCookies` instead of filling a secret, since a password fill disables screenshots for the restored exploration.",D019;D004;D040;D051,D019#start-signed-in;D004#sign-in-once-in-a-setup-test;D040#commands;D051#screenshots-after-a-secret-fill
+Q008,"The decision-model executor selects the `type` operation and identifies a target field from the latest screen observation. A separate text model then generates the input value using the goal, parameters, field label, and page text. The executor enters exactly the generated string into the selected field.",D016,D016#what-the-model-can-do;D016#how-text-gets-typed

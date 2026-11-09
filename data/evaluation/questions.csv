@@ -1,1 +1,9 @@
 question_id,question,type,difficulty,notes
+Q001,How do I install the e2e Claude Code plugin?,procedural,single,"Plugin block is the only part of this section not stated elsewhere (init, paths and npx skills add also in D006#install-the-skill and D040#commands)."
+Q002,How do I establish screenshot baselines for visual tests in e2e?,procedural,single,
+Q003,Which models does e2e identify as refusing forced tool choice during agent steps?,factual,detail,
+Q004,Where should a custom e2e integration retrieve its authentication token when starting remote iOS or Android test sessions?,factual,paraphrase,
+Q005,How should developers configure e2e agent authentication for local development compared to CI environments?,comparative,multi-section,
+Q006,How can an iOS Expo development build be configured in e2e to connect directly to its development server with camera permission already granted?,procedural,multi-section,
+Q007,How can developers explore an app while already signed in without losing the ability to capture screenshots?,procedural,multi-section,
+Q008,How does e2e's decision-model executor select a text field and determine what to enter into it?,conceptual,multi-section,

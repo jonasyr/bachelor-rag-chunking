@@ -1,18 +1,18 @@
 area,draw,section_id,slot_id,class,status,skip_reason,question_id
-Get started,1,D013#install-the-skill,S01,single,open,,
-Get started,2,D037#use-a-subscription-or-api-key,S02,multi-section,open,,
+Get started,1,D013#install-the-skill,S01,single,used,,Q001
+Get started,2,D037#use-a-subscription-or-api-key,S02,multi-section,used,,Q005
 Get started,3,D014#assertions,,,reserve,,
 Get started,4,D037#add-an-agent-step,,,reserve,,
-Platforms,1,D035#hosted-devices,S03,paraphrase,open,,
-Platforms,2,D035#expo-development-builds,S04,multi-section,open,,
+Platforms,1,D035#hosted-devices,S03,paraphrase,used,,Q004
+Platforms,2,D035#expo-development-builds,S04,multi-section,used,,Q006
 Platforms,3,D003#signed-in-requests,,,reserve,,
 Platforms,4,D059#limits,,,reserve,,
-Features,1,D058#stored-screenshots,S05,single,open,,
-Features,2,D019#start-signed-in,S06,multi-section,open,,
+Features,1,D058#stored-screenshots,S05,single,used,,Q002
+Features,2,D019#start-signed-in,S06,multi-section,used,,Q007
 Features,3,D006#next,,,reserve,,
 Features,4,D004#session-rules,,,reserve,,
-Models and agents,1,D036#ai-sdk-providers,S07,detail,open,,
-Models and agents,2,D016#what-the-model-can-do,S08,multi-section,open,,
+Models and agents,1,D036#ai-sdk-providers,S07,detail,used,,Q003
+Models and agents,2,D016#what-the-model-can-do,S08,multi-section,used,,Q008
 Models and agents,3,D016#install-and-configure,,,reserve,,
 Models and agents,4,D055#ci,,,reserve,,
 Run in CI,1,D011#workflow,S09,detail,open,,
