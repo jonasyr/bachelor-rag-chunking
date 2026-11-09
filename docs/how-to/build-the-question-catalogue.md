@@ -39,6 +39,8 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    uv run streamlit run app/catalogue_editor.py --server.address localhost
    ```
 
+   Vor jedem Block legt Claude ein Vorbereitungsblatt `data/evaluation/catalogue_prep_block<N>.md` an (wörtliche
+   Doppelungen je Satz, Klassenregel; [ADR 0049](../adr/0049-schreibhilfen-im-editor.md#nachtrag-09112026-vorbereitungsblätter-für-jeden-block)).
    Der Abschnitt erscheint formatiert (Markdown); „Source text“ zeigt den genauen Text, auf den sich die Relevanzregel
    bezieht. Je Slot: die Leitfragen der Klasse oben lesen, den Ausgangsabschnitt lesen, Frage und Referenzantwort
    schreiben. „Also covered elsewhere“ unter dem Abschnitt zeigt Abschnitte mit demselben Text (mechanisch) oder Inhalt

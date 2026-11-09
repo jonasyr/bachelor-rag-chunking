@@ -3,7 +3,8 @@
 ## Status
 
 Angenommen (29.10.2026; ergänzt [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md); Entwurf:
-[Spec](../superpowers/specs/2026-10-29-catalogue-guidance-design.md))
+[Spec](../superpowers/specs/2026-10-29-catalogue-guidance-design.md)); Vorbereitungsblätter für alle Blöcke laut
+[Nachtrag 09.11.2026](#nachtrag-09112026-vorbereitungsblätter-für-jeden-block)
 
 ## Kontext
 
@@ -52,3 +53,15 @@ aus ADR 0031 in diesem Sinn.
   Inhalte ab, nicht Vorlagen.
 - Schlecht: Die Überschneidungsliste ist eine KI-Vorauswahl; sie kann Abschnitte übersehen. Die Suche im Editor und die
   Durchsicht nach jedem Block bleiben deshalb Pflicht.
+
+## Nachtrag 09.11.2026: Vorbereitungsblätter für jeden Block
+
+Von Jonas entschieden. Punkt 5 gilt nicht nur für Block 1: Claude legt vor jedem Block ein Vorbereitungsblatt
+`data/evaluation/catalogue_prep_block<N>.md` an, versioniert mit dem Block. Es entsteht mechanisch: je Satz des
+Ausgangsabschnitts (ohne Codeblöcke), ob eine Folge von fünf Wörtern auch im eigenen Text eines anderen Abschnitts steht
+(ohne umschließende und enthaltene Abschnitte), für Begriffe in Backticks die anderen Abschnitte mit diesem Begriff
+(gelistet bis zehn Treffer), dazu die Zeilen aus `catalogue_overlap.csv` und die Klassenregel. Es enthält keine Frage,
+keine Antwort, keinen Typ und kein Relevanzurteil. „ONLY HERE“ bedeutet nur „kein wörtlicher Treffer“; anders
+formulierte Stellen mit gleichem Inhalt deckt die Überschneidungsliste ab, die Suche im Editor und die Durchsicht nach
+jedem Block bleiben Pflicht. Anlass: In Block 1 brachen mehrere Fragen die Klassenregel erst in der Durchsicht, weil
+Teile der Antwort wörtlich in weiteren Abschnitten standen.
