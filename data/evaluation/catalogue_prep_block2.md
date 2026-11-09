@@ -3,10 +3,10 @@
 KI-Hilfe (Claude) vor dem Schreiben, offengelegt nach ADR 0031/0049, wie das Blatt zu Block 1. Rein mechanisch: je Satz
 des Ausgangsabschnitts (ohne Codeblöcke), ob eine Folge von 5 Wörtern auch im eigenen Text eines anderen Abschnitts
 steht (außer umschließenden und enthaltenen Abschnitten), und für Begriffe in Backticks, in welchen anderen
-Abschnitten sie vorkommen (nur bei höchstens 10 Treffern gelistet). Dazu die Zeilen aus `catalogue_overlap.csv`. Es
-enthält keine Frage, keine Antwort, keinen Typ und kein Relevanzurteil. „ONLY HERE“ heißt nur: kein wörtlicher Treffer;
-anders formulierte Stellen mit gleichem Inhalt findet es nicht (dafür „Also covered elsewhere“ im Editor). Erstellt am
-09.11.2026.
+Abschnitten sie vorkommen (nur bei höchstens 10 Treffern gelistet, dann vollständig). Dazu die Zeilen aus
+`catalogue_overlap.csv`. Es enthält keine Frage, keine Antwort, keinen Typ und kein Relevanzurteil. „ONLY HERE“ heißt
+nur: kein wörtlicher Treffer; anders formulierte Stellen mit gleichem Inhalt findet es nicht (dafür „Also covered
+elsewhere“ im Editor). Erstellt am 09.11.2026.
 
 ## S09 · detail · D011#workflow  (EAS Workflows › Workflow; page title: EAS Workflows)
 
@@ -50,12 +50,12 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 Regel: genau ein Abschnitt, dessen Hauptinhalt die Antwort ist; kein anderer Abschnitt enthält sie.
 
 - **[ONLY HERE]** ## Choose device options | Option | Default | Purpose | | --- | --- | --- | | `region` | Limrun selects | Region preference, such as `eu` or `us-east1`.
-    term `region` also in 6: D036#ai-sdk-providers, D037#use-a-subscription-or-api-key, D038#vision, D050#locator-actions, D050#queries …
+    term `region` also in 6: D036#ai-sdk-providers, D037#use-a-subscription-or-api-key, D038#vision, D050#locator-actions, D050#queries, D050#types
 - **[ONLY HERE]** Capacity may cause overflow to another region.
 - **[ONLY HERE]** | | `hardTimeout` | `1h` | Maximum device lifetime, including abandoned runs.
 - **[ONLY HERE]** Use a Go duration such as `30m` or `2h`.
 - **[ONLY HERE]** | | `ios.model` | Limrun selects | `iphone` or `ipad`.
-    term `iphone` also in 9: D010#workflow, D012#ios-and-android, D035#agent-tools, D035#hosted-devices, D035#several-devices …
+    term `iphone` also in 9: D010#workflow, D012#ios-and-android, D035#agent-tools, D035#hosted-devices, D035#several-devices, D047#agent-tools, D047#engine, D047#reference-mobile, D057#device-toolkits
 - **[ONLY HERE]** | | `android.model` | Limrun selects | `phone` or `tablet`.
     term `tablet` also in 1: D059#one-size-per-target
 - **[ONLY HERE]** | | `android.osVersion` | `15` | Android major version requested as a scheduling clue.
@@ -109,7 +109,7 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 Regel: genau ein Abschnitt, ein einzelnes Faktum, Referenzantwort höchstens 30 Wörter; das Faktum muss nur hier stehen.
 
 - **[ONLY HERE]** ## Declare what a tool does `defineTool` takes the AI SDK tool and these annotations:
-    term `defineTool` also in 9: D041#agentconfig, D041#agents, D042#actions, D044#runner-codes, D046#the-catalog …
+    term `defineTool` also in 9: D041#agentconfig, D041#agents, D042#actions, D044#runner-codes, D046#the-catalog, D051#tool-calls, D057#add-a-tool, D057#observe-from-a-tool, D060#ship-a-tool-pack
 - **[ONLY HERE]** | Annotation | Meaning | | --- | --- | | `mutates: true` | Changes state.
     term `mutates: true` also in 3: D018#driving-the-page-yourself, D057#add-a-tool, D057#observe-from-a-tool
 - **[ONLY HERE]** The call takes a slot of the step's action budget before it runs, failed or not, and runs in order with the other actions.
@@ -136,7 +136,7 @@ Regel: genau ein Abschnitt, ein einzelnes Faktum, Referenzantwort höchstens 30 
     term `--help` also in 2: D040#help-and-version, D040#reference-cli
     term `--version` also in 1: D040#help-and-version
 - **[ONLY HERE]** `run()` from `e2e/runner` sends no session event, only one `e2e_run_completed` per run that returns a report.
-    term `e2e/runner` also in 8: D040#commands, D044#runner-codes, D049#functions, D049#playwright-test-fixtures, D049#reference-runner …
+    term `e2e/runner` also in 8: D040#commands, D044#runner-codes, D049#functions, D049#playwright-test-fixtures, D049#reference-runner, D049#types, D051#outbound-connections, D056#the-notice
     term `e2e_run_completed` also in 1: D049#functions
     term `run()` also in 4: D026#configure-a-target, D043#engines, D051#outbound-connections, D056#the-notice
 - **[ONLY HERE]** The events go in one request when the command or `run()` ends, with a two-second deadline.
@@ -170,51 +170,51 @@ Regel: genau ein Abschnitt, ein einzelnes Faktum, Referenzantwort höchstens 30 
 - [ALSO: D056#where-it-goes] PostHog keeps no person profile and derives no location | **e2e_cli_session, once per command** | Property | Value | | --- | --- | | `command` | `init`, `run`, `list`, `cache ls`, `guide`, `telemetry`, ...
     term `cache ls` also in 3: D007#inspect-the-cache, D007#next, D040#commands
 - **[ONLY HERE]** | | `flags` | The names of the flags given, such as `--headed` or `--tag`.
-    term `--tag` also in 7: D022#watch-a-run, D032#port-the-config, D033#map-each-api, D040#commands, D049#functions …
+    term `--tag` also in 7: D022#watch-a-run, D032#port-the-config, D033#map-each-api, D040#commands, D049#functions, D052#options, D052#testoptions
 - [ALSO: D040#commands] Never their values | | `exit_code`, `duration_ms` | How the command ended and how long it took | | `error_code` | The runner code of the failure that stopped the command before it could run (`CONFIG_NOT_FOUND`, `INVALID_CONFIG`, ...), `CLI_USAGE` for a flag or argument the CLI rejected, else `null`
-    term `--yes` also in 7: D030#migrate-cypress, D031#migrate-detox, D032#migrate-maestro, D033#migrate-playwright, D034#migrate-selenium …
+    term `--yes` also in 7: D030#migrate-cypress, D031#migrate-detox, D032#migrate-maestro, D033#migrate-playwright, D034#migrate-selenium, D037#set-up-with-your-coding-agent, D040#commands
     term `CONFIG_NOT_FOUND` also in 2: D040#commands, D044#runner-codes
     term `chatgpt` also in 2: D040#commands, D055#set-up
-    term `copilot` also in 6: D037#use-a-subscription-or-api-key, D040#commands, D043#telemetry, D055#pick-a-model, D055#set-up …
+    term `copilot` also in 6: D037#use-a-subscription-or-api-key, D040#commands, D043#telemetry, D055#pick-a-model, D055#set-up, D055#subscriptions
     term `grok` also in 5: D036#ai-sdk-providers, D037#use-a-subscription-or-api-key, D040#commands, D055#set-up, D059#protected-previews
-    term `openai-compatible` also in 6: D036#ai-sdk-providers, D036#pick-a-gateway-or-a-provider, D037#use-a-subscription-or-api-key, D040#commands, D041#agents …
-    term `opencode-console` also in 7: D037#use-a-subscription-or-api-key, D040#commands, D043#model, D055#pick-a-model, D055#set-up …
-    term `openrouter` also in 8: D016#install-and-configure, D016#vision, D036#ai-sdk-providers, D036#pick-a-gateway-or-a-provider, D037#use-a-subscription-or-api-key …
+    term `openai-compatible` also in 6: D036#ai-sdk-providers, D036#pick-a-gateway-or-a-provider, D037#use-a-subscription-or-api-key, D040#commands, D041#agents, D055#set-up
+    term `opencode-console` also in 7: D037#use-a-subscription-or-api-key, D040#commands, D043#model, D055#pick-a-model, D055#set-up, D055#sign-in-help, D055#subscriptions
+    term `openrouter` also in 8: D016#install-and-configure, D016#vision, D036#ai-sdk-providers, D036#pick-a-gateway-or-a-provider, D037#use-a-subscription-or-api-key, D040#commands, D041#agents, D043#model
     term `scaffolded` also in 3: D033#defaults-that-differ, D041#resolution-order, D043#what-app-processes-inherit
 - **[ONLY HERE]** Never the endpoint typed for an OpenAI-compatible gateway | | `skill`, `mcp`, `install` | Whether the agent skill, the MCP registration, and the dependency install were chosen | **e2e_run_completed, once per e2e run, e2e explore, or completed run()** | Property | Value | | --- | --- | | `command` |
-    term `e2e/runner` also in 8: D040#commands, D044#runner-codes, D049#functions, D049#playwright-test-fixtures, D049#reference-runner …
+    term `e2e/runner` also in 8: D040#commands, D044#runner-codes, D049#functions, D049#playwright-test-fixtures, D049#reference-runner, D049#types, D051#outbound-connections, D056#the-notice
     term `run()` also in 4: D026#configure-a-target, D043#engines, D051#outbound-connections, D056#the-notice
 - **[ONLY HERE]** `web`, `ios`, `web@0.6.1`, or your own engine's name and version | | `steps_total`, `steps_agent`, `steps_locator`, `steps_assertion`, `steps_screen`, `steps_app`, `steps_session`, `steps_resource` | Step counts by kind | | `steps_agent_act`, `steps_agent_assert`, `steps_agent_extract`, `steps_agent
 - **[ONLY HERE]** `{"no-entry": 3, "retry": 1}` | | `tests_code_only`, `tests_replayed`, `tests_assisted`, `tests_live` | The executed tests by how the cache carried them: no agent step, every agent step replayed from the cache, the agent ran but the cache carried part of a step, the agent ran every agent step | | `a
 - **[ONLY HERE]** `{"tap": 12, "typeText": 3, "scroll": 2}` | | `model_gateway`, `model_provider`, `model_id`, `model_calls`, `model_tokens`, `model_cached_tokens`, `estimated_cost_usd` | For the first model-backed step: the AI SDK provider that served it (`gateway` for the Vercel AI Gateway, `openrouter.chat`, `open
 - **[ONLY HERE]** Then the run's totals | | `model_calls_act`, `model_calls_assert`, `model_calls_extract`, `model_calls_waitfor` | The model calls by agent entry point | | `cost_source` | `provider` when the provider priced the calls, `none` when nobody priced them, `null` for a run without model calls | | `artifact
-    term `APP_UNREACHABLE` also in 7: D008#upload-the-reports, D015#common-errors, D035#troubleshooting, D038#agent-act, D039#open …
+    term `APP_UNREACHABLE` also in 7: D008#upload-the-reports, D015#common-errors, D035#troubleshooting, D038#agent-act, D039#open, D041#the-app-under-test, D044#agenterror
 - **[ONLY HERE]** `null` for a clean run | | `error_kinds` | For `ENGINE_FAILURE`, `MODEL_PROVIDER_FAILED`, and `ERROR`: the code and a kind read off the message against a closed list (`auth`, `rate-limit`, `overloaded`, `timeout`, `network`, `server`, `bad-request`, `device`, `daemon`, `browser`, `permission`, `not-
-    term `MODEL_PROVIDER_FAILED` also in 6: D007#when-a-recording-is-written, D015#common-errors, D036#what-fails-and-where, D038#agent-act, D044#agenterror …
-    term `daemon` also in 9: D022#install-the-app, D022#integrations-eas, D022#options, D026#choose-device-options, D035#hosted-devices …
+    term `MODEL_PROVIDER_FAILED` also in 6: D007#when-a-recording-is-written, D015#common-errors, D036#what-fails-and-where, D038#agent-act, D044#agenterror, D055#sign-in-help
+    term `daemon` also in 9: D022#install-the-app, D022#integrations-eas, D022#options, D026#choose-device-options, D035#hosted-devices, D035#physical-devices, D035#troubleshooting, D047#engine, D051#outbound-connections
     term `not-found` also in 4: D007#fail-on-a-stale-recording, D007#why-a-step-was-not-replayed, D038#types, D044#agenterror
 - **[ONLY HERE]** Only the kind's name leaves the machine, never the message | Config features, absent when the config didn't load.
 - **[ONLY HERE]** Each is a count, a boolean, or one of the runner's own option values, never text you wrote:
 - [ALSO: D041#recording] | Property | Value | | --- | --- | | `config_workers`, `config_retries` | The worker count and retries the run resolved | | `config_agents`, `config_custom_executor`, `config_separate_judge`, `config_project_tools` | How many agents are configured, whether any has a custom executor or a judge model
     term `on-all-retries` also in 5: D033#browser-timeouts-and-artifacts, D040#commands, D041#artifacts, D041#recording, D052#options
-    term `on-first-retry` also in 6: D015#watch-it-happen, D033#browser-timeouts-and-artifacts, D033#defaults-that-differ, D040#commands, D041#recording …
-    term `production` also in 6: D006#what-the-agent-does, D011#model-key, D022#authenticate, D040#commands, D041#the-app-under-test …
-    term `retain-on-failure` also in 9: D015#watch-it-happen, D033#browser-timeouts-and-artifacts, D033#defaults-that-differ, D040#commands, D041#artifacts …
-    term `staging` also in 7: D005#write-a-provider, D024#setup, D041#the-app-under-test, D051#secrets-in-engine-options, D052#options …
+    term `on-first-retry` also in 6: D015#watch-it-happen, D033#browser-timeouts-and-artifacts, D033#defaults-that-differ, D040#commands, D041#recording, D052#options
+    term `production` also in 6: D006#what-the-agent-does, D011#model-key, D022#authenticate, D040#commands, D041#the-app-under-test, D059#let-the-runner-pick-the-port
+    term `retain-on-failure` also in 9: D015#watch-it-happen, D033#browser-timeouts-and-artifacts, D033#defaults-that-differ, D040#commands, D041#artifacts, D041#e2econfig, D041#recording, D041#top-level, D052#options
+    term `staging` also in 7: D005#write-a-provider, D024#setup, D041#the-app-under-test, D051#secrets-in-engine-options, D052#options, D053#options, D059#protected-previews
 - **[ONLY HERE]** | Property | Value | | --- | --- | | `explore_ended` | Why it stopped:
 - [ALSO: D040#commands] `finished`, `step-limit`, `time`, `stuck`, or `aborted` | | `explore_max_steps`, `explore_timeout_ms` | The budgets it ran with | | `explore_steps`, `explore_steps_passed`, `explore_steps_failed`, `explore_steps_blocked`, `explore_steps_exhausted` | Exploration steps, by how each ended | | `explore_
-    term `aborted` also in 6: D040#commands, D042#lifecycle, D044#agenterror, D044#runner-codes, D049#host …
+    term `aborted` also in 6: D040#commands, D042#lifecycle, D044#agenterror, D044#runner-codes, D049#host, D053#the-browser-fixture
     term `step-limit` also in 1: D040#commands
     term `stuck` also in 1: D040#commands
 - **[ONLY HERE]** `{"1": 0, "2": 1, "3": 0, "4": 0, "5": 1}` | **e2e_mcp_session, once per MCP session** An `e2e mcp` server sends one for each `open_session` it receives, when the session closes or the open fails.
-    term `open_session` also in 8: D040#commands, D044#agenterror, D044#runner-codes, D046#flags, D046#sessions …
+    term `open_session` also in 8: D040#commands, D044#agenterror, D044#runner-codes, D046#flags, D046#sessions, D046#setup, D046#several-sessions, D046#tools
 - **[ONLY HERE]** A session that is still open when the client kills the server isn't sent.
 - **[ONLY HERE]** | Property | Value | | --- | --- | | `client`, `client_version` | The name and version the MCP client gives itself (`claude-code`, `cursor-vscode`, ...).
     term `claude-code` also in 1: D043#telemetry
 - **[ONLY HERE]** `null` before the client introduced itself | | `outcome`, `error_code` | `closed` for a session that opened, `open-failed` with the runner code of the failure (`APP_UNREACHABLE`, `ENGINE_FAILURE`, ...) | | `ended_by` | `agent` for `close_session`, `idle`, `step` for the session's time limit, `server
-    term `APP_UNREACHABLE` also in 7: D008#upload-the-reports, D015#common-errors, D035#troubleshooting, D038#agent-act, D039#open …
+    term `APP_UNREACHABLE` also in 7: D008#upload-the-reports, D015#common-errors, D035#troubleshooting, D038#agent-act, D039#open, D041#the-app-under-test, D044#agenterror
     term `close_session` also in 5: D044#runner-codes, D046#sessions, D046#several-sessions, D046#the-catalog, D046#tools
-    term `idle` also in 9: D022#sessions, D024#watch-and-clean-up-browsers, D026#choose-device-options, D028#limits, D046#sessions …
+    term `idle` also in 9: D022#sessions, D024#watch-and-clean-up-browsers, D026#choose-device-options, D028#limits, D046#sessions, D046#the-catalog, D051#mcp-and-explore, D053#browser-interface, D053#the-browser-fixture
 - **[ONLY HERE]** `null` for a failed open | | `platform`, `engine`, `headed` | The target's platform and engine with its version, as for a run, and whether the UI was shown | | `duration_ms`, `sessions_open` | How long the session lived, and how many other sessions were open when it opened | | `calls_total`, `calls_
 - **[ONLY HERE]** `{"observe": 4, "tap": 9, "locate": 2, "screenshot": 1}` | | `error_codes` | How often each runner code failed a call:
 - **[ONLY HERE]** `{"LOCATOR_NOT_FOUND": 2}`, at most 20 codes |
