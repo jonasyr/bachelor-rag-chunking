@@ -9,5 +9,4 @@ Strategies: ADR 0005 / `docs/explanation/research-design.md`; parameter values a
   (`retrieve.py --control`); `chunk("K1")` aborts if the corpus changed and `K1_CHUNK_SIZE` no longer matches the
   rule — then set the printed value in config.
 - K0 (ADR 0041) is no chunking strategy: answers without retrieval (`config.CONTROL_ANSWER_STRATEGIES`), no chunks.
-- C4 (semantic) only if the 09.11.2026 milestone is met (ADR 0028); then reported descriptively only, outside the test
-  plan (ADR 0044) and outside 0046/0047.
+- C4 (semantic) is dropped: the 09.11.2026 milestone was missed (ADR 0028, addendum 06.11.2026); do not plan or build it.

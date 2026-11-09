@@ -152,15 +152,15 @@ K0). Parameterwerte stehen nur in `src/config.py`, erklärt in [Konfiguration](.
 | **C3** | strukturbasiert an Markdown-Überschriften, mit Unter- und Obergrenze | erhält semantische Einheiten | uneinheitliche Chunkgrößen (auf e2e relevant: sehr lange Referenzseiten neben vielen kurzen Abschnitten) |
 | K1 | Kontrolle, keine Strategie: größenbasiert ohne Overlap in der mittleren C3-Größe, nur Retrieval | trennt Struktur- von Größeneffekt | eine zusätzliche Retrieval-Reihe |
 | K0 | Kontrolle, keine Strategie: dieselben Fragen ohne Retrieval, nur Antworten | zeigt den Beitrag des Retrievals überhaupt | nicht blind bewertbar, kein Quellenbezug |
-| C4 | semantisch (optional) | theoretisch spannend | Mehraufwand, weitere Modellabhängigkeit |
+| C4 | semantisch (entfällt, ADR 0028) | theoretisch spannend | Mehraufwand, weitere Modellabhängigkeit |
 
 **Warum diese drei.** C1 ist die naive, reproduzierbare Untergrenze. C2 ist die Variante, die in der Praxis oft
 genügt; sie als starke Baseline ernst zu nehmen, schützt die Arbeit gegen den Vorwurf der Trivialität (H1). C3 nutzt
 die Markdown-Struktur, die technische Dokumentation ohnehin mitbringt, und ist die Strategie, deren Mehrwert in Frage
-steht. C4 bringt eine weitere Modellabhängigkeit und kommt nur, wenn der Meilenstein 09.11.2026 (Ground Truth
-eingefroren) planmäßig erreicht ist; auch dann wird es nur beschreibend berichtet, außerhalb von Testplan,
-Zweitbewertung und RAGAS ([ADR 0028](../adr/0028-c4-bedingung.md),
-[Nachtrag](../adr/0028-c4-bedingung.md#nachtrag-22102026-c4-nur-deskriptiv)).
+steht. C4 hätte eine weitere Modellabhängigkeit gebracht und wäre nur gekommen, wenn der Meilenstein 09.11.2026 (Ground
+Truth eingefroren) planmäßig erreicht worden wäre; er wurde verschoben, C4 entfällt
+([ADR 0028](../adr/0028-c4-bedingung.md),
+[Nachtrag](../adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)).
 
 **Warum die Kontrolle K1.** C3 unterscheidet sich von C1/C2 nicht nur in der Struktur, sondern auch in der Größe:
 Seine Chunks sind im Mittel kleiner, und bei konstantem top-k erhält das Sprachmodell weniger Kontext. Ohne Kontrolle
