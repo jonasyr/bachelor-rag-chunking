@@ -4,6 +4,8 @@
 
 Stand: 22.10.2026.
 
+Praktischer Schreibleitfaden mit Checkliste (englisch): [Question writing guide](question-writing-guide.md).
+
 **Umfang:** 48 Fragen ([ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md), im Rahmen von [ADR 0017](../adr/0017-fragenkatalog.md): 30–60).
 
 **Fragetypen (englisch):**
