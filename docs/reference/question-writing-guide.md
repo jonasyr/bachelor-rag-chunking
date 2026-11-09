@@ -62,12 +62,16 @@ triggers `comparative` although the question may just ask for a fact).
 
 ## Writing the reference answer
 
-The reference answer becomes the **key points** for scoring: the app splits it at semicolons and at sentence ends,
-at most `config.KEY_POINTS_MAX` = 4 points, point 1 is the **core point** (the direct answer). Generated answers are
-scored on whether they contain each point ([Evaluation](evaluation.md#regelbasierte-bewertung)). So:
+The reference answer pre-fills the **key points** for scoring: the app splits it at semicolons and at sentence ends
+before a capital letter, at most `config.KEY_POINTS_MAX` = 4 points (the rest stays in point 4); you check and edit the
+points before scoring and freeze them. Point 1 is the **core point** (the direct answer). Generated answers are scored
+on whether they contain each point ([Evaluation](evaluation.md#regelbasierte-bewertung),
+[ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)). The cleaner the answer, the less
+editing later. So:
 
 - **First sentence = the direct answer** to the question. Everything else supports it.
-- **One sentence per point, at most four points.** A fifth sentence is merged into the fourth point.
+- **One sentence per point, at most four points.** A fifth sentence is merged into the fourth point. Start each
+  sentence with a capital letter (not with a backticked name, which does not split) and avoid `;` inside a point.
 - **Only what the annotated sections say.** Nothing from other sections, general knowledge or your own inference;
   that would be a point no correct RAG answer can be sure to contain.
 - **Only what the question asks.** Extra but true details (costs, tips, side notes) become key points too and make
