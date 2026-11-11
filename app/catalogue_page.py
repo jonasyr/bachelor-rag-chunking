@@ -38,6 +38,7 @@ SKIP_LABELS = {
     "too-short": "Too short to ask about",
     "duplicate-topic": "Same topic as an earlier slot",
     "no-answerable-content": "Nothing a question could ask",
+    "content-elsewhere": "All its content is also stated elsewhere",
 }
 
 

@@ -5,7 +5,8 @@
 Angenommen (14.10.2026; ergänzt [ADR 0029](0029-fragetypen-und-konstruktionsklassen.md); erweitert
 [ADR 0030](0030-einfrieren-des-fragenkatalogs.md); Slotzahlen ersetzt durch [ADR 0039](0039-stichprobenplan-e2e.md);
 ergänzt durch [ADR 0040](0040-closed-book-pruefung.md) (Closed-Book-Prüfung nach jedem Block) und
-[ADR 0049](0049-schreibhilfen-im-editor.md) (Schreibhilfen, Zugriff über Tailscale)); Zahlen im Kontext:
+[ADR 0049](0049-schreibhilfen-im-editor.md) (Schreibhilfen, Zugriff über Tailscale)); Sprunggrund `content-elsewhere`
+laut [Nachtrag 11.11.2026](#nachtrag-11112026-sprunggrund-content-elsewhere); Zahlen im Kontext:
 Vue-Korpus `40aa88a` ([ADR 0025](0025-korpus-guide-api-styleguide.md)); aktuelle Werte in
 [Korpus](../reference/corpus.md)
 
@@ -57,3 +58,20 @@ Feldzahl oder doppelter Frage-ID als Fehler ablehnen; der Editor läuft nur auf 
 - Neutral: Ein ungeeigneter Abschnitt kostet einen protokollierten Sprung; ist eine Reserve erschöpft, braucht eine
   größere Reserve ein neues ADR.
 - Schlecht: Zufällige Abschnitte erfordern mehr Einarbeitung je Frage als frei gewählte Themen.
+
+## Nachtrag 11.11.2026: Sprunggrund `content-elsewhere`
+
+Von Jonas entschieden. Die vier festen Gründe decken einen Fall nicht ab, der in Block 2 auftrat: Der Abschnitt hat
+beantwortbaren Inhalt, aber jede Aussage, die eine Frage nutzen könnte, steht auch in einem anderen Abschnitt. Nach der
+Duplikatregel (jeder Abschnitt mit einem nötigen Teil der Antwort ist relevant) kann er dann weder `single` noch `detail`
+oder `paraphrase` tragen. Anlass war `D054#what-can-still-leak` (Slot S15, `single`): Seine Lücken stehen in
+`D051#where-redaction-stops`, `D051#site-check`, `D051#cache-trust`, `D051#artifacts`, `D051#redaction` und
+`D041#recording`, seine Ratschläge in `D006#what-the-agent-does`, `D051#policy-denials` und
+`D051#screenshots-after-a-secret-fill`; nur „Keep secrets out of your app's output“ steht allein dort.
+
+Wir werden deshalb einen fünften festen Grund `content-elsewhere` zulassen („jeder Inhalt steht auch woanders“). Er gilt
+nur, wenn die Durchsicht die anderen Abschnitte je Aussage in `catalogue_review.csv` nennt (Zeile der Art `class`) und
+Jonas sie annimmt; „schwer zu schreiben“ bleibt kein Grund. Den Slot übernimmt wie bei jedem Sprung der nächste
+Reserveabschnitt des Bereichs in Ziehungsreihenfolge, für S15 `D005#run-a-script-before-the-page`. Der Sprung wird
+wie jeder andere in der Arbeit berichtet. Schlecht: Der Grund verlangt ein Urteil statt einer Zählung, wie
+`duplicate-topic`; die Belegpflicht in der Durchsicht macht ihn nachprüfbar.

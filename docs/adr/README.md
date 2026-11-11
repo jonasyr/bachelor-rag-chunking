@@ -72,7 +72,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen; Nachträge 22.10.2026 (C4 nur deskriptiv), 06.11.2026 (C4 entfällt) |
 | [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragetypen, Konstruktionsklassen und Quoten des Fragenkatalogs | Angenommen; ergänzt durch 0031; Bereichsuntergrenzen ersetzt und Stoppwörter angepasst durch 0039; Hinweis: Quelle des Verhältnisses 2:2:2:1:1 |
 | [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre | Angenommen; erweitert durch 0031; ergänzt durch 0040 |
-| [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen; Slotzahlen ersetzt durch 0039; ergänzt durch 0040 |
+| [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen; Slotzahlen ersetzt durch 0039; ergänzt durch 0040; Nachtrag 11.11.2026 (Sprunggrund `content-elsewhere`) |
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten | Angenommen; ergänzt durch 0034, 0035; Hinweis: Mischen mit Seed (Nachtrag in 0046) |
 | [0033](0033-antwortmodell.md) | Antwortmodell und einmalige Generierung | Angenommen; ergänzt durch 0041; Nachtrag 22.10.2026 (Belege) |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung in der App | Angenommen; ergänzt durch 0035 |
@@ -90,4 +90,4 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007; ersetzt den Intra-Rater-Folgeschritt von 0035; umgesetzt (PR #40); Nachträge 22.10.2026 (Datenschutz, Maß, Zufallszahlen) |
 | [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachträge 21.10.2026 (Strictness), 26.10.2026 (fehlende Werte) |
 | [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |
-| [0049](0049-schreibhilfen-im-editor.md) | Schreibhilfen im Katalog-Editor | Angenommen; ergänzt 0031; Nachtrag 09.11.2026 (Vorbereitungsblätter für jeden Block) |
+| [0049](0049-schreibhilfen-im-editor.md) | Schreibhilfen im Katalog-Editor | Angenommen; ergänzt 0031; Nachtrag 09.11.2026 (Vorbereitungsblätter für jeden Block), 10.11.2026 (Typ-Eignung im Vorbereitungsblatt) |

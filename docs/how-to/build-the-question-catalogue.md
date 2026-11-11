@@ -40,7 +40,9 @@ Voraussetzung: Snapshot, Ingest und Preprocessing sind gelaufen ([Korpus-Snapsho
    ```
 
    Vor jedem Block legt Claude ein Vorbereitungsblatt `data/evaluation/catalogue_prep_block<N>.md` an (wörtliche
-   Doppelungen je Satz, Klassenregel; [ADR 0049](../adr/0049-schreibhilfen-im-editor.md#nachtrag-09112026-vorbereitungsblätter-für-jeden-block)).
+   Doppelungen je Satz, Klassenregel; [ADR 0049](../adr/0049-schreibhilfen-im-editor.md#nachtrag-09112026-vorbereitungsblätter-für-jeden-block)),
+   ab Block 3 mit der Typ-Eignung je Slot gegen die Typziele im [Plan](../plan.md#zeitplan)
+   ([Nachtrag 10.11.2026](../adr/0049-schreibhilfen-im-editor.md#nachtrag-10112026-typ-eignung-im-vorbereitungsblatt)).
    Der Abschnitt erscheint formatiert (Markdown); „Source text“ zeigt den genauen Text, auf den sich die Relevanzregel
    bezieht. Je Slot: die Leitfragen der Klasse oben lesen, den Ausgangsabschnitt lesen, Frage und Referenzantwort
    schreiben. „Also covered elsewhere“ unter dem Abschnitt zeigt Abschnitte mit demselben Text (mechanisch) oder Inhalt

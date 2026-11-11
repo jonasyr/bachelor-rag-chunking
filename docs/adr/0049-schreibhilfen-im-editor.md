@@ -4,7 +4,8 @@
 
 Angenommen (29.10.2026; ergänzt [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md); Entwurf:
 [Spec](../superpowers/specs/2026-10-29-catalogue-guidance-design.md)); Vorbereitungsblätter für alle Blöcke laut
-[Nachtrag 09.11.2026](#nachtrag-09112026-vorbereitungsblätter-für-jeden-block)
+[Nachtrag 09.11.2026](#nachtrag-09112026-vorbereitungsblätter-für-jeden-block); Typ-Eignung im Blatt laut
+[Nachtrag 10.11.2026](#nachtrag-10112026-typ-eignung-im-vorbereitungsblatt)
 
 ## Kontext
 
@@ -65,3 +66,15 @@ keine Antwort, keinen Typ und kein Relevanzurteil. „ONLY HERE“ bedeutet nur 
 formulierte Stellen mit gleichem Inhalt deckt die Überschneidungsliste ab, die Suche im Editor und die Durchsicht nach
 jedem Block bleiben Pflicht. Anlass: In Block 1 brachen mehrere Fragen die Klassenregel erst in der Durchsicht, weil
 Teile der Antwort wörtlich in weiteren Abschnitten standen.
+
+## Nachtrag 10.11.2026: Typ-Eignung im Vorbereitungsblatt
+
+Von Jonas entschieden. Nach Block 2 fehlen vor allem `conceptual`-Fragen (2 von 12 nach 16 Fragen), und die Ausgangsabschnitte
+sind gezogen, nicht wählbar (ADR 0031). Ab Block 3 nennt das Vorbereitungsblatt deshalb je Slot die Fragetypen, die der
+Text des Abschnitts trägt, jeweils mit der Stelle, auf die sich der Typ stützt, und ob sie nur dort steht (sonst bricht
+die Klassenregel), sowie die Typen, die an der Klasse scheitern (z. B. `comparative` unter `paraphrase`, wenn der
+zweite Gegenstand ein Wort des Seitentitels ist). Das ersetzt für die Typ-Eignung den Satz „Es enthält … keinen Typ“
+des Nachtrags vom 09.11.2026; Frage, Antwort und Relevanzurteil bleiben ausgeschlossen, und den Typ wählt weiter Jonas
+im Editor. Die Typziele je Block stehen im [Plan](../plan.md#zeitplan). Tabellenzeilen zählen im mechanischen Teil ab
+Block 3 je als ein Satz. Schlecht: Der Vorschlag lenkt die Fragen stärker als die bisherigen Hilfen; er wird wie die
+übrigen Hilfen offengelegt.

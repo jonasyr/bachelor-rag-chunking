@@ -15,20 +15,20 @@ Models and agents,1,D036#ai-sdk-providers,S07,detail,used,,Q003
 Models and agents,2,D016#what-the-model-can-do,S08,multi-section,used,,Q008
 Models and agents,3,D016#install-and-configure,,,reserve,,
 Models and agents,4,D055#ci,,,reserve,,
-Run in CI,1,D011#workflow,S09,detail,open,,
-Run in CI,2,D010#workflow,S10,paraphrase,open,,
+Run in CI,1,D011#workflow,S09,detail,used,,Q009
+Run in CI,2,D010#workflow,S10,paraphrase,used,,Q012
 Run in CI,3,D008#model-credentials,,,reserve,,
 Run in CI,4,D009#workflow,,,reserve,,
-Hosted browsers and devices,1,D026#choose-device-options,S11,single,open,,
-Hosted browsers and devices,2,D022#sessions,S12,detail,open,,
+Hosted browsers and devices,1,D026#choose-device-options,S11,single,used,,Q013
+Hosted browsers and devices,2,D022#sessions,S12,detail,used,,Q010
 Hosted browsers and devices,3,D027#set-up-the-provider,,,reserve,,
 Hosted browsers and devices,4,D025#where-it-fits,,,reserve,,
-Extend,1,D057#declare-what-a-tool-does,S13,detail,open,,
+Extend,1,D057#declare-what-a-tool-does,S13,detail,used,,Q014
 Extend,2,D060#capabilities,,,reserve,,
-Deep dive,1,D056#what-is-sent,S14,detail,open,,
-Deep dive,2,D054#what-can-still-leak,S15,single,open,,
-Deep dive,3,D015#watch-it-happen,S16,paraphrase,open,,
-Deep dive,4,D005#run-a-script-before-the-page,,,reserve,,
+Deep dive,1,D056#what-is-sent,S14,detail,used,,Q011
+Deep dive,2,D054#what-can-still-leak,S15,single,skipped,content-elsewhere,
+Deep dive,3,D015#watch-it-happen,S16,paraphrase,used,,Q016
+Deep dive,4,D005#run-a-script-before-the-page,S15,single,used,,Q015
 Deep dive,5,D005#pick-a-lease-scope,,,reserve,,
 Deep dive,6,D015#agent-steps,,,reserve,,
 Migrate,1,D030#map-each-command,S17,paraphrase,open,,
