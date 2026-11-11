@@ -39,14 +39,16 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > 13.11. ist ein Block je Tag nötig. Stehen am 11.11. keine 24 Fragen, ist eine Kürzung des Katalogs (im Rahmen von
 > 30–60, [ADR 0017](adr/0017-fragenkatalog.md)) per neuem ADR zu prüfen.
 
-> **Typverteilung Restkatalog** (10.11.2026, nach 16 Fragen): Es fehlen 11 `conceptual`, 5 `comparative`,
-> 4 `limitation`, 7 `procedural` und 5 `factual` (Quoten: [ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md)).
+> **Typverteilung Restkatalog** (11.11.2026, nach 16 Fragen: 8 `factual`, 4 `procedural`, 2 `conceptual`,
+> 1 `comparative`, 1 `limitation`): Es fehlen 10 `conceptual`, 5 `comparative`, 5 `limitation`, 8 `procedural` und
+> 4 `factual` (Quoten: [ADR 0029](adr/0029-fragetypen-und-konstruktionsklassen.md)).
 > Die Abschnitte sind gezogen und nicht wählbar ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)); gesteuert
 > wird über die Frage, die ein Abschnitt trägt, nie über einen künstlichen Typ. Das Vorbereitungsblatt prüft dazu je
 > Slot die Typ-Eignung ([ADR 0049](adr/0049-schreibhilfen-im-editor.md#nachtrag-10112026-typ-eignung-im-vorbereitungsblatt)).
-> Ziel je Block (conceptual/comparative/limitation/procedural/factual): Block 3 3/2/1/1/1, nach Prüfung der Abschnitte
-> eher 4/1/1/1/1; Block 4 2/2/1/2/1; Block 5 3/1/1/2/1; Block 6 2/1/1/2/2. Weicht ein Block ab, wandert der Rest in den
-> nächsten; die Ziele für Block 4 bis 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft.
+> Ziel je Block (conceptual/comparative/limitation/procedural/factual): Block 3 4/1/1/2/0 (nach Prüfung der
+> Abschnitte; ein zweites `comparative` trägt kein Slot); Block 4 2/2/1/2/1; Block 5 2/1/2/2/1; Block 6 2/1/1/2/2;
+> Summe 10/5/5/8/4. Weicht ein Block ab, wandert der Rest in den nächsten; die Ziele für Block 4 bis 6 werden mit dem
+> jeweiligen Vorbereitungsblatt geprüft.
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))
 > und RAGAS-Feinheiten, nicht die Schreibphase; der RAGAS-Lauf selbst ist fest ([ADR 0047](adr/0047-ragas-als-triangulation.md)).

@@ -10,10 +10,10 @@ Vorschlag; den Typ wählt Jonas (ADR 0031). Das Blatt enthält keine Frage, kein
 „ONLY HERE“ heißt nur: kein wörtlicher Treffer; anders formulierte Stellen mit gleichem Inhalt findet es nicht (dafür
 „Also covered elsewhere“ im Editor). Erstellt am 10.11.2026.
 
-Typziel Block 3 ([Plan](../../docs/plan.md#stand)): 3 conceptual, 2 comparative, 1 limitation, 1 procedural,
-1 factual. Die Abschnitte tragen nach dieser Prüfung eher **4 conceptual, 1 comparative**, 1 limitation,
-1 procedural, 1 factual: Ein zweites `comparative` fand sich in keinem Slot, ohne die Klassenregel zu brechen
-(siehe S17, S19, S22). Das fehlende `comparative` wandert in Block 4.
+Typziel Block 3 ([Plan](../../docs/plan.md#zeitplan), korrigiert am 11.11.2026): **4 conceptual, 1 comparative,
+1 limitation, 2 procedural, 0 factual**. Nach 16 Fragen fehlen nur noch 4 `factual`, aber 8 `procedural`; deshalb
+S21 als `procedural`. Ein zweites `comparative` fand sich in keinem Slot, ohne die Klassenregel zu brechen (siehe S17,
+S19, S22); es wandert in Block 4.
 
 ## S17 · paraphrase · D030#map-each-command  (From Cypress › Map each command; page title: From Cypress)
 
@@ -736,7 +736,7 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 
 Regel: mindestens zwei Abschnitte, jeder liefert einen nötigen Teil; enthaltene oder umschließende Abschnitte zählen nicht als zweiter; H1 nur mit Grund in `notes`.
 
-**Typ-Eignung:** Trägt `factual` oder `procedural`: „Each action resolves one node, waits for actionability, and performs one operation. The timeout is `config.actionTimeout`, and every action takes `{ timeout }`“. Für `multi-section` braucht es einen zweiten nötigen Teil, z. B. die Definition von `actionTimeout` in D041 oder Actionability in D042#capabilities. „actionability“ steht in acht Abschnitten; prüfe, welcher Teil wirklich nötig ist.
+**Typ-Eignung:** Trägt `procedural` (Ziel, weil `factual` fast voll ist) oder `factual`: „Each action resolves one node, waits for actionability, and performs one operation. The timeout is `config.actionTimeout`, and every action takes `{ timeout }`“. Für `multi-section` braucht es einen zweiten nötigen Teil, z. B. die Definition von `actionTimeout` in D041 oder Actionability in D042#capabilities. „actionability“ steht in acht Abschnitten; prüfe, welcher Teil wirklich nötig ist.
 
 - **[ONLY HERE]** ### Locator actions Each action resolves one node, waits for actionability, and performs one operation.
 - **[ONLY HERE]** The timeout is [`config.actionTimeout`](/reference/config#actiontimeout), and every action takes `{ timeout }` to override it.

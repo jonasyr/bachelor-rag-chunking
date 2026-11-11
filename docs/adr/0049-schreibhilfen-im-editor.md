@@ -69,7 +69,7 @@ Teile der Antwort wörtlich in weiteren Abschnitten standen.
 
 ## Nachtrag 10.11.2026: Typ-Eignung im Vorbereitungsblatt
 
-Von Jonas entschieden. Nach 16 Fragen fehlen vor allem `conceptual`-Fragen (1 von 12), und die Ausgangsabschnitte
+Von Jonas entschieden. Nach Block 2 fehlen vor allem `conceptual`-Fragen (2 von 12 nach 16 Fragen), und die Ausgangsabschnitte
 sind gezogen, nicht wählbar (ADR 0031). Ab Block 3 nennt das Vorbereitungsblatt deshalb je Slot die Fragetypen, die der
 Text des Abschnitts trägt, jeweils mit der Stelle, auf die sich der Typ stützt, und ob sie nur dort steht (sonst bricht
 die Klassenregel), sowie die Typen, die an der Klasse scheitern (z. B. `comparative` unter `paraphrase`, wenn der
