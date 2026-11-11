@@ -10,7 +10,7 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 24 von 48 Fragen (Block 1 am 09.11., Block 2 und 3 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 5 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
+Hauptkatalog hat 32 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 6 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
@@ -47,8 +47,9 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > Slot die Typ-Eignung ([ADR 0049](adr/0049-schreibhilfen-im-editor.md#nachtrag-10112026-typ-eignung-im-vorbereitungsblatt)).
 > Ziel je Block (conceptual/comparative/limitation/procedural/factual): Block 3 4/1/1/2/0 (nach Prüfung der
 > Abschnitte; ein zweites `comparative` trägt kein Slot), erreicht 3/1/2/2/0 (S22 als `limitation`); danach Block 4
-> 2/2/1/2/1, Block 5 3/1/1/2/1, Block 6 2/1/1/2/2; Summe 10/5/5/8/4. Weicht ein Block ab, wandert der Rest in den nächsten; die Ziele für Block 4 bis 6 werden mit dem
-> jeweiligen Vorbereitungsblatt geprüft.
+> 2/2/1/2/1, erreicht 1/2/1/1/3 (S25 nach drei Durchsichtsrunden als `factual`, S31 als `factual`); danach fehlen
+> 6/2/2/5/1, Ziel Block 5 3/1/1/3/0, Block 6 3/1/1/2/1. Weicht ein Block ab, wandert der Rest in den nächsten; die
+> Ziele für Block 5 und 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft.
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))
 > und RAGAS-Feinheiten, nicht die Schreibphase; der RAGAS-Lauf selbst ist fest ([ADR 0047](adr/0047-ragas-als-triangulation.md)).
