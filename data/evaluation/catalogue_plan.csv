@@ -31,18 +31,18 @@ Deep dive,3,D015#watch-it-happen,S16,paraphrase,used,,Q016
 Deep dive,4,D005#run-a-script-before-the-page,S15,single,used,,Q015
 Deep dive,5,D005#pick-a-lease-scope,,,reserve,,
 Deep dive,6,D015#agent-steps,,,reserve,,
-Migrate,1,D030#map-each-command,S17,paraphrase,open,,
-Migrate,2,D033#map-each-api,S18,single,open,,
-Migrate,3,D033#what-differs-on-purpose,S19,detail,open,,
-Migrate,4,D032#map-each-command,S20,multi-section,open,,
+Migrate,1,D030#map-each-command,S17,paraphrase,used,,Q017
+Migrate,2,D033#map-each-api,S18,single,used,,Q018
+Migrate,3,D033#what-differs-on-purpose,S19,detail,used,,Q019
+Migrate,4,D032#map-each-command,S20,multi-section,used,,Q020
 Migrate,5,D032#rewrite-selectors,,,reserve,,
 Migrate,6,D033#browser-timeouts-and-artifacts,,,reserve,,
 Migrate,7,D034#rewrite-one-flow,,,reserve,,
 Migrate,8,D031#rewrite-one-spec,,,reserve,,
-Test API,1,D050#locator-actions,S21,multi-section,open,,
-Test API,2,D050#refinement,S22,detail,open,,
-Test API,3,D052#fixtures,S23,paraphrase,open,,
-Test API,4,D050#types,S24,detail,open,,
+Test API,1,D050#locator-actions,S21,multi-section,used,,Q021
+Test API,2,D050#refinement,S22,detail,used,,Q022
+Test API,3,D052#fixtures,S23,paraphrase,used,,Q023
+Test API,4,D050#types,S24,detail,used,,Q024
 Test API,5,D038#agent-act,S25,detail,open,,
 Test API,6,D045#locator-matchers,S26,multi-section,open,,
 Test API,7,D045#screenshot-matchers,S27,single,open,,

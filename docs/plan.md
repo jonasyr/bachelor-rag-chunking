@@ -10,7 +10,7 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 16 von 48 Fragen (Block 1 am 09.11., Block 2 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 2 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
+Hauptkatalog hat 24 von 48 Fragen (Block 1 am 09.11., Block 2 und 3 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 5 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
@@ -22,7 +22,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 |----------|-------|--------------|----------|--------|
 | 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py`, Korpusmanifest; Wechsel zu e2e ([ADR 0038](adr/0038-korpus-e2e.md)) | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll | erledigt 18.10. |
 | 20.10.–02.11. | Pipeline | Chunking C1–C3 und K1, Embedding, Chroma, Retrieval, Generierung, Kontrolle K0 ([ADR 0041](adr/0041-kontrolle-k0.md)); Pilot auf e2e als Vortest von Prompt und Rubrik | lauffähige Pipeline, Modellversionen dokumentiert | erledigt 20.10. |
-| 23.10.–13.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | offen (16/48) |
+| 23.10.–13.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | offen (24/48) |
 | 03.–09.11. | Auswertungsskripte | Statistik, Tabellen und Abbildungen ([ADR 0044](adr/0044-statistische-auswertung.md)), RAGAS-Lauf ([ADR 0047](adr/0047-ragas-als-triangulation.md)), Zweitbewertung und Übereinstimmung ([ADR 0046](adr/0046-zweitbewertung.md)) | `analyse.py`, `ragas_eval.py`, `second_rater.py` getestet | erledigt 22.10. |
 | **13.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)): am 06.11. vom 09.11. verschoben; C4 entfällt damit ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)) | Commit-Hash im Experiment-Protokoll | offen |
 | 14.–15.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | offen |
@@ -46,8 +46,8 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > wird über die Frage, die ein Abschnitt trägt, nie über einen künstlichen Typ. Das Vorbereitungsblatt prüft dazu je
 > Slot die Typ-Eignung ([ADR 0049](adr/0049-schreibhilfen-im-editor.md#nachtrag-10112026-typ-eignung-im-vorbereitungsblatt)).
 > Ziel je Block (conceptual/comparative/limitation/procedural/factual): Block 3 4/1/1/2/0 (nach Prüfung der
-> Abschnitte; ein zweites `comparative` trägt kein Slot); Block 4 2/2/1/2/1; Block 5 2/1/2/2/1; Block 6 2/1/1/2/2;
-> Summe 10/5/5/8/4. Weicht ein Block ab, wandert der Rest in den nächsten; die Ziele für Block 4 bis 6 werden mit dem
+> Abschnitte; ein zweites `comparative` trägt kein Slot), erreicht 3/1/2/2/0 (S22 als `limitation`); danach Block 4
+> 2/2/1/2/1, Block 5 3/1/1/2/1, Block 6 2/1/1/2/2; Summe 10/5/5/8/4. Weicht ein Block ab, wandert der Rest in den nächsten; die Ziele für Block 4 bis 6 werden mit dem
 > jeweiligen Vorbereitungsblatt geprüft.
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))

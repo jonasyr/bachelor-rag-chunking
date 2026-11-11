@@ -736,7 +736,7 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 
 Regel: mindestens zwei Abschnitte, jeder liefert einen nötigen Teil; enthaltene oder umschließende Abschnitte zählen nicht als zweiter; H1 nur mit Grund in `notes`.
 
-**Typ-Eignung:** Trägt `procedural` (Ziel, weil `factual` fast voll ist) oder `factual`: „Each action resolves one node, waits for actionability, and performs one operation. The timeout is `config.actionTimeout`, and every action takes `{ timeout }`“. Für `multi-section` braucht es einen zweiten nötigen Teil, z. B. die Definition von `actionTimeout` in D041 oder Actionability in D042#capabilities. „actionability“ steht in acht Abschnitten; prüfe, welcher Teil wirklich nötig ist.
+**Typ-Eignung:** Trägt `procedural` (Ziel, weil `factual` fast voll ist). Stärkste Stelle (ergänzt am 11.11.2026): die Notiz zu `fill`, wörtlich nur hier: „`fill` sets the value directly and fires no key events. An autocomplete, a search-as-you-type box, or a masked input wired to `keydown` or `keyup` never reacts to it. Use `pressSequentially` for those.“ Dazu `delay` und die gemeinsame Aktionsfrist. Zweiter Teil für `multi-section`: der Tastaturvertrag (`keyboard.type` über den Tastaturpfad der Plattform), der in D060#keyboard und in D042#capabilities (`EngineKeyboard`) steht; prüfe, welcher Abschnitt den nötigen Teil trägt. Alternative: Timeout jeder Aktion (`config.actionTimeout`, `{ timeout }`) mit der Definition in D041.
 
 - **[ONLY HERE]** ### Locator actions Each action resolves one node, waits for actionability, and performs one operation.
 - **[ONLY HERE]** The timeout is [`config.actionTimeout`](/reference/config#actiontimeout), and every action takes `{ timeout }` to override it.
