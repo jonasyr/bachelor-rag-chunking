@@ -72,7 +72,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0028](0028-c4-bedingung.md) | C4 nur, wenn der Meilenstein 09.11.2026 (Ground Truth eingefroren) planmäßig erreicht ist | Angenommen; Nachträge 22.10.2026 (C4 nur deskriptiv), 06.11.2026 (C4 entfällt) |
 | [0029](0029-fragetypen-und-konstruktionsklassen.md) | Fragetypen, Konstruktionsklassen und Quoten des Fragenkatalogs | Angenommen; ergänzt durch 0031; Bereichsuntergrenzen ersetzt und Stoppwörter angepasst durch 0039; Hinweis: Quelle des Verhältnisses 2:2:2:1:1 |
 | [0030](0030-einfrieren-des-fragenkatalogs.md) | Einfrieren des Fragenkatalogs als technische Sperre | Angenommen; erweitert durch 0031; ergänzt durch 0040 |
-| [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen; Slotzahlen ersetzt durch 0039; ergänzt durch 0040; Nachtrag 11.11.2026 (Sprunggrund `content-elsewhere`) |
+| [0031](0031-stichprobenplan-und-ki-durchsicht.md) | Zufälliger Stichprobenplan und protokollierte KI-Durchsicht des Fragenkatalogs | Angenommen; Slotzahlen ersetzt durch 0039; ergänzt durch 0040; Nachträge 11.11.2026 (Sprunggrund `content-elsewhere`; Beleg für Slots ohne Frage) |
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten | Angenommen; ergänzt durch 0034, 0035; Hinweis: Mischen mit Seed (Nachtrag in 0046) |
 | [0033](0033-antwortmodell.md) | Antwortmodell und einmalige Generierung | Angenommen; ergänzt durch 0041; Nachtrag 22.10.2026 (Belege) |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung in der App | Angenommen; ergänzt durch 0035 |

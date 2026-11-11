@@ -103,7 +103,8 @@ Template:
 - **Skip a section** only with a fixed reason (`config.CATALOGUE_SKIP_REASONS`): `code-or-links`, `too-short`
   (under 50 tokens), `duplicate-topic` (same topic as an earlier slot), `no-answerable-content`, `content-elsewhere` (every statement
   a question could use is also stated in another section, so the class rule cannot hold; the sections are named in the
-  review log, [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md#nachtrag-11112026-sprunggrund-content-elsewhere)). "Hard to write" is
+  review log, or for a slot without a question in the block's prep sheet,
+  [ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md#nachtrag-11112026-sprunggrund-content-elsewhere)). "Hard to write" is
   not a reason.
 - **AI review** after each block: Claude adds suggestions (missing section, wording, fact, class) in the Review tab;
   you accept or reject with a reason, and change the text yourself in Write ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)).
