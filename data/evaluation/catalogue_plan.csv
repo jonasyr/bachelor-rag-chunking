@@ -43,9 +43,9 @@ Test API,1,D050#locator-actions,S21,multi-section,used,,Q021
 Test API,2,D050#refinement,S22,detail,used,,Q022
 Test API,3,D052#fixtures,S23,paraphrase,used,,Q023
 Test API,4,D050#types,S24,detail,used,,Q024
-Test API,5,D038#agent-act,S25,detail,open,,
-Test API,6,D045#locator-matchers,S26,multi-section,open,,
-Test API,7,D045#screenshot-matchers,S27,single,open,,
+Test API,5,D038#agent-act,S25,detail,used,,Q025
+Test API,6,D045#locator-matchers,S26,multi-section,used,,Q026
+Test API,7,D045#screenshot-matchers,S27,single,used,,Q027
 Test API,8,D039#clearstate,,,reserve,,
 Test API,9,D045#expectcall-softexpectcall-and-expect,,,reserve,,
 Test API,10,D038#agent-waitfor,,,reserve,,
@@ -53,11 +53,11 @@ Test API,11,D052#hooks,,,reserve,,
 Test API,12,D052#testoptions,,,reserve,,
 Test API,13,D039#restart,,,reserve,,
 Test API,14,D052#options,,,reserve,,
-Project,1,D046#exit-codes,S28,paraphrase,open,,
-Project,2,D040#commands,S29,paraphrase,open,,
-Project,3,D051#policy-denials,S30,single,open,,
-Project,4,D043#reporters,S31,single,open,,
-Project,5,D041#recording,S32,paraphrase,open,,
+Project,1,D046#exit-codes,S28,paraphrase,used,,Q028
+Project,2,D040#commands,S29,paraphrase,used,,Q029
+Project,3,D051#policy-denials,S30,single,used,,Q030
+Project,4,D043#reporters,S31,single,used,,Q031
+Project,5,D041#recording,S32,paraphrase,used,,Q032
 Project,6,D041#run-limits,S33,multi-section,open,,
 Project,7,D041#modelinstance,S34,detail,open,,
 Project,8,D041#output,S35,paraphrase,open,,
