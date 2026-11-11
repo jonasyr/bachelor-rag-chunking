@@ -224,7 +224,7 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 
 Regel: genau ein Abschnitt, dessen Hauptinhalt die Antwort ist; jeder Teil der Antwort muss nur hier stehen.
 
-**Typ-Eignung:** Keine Typ-Eignung für `single`: jedes Feld steht mit Bedeutung und Default auch in D041#the-app-under-test. Dazu gehören `executable` „never shell-interpreted“, `{port}` in `args` und `env`, `cwd`, `inheritEnv` mit `*`-Präfix, `startupTimeout` 60000, `shutdownTimeout` 10000 („grace period before force-kill“), `log` („output discarded“) und `reuseExisting` `false`. Geprüft mit `find` und durch Lesen; Teile stehen auch in D059#let-the-runner-start-it und D043#what-app-processes-inherit. Vorschlag: Sprung mit `content-elsewhere` ([ADR 0031, Nachtrag 11.11.2026](../../docs/adr/0031-stichprobenplan-und-ki-durchsicht.md)). Dafür braucht es eine angenommene `class`-Zeile in der Durchsicht, die D041#the-app-under-test nennt; entscheiden musst du. Dann übernimmt die nächste Reserve in Zugreihenfolge, `D051#outbound-connections` (Project, Zug 13), mit Klasse `single` (Abschnitt unten).
+**Typ-Eignung:** Keine Typ-Eignung für `single`: jedes Feld steht mit Bedeutung und Default auch in D041#the-app-under-test. Dazu gehören `executable` „never shell-interpreted“, `{port}` in `args` und `env`, `cwd`, `inheritEnv` mit `*`-Präfix, `startupTimeout` 60000, `shutdownTimeout` 10000 („grace period before force-kill“), `log` („output discarded“) und `reuseExisting` `false`. Geprüft mit `find` und durch Lesen; Teile stehen auch in D059#let-the-runner-start-it und D043#what-app-processes-inherit. Vorschlag: Sprung mit `content-elsewhere` ([ADR 0031, Nachtrag 11.11.2026](../../docs/adr/0031-stichprobenplan-und-ki-durchsicht.md)). Der Beleg ist diese Aufstellung ([ADR 0031, Nachtrag 11.11.2026 (2)](../../docs/adr/0031-stichprobenplan-und-ki-durchsicht.md#nachtrag-11112026-2-beleg-für-slots-ohne-frage)); Jonas hat den Sprung am 11.11.2026 entschieden (PR #59). Nur die Einheit Millisekunden bei `shutdownTimeout` steht ausdrücklich nur hier; D041#the-app-under-test nennt die Werte (`5_000`, Default `10000`) ohne Einheit. Dann übernimmt die nächste Reserve in Zugreihenfolge, `D051#outbound-connections` (Project, Zug 13), mit Klasse `single` (Abschnitt unten).
 
 *(Nur Codeblock: der mechanische Teil prüft keine Codeblöcke. Die Kommentare im Code sind mit `catalogue.py find` und durch Lesen gegen den Korpus geprüft; das Ergebnis steht in der Typ-Eignung.)*
 
@@ -607,6 +607,85 @@ Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
 - D052#fixtures: Both cover COLLECTION_ERROR for an invalid fixture definition and timeouts of abandoned bodies.
 - D052#testoptions: Both describe COLLECTION_ERROR for malformed options and nested serial groups.
 - D053#the-browser-fixture: Both define EVALUATE_FAILED and APP_URL_REQUIRED.
+
+## S37 · single · D051#outbound-connections  (Security rules › Reference › Outbound connections; page title: Security rules)
+
+Regel: genau ein Abschnitt, dessen Hauptinhalt die Antwort ist; jeder Teil der Antwort muss nur hier stehen.
+
+**Typ-Eignung:** Keine Typ-Eignung für `single`: jedes Feld steht mit Bedeutung und Default auch in D041#the-app-under-test. Dazu gehören `executable` „never shell-interpreted“, `{port}` in `args` und `env`, `cwd`, `inheritEnv` mit `*`-Präfix, `startupTimeout` 60000, `shutdownTimeout` 10000 („grace period before force-kill“), `log` („output discarded“) und `reuseExisting` `false`. Geprüft mit `find` und durch Lesen; Teile stehen auch in D059#let-the-runner-start-it und D043#what-app-processes-inherit. Vorschlag: Sprung mit `content-elsewhere` ([ADR 0031, Nachtrag 11.11.2026](../../docs/adr/0031-stichprobenplan-und-ki-durchsicht.md)). Der Beleg ist diese Aufstellung ([ADR 0031, Nachtrag 11.11.2026 (2)](../../docs/adr/0031-stichprobenplan-und-ki-durchsicht.md#nachtrag-11112026-2-beleg-für-slots-ohne-frage)); Jonas hat den Sprung am 11.11.2026 entschieden (PR #59). Nur die Einheit Millisekunden bei `shutdownTimeout` steht ausdrücklich nur hier; D041#the-app-under-test nennt die Werte (`5_000`, Default `10000`) ohne Einheit. Dann übernimmt die nächste Reserve in Zugreihenfolge, `D051#outbound-connections` (Project, Zug 13), mit Klasse `single` (Abschnitt unten).
+
+- **[ONLY HERE]** ### Outbound connections **Note** There is no crash reporting, and no update check outside `e2e feedback`.
+    term `e2e feedback` also in 4: D040#commands, D040#exit-codes, D054#what-leaves-your-computer, D056#feedback
+- **[ONLY HERE]** `--ai-trace` writes a local file and doesn't upload it.
+    term `--ai-trace` also in 6: D013#how-an-agent-reads-a-failure, D015#agent-steps, D040#commands, D041#output, D043#diagnostics, D051#artifacts
+- **[ONLY HERE]** Your test code, plugins, and app can make more connections.
+- **[ALSO: D054#what-leaves-your-computer]** | `eu.i.posthog.com` | One telemetry request per CLI invocation or per `run()` from `e2e/runner` that returns a report, plus at most one per session `e2e mcp` serves, unless you opt out ([Telemetry](/telemetry)). One request per `e2e feedback` report sent: none under `--dry-run` or `E2E_TELEMETRY_DE
+    term `--dry-run` also in 2: D040#commands, D056#feedback
+    term `--repro` also in 2: D040#commands, D056#feedback
+    term `DO_NOT_TRACK` also in 4: D040#commands, D043#telemetry, D056#feedback, D056#opt-out
+    term `E2E_TELEMETRY_DEBUG` also in 3: D040#commands, D043#telemetry, D056#see-what-would-be-sent
+    term `E2E_TELEMETRY_DISABLED` also in 8: D008#what-ci-changes, D040#commands, D043#reference-environment, D043#telemetry, D056#feedback, D056#in-a-fleet, D056#in-ci, D056#opt-out
+    term `e2e feedback` also in 4: D040#commands, D040#exit-codes, D054#what-leaves-your-computer, D056#feedback
+    term `e2e/runner` also in 8: D040#commands, D044#runner-codes, D049#functions, D049#playwright-test-fixtures, D049#reference-runner, D049#types, D056#the-notice, D056#what-is-sent
+    term `eu.i.posthog.com` also in 2: D054#what-leaves-your-computer, D056#where-it-goes
+    term `run()` also in 4: D026#configure-a-target, D043#engines, D056#the-notice, D056#what-is-sent
+- **[ONLY HERE]** | Your model provider | Agent steps that call a model. Deterministic tests and fully replayed steps make no model call. |
+- **[ONLY HERE]** | A subscription provider's sign-in and model-list endpoints | `e2e login` and `e2e models` ([Subscriptions](/subscriptions)). |
+    term `e2e models` also in 5: D040#commands, D043#model, D044#exit-codes, D044#reference-errors, D055#pick-a-model
+- **[ONLY HERE]** | The app's `readyUrl` | Readiness probes for an app the runner starts. |
+    term `readyUrl` also in 7: D035#expo-development-builds, D041#the-app-under-test, D042#app, D044#agenterror, D044#runner-codes, D046#several-sessions, D059#let-the-runner-start-it
+- **[ONLY HERE]** | Playwright's browser download | One time, when the browser is missing. |
+- **[ONLY HERE]** | The DevTools endpoint in `web({ connect })` | Every run of that target. |
+    term `web({ connect })` also in 3: D033#browser-timeouts-and-artifacts, D034#port-the-config, D044#runner-codes
+- **[ONLY HERE]** | The GitHub API | Only from the `@e2e-dev/github` reporter. |
+    term `@e2e-dev/github` also in 9: D012#pull-request-comments, D020#github, D020#setup, D040#commands, D043#reporters, D048#built-in-reporters, D048#custom-reporters, D048#reference-reporters, D048#related
+- **[ONLY HERE]** | `registry.npmjs.org` | One request per `e2e feedback` you run, to check for a newer e2e release. Skipped with `--allow-outdated` and under `E2E_TELEMETRY_DISABLED` or `DO_NOT_TRACK`. |
+    term `--allow-outdated` also in 1: D040#commands
+    term `DO_NOT_TRACK` also in 4: D040#commands, D043#telemetry, D056#feedback, D056#opt-out
+    term `E2E_TELEMETRY_DISABLED` also in 8: D008#what-ci-changes, D040#commands, D043#reference-environment, D043#telemetry, D056#feedback, D056#in-a-fleet, D056#in-ci, D056#opt-out
+    term `e2e feedback` also in 4: D040#commands, D040#exit-codes, D054#what-leaves-your-computer, D056#feedback
+    term `registry.npmjs.org` also in 1: D054#what-leaves-your-computer
+- **[ONLY HERE]** | `api.limrun.com` (or `LIMRUN_BASE_URL`) and its devices | Only from [`limrun()`](/integrations/limrun). It signs in with `LIMRUN_API_KEY`. |
+    term `LIMRUN_API_KEY` also in 2: D026#install-and-authenticate, D043#engines
+    term `LIMRUN_BASE_URL` also in 1: D043#engines
+    term `api.limrun.com` also in 1: D043#engines
+    term `limrun()` also in 2: D026#configure-a-target, D043#engines
+- **[ONLY HERE]** | The Kernel API and its hosted browsers | Only from [`kernel()`](/integrations/kernel). |
+    term `kernel()` also in 4: D005#hosted-browsers, D024#integrations-kernel, D024#setup, D043#engines
+- **[ONLY HERE]** | The Expo API and the simulators' agent-device daemons | Only from [`easSimulators()`](/integrations/eas). It signs in with `EXPO_TOKEN`, else with the eas-cli login in `~/.expo/state.json`. On a CI runner, set `EXPO_TOKEN` or keep that login out of the runner's home. |
+    term `EXPO_TOKEN` also in 3: D022#authenticate, D022#when-a-session-fails-to-start, D043#engines
+    term `easSimulators()` also in 5: D022#install-the-app, D022#integrations-eas, D022#setup, D035#hosted-devices, D043#engines
+    term `~/.expo/state.json` also in 1: D022#authenticate
+- **[ONLY HERE]** | `mcr.microsoft.com` | Only from [`smol()`](/integrations/smol), to pull the Playwright image. The machines then have unrestricted network access, and reach every port on your computer's loopback through `host.smolvm.internal`, not only `hostPorts` ([Set up the provider](/integrations/smol#set-up-t
+    term `host.smolvm.internal` also in 1: D027#set-up-the-provider
+    term `hostPorts` also in 4: D027#options, D027#run-the-app-in-the-machine, D027#set-up-the-provider, D027#start-every-test-signed-in
+    term `smol()` also in 3: D005#hosted-browsers, D027#integrations-smol, D027#set-up-the-provider
+- **[ONLY HERE]** | The package registry | When `e2e init` installs dependencies. |
+- **[ONLY HERE]** | The app under test | Every run, plus whatever the app itself loads. |
+
+Inhaltliche Überschneidungen (`catalogue_overlap.csv`):
+- D027#set-up-the-provider: Both say smol machines pull the Playwright image, have unrestricted outbound network access, and reach any loopback port via host.smolvm.internal.
+- D040#commands: Both describe e2e feedback, e2e models and --ai-trace network use.
+- D001#what-a-step-costs: Both say replayed agent steps make no model call.
+- D007#how-a-replay-works: Both say a replayed step finishes without a model call.
+- D014#locators: Both say locators and deterministic tests make no model call.
+- D015#agent-steps: Both say a replayed step makes no model call, and --ai-trace is the opt-in trace.
+- D022#authenticate: Both say EAS simulators sign in with EXPO_TOKEN or the eas-cli login in ~/.expo/state.json.
+- D027#set-up-the-provider: Both warn the smol machines have unrestricted network access and reach host loopback ports, not only hostPorts.
+- D040#commands: Both describe e2e feedback --dry-run, --allow-outdated and the npm registry check for a newer release.
+- D041#the-app-under-test: Both describe the readyUrl readiness probe of an app the runner starts.
+- D043#telemetry: Both describe E2E_TELEMETRY_DEBUG and E2E_TELEMETRY_DISABLED/DO_NOT_TRACK controlling telemetry sending.
+- D043#engines: Both give LIMRUN_BASE_URL as the Limrun API host defaulting to api.limrun.com.
+- D051#artifacts: Both say --ai-trace is opt-in, writes a local file and is not uploaded.
+- D053#installing-browsers: Both say a missing Playwright browser is downloaded once.
+- D054#what-leaves-your-computer: Both list the destinations a run contacts: model provider, app under test, PostHog telemetry, and npm registry only for e2e feedback.
+- D056#opt-out: Both say telemetry is skipped under E2E_TELEMETRY_DISABLED or DO_NOT_TRACK.
+- D056#see-what-would-be-sent: Both mention E2E_TELEMETRY_DEBUG preventing telemetry from being sent.
+- D056#what-is-sent: Both state telemetry is one request per CLI invocation or run() that returns a report, plus MCP sessions.
+- D056#where-it-goes: Both name eu.i.posthog.com as the telemetry destination.
+- D056#feedback: Both describe e2e feedback sending one event to PostHog, with dry-run and opt-out exceptions.
+- D059#let-the-runner-start-it: Both describe readyUrl as the health endpoint the runner probes for a started app.
+- D056#what-is-sent: Both state when telemetry requests are sent: per CLI invocation, per run() and per MCP session.
 
 ## S40 · single · D053#browser-interface  (Browser › Types › `Browser` interface; page title: Browser)
 

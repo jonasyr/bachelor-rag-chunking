@@ -6,7 +6,8 @@ Angenommen (14.10.2026; ergänzt [ADR 0029](0029-fragetypen-und-konstruktionskla
 [ADR 0030](0030-einfrieren-des-fragenkatalogs.md); Slotzahlen ersetzt durch [ADR 0039](0039-stichprobenplan-e2e.md);
 ergänzt durch [ADR 0040](0040-closed-book-pruefung.md) (Closed-Book-Prüfung nach jedem Block) und
 [ADR 0049](0049-schreibhilfen-im-editor.md) (Schreibhilfen, Zugriff über Tailscale)); Sprunggrund `content-elsewhere`
-laut [Nachtrag 11.11.2026](#nachtrag-11112026-sprunggrund-content-elsewhere); Zahlen im Kontext:
+laut [Nachtrag 11.11.2026](#nachtrag-11112026-sprunggrund-content-elsewhere), Beleg für Slots ohne Frage laut
+[Nachtrag 11.11.2026 (2)](#nachtrag-11112026-2-beleg-für-slots-ohne-frage); Zahlen im Kontext:
 Vue-Korpus `40aa88a` ([ADR 0025](0025-korpus-guide-api-styleguide.md)); aktuelle Werte in
 [Korpus](../reference/corpus.md)
 
@@ -75,3 +76,19 @@ Jonas sie annimmt; „schwer zu schreiben“ bleibt kein Grund. Den Slot überni
 Reserveabschnitt des Bereichs in Ziehungsreihenfolge, für S15 `D005#run-a-script-before-the-page`. Der Sprung wird
 wie jeder andere in der Arbeit berichtet. Schlecht: Der Grund verlangt ein Urteil statt einer Zählung, wie
 `duplicate-topic`; die Belegpflicht in der Durchsicht macht ihn nachprüfbar.
+
+## Nachtrag 11.11.2026 (2): Beleg für Slots ohne Frage
+
+Von Jonas entschieden. Der Beleg für `content-elsewhere` steht laut Nachtrag oben als `class`-Zeile in
+`catalogue_review.csv`. Eine Zeile dort gehört aber immer zu einer bestehenden Frage (`catalogue_review.review_errors`).
+Zeigt schon das Vorbereitungsblatt ([ADR 0049](0049-schreibhilfen-im-editor.md)) vor dem Schreiben, dass ein Slot
+keinen Inhalt hat, der nur dort steht, gäbe es diese Zeile erst nach einer Frage, die sicher wegfällt.
+
+Wir werden deshalb für einen Slot ohne Frage den Beleg im Vorbereitungsblatt des Blocks führen: je Aussage des
+Abschnitts der andere Abschnitt, in dem sie steht. Jonas' Entscheidung steht im Pull Request, der den Sprung in
+`catalogue_plan.csv` schreibt; der Sprung wird wie jeder andere in der Arbeit berichtet. Für einen Slot mit Frage gilt
+weiter die `class`-Zeile. Erster Fall: S37 `D041#commandconfig` (Project, `single`): jedes Feld von `CommandConfig`
+steht mit Bedeutung und Default auch in `D041#the-app-under-test`
+([Vorbereitungsblatt Block 5](../../data/evaluation/catalogue_prep_block5.md), Abschnitt S37).
+Den Slot übernimmt `D051#outbound-connections` (Zug 13). Schlecht: Der Beleg steht nicht im Durchsichtsprotokoll; die
+KI-Offenlegung muss die Vorbereitungsblätter mitzählen.
