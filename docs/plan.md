@@ -48,7 +48,8 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > Ziel je Block (conceptual/comparative/limitation/procedural/factual): Block 3 4/1/1/2/0 (nach Prüfung der
 > Abschnitte; ein zweites `comparative` trägt kein Slot), erreicht 3/1/2/2/0 (S22 als `limitation`); danach Block 4
 > 2/2/1/2/1, erreicht 1/2/1/1/3 (S25 nach drei Durchsichtsrunden als `factual`, S31 als `factual`); danach fehlen
-> 6/2/2/5/1, Ziel Block 5 3/1/1/3/0, Block 6 3/1/1/2/1. Weicht ein Block ab, wandert der Rest in den nächsten; die
+> 6/2/2/5/1, Ziel Block 5 2/1/1/3/1, Block 6 4/1/1/2/0 (das dritte `conceptual` trägt in Block 5 kein Slot sauber,
+> [Vorbereitungsblatt](../data/evaluation/catalogue_prep_block5.md)). Weicht ein Block ab, wandert der Rest in den nächsten; die
 > Ziele für Block 5 und 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft.
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))

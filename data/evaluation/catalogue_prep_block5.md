@@ -11,11 +11,11 @@ bezeichnet, die anders formuliert auch woanders standen (S25, S30). Die Typ-Eign
 Jonas (ADR 0031). Das Blatt enthält keine Frage, keine Antwort und kein Relevanzurteil. „ONLY HERE“ heißt nur: kein
 wörtlicher Treffer. Erstellt am 11.11.2026.
 
-Typziel Block 5 ([Plan](../../docs/plan.md#zeitplan)): **3 conceptual, 1 comparative, 1 limitation, 3 procedural,
-0 factual**. Vorschlag: S33 procedural, S34 conceptual, S35 procedural, S36 limitation, S37 Sprung (`content-elsewhere`,
-Reserve D051#outbound-connections), S38 conceptual, S39 comparative, S40 procedural. Das dritte `conceptual` trägt in
-diesem Block wohl kein Slot sauber: Die Reserve für S37 passt eher zu `limitation` oder `factual`, und S33 als
-`conceptual` fehlte dann bei `procedural`. Was hier fehlt, wandert nach Block 6.
+Typziel Block 5 ([Plan](../../docs/plan.md#zeitplan)): **2 conceptual, 1 comparative, 1 limitation, 3 procedural,
+1 factual**. Vorschlag: S33 procedural, S34 conceptual, S35 procedural, S36 limitation, S37 Sprung (`content-elsewhere`)
+mit der Reserve D051#outbound-connections als `factual`, S38 conceptual, S39 comparative, S40 procedural. Ein drittes
+`conceptual` trägt in diesem Block kein Slot sauber (S33 als `conceptual` fehlte bei `procedural`, die Reserve nennt
+Bedingungen, keine Gründe); es wandert nach Block 6 (Ziel dort 4 conceptual).
 
 ## S33 · multi-section · D041#run-limits  (E2EConfig › Run limits; page title: E2EConfig)
 
