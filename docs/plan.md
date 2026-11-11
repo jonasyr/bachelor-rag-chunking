@@ -10,7 +10,7 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 16 von 48 Fragen (Block 1 am 09.11., Block 2 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 1 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
+Hauptkatalog hat 16 von 48 Fragen (Block 1 am 09.11., Block 2 am 11.11.; ein Sprung `content-elsewhere` in S15), `conceptual` 2 von 12 ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
