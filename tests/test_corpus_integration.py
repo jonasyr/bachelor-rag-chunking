@@ -171,7 +171,8 @@ def test_committed_plan_matches_a_fresh_draw():
     fresh = draw_plan(corpus)
     assert draw_plan(corpus) == fresh  # deterministic
     rows = read_plan(CATALOGUE_PLAN_FILE)
-    assert [r["area"] for r in rows if r["slot_id"]] == [
+    # a skipped row keeps its slot_id; the reserve row that took over fills the slot (ADR 0031)
+    assert [r["area"] for r in rows if r["slot_id"] and r["status"] != "skipped"] == [
         a for a in CORPUS_AREAS for _ in range(CATALOGUE_AREA_SLOTS[a])
     ]
     assert plan_integrity(rows, fresh) == []

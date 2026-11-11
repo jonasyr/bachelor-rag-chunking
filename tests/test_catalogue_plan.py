@@ -155,6 +155,14 @@ def test_skip_moves_the_slot_to_the_next_reserve_section(corpus, small_plan):
     assert slot_row(rows, "S01")["section_id"] == new["section_id"] != s01["section_id"]
 
 
+def test_content_elsewhere_is_a_listed_skip_reason(corpus, small_plan):
+    """ADR 0031, addendum 11.11.2026: every statement of the section is also stated elsewhere."""
+    new = skip_slot(small_plan, "S01", "content-elsewhere", corpus)
+    skipped = next(r for r in read_plan(small_plan) if r["skip_reason"] == "content-elsewhere")
+    assert skipped["status"] == "skipped"
+    assert new["slot_id"] == "S01"
+
+
 def test_skip_needs_a_listed_reason_an_open_slot_and_a_reserve(corpus, small_plan):
     with pytest.raises(ValueError, match="reason"):
         skip_slot(small_plan, "S01", "boring", corpus)

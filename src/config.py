@@ -221,7 +221,13 @@ CATALOGUE_AREA_SLOTS = {
     "Project": 12, "Web": 2, "Mobile": 2, "Engine contract": 4, "Examples": 1,
 }  # fmt: skip
 CATALOGUE_RESERVE = dict(CATALOGUE_AREA_SLOTS)  # replacement sections per area (ADR 0039)
-CATALOGUE_SKIP_REASONS = ("code-or-links", "too-short", "duplicate-topic", "no-answerable-content")
+CATALOGUE_SKIP_REASONS = (
+    "code-or-links",
+    "too-short",
+    "duplicate-topic",
+    "no-answerable-content",
+    "content-elsewhere",  # ADR 0031, Nachtrag 11.11.2026
+)
 CATALOGUE_SKIP_MIN_TOKENS = 50  # `too-short`: starting section under this many tokens
 CATALOGUE_PLAN_STATUSES = ("open", "used", "skipped", "reserve")
 CATALOGUE_SLOT_FORMAT = "S{:02d}"  # slot IDs S01 … S48 in the plan
