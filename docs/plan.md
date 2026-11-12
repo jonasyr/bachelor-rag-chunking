@@ -51,7 +51,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > 6/2/2/5/1, Ziel Block 5 2/1/1/3/1 (das dritte `conceptual` trägt in Block 5 kein Slot sauber,
 > [Vorbereitungsblatt](../data/evaluation/catalogue_prep_block5.md)), erreicht 2/1/1/3/1 (S37 nach dem Sprung auf
 > D051#outbound-connections als `factual`); danach fehlen 4/1/1/2/0, Ziel Block 6 4/1/1/2/0. Weicht ein Block ab, wandert der Rest in den nächsten; die
-> Ziele für Block 5 und 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft.
+> Ziele für Block 5 und 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft ([Block 6](../data/evaluation/catalogue_prep_block6.md)).
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))
 > und RAGAS-Feinheiten, nicht die Schreibphase; der RAGAS-Lauf selbst ist fest ([ADR 0047](adr/0047-ragas-als-triangulation.md)).
