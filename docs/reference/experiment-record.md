@@ -97,8 +97,17 @@ Verhalten bei Störungen.
 | 3, Commits mit den pre-commit-Hooks | gefunden: `trailing-whitespace` und `end-of-file-fixer` liefen über `data/` und hätten gehashte Ergebnisdateien verändern können; die Größengrenze von 5 MB hätte das RAGAS-Journal abgewiesen. Behoben; danach alle Commits ohne Änderung durch einen Hook |
 
 Unabhängig davon prüften zwei Durchsichten den Code auf Lücken in der Aufzeichnung und auf Verhalten bei Abbrüchen; ihre
-Befunde sind in [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) umgesetzt. Nicht prüfbar war ohne
-echte API, ob `gpt-6-luna` und `gpt-6-sol` die Parameter annehmen; das zeigt ein Prüfaufruf vor dem Hauptlauf.
+Befunde sind in [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) umgesetzt. Was ohne echte API nicht
+prüfbar war, zeigte ein Prüfaufruf am selben Abend (Skript außerhalb des Repos, etwa 0,04 USD, nichts geschrieben):
+
+- Modellobjekte unverändert seit dem Pinnen: `gpt-6-luna` erstellt 14.09.2026, 17:15:02 UTC, `gpt-6-sol` 17:12:17 UTC.
+- Eine Closed-Book-Antwort von `gpt-6-luna` mit den gepinnten Einstellungen: `finish_reason` `stop`,
+  `reasoning_tokens` 0 (Effort `none` ohne verdecktes Reasoning, [ADR 0033](../adr/0033-antwortmodell.md)),
+  `system_fingerprint` nicht gemeldet, `service_tier` `default`; die vollständige Antwort kommt im Journal an.
+- RAGAS auf einer Pilot-Antwort (E01/C1) über den neuen Recorder: 11 Aufrufe, alle mit Status 200 und ihrem Auftrag
+  erfasst; `gpt-6-sol` nimmt Temperatur 0, Effort `none`, `seed` und `json_object` an, `reasoning_tokens` 0, kein
+  Fingerabdruck. Werte 1,000 / 0,780 / 0,806 / 1,000 gegenüber 1,000 / 0,776 / 0,833 / 1,000 im
+  [RAGAS-Pilot](#ragas-pilot-e2e-21102026): die bekannte Streuung des Richters.
 
 ## Fragenkatalog eingefroren (16.11.2026)
 
