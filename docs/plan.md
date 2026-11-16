@@ -9,8 +9,8 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 ([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
-**Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 40 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11.; Sprünge `content-elsewhere` in S15 und S37), `conceptual` 8 von 12; Closed-Book 30 retrieval-abhängig, Block 6 braucht mindestens 2 weitere ([ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. vom 13.11. auf den 16.11. verschoben (Block 6 offen), C4 entfällt
+**Nächster Schritt:** Fragenkatalog einfrieren ([Backlog](#backlog) Punkt 1), dann Hauptlauf. **Größtes Risiko:** Der
+Hauptkatalog hat 48 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11., Block 6 am 16.11.; Sprünge `content-elsewhere` in S15 und S37), alle Typquoten erfüllt; Closed-Book 35 retrieval-abhängig nach der Gesamtdurchsicht (Runde 9, 16.11.; mindestens 32, [ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); offen ist nur das Einfrieren; das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. vom 13.11. auf den 16.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
@@ -22,7 +22,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 |----------|-------|--------------|----------|--------|
 | 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py`, Korpusmanifest; Wechsel zu e2e ([ADR 0038](adr/0038-korpus-e2e.md)) | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll | erledigt 18.10. |
 | 20.10.–02.11. | Pipeline | Chunking C1–C3 und K1, Embedding, Chroma, Retrieval, Generierung, Kontrolle K0 ([ADR 0041](adr/0041-kontrolle-k0.md)); Pilot auf e2e als Vortest von Prompt und Rubrik | lauffähige Pipeline, Modellversionen dokumentiert | erledigt 20.10. |
-| 23.10.–16.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | offen (40/48) |
+| 23.10.–16.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | 48/48, Einfrieren offen |
 | 03.–09.11. | Auswertungsskripte | Statistik, Tabellen und Abbildungen ([ADR 0044](adr/0044-statistische-auswertung.md)), RAGAS-Lauf ([ADR 0047](adr/0047-ragas-als-triangulation.md)), Zweitbewertung und Übereinstimmung ([ADR 0046](adr/0046-zweitbewertung.md)) | `analyse.py`, `ragas_eval.py`, `second_rater.py` getestet | erledigt 22.10. |
 | **16.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)): am 06.11. vom 09.11. auf den 13.11., am 16.11. vom 13.11. auf den 16.11. verschoben; C4 entfällt damit ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)) | Commit-Hash im Experiment-Protokoll | offen |
 | 17.–18.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | offen |
@@ -50,7 +50,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > 2/2/1/2/1, erreicht 1/2/1/1/3 (S25 nach drei Durchsichtsrunden als `factual`, S31 als `factual`); danach fehlen
 > 6/2/2/5/1, Ziel Block 5 2/1/1/3/1 (das dritte `conceptual` trägt in Block 5 kein Slot sauber,
 > [Vorbereitungsblatt](../data/evaluation/catalogue_prep_block5.md)), erreicht 2/1/1/3/1 (S37 nach dem Sprung auf
-> D051#outbound-connections als `factual`); danach fehlen 4/1/1/2/0, Ziel Block 6 4/1/1/2/0. Weicht ein Block ab, wandert der Rest in den nächsten; die
+> D051#outbound-connections als `factual`); danach fehlen 4/1/1/2/0, Ziel Block 6 4/1/1/2/0, erreicht 4/1/1/2/0. Weicht ein Block ab, wandert der Rest in den nächsten; die
 > Ziele für Block 5 und 6 werden mit dem jeweiligen Vorbereitungsblatt geprüft ([Block 6](../data/evaluation/catalogue_prep_block6.md)).
 
 > **Puffer-Regel:** Rutscht der Meilenstein, entfallen zuerst C4 (am 06.11. angewandt, [ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt))

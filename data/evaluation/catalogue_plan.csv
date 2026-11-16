@@ -78,20 +78,20 @@ Project,22,D049#functions,,,reserve,,
 Project,23,D041#artifacts,,,reserve,,
 Project,24,D048#what-reporter-does-to-reporter-objects,,,reserve,,
 Web,1,D053#browser-interface,S40,single,used,,Q039
-Web,2,D053#the-browser-fixture,S41,multi-section,open,,
+Web,2,D053#the-browser-fixture,S41,multi-section,used,,Q041
 Web,3,D053#options,,,reserve,,
 Web,4,D053#weboptions,,,reserve,,
-Mobile,1,D047#device,S42,multi-section,open,,
-Mobile,2,D047#engine,S43,paraphrase,open,,
+Mobile,1,D047#device,S42,multi-section,used,,Q042
+Mobile,2,D047#engine,S43,paraphrase,used,,Q043
 Mobile,3,D047#device-fixture,,,reserve,,
 Mobile,4,D047#engine-options,,,reserve,,
-Engine contract,1,D042#errors,S44,paraphrase,open,,
-Engine contract,2,D042#capabilities,S45,detail,open,,
-Engine contract,3,D042#lifecycle,S46,single,open,,
-Engine contract,4,D042#app,S47,multi-section,open,,
+Engine contract,1,D042#errors,S44,paraphrase,used,,Q044
+Engine contract,2,D042#capabilities,S45,detail,used,,Q045
+Engine contract,3,D042#lifecycle,S46,single,used,,Q046
+Engine contract,4,D042#app,S47,multi-section,used,,Q047
 Engine contract,5,D042#shared-semantics,,,reserve,,
 Engine contract,6,D042#artifacts,,,reserve,,
 Engine contract,7,D042#defineengine,,,reserve,,
 Engine contract,8,D042#semanticnode,,,reserve,,
-Examples,1,D017#pick-an-example,S48,multi-section,open,,
+Examples,1,D017#pick-an-example,S48,multi-section,used,,Q048
 Examples,2,D017#next,,,reserve,,
