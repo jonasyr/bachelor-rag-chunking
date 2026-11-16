@@ -58,10 +58,14 @@ def _git(*args: str) -> str | None:
     return done.stdout.strip()
 
 
+# Data and results are hashed in every record; "uncommitted changes" means code, docs and config.
+CODE_STATUS = ("status", "--porcelain", "--", ".", ":(exclude)data", ":(exclude)output")
+
+
 def environment() -> dict:
     """Code and environment of a run (ADR 0050): commit, uncommitted changes, Python and the
     checksum of uv.lock (every package version), so the run can be tied to its exact code."""
-    status = _git("status", "--porcelain")
+    status = _git(*CODE_STATUS)
     lock = ROOT / "uv.lock"
     return {
         "git_commit": _git("rev-parse", "HEAD"),
@@ -72,9 +76,10 @@ def environment() -> dict:
 
 
 def require_clean_tree() -> None:
-    """Refuse an API step of the main run while the repository has uncommitted changes, so the
-    commit in its record is exactly the code that ran (ADR 0050)."""
-    status = _git("status", "--porcelain")
+    """Refuse an API step of the main run while code, docs or config have uncommitted changes, so
+    the commit in its record is exactly the code that ran (ADR 0050); data/ and output/ are
+    hashed in the records instead."""
+    status = _git(*CODE_STATUS)
     if status is None:
         raise RuntimeError("git status failed; the main run needs the repository (ADR 0050)")
     if status:
