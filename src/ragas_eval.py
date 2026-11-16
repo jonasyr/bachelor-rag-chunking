@@ -37,6 +37,8 @@ from config import (
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RAGAS_DECIMALS,
+    RAGAS_JOURNAL_BATCH,
+    RAGAS_JOURNAL_SUFFIX,
     RAGAS_JUDGE_MODEL,
     RAGAS_METRICS,
     RAGAS_REPEAT_FILE_NAME,
@@ -49,8 +51,18 @@ from config import (
 from embed import load_jsonl
 from freeze import is_main_catalogue, require_frozen
 from generate import ANSWERS_HEADER, created_iso
+from journal import Journal
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import append_record, latest_run, ragas_record, require_run, sha256_of
+from run_log import (
+    append_record,
+    environment,
+    latest_run,
+    ragas_record,
+    ragas_settings,
+    require_run,
+    session_commits,
+    sha256_of,
+)
 
 # ragas_client is imported only inside main(): it imports nothing from here, but the real scorer
 # (make_scorer) takes its types from this module.
@@ -237,49 +249,13 @@ def run(
         require_run(runs_file, "summarise", EXPERIMENT, [], [scores_file])
     if out_file.exists():
         raise FileExistsError(
-            f"{out_file} exists; RAGAS runs once (ADR 0047), delete it deliberately to run again"
+            f"{out_file} exists; RAGAS runs once (ADR 0047). If it was written without a run "
+            f"record (a stop right after writing), delete it: a new run takes every score from "
+            f"{out_file.stem}{RAGAS_JOURNAL_SUFFIX} and calls the API for none (ADR 0050)"
         )
     samples = build_samples(
         answers_file, paths["questions_file"], paths["ground_truth_file"], chunk_files
     )
-
-    created_before = model_created()  # free lookup, only after every local check
-    results = scorer(samples)
-    if len(results) != len(samples):
-        raise RuntimeError(
-            f"the scorer returned {len(results)} results for {len(samples)} samples; nothing "
-            "was written (ADR 0047)"
-        )
-    nan_counts = dict.fromkeys(RAGAS_METRICS, 0)
-    rows = []
-    for sample, values in zip(samples, results, strict=True):
-        values = validated(sample, values)
-        reasons = []
-        for metric in RAGAS_METRICS:
-            if _is_nan(values[metric][0]):
-                nan_counts[metric] += 1
-                reasons.append(f"{metric}: {values[metric][1].strip()}")
-        rows.append(
-            {
-                "question_id": sample.question_id,
-                "strategy": sample.strategy,
-                **{m: _cell(values[m][0]) for m in RAGAS_METRICS},
-                "nan_reasons": "; ".join(reasons),
-            }
-        )
-    recorder.check()
-    if not recorder.models:
-        raise RuntimeError(
-            "no judge model reported by the API for the scored samples; nothing was written "
-            "(ADR 0033)"
-        )
-    created_after = model_created()
-    if created_after != created_before:
-        raise RuntimeError(
-            f"the model behind {RAGAS_JUDGE_MODEL} changed during the run (created "
-            f"{created_iso(created_before)}, now {created_iso(created_after)}); nothing was "
-            "written (ADR 0033)"
-        )
 
     inputs = [
         answers_file,
@@ -290,6 +266,86 @@ def run(
     ]
     if main:
         inputs.append(scores_file)
+
+    created_before = model_created()  # free lookup, only after every local check
+    journal_file = out_file.with_name(out_file.stem + RAGAS_JOURNAL_SUFFIX)
+    settings = ragas_settings()
+    journal = Journal(
+        journal_file,
+        {
+            "step": step,
+            "strategy": EXPERIMENT,
+            **settings,
+            "model_created": created_iso(created_before),
+            "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
+        },
+        session=environment(),
+    )
+    done = {
+        (item["question_id"], item["strategy"]): {m: tuple(v) for m, v in item["values"].items()}
+        for batch in journal.of("batch")
+        for item in batch["items"]
+    }
+    recorder.restore(
+        [c for e in journal.entries if e["kind"] in ("batch", "abort") for c in e["calls"]]
+    )
+    pending = [s for s in samples if (s.question_id, s.strategy) not in done]
+    try:
+        for start in range(0, len(pending), RAGAS_JOURNAL_BATCH):
+            batch = pending[start : start + RAGAS_JOURNAL_BATCH]
+            scored = scorer(batch)
+            if len(scored) != len(batch):
+                raise RuntimeError(
+                    f"the scorer returned {len(scored)} results for {len(batch)} samples; "
+                    "nothing was written (ADR 0047)"
+                )
+            items = [
+                {"question_id": s.question_id, "strategy": s.strategy, "values": values}
+                for s, values in zip(batch, scored, strict=True)
+            ]
+            journal.append({"kind": "batch", "items": items, "calls": recorder.drain()})
+            for s, values in zip(batch, scored, strict=True):
+                done[(s.question_id, s.strategy)] = values
+    except BaseException as error:
+        journal.abort(error, calls=recorder.drain())
+        raise
+    try:  # a refused run is journaled too; its scores stay for the record (ADR 0050)
+        results = [done[(s.question_id, s.strategy)] for s in samples]
+        nan_counts = dict.fromkeys(RAGAS_METRICS, 0)
+        rows = []
+        for sample, values in zip(samples, results, strict=True):
+            values = validated(sample, values)
+            reasons = []
+            for metric in RAGAS_METRICS:
+                if _is_nan(values[metric][0]):
+                    nan_counts[metric] += 1
+                    reasons.append(f"{metric}: {values[metric][1].strip()}")
+            rows.append(
+                {
+                    "question_id": sample.question_id,
+                    "strategy": sample.strategy,
+                    **{m: _cell(values[m][0]) for m in RAGAS_METRICS},
+                    "nan_reasons": "; ".join(reasons),
+                }
+            )
+        recorder.check()
+        if not recorder.models:
+            raise RuntimeError(
+                "no judge model reported by the API for the scored samples; nothing was written "
+                "(ADR 0033)"
+            )
+        created_after = model_created()
+        if created_after != created_before:
+            raise RuntimeError(
+                f"the model behind {RAGAS_JUDGE_MODEL} changed during the run (created "
+                f"{created_iso(created_before)}, now {created_iso(created_after)}); nothing was "
+                "written (ADR 0033)"
+            )
+
+    except BaseException as error:
+        journal.abort(error, calls=recorder.drain())
+        raise
+
     # the complete record is built before anything is written; only the output hash follows
     record = ragas_record(
         {
@@ -304,10 +360,18 @@ def run(
             "judge_prompt_tokens": recorder.chat_prompt_tokens,
             "judge_completion_tokens": recorder.chat_completion_tokens,
             "embedding_tokens": recorder.embedding_tokens,
+            "sessions": len(journal.of("session")),
+            "session_commits": session_commits(journal),
+            "aborts": len(journal.of("abort")),
+            "api_calls": sum(len(e["calls"]) for e in journal.entries if "calls" in e),
+            "http_errors": sum(
+                1 for e in journal.entries for c in e.get("calls", []) if c.get("status") != 200
+            ),
         }
     )
     write_csv(out_file, RAGAS_HEADER, rows)
-    append_record(record | {"outputs_sha256": {out_file.name: sha256_of(out_file)}}, runs_file)
+    outputs = {out_file.name: sha256_of(out_file), journal_file.name: sha256_of(journal_file)}
+    append_record(record | {"outputs_sha256": outputs}, runs_file)
     return len(rows)
 
 
@@ -347,6 +411,9 @@ def set_paths(set_dir: Path) -> dict:
 
 def main(argv: list[str] | None = None) -> None:
     import argparse
+    import logging
+
+    from run_log import require_clean_tree
 
     p = argparse.ArgumentParser(
         description="Score the answers C1-C3 with RAGAS (ADR 0047); runs once, never overwrites."
@@ -359,6 +426,10 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = p.parse_args(argv)
     paths = set_paths(args.set) if args.set else main_paths()
+    if paths["runs_file"] == GENERATION_RUNS_FILE:  # the main catalogue
+        require_clean_tree()
+    logging.basicConfig(format="%(levelname)s %(name)s: %(message)s")
+    logging.getLogger("openai").setLevel(logging.INFO)  # shows each SDK retry (ADR 0050)
 
     from llm_client import model_created
     from ragas_client import ApiRecorder, async_client, make_scorer

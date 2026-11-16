@@ -58,7 +58,7 @@ from evaluate_retrieval import SCORES_HEADER as RETRIEVAL_HEADER
 from freeze import is_main_catalogue, require_frozen
 from ragas_eval import RAGAS_HEADER
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import latest_run, require_run
+from run_log import latest_run, require_run, sha256_of
 from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
 from second_rater import CLOSE_STEP
 
@@ -297,6 +297,22 @@ def _load_second_rating(paths: dict, notes: list[str]) -> dict | None:
     return second | {"paired": paired}
 
 
+def _embedding_run(runs_file: Path, key: str, chunk_file: Path | None) -> dict | None:
+    """The embed record that paid for the vectors of `key`: the latest one that called the API
+    and, when the chunk file is there, embedded exactly that file. A later run that only reused
+    the stored vectors (new clone, second machine) logs no tokens and must not zero the costs."""
+    records = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines()]
+    paid = [
+        r
+        for r in records
+        if r.get("step") == "embed" and r.get("strategy") == key and r.get("input_tokens", 0) > 0
+    ]
+    if chunk_file is not None and chunk_file.exists():
+        digest = sha256_of(chunk_file)
+        paid = [r for r in paid if r.get("inputs_sha256", {}).get(chunk_file.name) == digest]
+    return paid[-1] if paid else None
+
+
 def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     notes: list[str] = []
     # a set that resolves to the main catalogue gets no pilot exceptions
@@ -374,7 +390,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     embedding = None
     emb = paths["embedding_runs_file"]
     if emb.exists():
-        found = {k: latest_run(emb, "embed", k) for k in [*STRATEGY_IDS, K1]}
+        found = {k: _embedding_run(emb, k, (chunk_files or {}).get(k)) for k in [*STRATEGY_IDS, K1]}
         if all(found.values()):
             embedding = {
                 k: {f: r[f] for f in ("input_tokens", "cost_usd", "vector_bytes", "vectors")}

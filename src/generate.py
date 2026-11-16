@@ -21,6 +21,9 @@ Output schema of both files (docs/reference/data-formats.md): question_id, strat
 sources, prompt_tokens, completion_tokens
 """
 
+import hashlib
+import json
+from dataclasses import asdict, fields
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -33,6 +36,7 @@ from config import (
     EMBEDDING_RUNS_FILE,
     GENERATED_ANSWERS_CONTROL_FILE,
     GENERATED_ANSWERS_FILE,
+    GENERATION_JOURNAL_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
     ID_SEPARATOR,
@@ -44,12 +48,23 @@ from config import (
     STRATEGY_IDS,
 )
 from embed import load_jsonl
+from embedding_client import drain_http_errors
 from evaluate_retrieval import ranked_results
-from freeze import require_frozen
+from freeze import is_main_catalogue, require_frozen
+from journal import Journal
 from llm_client import Completer, Completion, ModelCreated, complete, model_created
 from prompt import closed_book_messages, context, messages
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
-from run_log import append_generation_run, generation_cost, require_run, sha256_of
+from run_log import (
+    append_generation_run,
+    environment,
+    generation_cost,
+    generation_settings,
+    prompts_sha256,
+    require_run,
+    session_commits,
+    sha256_of,
+)
 
 ANSWERS_HEADER = [
     "question_id",
@@ -59,6 +74,23 @@ ANSWERS_HEADER = [
     "prompt_tokens",
     "completion_tokens",
 ]
+
+
+COMPLETION_FIELDS = [f.name for f in fields(Completion) if f.name != "raw"]
+
+
+def messages_sha256(msgs: list[dict]) -> str:
+    return hashlib.sha256(json.dumps(msgs, ensure_ascii=False).encode()).hexdigest()
+
+
+def usage_detail(response: dict, name: str) -> int:
+    """reasoning_tokens or cached_tokens from a raw response's usage details (0 if absent)."""
+    usage = response.get("usage") or {}
+    for details in ("completion_tokens_details", "prompt_tokens_details"):
+        value = (usage.get(details) or {}).get(name)
+        if value is not None:
+            return int(value)
+    return 0
 
 
 def checked(answer: Completion, label: str, models: set[str], fingerprints: set[str]) -> Completion:
@@ -106,17 +138,20 @@ def generate(
     runs_file: Path = GENERATION_RUNS_FILE,
     retrieval_runs_file: Path = EMBEDDING_RUNS_FILE,
     legacy_retrieval: bool = False,
+    journal_file: Path | None = None,
 ) -> int:
     """Write one answer per question and experiment strategy; return the number of answers.
 
     `legacy_retrieval` lets a retrieval record without an output checksum (pilot sets, written
     before 17.10.2026) pass on its inputs; the main experiment always needs the checksum.
     """
+    journal_file = journal_file or out_file.with_name(GENERATION_JOURNAL_FILE.name)
     for path in (out_file, control_file):
         if path.exists():
             raise FileExistsError(
-                f"{path} exists; answers are generated once (ADR 0033), delete it deliberately "
-                "to generate them again"
+                f"{path} exists; answers are generated once (ADR 0033). If it was written without "
+                f"a run record (a stop right after writing), delete both answer files: a new run "
+                f"takes every answer from {journal_file.name} and calls the API for none (ADR 0050)"
             )
     require_frozen(questions_file, ground_truth_file, sections_file, documents_file, freeze_file)
     keys = list(STRATEGY_IDS)  # always the complete experiment, never K1 (ADR 0026)
@@ -145,64 +180,102 @@ def generate(
     grouped = ranked_results(results_file, qids, keys, chunks)
 
     created_before = model_created()  # free lookup, only after every local check
-    rows: list[dict] = []
+    jobs = [
+        (
+            q["question_id"],
+            key,
+            messages(
+                q["question"],
+                context([r["chunk_id"] for r in grouped[(q["question_id"], key)]], chunks),
+            ),
+        )
+        for q in questions
+        for key in keys
+    ]
+    (control,) = CONTROL_ANSWER_STRATEGIES  # K0: no retrieval, the closed-book prompt (ADR 0041)
+    jobs += [(q["question_id"], control, closed_book_messages(q["question"])) for q in questions]
+    journal = Journal(
+        journal_file,
+        {
+            "step": "generate",
+            "strategy": ",".join(keys),
+            **generation_settings(),
+            "prompts_sha256": prompts_sha256(),
+            "model_created": created_iso(created_before),
+            "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
+        },
+        session=environment(),
+    )
+    done = {(e["question_id"], e["strategy"]): e for e in journal.of("item")}
+    answers: dict[tuple[str, str], Completion] = {}
     models: set[str] = set()
     fingerprints: set[str] = set()
-    tokens = {key: [0, 0] for key in keys}  # prompt, completion
-    for question in questions:
-        qid = question["question_id"]
-        for key in keys:
-            sources = [r["chunk_id"] for r in grouped[(qid, key)]]
-            answer = checked(
-                completer(messages(question["question"], context(sources, chunks))),
+    received = 0
+    try:
+        for qid, key, msgs in jobs:
+            digest = messages_sha256(msgs)
+            entry = done.get((qid, key))
+            if entry is None:  # not yet paid for: ask the API and journal the answer at once
+                answer = completer(msgs)
+                entry = {
+                    "kind": "item",
+                    "question_id": qid,
+                    "strategy": key,
+                    "messages_sha256": digest,
+                    **{k: v for k, v in asdict(answer).items() if k != "raw"},
+                    "response": answer.raw,
+                    "http_errors": drain_http_errors(),
+                }
+                journal.append(entry)
+                received += 1
+            elif entry["messages_sha256"] != digest:
+                raise RuntimeError(
+                    f"{qid}/{key}: the journaled answer was asked with another prompt; nothing "
+                    "was written (ADR 0050)"
+                )
+            answers[(qid, key)] = checked(
+                Completion(**{f: entry[f] for f in COMPLETION_FIELDS}),
                 f"{qid}/{key}",
                 models,
                 fingerprints,
             )
-            tokens[key][0] += answer.prompt_tokens
-            tokens[key][1] += answer.completion_tokens
-            rows.append(
-                {
-                    "question_id": qid,
-                    "strategy": key,
-                    "answer": answer.text,
-                    "sources": ID_SEPARATOR.join(sources),
-                    "prompt_tokens": answer.prompt_tokens,
-                    "completion_tokens": answer.completion_tokens,
-                }
+        created_after = model_created()
+        if created_after != created_before:
+            raise RuntimeError(
+                f"the model behind {LLM_MODEL} changed during the run (created "
+                f"{created_iso(created_before)}, now {created_iso(created_after)}); nothing was "
+                "written (ADR 0033)"
             )
+    except BaseException as error:
+        journal.abort(error, answers_received=received, http_errors=drain_http_errors())
+        raise
 
-    (control,) = CONTROL_ANSWER_STRATEGIES  # K0: no retrieval, the closed-book prompt (ADR 0041)
-    control_rows: list[dict] = []
-    control_tokens = [0, 0]
-    for question in questions:
-        qid = question["question_id"]
-        answer = checked(
-            completer(closed_book_messages(question["question"])),
-            f"{qid}/{control}",
-            models,
-            fingerprints,
-        )
-        control_tokens[0] += answer.prompt_tokens
-        control_tokens[1] += answer.completion_tokens
-        control_rows.append(
-            {
-                "question_id": qid,
-                "strategy": control,
-                "answer": answer.text,
-                "sources": "",
-                "prompt_tokens": answer.prompt_tokens,
-                "completion_tokens": answer.completion_tokens,
-            }
-        )
+    def row(qid: str, key: str) -> dict:
+        answer = answers[(qid, key)]
+        sources = [] if key == control else [r["chunk_id"] for r in grouped[(qid, key)]]
+        return {
+            "question_id": qid,
+            "strategy": key,
+            "answer": answer.text,
+            "sources": ID_SEPARATOR.join(sources),
+            "prompt_tokens": answer.prompt_tokens,
+            "completion_tokens": answer.completion_tokens,
+        }
 
-    created_after = model_created()
-    if created_after != created_before:
-        raise RuntimeError(
-            f"the model behind {LLM_MODEL} changed during the run (created "
-            f"{created_iso(created_before)}, now {created_iso(created_after)}); nothing was "
-            "written (ADR 0033)"
-        )
+    rows = [row(qid, key) for qid, key, _ in jobs if key != control]
+    control_rows = [row(qid, key) for qid, key, _ in jobs if key == control]
+    by_strategy = {}
+    for key in [*keys, control]:
+        items = [e for e in journal.of("item") if e["strategy"] == key]
+        p = sum(e["prompt_tokens"] for e in items)
+        c = sum(e["completion_tokens"] for e in items)
+        by_strategy[key] = {
+            "prompt_tokens": p,
+            "completion_tokens": c,
+            "reasoning_tokens": sum(usage_detail(e["response"], "reasoning_tokens") for e in items),
+            "cached_tokens": sum(usage_detail(e["response"], "cached_tokens") for e in items),
+            "cost_usd": generation_cost(p, c),
+        }
     write_csv(out_file, ANSWERS_HEADER, rows)
     write_csv(control_file, ANSWERS_HEADER, control_rows)
     append_generation_run(
@@ -212,24 +285,23 @@ def generate(
             "model_reported": next(iter(models), None),
             "model_created": created_iso(created_before),
             "system_fingerprint": next(iter(fingerprints), None),
+            "prompts_sha256": prompts_sha256(),
             "answers": len(rows),
             "control_answers": len(control_rows),
+            "sessions": len(journal.of("session")),
+            "session_commits": session_commits(journal),
+            "aborts": len(journal.of("abort")),
+            "http_errors": sum(len(e.get("http_errors", [])) for e in journal.entries),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
             "outputs_sha256": {
                 out_file.name: sha256_of(out_file),
                 control_file.name: sha256_of(control_file),
+                journal_file.name: sha256_of(journal_file),
             },
-            "by_strategy": {
-                key: {
-                    "prompt_tokens": p,
-                    "completion_tokens": c,
-                    "cost_usd": generation_cost(p, c),
-                }
-                for key, (p, c) in {**tokens, control: control_tokens}.items()
-            },
+            "by_strategy": by_strategy,
         },
-        sum(p for p, _ in tokens.values()) + control_tokens[0],
-        sum(c for _, c in tokens.values()) + control_tokens[1],
+        sum(v["prompt_tokens"] for v in by_strategy.values()),
+        sum(v["completion_tokens"] for v in by_strategy.values()),
         runs_file,
     )
     return len(rows)
@@ -252,6 +324,9 @@ def pilot_paths(set_dir: Path) -> dict:
 
 if __name__ == "__main__":
     import argparse
+    import logging
+
+    from run_log import require_clean_tree
 
     p = argparse.ArgumentParser(
         description="Generate one answer per question and strategy C1-C3 (ADR 0033)."
@@ -260,7 +335,15 @@ if __name__ == "__main__":
         "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/hard) instead"
     )
     args = p.parse_args()
+    if args.set and is_main_catalogue(
+        args.set / QUESTIONS_FILE.name, args.set / GROUND_TRUTH_FILE.name
+    ):
+        raise SystemExit(f"{args.set} holds the main catalogue; run without --set (ADR 0033)")
     paths = pilot_paths(args.set) if args.set else {}
+    if not args.set:
+        require_clean_tree()
+    logging.basicConfig(format="%(levelname)s %(name)s: %(message)s")
+    logging.getLogger("openai").setLevel(logging.INFO)  # shows each SDK retry (ADR 0050)
     count = generate(**paths)
     print(f"{count} answers -> {paths.get('out_file', GENERATED_ANSWERS_FILE)}")
     control_out = paths.get("control_file", GENERATED_ANSWERS_CONTROL_FILE)

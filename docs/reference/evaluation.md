@@ -77,8 +77,8 @@ Kriterien in `scores.csv`: `config.RUBRIC_CRITERIA`.
 Regeln nach [ADR 0035](../adr/0035-regelbasierte-bewertung.md) (`src/scoring_rules.py`, Version
 `config.RUBRIC_RULES_VERSION`). Vor der Bewertung schreibt Jonas je Frage 1–`config.KEY_POINTS_MAX` Kernpunkte (Punkt 1 =
 Kernaussage, die direkte Antwort auf die Frage) und friert sie ein. Die App befüllt sie aus der Referenzantwort vor:
-getrennt an Semikolon und an Satzenden vor einem Großbuchstaben, Teile über `KEY_POINTS_MAX` hinaus bleiben im letzten
-Punkt (`scoring_rules.split_reference`); Jonas prüft und teilt weiter
+getrennt an Semikolon und an Satzenden vor einem Großbuchstaben, Zeilenumbrüche und Codeblöcke einzeilig, Teile über
+`KEY_POINTS_MAX` hinaus bleiben im letzten Punkt (`scoring_rules.split_reference`); Jonas prüft und teilt weiter
 ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)). Je Antwort werden dann diese
 Prüffragen beantwortet:
 

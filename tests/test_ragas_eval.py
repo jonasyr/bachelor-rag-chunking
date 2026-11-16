@@ -182,6 +182,10 @@ def go(files, scorer=None, recorder=None, created=None, main=True, record=True, 
     )
 
 
+def journal(files):
+    return files["out_file"].with_name("ragas_scores_journal.jsonl")
+
+
 def records(files):
     return [json.loads(x) for x in files["runs_file"].read_text().splitlines()]
 
@@ -334,6 +338,8 @@ def test_judge_model_change_writes_nothing(files):
     with pytest.raises(RuntimeError, match="changed during the run"):
         go(files, created=FakeCreated(1, 2))
     assert not files["out_file"].exists()
+    assert json.loads(journal(files).read_text().splitlines()[-1])["kind"] == "abort"
+    journal(files).unlink()  # a changed judge is never continued; start the second case anew
     recorder = ApiRecorder()
     recorder.models = {"a", "b"}
     with pytest.raises(RuntimeError, match="nothing was written"):
@@ -360,7 +366,10 @@ def test_record_hashes_inputs_and_output(files):
         )
     } | {f.name for f in files["chunk_files"].values()}
     assert set(record["inputs_sha256"]) == expected
-    assert record["outputs_sha256"] == {"ragas_scores.csv": sha256_of(files["out_file"])}
+    assert record["outputs_sha256"] == {
+        "ragas_scores.csv": sha256_of(files["out_file"]),
+        "ragas_scores_journal.jsonl": sha256_of(journal(files)),
+    }
     assert record["strategy"] == "C1,C2,C3"
     assert record["model_reported"] == "gpt-6-sol-x"
     assert record["judge_cost_usd"] == pytest.approx((1000 * 2.0 + 200 * 10.0) / 1e6)
@@ -383,11 +392,14 @@ def test_repeat_only_for_pilot_sets_and_logged_apart(files):
     assert go(files, main=False) == 6
     assert go(files, main=False, repeat=True, record=False) == 6
     assert files["repeat_file"].exists()
+    repeat_journal = files["repeat_file"].with_name("ragas_scores_repeat_journal.jsonl")
     assert latest_run(files["runs_file"], "ragas_repeat", EXPERIMENT)["outputs_sha256"] == {
-        RAGAS_REPEAT_FILE_NAME: sha256_of(files["repeat_file"])
+        RAGAS_REPEAT_FILE_NAME: sha256_of(files["repeat_file"]),
+        repeat_journal.name: sha256_of(repeat_journal),
     }
     assert latest_run(files["runs_file"], "ragas", EXPERIMENT)["outputs_sha256"] == {
-        "ragas_scores.csv": sha256_of(files["out_file"])
+        "ragas_scores.csv": sha256_of(files["out_file"]),
+        "ragas_scores_journal.jsonl": sha256_of(journal(files)),
     }
 
 
@@ -451,3 +463,58 @@ def test_validated_accepts_a_clean_sample():
     s = Sample("Q1", "C1", "q", "a", ("c",), "r")
     values = {m: (0.25, "") for m in RAGAS_METRICS}
     assert validated(s, values) == values
+
+
+class FailOnCall(FakeScorer):
+    """Fails on scorer call `number` (one batch), as a network outage after the retries would."""
+
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def __call__(self, samples):
+        if len(self.calls) + 1 == self.number:
+            self.calls.append(samples)
+            raise ConnectionError("network down")
+        return super().__call__(samples)
+
+
+def test_scores_are_journaled_per_batch_and_a_restart_continues(files, monkeypatch):
+    monkeypatch.setattr("ragas_eval.RAGAS_JOURNAL_BATCH", 2)
+    with pytest.raises(ConnectionError):
+        go(files, FailOnCall(2))
+    assert not files["out_file"].exists()
+    kinds = [json.loads(x)["kind"] for x in journal(files).read_text().splitlines()]
+    assert kinds == ["start", "session", "batch", "abort"]
+    again = FakeScorer()
+    assert go(files, again, record=False) == len(QUESTIONS) * 3
+    assert sum(len(c) for c in again.calls) == len(QUESTIONS) * 3 - 2  # first batch reused
+    (record,) = (r for r in records(files) if r["step"] == "ragas")
+    assert record["sessions"] == 2 and record["aborts"] == 1
+    assert len(record["session_commits"]) == 1
+
+
+def test_scores_lost_after_writing_come_back_from_the_journal_without_api(files):
+    go(files)
+    first = files["out_file"].read_text()
+    files["out_file"].unlink()
+    again = FakeScorer()
+    go(files, again, record=False)
+    assert again.calls == [] and files["out_file"].read_text() == first
+
+
+def test_invalid_values_stay_journaled_and_stop_every_restart(files):
+    bad = FakeScorer({("Q002", "C3"): {"faithfulness": (1.2, "")}})
+    with pytest.raises(RuntimeError, match="outside 0-1"):
+        go(files, bad)
+    again = FakeScorer()
+    with pytest.raises(RuntimeError, match="outside 0-1"):
+        go(files, again, record=False)
+    assert again.calls == []
+
+
+def test_a_journal_of_another_judge_is_never_continued(files):
+    with pytest.raises(ConnectionError):
+        go(files, FailOnCall(1))
+    with pytest.raises(RuntimeError, match="move it aside deliberately"):
+        go(files, created=FakeCreated(99), record=False)

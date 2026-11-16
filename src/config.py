@@ -46,6 +46,7 @@ CONTROL_RETRIEVED_FILE = DATA_EVAL / "retrieved_results_control.csv"  # control 
 GENERATED_ANSWERS_FILE = DATA_EVAL / "generated_answers.csv"
 GENERATED_ANSWERS_CONTROL_FILE = DATA_EVAL / "generated_answers_control.csv"  # control K0 (D41)
 GENERATION_RUNS_FILE = DATA_EVAL / "generation_runs.jsonl"  # generation + later steps (D33)
+GENERATION_JOURNAL_FILE = DATA_EVAL / "generation_journal.jsonl"  # raw API responses (D50)
 SCORES_FILE = DATA_EVAL / "scores.csv"
 # Blind rubric scoring (D32): the rater fills the sheet while reading the packet; the key that maps
 # each code to its strategy is opened only by `evaluate_answers.py --mode summarise`.
@@ -340,6 +341,11 @@ LLM_SEED = 20261017  # best-effort deterministic sampling on every request (D33)
 LLM_MAX_TOKENS = 1024  # an answer cut off at this limit stops the run (D33)
 LLM_PRICE_INPUT_PER_MTOK = 0.10  # USD per 1M input tokens, OpenAI model page, accessed 17.10.2026
 LLM_PRICE_OUTPUT_PER_MTOK = 0.50  # USD per 1M output tokens, same page and date
+# SDK settings of the generation and embedding client (D50). A request that still fails after
+# the retries stops the run; the answers received so far stay in the journal and a restart
+# continues from them.
+OPENAI_MAX_RETRIES = 8  # SDK retries per request with exponential backoff (SDK default 2)
+OPENAI_TIMEOUT_S = 120  # per request (SDK default 600)
 
 # Prompt (docs/reference/prompts.md): identical for every strategy (D6); tests compare it with
 # the documented text.
@@ -385,6 +391,8 @@ RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK = 10.0  # USD per 1M output tokens, same sourc
 RAGAS_TIMEOUT_S = 120  # per request
 RAGAS_MAX_RETRIES = 5  # SDK retries per request
 RAGAS_CONCURRENCY = 8  # parallel scoring jobs
+RAGAS_JOURNAL_SUFFIX = "_journal.jsonl"  # next to the scores file: scores and raw calls (D50)
+RAGAS_JOURNAL_BATCH = 8  # samples scored and journaled together; a restart loses at most one batch
 RAGAS_DO_NOT_TRACK = True  # ragas telemetry off: no posts (a random local uuid file remains)
 RAGAS_MAX_TOKENS = 4096  # max_completion_tokens of a judge call; a truncated output is an error
 # Reason stored when RAGAS returns a bare NaN (no reason in the result), per metric. The texts name

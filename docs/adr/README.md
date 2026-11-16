@@ -3,7 +3,7 @@
 *[Doku-Index](../README.md) · Entscheidungen*
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0049 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0050 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -91,3 +91,4 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachträge 21.10.2026 (Strictness), 26.10.2026 (fehlende Werte) |
 | [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |
 | [0049](0049-schreibhilfen-im-editor.md) | Schreibhilfen im Katalog-Editor | Angenommen; ergänzt 0031; Nachtrag 09.11.2026 (Vorbereitungsblätter für jeden Block), 10.11.2026 (Typ-Eignung im Vorbereitungsblatt) |
+| [0050](0050-journal-und-fortsetzen-der-api-schritte.md) | Journal und Fortsetzen der API-Schritte | Angenommen; ergänzt 0033 und 0047 |

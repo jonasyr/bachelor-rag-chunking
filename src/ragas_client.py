@@ -6,6 +6,8 @@ changed (more than one model or fingerprint), so the scores are not written.
 """
 
 import asyncio
+import contextvars
+import json
 import math
 import os
 from typing import TYPE_CHECKING, Any
@@ -36,6 +38,11 @@ if TYPE_CHECKING:
     from ragas_eval import MetricValue, Sample, Scorer
 
 
+# The scoring job (question/strategy/metric) a request belongs to; set per job in `scorer_for`
+# and read in the response hook, which runs in the job's task (ADR 0050).
+JOB: contextvars.ContextVar[str] = contextvars.ContextVar("ragas_job", default="")
+
+
 class ApiRecorder:
     def __init__(self) -> None:
         self.models: set[str] = set()
@@ -43,14 +50,48 @@ class ApiRecorder:
         self.chat_prompt_tokens = 0
         self.chat_completion_tokens = 0
         self.embedding_tokens = 0
+        self.calls: list[dict] = []  # every response since the last drain, for the journal
+
+    def drain(self) -> list[dict]:
+        taken, self.calls = self.calls, []
+        return taken
+
+    def restore(self, calls: list[dict]) -> None:
+        """Count the journaled calls of earlier sessions as if they were made now (ADR 0050)."""
+        for call in calls:
+            if call.get("status") == 200:
+                self._count(call["path"], call.get("response") or {})
 
     async def on_response(self, response: httpx.Response) -> None:
         path = response.request.url.path
-        chat = path.endswith("/chat/completions")
-        if not (chat or path.endswith("/embeddings")) or response.status_code != 200:
-            return
         await response.aread()
-        body = response.json()
+        try:
+            body = response.json()
+        except ValueError:
+            body = {"text": response.text}
+        try:
+            request = json.loads(response.request.content or b"null")
+        except ValueError:
+            request = None
+        if path.endswith("/embeddings") and isinstance(body.get("data"), list):
+            # the vectors are not needed for the record and would make the journal huge
+            body = {**body, "data": [{"index": d.get("index")} for d in body["data"]]}
+        self.calls.append(
+            {
+                "job": JOB.get(),
+                "path": path,
+                "status": response.status_code,
+                "request": request,
+                "response": body,
+            }
+        )
+        if response.status_code == 200:
+            self._count(path, body)
+
+    def _count(self, path: str, body: dict) -> None:
+        chat = path.endswith("/chat/completions")
+        if not (chat or path.endswith("/embeddings")):
+            return
         usage = body.get("usage") or {}
         if chat:
             if body.get("model"):
@@ -195,6 +236,7 @@ def scorer_for(metrics: dict[str, Any]) -> "Scorer":
         gate = asyncio.Semaphore(RAGAS_CONCURRENCY)
 
         async def one(name: str, sample: "Sample") -> "MetricValue":
+            JOB.set(f"{sample.question_id}/{sample.strategy}/{name}")
             async with gate:
                 result = await metrics[name].ascore(**_arguments(name, sample))
             return _value(name, result)

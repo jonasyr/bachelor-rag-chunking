@@ -77,6 +77,38 @@ Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl`
 | Slots je Bereich | nach Tokenanteil, mindestens 1: [Korpus](corpus.md#bereiche) |
 | Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 15.10.2026, Commit `4b22a45`; nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
 
+## Generalprobe Hauptlauf (16.11.2026)
+
+Alle zehn Schritte aus [Experiment durchführen](../how-to/run-the-experiment.md#hauptlauf-auf-einen-blick) in einer
+Wegwerfkopie des Repos mit dem eingefrorenen Katalog (48 Fragen), gegen einen nachgebauten OpenAI-Server
+(`OPENAI_BASE_URL` auf `127.0.0.1`, Schlüssel ungültig, also kein Aufruf bei OpenAI und keine Kosten). Der Server gab für
+gespeicherte Texte die gespeicherten Vektoren zurück (die Modellstand-Prüfung bestand), sonst feste Pseudovektoren,
+Antworttexte und für RAGAS aus dem angefragten Schema gebaute JSON-Antworten. Bewertung und Kernpunkte setzte ein Skript
+über dieselben Funktionen wie die App. Die Werte sind deshalb bedeutungslos; geprüft wurden Ablauf, Aufzeichnung und
+Verhalten bei Störungen.
+
+| Durchgang | Befund |
+|---|---|
+| 1 (Code vor [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) | alle zehn Schritte liefen durch (192 Antworten, RAGAS mit 1.586 Aufrufen, `analyse.py` mit 14 Tabellen und 8 Abbildungen). Gefunden: die Vorbefüllung der Kernpunkte übernahm Zeilenumbrüche aus Referenzantworten mit Codeblock (Q001, Q005), Speichern in der App lehnte sie ab; ein fehlgeschlagener RAGAS-Auftrag verwarf den ganzen Lauf |
+| 2 (Code mit ADR 0050) | Prüfung auf sauberen Code-Stand verweigerte das zweite `retrieve.py` der Anleitung, weil die Ergebnisse des ersten noch nicht committet waren; behoben (`data/` und `output/` zählen nicht) |
+| 3, Generierung | Server nach 61 Antworten beendet: 8 sichtbare Wiederholungen in 37 s, dann Abbruch mit `abort` im Journal, keine Antwortdatei. Neustart, nach 50 weiteren Antworten Prozess per SIGKILL beendet: Journal mit 111 Antworten unversehrt. Dritter Start: nur die 81 fehlenden Antworten angefragt; Laufeintrag mit `sessions` 3, `aborts` 1, `git_dirty` false |
+| 3, Fenster zwischen Schreiben und Eintrag | Antwortdateien gelöscht und Schritt erneut gestartet: 0 Antwort-Aufrufe (nur die zwei Modellabfragen), Dateien byteweise gleich |
+| 3, RAGAS | Server nach 408 Aufrufen beendet: 4 Blöcke (32 Antworten) im Journal, Abbruch mit den 54 Aufrufen des laufenden Blocks. Neustart bewertete nur die übrigen 112 Antworten; Tokens und Kosten zählen alle 1.638 Aufrufe. Journal 12 MB |
+| 3, Commits mit den pre-commit-Hooks | gefunden: `trailing-whitespace` und `end-of-file-fixer` liefen über `data/` und hätten gehashte Ergebnisdateien verändern können; die Größengrenze von 5 MB hätte das RAGAS-Journal abgewiesen. Behoben; danach alle Commits ohne Änderung durch einen Hook |
+
+Unabhängig davon prüften zwei Durchsichten den Code auf Lücken in der Aufzeichnung und auf Verhalten bei Abbrüchen; ihre
+Befunde sind in [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) umgesetzt. Was ohne echte API nicht
+prüfbar war, zeigte ein Prüfaufruf am selben Abend (Skript außerhalb des Repos, etwa 0,04 USD, nichts geschrieben):
+
+- Modellobjekte unverändert seit dem Pinnen: `gpt-6-luna` erstellt 14.09.2026, 17:15:02 UTC, `gpt-6-sol` 17:12:17 UTC.
+- Eine Closed-Book-Antwort von `gpt-6-luna` mit den gepinnten Einstellungen: `finish_reason` `stop`,
+  `reasoning_tokens` 0 (Effort `none` ohne verdecktes Reasoning, [ADR 0033](../adr/0033-antwortmodell.md)),
+  `system_fingerprint` nicht gemeldet, `service_tier` `default`; die vollständige Antwort kommt im Journal an.
+- RAGAS auf einer Pilot-Antwort (E01/C1) über den neuen Recorder: 11 Aufrufe, alle mit Status 200 und ihrem Auftrag
+  erfasst; `gpt-6-sol` nimmt Temperatur 0, Effort `none`, `seed` und `json_object` an, `reasoning_tokens` 0, kein
+  Fingerabdruck. Werte 1,000 / 0,780 / 0,806 / 1,000 gegenüber 1,000 / 0,776 / 0,833 / 1,000 im
+  [RAGAS-Pilot](#ragas-pilot-e2e-21102026): die bekannte Streuung des Richters.
+
 ## Fragenkatalog eingefroren (16.11.2026)
 
 | Feld | Wert |

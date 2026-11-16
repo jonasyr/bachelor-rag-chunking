@@ -173,6 +173,14 @@ def run(files, completer=None, record=True, created=None, **overrides):
     return generate(completer or FakeCompleter(), model_created=created or FakeCreated(), **args)
 
 
+def journal(files):
+    return files["out_file"].with_name("generation_journal.jsonl")
+
+
+def journal_entries(files):
+    return [json.loads(line) for line in journal(files).read_text().splitlines()]
+
+
 def runs(files):
     return [json.loads(line) for line in files["runs_file"].read_text().splitlines()]
 
@@ -249,7 +257,7 @@ def test_run_log_records_versions_inputs_and_cost(files):
 def test_existing_answers_are_never_overwritten(files):
     files["out_file"].write_text("kept", encoding="utf-8")
     completer = FakeCompleter()
-    with pytest.raises(FileExistsError, match="delete it"):
+    with pytest.raises(FileExistsError, match="delete both answer files"):
         run(files, completer)
     assert completer.calls == []
     assert files["out_file"].read_text(encoding="utf-8") == "kept"
@@ -327,6 +335,7 @@ def test_run_log_records_the_checksum_of_the_answers(files):
     assert record["outputs_sha256"] == {
         "generated_answers.csv": sha256_of(files["out_file"]),
         "generated_answers_control.csv": sha256_of(files["control_file"]),
+        "generation_journal.jsonl": sha256_of(journal(files)),
     }
 
 
@@ -456,6 +465,7 @@ def test_the_run_record_has_k0_tokens_and_both_hashes(files):
     assert record["outputs_sha256"] == {
         files["out_file"].name: sha256_of(files["out_file"]),
         files["control_file"].name: sha256_of(files["control_file"]),
+        "generation_journal.jsonl": sha256_of(journal(files)),
     }
     k0 = record["by_strategy"]["K0"]
     n = len(QUESTIONS) * len(STRATEGIES)
@@ -479,3 +489,103 @@ def test_an_existing_control_file_is_never_overwritten(files):
 
 def test_pilot_paths_include_the_control_file(tmp_path):
     assert pilot_paths(tmp_path)["control_file"] == tmp_path / "generated_answers_control.csv"
+
+
+class FailAt(FakeCompleter):
+    """Raises at call `number`, as a network error after the SDK retries would."""
+
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def __call__(self, prompt):
+        if len(self.calls) + 1 == self.number:
+            self.calls.append(prompt)
+            raise ConnectionError("network down")
+        return super().__call__(prompt)
+
+
+def test_every_answer_is_journaled_with_the_whole_response(files):
+    run(files)
+    entries = journal_entries(files)
+    assert entries[0]["kind"] == "start" and entries[1]["kind"] == "session"
+    items = [e for e in entries if e["kind"] == "item"]
+    assert len(items) == len(QUESTIONS) * (len(STRATEGIES) + 1)
+    assert items[0]["question_id"] == "Q001" and items[0]["strategy"] == "C1"
+    assert items[0]["text"] == "Answer. #1" and "response" in items[0]
+
+
+def test_a_stopped_run_writes_no_answers_and_journals_the_abort(files):
+    with pytest.raises(ConnectionError):
+        run(files, FailAt(4))
+    assert not files["out_file"].exists() and not files["control_file"].exists()
+    entries = journal_entries(files)
+    assert [e["kind"] for e in entries][-1] == "abort"
+    assert entries[-1]["answers_received"] == 3 and "network down" in entries[-1]["error"]
+    assert not files["runs_file"].exists() or "generate" not in files["runs_file"].read_text()
+
+
+def test_a_restart_continues_from_the_journal_without_asking_again(files):
+    with pytest.raises(ConnectionError):
+        run(files, FailAt(4))
+    second = FakeCompleter()
+    run(files, second, record=False)
+    total = len(QUESTIONS) * (len(STRATEGIES) + 1)
+    assert len(second.calls) == total - 3  # the three paid answers are reused
+    rows = read(files["out_file"])
+    assert [r["answer"] for r in rows[:3]] == ["Answer. #1", "Answer. #2", "Answer. #3"]
+    (record,) = (r for r in runs(files) if r["step"] == "generate")
+    assert record["sessions"] == 2 and record["aborts"] == 1
+    assert record["answers"] == len(QUESTIONS) * len(STRATEGIES)
+    sessions = [e for e in journal_entries(files) if e["kind"] == "session"]
+    assert all("git_commit" in s and "python" in s for s in sessions)
+    assert record["session_commits"] == [sessions[0]["git_commit"]]
+
+
+def test_record_lists_every_commit_a_continued_run_ran_on(files, monkeypatch):
+    import generate as generate_module
+
+    monkeypatch.setattr(generate_module, "environment", lambda: {"git_commit": "aaa"})
+    with pytest.raises(ConnectionError):
+        run(files, FailAt(2))
+    monkeypatch.setattr(generate_module, "environment", lambda: {"git_commit": "bbb"})
+    run(files, FakeCompleter(), record=False)
+    record = next(r for r in runs(files) if r["step"] == "generate")
+    assert record["session_commits"] == ["aaa", "bbb"]
+
+
+def test_answers_lost_after_writing_come_back_from_the_journal_without_api(files):
+    run(files)
+    first = read(files["out_file"])
+    files["out_file"].unlink()
+    files["control_file"].unlink()
+    again = FakeCompleter(text="Other")
+    run(files, again, record=False)
+    assert again.calls == [] and read(files["out_file"]) == first
+
+
+def test_a_journal_of_other_inputs_is_never_continued(files):
+    with pytest.raises(ConnectionError):
+        run(files, FailAt(2))
+    rows = read(files["questions_file"])
+    rows[0]["question"] = "Changed?"
+    write_csv(files["questions_file"], list(rows[0]), [list(r.values()) for r in rows])
+    with pytest.raises(RuntimeError, match="move it aside deliberately"):
+        run(files, FakeCompleter())
+
+
+def test_a_cut_off_answer_stays_journaled_and_stops_every_restart(files):
+    with pytest.raises(RuntimeError, match="finish_reason"):
+        run(files, CutOffAt(2))
+    again = FakeCompleter()
+    with pytest.raises(RuntimeError, match="finish_reason"):
+        run(files, again, record=False)
+    assert len(again.calls) == 0  # the journaled cut-off answer is checked again, not re-asked
+
+
+def test_record_holds_code_environment_and_prompt_checksum(files):
+    run(files)
+    (record,) = runs(files)
+    for key in ("git_commit", "git_dirty", "python", "uv_lock_sha256", "prompts_sha256"):
+        assert key in record
+    assert record["by_strategy"]["C1"]["reasoning_tokens"] == 0

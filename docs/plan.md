@@ -5,8 +5,9 @@
 ## Stand
 
 Stand 16.11.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
-Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlaufs sind bestanden
-([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
+Zweitbewertung sind umgesetzt und getestet; Pilot e2e, Probelauf und Generalprobe des Hauptlaufs sind bestanden
+([Experiment-Protokoll](reference/experiment-record.md)); Generierung und RAGAS setzen nach einem Abbruch fort
+([ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Hauptlauf 17.–18.11., zuerst die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)). **Größtes Risiko:** Bewertung und Analyse haben nur 19.–25.11. Der
@@ -73,9 +74,10 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 4. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
    R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
    ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-5. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version und
-   `system_fingerprint` im [Experiment-Protokoll](reference/experiment-record.md) stehen
-   ([ADR 0033](adr/0033-antwortmodell.md)).
+5. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version,
+   Commit, `system_fingerprint`, Sitzungen und Abbrüche aus den Laufeinträgen im
+   [Experiment-Protokoll](reference/experiment-record.md) stehen ([ADR 0033](adr/0033-antwortmodell.md),
+   [ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
 6. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
@@ -160,3 +162,7 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   17.–18.11., Bewertung und Analyse 19.–25.11. (drei Tage kürzer); die Schreibphase bleibt (Puffer-Regel).
 - 16.11.2026: Fragenkatalog eingefroren (48 Fragen, 35 retrieval-abhängig) nach der Gesamtdurchsicht (Runde 9);
   Freeze-Datensatz und Hashes im [Experiment-Protokoll](reference/experiment-record.md#fragenkatalog-eingefroren-16112026).
+- 16.11.2026: Generalprobe des Hauptlaufs mit Störungen und zwei Code-Durchsichten; Generierung und RAGAS journalisieren
+  jede API-Antwort und setzen nach einem Abbruch fort, Laufeinträge nennen Commit und Umgebung
+  ([ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md),
+  [Generalprobe](reference/experiment-record.md#generalprobe-hauptlauf-16112026)).

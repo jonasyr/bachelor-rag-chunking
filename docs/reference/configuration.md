@@ -42,6 +42,7 @@ Formate aller Dateien: [Datenformate](data-formats.md).
 | `CONTROL_RETRIEVED_FILE` | `data/evaluation/retrieved_results_control.csv` | Top-k der Kontrolle K1 | [ADR 0026](../adr/0026-c3-vergleichbarkeit.md) |
 | `GENERATED_ANSWERS_FILE` | `data/evaluation/generated_answers.csv` | generierte Antworten (nie überschrieben) | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `GENERATED_ANSWERS_CONTROL_FILE` | `data/evaluation/generated_answers_control.csv` | Antworten der Kontrolle K0 (nie überschrieben) | [ADR 0041](../adr/0041-kontrolle-k0.md) |
+| `GENERATION_JOURNAL_FILE` | `data/evaluation/generation_journal.jsonl` | Journal jeder API-Antwort der Generierung ([Antworten](data-formats.md#antworten)) | [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
 | `GENERATION_RUNS_FILE` | `data/evaluation/generation_runs.jsonl` | Laufprotokoll der Antwort-, Bewertungs-, RAGAS- und Zweitbewertungsschritte und der Closed-Book-Prüfung ([Schritte](data-formats.md#laufprotokoll)) | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
 | `SCORES_FILE` | `data/evaluation/scores.csv` | Rubrik-Bewertungen mit Strategie (abgeleitet aus Bogen und Schlüssel) | [ADR 0013](../adr/0013-antwort-rubrik.md) |
 | `SCORING_SHEET_FILE` | `data/evaluation/scoring_sheet.csv` | Bewertungsbogen der blinden Bewertung | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
@@ -169,6 +170,8 @@ Konstante Einstellungen der Antwortgenerierung: [Prompts](prompts.md).
 | `LLM_SEED` | `20261017` | fester `seed` jeder Anfrage (OpenAI: Beta, nur „best effort“); fest, nie getunt | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_MAX_TOKENS` | `1024` | Obergrenze der Antwortlänge (`max_completion_tokens`); eine dort abgeschnittene Antwort bricht den Lauf ab | [ADR 0033](../adr/0033-antwortmodell.md) |
 | `LLM_PRICE_INPUT_PER_MTOK`, `LLM_PRICE_OUTPUT_PER_MTOK` | `0.10`, `0.50` | USD je 1 Mio. Ein- bzw. Ausgabe-Tokens (OpenAI-Modellseite, abgerufen 17.10.2026); Grundlage von `cost_usd` | [ADR 0008](../adr/0008-kosten-als-variable.md), [ADR 0033](../adr/0033-antwortmodell.md) |
+| `OPENAI_MAX_RETRIES` | `8` | Wiederholungen je Anfrage im SDK (Generierung, Embeddings; SDK-Standard 2) mit wachsender Wartezeit; jede erscheint auf der Konsole | [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
+| `OPENAI_TIMEOUT_S` | `120` | Zeitgrenze je Anfrage in Sekunden (SDK-Standard 600) | [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
 
 ### Prompts
 
@@ -197,6 +200,8 @@ Verfahren: [Evaluation](evaluation.md#triangulation), Dateien: [Datenformate](da
 | `RAGAS_TIMEOUT_S` | `120` | Zeitgrenze je Anfrage in Sekunden | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_MAX_RETRIES` | `5` | Wiederholungen je Anfrage im SDK | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_CONCURRENCY` | `8` | gleichzeitige Bewertungsaufträge (eine Antwort mit einer Metrik) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
+| `RAGAS_JOURNAL_SUFFIX` | `"_journal.jsonl"` | Namensendung des Journals neben der Ergebnisdatei (`ragas_scores_journal.jsonl`) | [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
+| `RAGAS_JOURNAL_BATCH` | `8` | Antworten, die zusammen bewertet und journalisiert werden; ein Neustart verliert höchstens einen Block | [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
 | `RAGAS_DO_NOT_TRACK` | `True` | unterbindet das Senden der RAGAS-Telemetrie ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_MAX_TOKENS` | `4096` | `max_completion_tokens` eines Richteraufrufs; eine abgeschnittene Ausgabe ist ein Fehler | [ADR 0047](../adr/0047-ragas-als-triangulation.md) |
 | `RAGAS_NAN_REASONS` | Text je Metrik | feste Begründung, wenn RAGAS 0.4.3 ein NaN ohne eigenen Grund liefert (Faithfulness, Context Recall, Context Precision; Response Relevancy hat keinen Eintrag) | [ADR 0047](../adr/0047-ragas-als-triangulation.md), [Spec](../superpowers/specs/2026-10-21-ragas-design.md) |

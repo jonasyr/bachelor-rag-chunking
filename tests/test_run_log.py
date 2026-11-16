@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from run_log import append_step_run, require_run, sha256_of
+import run_log
+from run_log import append_step_run, latest_run, require_run, sha256_of
 
 
 def test_append_step_run_records_hashes(tmp_path):
@@ -39,3 +40,27 @@ def test_step_command_names_the_ragas_runs():
 
     assert step_command("ragas", "C1,C2,C3") == "src/ragas_eval.py"
     assert step_command("ragas_repeat", "C1,C2,C3") == "src/ragas_eval.py --repeat"
+
+
+def test_a_torn_run_log_line_is_named(tmp_path):
+    runs = tmp_path / "runs.jsonl"
+    runs.write_text('{"step": "a", "strategy": "C1"}\n{"step": "b"', encoding="utf-8")
+    with pytest.raises(ValueError, match="line 2 is not JSON"):
+        latest_run(runs, "a", "C1")
+
+
+def test_environment_names_commit_python_and_lock():
+    env = run_log.environment()
+    assert set(env) == {"git_commit", "git_dirty", "python", "uv_lock_sha256"}
+    assert env["python"] and env["uv_lock_sha256"]
+
+
+def test_clean_tree_check_refuses_uncommitted_changes(monkeypatch):
+    monkeypatch.setattr(run_log, "_git", lambda *a: " M src/config.py")
+    with pytest.raises(RuntimeError, match="uncommitted changes"):
+        run_log.require_clean_tree()
+    monkeypatch.setattr(run_log, "_git", lambda *a: "")
+    run_log.require_clean_tree()
+    monkeypatch.setattr(run_log, "_git", lambda *a: None)
+    with pytest.raises(RuntimeError, match="git status failed"):
+        run_log.require_clean_tree()

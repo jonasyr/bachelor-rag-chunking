@@ -20,6 +20,7 @@ class FakeOpenAI:
                 )
             ],
             usage=SimpleNamespace(prompt_tokens=120, completion_tokens=30),
+            model_dump=lambda mode: {"id": "chatcmpl-1", "model": model},
         )
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self.create))
         self.models = SimpleNamespace(retrieve=self.retrieve)
@@ -75,3 +76,7 @@ def test_model_created_reads_the_pinned_model():
     client = FakeOpenAI()
     assert model_created(client=client) == 1789406102
     assert client.retrieved == [LLM_MODEL]
+
+
+def test_keeps_the_whole_response_for_the_journal():
+    assert complete([], client=FakeOpenAI()).raw == {"id": "chatcmpl-1", "model": "gpt-6-luna-x"}
