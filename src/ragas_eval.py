@@ -55,10 +55,12 @@ from journal import Journal
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import (
     append_record,
+    environment,
     latest_run,
     ragas_record,
     ragas_settings,
     require_run,
+    session_commits,
     sha256_of,
 )
 
@@ -277,6 +279,7 @@ def run(
             "model_created": created_iso(created_before),
             "inputs_sha256": {f.name: sha256_of(f) for f in inputs},
         },
+        session=environment(),
     )
     done = {
         (item["question_id"], item["strategy"]): {m: tuple(v) for m, v in item["values"].items()}
@@ -358,6 +361,7 @@ def run(
             "judge_completion_tokens": recorder.chat_completion_tokens,
             "embedding_tokens": recorder.embedding_tokens,
             "sessions": len(journal.of("session")),
+            "session_commits": session_commits(journal),
             "aborts": len(journal.of("abort")),
             "api_calls": sum(len(e["calls"]) for e in journal.entries if "calls" in e),
             "http_errors": sum(

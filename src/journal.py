@@ -7,7 +7,8 @@ instead of drawing a second sample.
 
 The first line is the `start` entry: the step, its pinned settings and the checksums of its
 inputs. A restart continues only when these are unchanged; otherwise it refuses, and the journal
-must be moved aside deliberately. Each run of the step appends a `session` entry; a stop appends
+must be moved aside deliberately. Each run of the step appends a `session` entry with its code and
+environment, so a run continued after a commit shows every commit it ran on; a stop appends
 an `abort` entry with the error before the error propagates. Every line is flushed and synced to
 disk before the step goes on.
 """
@@ -19,8 +20,9 @@ from pathlib import Path
 
 
 class Journal:
-    def __init__(self, path: Path, start: dict) -> None:
-        """Open the journal at `path` for a step described by `start` (JSON values only)."""
+    def __init__(self, path: Path, start: dict, session: dict | None = None) -> None:
+        """Open the journal at `path` for a step described by `start` (JSON values only);
+        `session` (e.g. the commit and environment of this call) goes into the session entry."""
         self.path = path
         self.start = json.loads(json.dumps(start))  # normalised as it is stored
         self.entries: list[dict] = []
@@ -54,7 +56,7 @@ class Journal:
         else:
             self._write({"kind": "start", "time": _now(), **self.start})
         resumed = [e for e in self.entries if e.get("kind") not in ("session", "abort")]
-        self.append({"kind": "session", "resumed_entries": len(resumed)})
+        self.append({"kind": "session", "resumed_entries": len(resumed), **(session or {})})
 
     def of(self, kind: str) -> list[dict]:
         return [e for e in self.entries if e.get("kind") == kind]

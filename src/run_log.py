@@ -75,6 +75,17 @@ def environment() -> dict:
     }
 
 
+def session_commits(journal) -> list:
+    """The distinct commits the sessions of a journaled run ran on, in order (ADR 0050); more
+    than one means the run was continued on changed code."""
+    commits: list = []
+    for entry in journal.of("session"):
+        commit = entry.get("git_commit")
+        if commit not in commits:
+            commits.append(commit)
+    return commits
+
+
 def require_clean_tree() -> None:
     """Refuse an API step of the main run while code, docs or config have uncommitted changes, so
     the commit in its record is exactly the code that ran (ADR 0050); data/ and output/ are

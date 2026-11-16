@@ -57,10 +57,12 @@ from prompt import closed_book_messages, context, messages
 from retrieve import QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import (
     append_generation_run,
+    environment,
     generation_cost,
     generation_settings,
     prompts_sha256,
     require_run,
+    session_commits,
     sha256_of,
 )
 
@@ -202,6 +204,7 @@ def generate(
             "model_created": created_iso(created_before),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},
         },
+        session=environment(),
     )
     done = {(e["question_id"], e["strategy"]): e for e in journal.of("item")}
     answers: dict[tuple[str, str], Completion] = {}
@@ -286,6 +289,7 @@ def generate(
             "answers": len(rows),
             "control_answers": len(control_rows),
             "sessions": len(journal.of("session")),
+            "session_commits": session_commits(journal),
             "aborts": len(journal.of("abort")),
             "http_errors": sum(len(e.get("http_errors", [])) for e in journal.entries),
             "inputs_sha256": {f.name: sha256_of(f) for f in [results_file, *inputs]},

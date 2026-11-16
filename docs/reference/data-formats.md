@@ -261,7 +261,8 @@ wie `generated_answers.csv`, `strategy` = `K0`, `sources` leer; wird nie übersc
 - `start` (erste Zeile): `time`, `step` (`generate`), `strategy`, die gepinnten Einstellungen und `openai_sdk` wie im
   Laufeintrag, `prompts_sha256`, `model_created`, `inputs_sha256`. Ein Neustart setzt nur fort, wenn alle Felder außer
   `time` gleich sind.
-- `session`: ein Aufruf von `generate.py`; `resumed_entries` = Zahl der übernommenen Einträge.
+- `session`: ein Aufruf von `generate.py`; `resumed_entries` = Zahl der übernommenen Einträge, dazu `git_commit`,
+  `git_dirty`, `python` und `uv_lock_sha256` dieses Aufrufs.
 - `item`: `question_id`, `strategy` (`C1`–`C3`, `K0`), `messages_sha256` (Prüfsumme des gesendeten Prompts), die Felder
   von `llm_client.Completion` (`text`, `model`, `finish_reason`, `prompt_tokens`, `completion_tokens`,
   `system_fingerprint`), `response` (die vollständige API-Antwort) und `http_errors` (Fehlerantworten vor dieser
@@ -476,7 +477,8 @@ Vektoren wiederverwendet wurden.
 - `git_commit`, `git_dirty` (ungespeicherte Änderungen außerhalb von `data/` und `output/`), `python`,
   `uv_lock_sha256` (alle Paketversionen); dieselben vier Felder tragen `embed`, `retrieve` und `ragas` ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
   `prompts_sha256`: Prüfsumme der [Prompts](prompts.md); `sessions`, `aborts`, `http_errors`: Zahl der Sitzungen,
-  Abbrüche und Fehlerantworten laut Journal.
+  Abbrüche und Fehlerantworten laut Journal; `session_commits`: die verschiedenen Commits der Sitzungen in ihrer
+  Reihenfolge (mehr als einer heißt: nach einem Abbruch auf geändertem Code fortgesetzt).
 - `inputs_sha256`: `retrieved_results.csv`, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
   `generated_answers.csv`, `generated_answers_control.csv` und `generation_journal.jsonl`. `retrieved_results.csv` prüft `generate.py` schon vor
   dem Lauf gegen den `retrieve`-Eintrag; hier ist die Prüfsumme nur aufgezeichnet.
@@ -514,7 +516,7 @@ Pilot-Beispiel im [Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21
 - `judge_prompt_tokens`, `judge_completion_tokens`, `embedding_tokens` (die Embeddings der Response Relevancy, nur sie
   gehen an das Embedding-Modell); `judge_cost_usd` (nach `RAGAS_JUDGE_PRICE_*`), `embedding_cost_usd`
   (nach `EMBEDDING_PRICE_PER_MTOK`) und `cost_usd` (Summe) in USD.
-- `sessions`, `aborts`, `api_calls`, `http_errors` laut Journal; Tokens und Kosten zählen auch die Aufrufe
+- `sessions`, `session_commits`, `aborts`, `api_calls`, `http_errors` laut Journal; Tokens und Kosten zählen auch die Aufrufe
   abgebrochener Blöcke ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
 - zuletzt `outputs_sha256`: die Ergebnisdatei des Schritts und ihr Journal.
 

@@ -537,6 +537,21 @@ def test_a_restart_continues_from_the_journal_without_asking_again(files):
     (record,) = (r for r in runs(files) if r["step"] == "generate")
     assert record["sessions"] == 2 and record["aborts"] == 1
     assert record["answers"] == len(QUESTIONS) * len(STRATEGIES)
+    sessions = [e for e in journal_entries(files) if e["kind"] == "session"]
+    assert all("git_commit" in s and "python" in s for s in sessions)
+    assert record["session_commits"] == [sessions[0]["git_commit"]]
+
+
+def test_record_lists_every_commit_a_continued_run_ran_on(files, monkeypatch):
+    import generate as generate_module
+
+    monkeypatch.setattr(generate_module, "environment", lambda: {"git_commit": "aaa"})
+    with pytest.raises(ConnectionError):
+        run(files, FailAt(2))
+    monkeypatch.setattr(generate_module, "environment", lambda: {"git_commit": "bbb"})
+    run(files, FakeCompleter(), record=False)
+    record = next(r for r in runs(files) if r["step"] == "generate")
+    assert record["session_commits"] == ["aaa", "bbb"]
 
 
 def test_answers_lost_after_writing_come_back_from_the_journal_without_api(files):

@@ -491,6 +491,7 @@ def test_scores_are_journaled_per_batch_and_a_restart_continues(files, monkeypat
     assert sum(len(c) for c in again.calls) == len(QUESTIONS) * 3 - 2  # first batch reused
     (record,) = (r for r in records(files) if r["step"] == "ragas")
     assert record["sessions"] == 2 and record["aborts"] == 1
+    assert len(record["session_commits"]) == 1
 
 
 def test_scores_lost_after_writing_come_back_from_the_journal_without_api(files):

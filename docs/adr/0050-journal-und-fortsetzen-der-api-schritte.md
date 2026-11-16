@@ -33,7 +33,8 @@ schreiben und einen abgebrochenen Lauf aus diesem Journal fortsetzen statt ihn n
 
 - **Journal** (`journal.Journal`): JSONL, jede Zeile vor dem nächsten Schritt auf die Platte geschrieben (`fsync`).
   Die erste Zeile (`start`) hält Schritt, gepinnte Einstellungen, Prompt-Prüfsumme, Erstellungszeitpunkt des Modells
-  und die Prüfsummen der Eingaben; jeder Lauf hängt `session` an, ein Abbruch `abort` mit dem Fehler.
+  und die Prüfsummen der Eingaben; jeder Lauf hängt `session` mit Commit und Umgebung an, ein Abbruch `abort` mit dem
+  Fehler.
 - **Generierung**: `generation_journal.jsonl` hält je Antwort die vollständige API-Antwort. Ein Neustart übernimmt
   jede journalisierte Antwort und fragt nur die fehlenden an. Fehlen nach einem Abbruch die Antwortdateien, entstehen
   sie aus dem Journal ohne einen Antwort-Aufruf neu.
@@ -44,8 +45,10 @@ schreiben und einen abgebrochenen Lauf aus diesem Journal fortsetzen statt ihn n
   nicht fort, sondern bricht ab; das Journal wird nur von Hand beiseitegelegt. Eine journalisierte Antwort, die die
   Prüfung nicht besteht (abgeschnitten, leer), stoppt jeden Neustart erneut, bis Jonas entscheidet.
 - **Laufeinträge** von `embed`, `retrieve`, `generate` und `ragas` tragen `git_commit`, `git_dirty`, `python` und
-  `uv_lock_sha256`; `generate` zusätzlich `prompts_sha256`, `sessions`, `aborts`, `http_errors` und je Strategie
-  `reasoning_tokens` und `cached_tokens`.
+  `uv_lock_sha256`; `generate` zusätzlich `prompts_sha256`, `sessions`, `session_commits`, `aborts`, `http_errors`
+  und je Strategie `reasoning_tokens` und `cached_tokens`. Ein Code-Commit zwischen zwei Sitzungen wird nicht
+  verweigert (ein nötiger Fix nach einem Abbruch darf keine zweite Stichprobe erzwingen), steht aber mit jedem Commit in
+  `session_commits`; Prompts und Einstellungen sind ohnehin im `start`-Eintrag festgelegt.
 - **Sauberer Code-Stand**: `retrieve.py`, `generate.py` und `ragas_eval.py` verweigern auf dem Hauptkatalog jeden
   API-Aufruf, solange Code, Doku oder Konfiguration ungespeicherte Änderungen haben; `data/` und `output/` sind
   ausgenommen, sie sind in den Laufeinträgen gehasht.
