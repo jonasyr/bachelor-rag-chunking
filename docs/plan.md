@@ -35,9 +35,8 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 > **Risiko Schreibphase:** Für das Schreiben bleiben knapp drei Wochen. Kapitel ohne Ergebnisabhängigkeit
 > (Einleitung, Grundlagen, Methodik) ab Anfang November parallel zum Fragenkatalog entwerfen.
 
-> **Risiko Fragenkatalog:** Er wird regelmäßig unterschätzt. Am 06.11. lag eine Frage vor; das Einfrieren rutschte
-> vom 13.11. auf den 16.11., weil Block 6 noch fehlte. Steht Block 6 am 16.11. nicht, ist eine Kürzung des Katalogs
-> (im Rahmen von 30–60, [ADR 0017](adr/0017-fragenkatalog.md)) per neuem ADR zu prüfen.
+> **Risiko Fragenkatalog (erledigt 16.11.):** Am 06.11. lag eine Frage vor; das Einfrieren rutschte vom 13.11. auf
+> den 16.11., weil Block 6 noch fehlte. Eingefroren mit 48 Fragen, ohne Kürzung.
 
 > **Typverteilung Restkatalog** (11.11.2026, nach 16 Fragen: 8 `factual`, 4 `procedural`, 2 `conceptual`,
 > 1 `comparative`, 1 `limitation`): Es fehlen 10 `conceptual`, 5 `comparative`, 5 `limitation`, 8 `procedural` und
@@ -62,32 +61,29 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 
 Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlauf).
 
-1. **Fragenkatalog** (kritischer Pfad). Wer: Jonas. Frist: Einfrieren 16.11. Fertig, wenn 48
-   Fragen mit Referenzantworten und Relevanz eingefroren sind und der Freeze-Datensatz committet ist
-   ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
-2. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
+1. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
    Antworten in `data/pilot/e2e_jonas/` bewertet sind und der Vergleich mit der Agentenbewertung im
    [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026) steht.
-3. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas. Frist: Mitte November.
+2. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas. Frist: Mitte November.
    Fertig, wenn eine Person mündlich zugestimmt hat (Vermerk außerhalb des Repos, in Dateien nur das Pseudonym `R2`);
-   sonst gilt das Ersatzverfahren (Punkt 4).
-4. **Ersatzverfahren der Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas entscheidet, ob es
+   sonst gilt das Ersatzverfahren (Punkt 3).
+3. **Ersatzverfahren der Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas entscheidet, ob es
    gebraucht wird; Claude setzt die Intra-Rater-Wiederholung und die LLM-Gegenprobe um. Frist: Mitte November. Fertig,
    wenn feststeht, ob es gebraucht wird, und es im Bedarfsfall umgesetzt und getestet ist.
-5. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
+4. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
    R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
    ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-6. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version und
+5. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version und
    `system_fingerprint` im [Experiment-Protokoll](reference/experiment-record.md) stehen
    ([ADR 0033](adr/0033-antwortmodell.md)).
-7. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
+6. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
-8. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
+7. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
-9. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
-10. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
+8. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+9. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
     [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
 
 ## Offene Entscheidungen
@@ -162,3 +158,5 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)).
 - 16.11.2026: Einfrieren vom 13.11. auf den 16.11. verschoben, weil Block 6 (S41–S48) noch fehlte; Experimente
   17.–18.11., Bewertung und Analyse 19.–25.11. (drei Tage kürzer); die Schreibphase bleibt (Puffer-Regel).
+- 16.11.2026: Fragenkatalog eingefroren (48 Fragen, 35 retrieval-abhängig) nach der Gesamtdurchsicht (Runde 9);
+  Freeze-Datensatz und Hashes im [Experiment-Protokoll](reference/experiment-record.md#fragenkatalog-eingefroren-16112026).
