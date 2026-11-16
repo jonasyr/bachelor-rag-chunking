@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-16",
+  "rules_version": "2026-10-20",
+  "questions": 48,
+  "types": {
+    "factual": 12,
+    "procedural": 12,
+    "conceptual": 12,
+    "comparative": 6,
+    "limitation": 6
+  },
+  "classes": {
+    "single": 12,
+    "multi-section": 12,
+    "detail": 12,
+    "paraphrase": 12
+  },
+  "closed_book": {
+    "dependent": 35,
+    "known": 13
+  },
+  "sha256": {
+    "questions.csv": "7e1cb42c185fae77804b3a9244aad4480cadb4dce1b93b20573e1c9e9332bf1c",
+    "ground_truth.csv": "18f0b75799b802abb2e2255a7369547c99b52d9e87eeaa5ced1dbcfc35ed1552",
+    "sections.jsonl": "e2e72242c7f867018405d23ec6fed44681dd1eda4f23f740f46fe09a0167f4aa",
+    "documents.jsonl": "509ab9f725146312f31c0f2223619815b99589cd35d6f52947512f038229cab0",
+    "catalogue_plan.csv": "430cd516829482f2fe91cc686cc20e63e2a42886635d14221f2e2b8f22fd9244",
+    "catalogue_review.csv": "a56fce194928abc4b4f8e8ca8b07ccda4a5644bafc15c59df3c8285fcd85f255",
+    "closed_book_screen.csv": "3b6ec79d4419c3aa9aa5f0faf4e2a16ff82fab61164cba869b345f37357e7953",
+    "catalogue_overlap.csv": "bbdb6a61d28d2d6d0e2d0eb9e6f263c5ee186ded0cd78d8cc8cb258630591221"
+  }
+}

@@ -2,7 +2,7 @@
 
 *[Doku-Index](../README.md) · Referenz · Verwandt: [Korpus](corpus.md), [Datenformate](data-formats.md), [Vue-Historie](experiment-record-vue.md)*
 
-Stand: 22.10.2026. Gemessene Werte aller Läufe auf dem e2e-Korpus mit Datum; wird mit jedem Lauf fortgeschrieben und
+Stand: 16.11.2026. Gemessene Werte aller Läufe auf dem e2e-Korpus mit Datum; wird mit jedem Lauf fortgeschrieben und
 ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus: [Korpus](corpus.md)
 ([ADR 0038](../adr/0038-korpus-e2e.md)); Parameter: [Konfiguration](configuration.md). Die abgeschlossenen Werte des
 Vue.js-Korpus (bis 18.10.2026) stehen in [Experiment-Protokoll: Vue.js](experiment-record-vue.md). Dateigrößen in
@@ -76,6 +76,19 @@ Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl`
 | Datei | `data/evaluation/catalogue_plan.csv`, 48 Slots und 48 Reserveabschnitte, SHA-256 `0e348c317fe1a202a0a48a54ea7eed64f045be37aa01ce2f3c45580321dff8c9` |
 | Slots je Bereich | nach Tokenanteil, mindestens 1: [Korpus](corpus.md#bereiche) |
 | Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 15.10.2026, Commit `4b22a45`; nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
+
+## Fragenkatalog eingefroren (16.11.2026)
+
+| Feld | Wert |
+|---|---|
+| Eingefroren | 16.11.2026, `uv run python src/catalogue.py freeze` nach strenger Prüfung ([ADR 0017](../adr/0017-fragenkatalog.md)); Commit: Merge des Freeze-PR (Hash folgt nach dem Merge) |
+| Freeze-Datensatz | `data/evaluation/catalogue_freeze.json`, Regelversion der Bewertung `2026-10-20` |
+| Fragen | 48: factual 12, procedural 12, conceptual 12, comparative 6, limitation 6; Klassen single, multi-section, detail, paraphrase je 12 |
+| Closed-Book | 35 retrieval-abhängig, 13 bekannt (mindestens 32, [ADR 0040](../adr/0040-closed-book-pruefung.md)) |
+| KI-Durchsicht | 9 Runden, 103 Vorschläge: 80 angenommen, 23 abgelehnt ([ADR 0031](../adr/0031-stichprobenplan-und-ki-durchsicht.md)) |
+| Slots | 48 benutzt, 2 übersprungen (`content-elsewhere`, S15 und S37) |
+| SHA-256 `questions.csv` | `7e1cb42c185fae77804b3a9244aad4480cadb4dce1b93b20573e1c9e9332bf1c` |
+| SHA-256 `ground_truth.csv` | `18f0b75799b802abb2e2255a7369547c99b52d9e87eeaa5ced1dbcfc35ed1552` |
 
 ## Pilot e2e (19./20.10.2026)
 
