@@ -10,7 +10,7 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
 **Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 40 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11.; Sprünge `content-elsewhere` in S15 und S37), `conceptual` 8 von 12; Closed-Book 30 retrieval-abhängig, Block 6 braucht mindestens 2 weitere ([ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. verschoben, C4 entfällt
+Hauptkatalog hat 40 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11.; Sprünge `content-elsewhere` in S15 und S37), `conceptual` 8 von 12; Closed-Book 30 retrieval-abhängig, Block 6 braucht mindestens 2 weitere ([ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. auf den 16.11. verschoben (Block 6 offen), C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
@@ -22,11 +22,11 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 |----------|-------|--------------|----------|--------|
 | 13.–19.10. | Korpus | Snapshot, `ingest.py`, `preprocess.py`, Korpusmanifest; Wechsel zu e2e ([ADR 0038](adr/0038-korpus-e2e.md)) | `documents.jsonl`, `corpus_manifest.csv`, Token-Zahl im Experiment-Protokoll | erledigt 18.10. |
 | 20.10.–02.11. | Pipeline | Chunking C1–C3 und K1, Embedding, Chroma, Retrieval, Generierung, Kontrolle K0 ([ADR 0041](adr/0041-kontrolle-k0.md)); Pilot auf e2e als Vortest von Prompt und Rubrik | lauffähige Pipeline, Modellversionen dokumentiert | erledigt 20.10. |
-| 23.10.–13.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | offen (40/48) |
+| 23.10.–16.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | offen (40/48) |
 | 03.–09.11. | Auswertungsskripte | Statistik, Tabellen und Abbildungen ([ADR 0044](adr/0044-statistische-auswertung.md)), RAGAS-Lauf ([ADR 0047](adr/0047-ragas-als-triangulation.md)), Zweitbewertung und Übereinstimmung ([ADR 0046](adr/0046-zweitbewertung.md)) | `analyse.py`, `ragas_eval.py`, `second_rater.py` getestet | erledigt 22.10. |
-| **13.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)): am 06.11. vom 09.11. verschoben; C4 entfällt damit ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)) | Commit-Hash im Experiment-Protokoll | offen |
-| 14.–15.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | offen |
-| 16.–25.11. | Bewertung und Analyse | regelbasierte Rubrik-Bewertung (144 Antworten: 48 Fragen × C1–C3), danach 48 Antworten K0; Zweitbewertung von 36 Antworten; RAGAS nach `summarise`; Statistik, Tabellen, Abbildungen ([Experiment durchführen](how-to/run-the-experiment.md)) | `scores.csv`, `scores_control.csv`, `ragas_scores.csv`, `output/tables/` (mit `agreement.tex`), `output/figures/` | offen |
+| **16.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)): am 06.11. vom 09.11. auf den 13.11., am 16.11. auf den 16.11. verschoben; C4 entfällt damit ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)) | Commit-Hash im Experiment-Protokoll | offen |
+| 17.–18.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | offen |
+| 19.–25.11. | Bewertung und Analyse | regelbasierte Rubrik-Bewertung (144 Antworten: 48 Fragen × C1–C3), danach 48 Antworten K0; Zweitbewertung von 36 Antworten; RAGAS nach `summarise`; Statistik, Tabellen, Abbildungen ([Experiment durchführen](how-to/run-the-experiment.md)) | `scores.csv`, `scores_control.csv`, `ragas_scores.csv`, `output/tables/` (mit `agreement.tex`), `output/figures/` | offen |
 | 26.11.–13.12. | Schreibphase | Methodik, Implementierung, Ergebnisse, Diskussion, Fazit | Rohfassung komplett | offen |
 | 14.–20.12. | Überarbeitung | Sprache, Argumentation, roter Faden, `./paperlab check` | Endfassung | offen |
 | 21.–23.12. | Puffer | Korrektorat, Formatierung, Zitation, `./paperlab final` | Abgabe-PDF | offen |
@@ -62,10 +62,10 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 
 Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlauf).
 
-1. **Fragenkatalog** (kritischer Pfad). Wer: Jonas. Frist: Einfrieren 13.11. Fertig, wenn 48
+1. **Fragenkatalog** (kritischer Pfad). Wer: Jonas. Frist: Einfrieren 16.11. Fertig, wenn 48
    Fragen mit Referenzantworten und Relevanz eingefroren sind und der Freeze-Datensatz committet ist
    ([Fragenkatalog erstellen](how-to/build-the-question-catalogue.md)).
-2. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (16.11.). Fertig, wenn die 9
+2. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
    Antworten in `data/pilot/e2e_jonas/` bewertet sind und der Vergleich mit der Agentenbewertung im
    [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026) steht.
 3. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas. Frist: Mitte November.
@@ -77,7 +77,7 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 5. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
    R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
    ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-6. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (14.–15.11.). Fertig, wenn Python-Version und
+6. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version und
    `system_fingerprint` im [Experiment-Protokoll](reference/experiment-record.md) stehen
    ([ADR 0033](adr/0033-antwortmodell.md)).
 7. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
@@ -160,3 +160,5 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
 - 06.11.2026: Zeitplan neu getaktet: Fragenkatalog mit 1 von 48 Fragen, Einfrieren auf den 13.11. verschoben,
   Experimente 14.–15.11., Bewertung ab 16.11.; die Schreibphase bleibt. C4 entfällt nach der Puffer-Regel
   ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)).
+- 16.11.2026: Einfrieren vom 13.11. auf den 16.11. verschoben, weil Block 6 (S41–S48) noch fehlte; Experimente
+  17.–18.11., Bewertung und Analyse 19.–25.11. (drei Tage kürzer); die Schreibphase bleibt (Puffer-Regel).
