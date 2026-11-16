@@ -81,7 +81,7 @@ Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl`
 
 | Feld | Wert |
 |---|---|
-| Eingefroren | 16.11.2026, `uv run python src/catalogue.py freeze` nach strenger Prüfung ([ADR 0017](../adr/0017-fragenkatalog.md)); Commit: Merge des Freeze-PR (Hash folgt nach dem Merge) |
+| Eingefroren | 16.11.2026, `uv run python src/catalogue.py freeze` nach strenger Prüfung ([ADR 0017](../adr/0017-fragenkatalog.md)); Commit `3cccc71` (PR #64) |
 | Freeze-Datensatz | `data/evaluation/catalogue_freeze.json`, Regelversion der Bewertung `2026-10-20` |
 | Fragen | 48: factual 12, procedural 12, conceptual 12, comparative 6, limitation 6; Klassen single, multi-section, detail, paraphrase je 12 |
 | Closed-Book | 35 retrieval-abhängig, 13 bekannt (mindestens 32, [ADR 0040](../adr/0040-closed-book-pruefung.md)) |
