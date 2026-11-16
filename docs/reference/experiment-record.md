@@ -77,6 +77,29 @@ Kosten- und Größensummen aus den ungerundeten Werten in `embedding_runs.jsonl`
 | Slots je Bereich | nach Tokenanteil, mindestens 1: [Korpus](corpus.md#bereiche) |
 | Vue-Plan | unverändert archiviert unter `data/evaluation/archive_vue/catalogue_plan.csv` (gezogen 15.10.2026, Commit `4b22a45`; nie benutzt; SHA-256 `5af20883e71b5deb9325bb559ee24a895821f454e767623c404d77218ff52d9c`) |
 
+## Generalprobe Hauptlauf (16.11.2026)
+
+Alle zehn Schritte aus [Experiment durchführen](../how-to/run-the-experiment.md#hauptlauf-auf-einen-blick) in einer
+Wegwerfkopie des Repos mit dem eingefrorenen Katalog (48 Fragen), gegen einen nachgebauten OpenAI-Server
+(`OPENAI_BASE_URL` auf `127.0.0.1`, Schlüssel ungültig, also kein Aufruf bei OpenAI und keine Kosten). Der Server gab für
+gespeicherte Texte die gespeicherten Vektoren zurück (die Modellstand-Prüfung bestand), sonst feste Pseudovektoren,
+Antworttexte und für RAGAS aus dem angefragten Schema gebaute JSON-Antworten. Bewertung und Kernpunkte setzte ein Skript
+über dieselben Funktionen wie die App. Die Werte sind deshalb bedeutungslos; geprüft wurden Ablauf, Aufzeichnung und
+Verhalten bei Störungen.
+
+| Durchgang | Befund |
+|---|---|
+| 1 (Code vor [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) | alle zehn Schritte liefen durch (192 Antworten, RAGAS mit 1.586 Aufrufen, `analyse.py` mit 14 Tabellen und 8 Abbildungen). Gefunden: die Vorbefüllung der Kernpunkte übernahm Zeilenumbrüche aus Referenzantworten mit Codeblock (Q001, Q005), Speichern in der App lehnte sie ab; ein fehlgeschlagener RAGAS-Auftrag verwarf den ganzen Lauf |
+| 2 (Code mit ADR 0050) | Prüfung auf sauberen Code-Stand verweigerte das zweite `retrieve.py` der Anleitung, weil die Ergebnisse des ersten noch nicht committet waren; behoben (`data/` und `output/` zählen nicht) |
+| 3, Generierung | Server nach 61 Antworten beendet: 8 sichtbare Wiederholungen in 37 s, dann Abbruch mit `abort` im Journal, keine Antwortdatei. Neustart, nach 50 weiteren Antworten Prozess per SIGKILL beendet: Journal mit 111 Antworten unversehrt. Dritter Start: nur die 81 fehlenden Antworten angefragt; Laufeintrag mit `sessions` 3, `aborts` 1, `git_dirty` false |
+| 3, Fenster zwischen Schreiben und Eintrag | Antwortdateien gelöscht und Schritt erneut gestartet: 0 Antwort-Aufrufe (nur die zwei Modellabfragen), Dateien byteweise gleich |
+| 3, RAGAS | Server nach 408 Aufrufen beendet: 4 Blöcke (32 Antworten) im Journal, Abbruch mit den 54 Aufrufen des laufenden Blocks. Neustart bewertete nur die übrigen 112 Antworten; Tokens und Kosten zählen alle 1.638 Aufrufe. Journal 12 MB |
+| 3, Commits mit den pre-commit-Hooks | gefunden: `trailing-whitespace` und `end-of-file-fixer` liefen über `data/` und hätten gehashte Ergebnisdateien verändern können; die Größengrenze von 5 MB hätte das RAGAS-Journal abgewiesen. Behoben; danach alle Commits ohne Änderung durch einen Hook |
+
+Unabhängig davon prüften zwei Durchsichten den Code auf Lücken in der Aufzeichnung und auf Verhalten bei Abbrüchen; ihre
+Befunde sind in [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) umgesetzt. Nicht prüfbar war ohne
+echte API, ob `gpt-6-luna` und `gpt-6-sol` die Parameter annehmen; das zeigt ein Prüfaufruf vor dem Hauptlauf.
+
 ## Fragenkatalog eingefroren (16.11.2026)
 
 | Feld | Wert |

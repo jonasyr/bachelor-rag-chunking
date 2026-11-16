@@ -255,6 +255,19 @@ Q001,C1,"...",C1_D013_0001;…,1200,180
 wie `generated_answers.csv`, `strategy` = `K0`, `sources` leer; wird nie überschrieben;
 [ADR 0041](../adr/0041-kontrolle-k0.md)).
 
+**`generation_journal.jsonl`** (`generate.py`, neben `generated_answers.csv`, `config.GENERATION_JOURNAL_FILE`;
+[ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)): jede API-Antwort, sobald sie eintrifft, eine JSON-Zeile je Eintrag, nie gekürzt. Arten (`kind`):
+
+- `start` (erste Zeile): `time`, `step` (`generate`), `strategy`, die gepinnten Einstellungen und `openai_sdk` wie im
+  Laufeintrag, `prompts_sha256`, `model_created`, `inputs_sha256`. Ein Neustart setzt nur fort, wenn alle Felder außer
+  `time` gleich sind.
+- `session`: ein Aufruf von `generate.py`; `resumed_entries` = Zahl der übernommenen Einträge.
+- `item`: `question_id`, `strategy` (`C1`–`C3`, `K0`), `messages_sha256` (Prüfsumme des gesendeten Prompts), die Felder
+  von `llm_client.Completion` (`text`, `model`, `finish_reason`, `prompt_tokens`, `completion_tokens`,
+  `system_fingerprint`), `response` (die vollständige API-Antwort) und `http_errors` (Fehlerantworten vor dieser
+  Antwort, je `status` und `path`).
+- `abort`: `error`, `answers_received` (in dieser Sitzung neu bezahlte Antworten), `http_errors`.
+
 ## Bewertung
 
 Blinde Bewertung ([ADR 0032](../adr/0032-blinde-rubrik-bewertung.md)): `evaluate_answers.py --mode scaffold` schreibt
@@ -359,6 +372,14 @@ E01,C1,1.000000,0.776339,0.833333,1.000000,
 zweite Lauf über dieselben Antworten, nur für die Stabilität der Werte. Er steht unter dem Schritt `ragas_repeat` im
 [Laufprotokoll](#laufprotokoll), der Eintrag `ragas` bleibt der der ersten Datei.
 
+**`ragas_scores_journal.jsonl`** (neben der Ergebnisdatei, Name = Ergebnisdatei ohne Endung plus
+`config.RAGAS_JOURNAL_SUFFIX`, also auch `ragas_scores_repeat_journal.jsonl`; [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)): `start`, `session` und `abort`
+wie im [Generierungsjournal](#antworten), `start` mit den Richter-Einstellungen von `run_log.ragas_settings`. Je Block
+von `config.RAGAS_JOURNAL_BATCH` Antworten ein Eintrag `batch`: `items` (je `question_id`, `strategy` und `values` = je
+Metrik `[Wert, Grund]`, Wert `null` oder NaN bei fehlendem Wert) und `calls` (jeder Aufruf des Blocks: `job` =
+`<question_id>/<strategy>/<Metrik>`, `path`, `status`, `request` = gesendeter JSON-Körper, `response` = Antwort; bei
+Embeddings ohne die Vektoren). `abort` trägt zusätzlich die `calls` des abgebrochenen Blocks.
+
 ## Zweitbewertung
 
 [ADR 0046](../adr/0046-zweitbewertung.md), Verfahren: [Evaluation](evaluation.md#zweitbewertung). Im Pilot-Set liegen
@@ -410,7 +431,7 @@ Felder und `outputs_sha256`.
 
 | `step` | Datei | `strategy` | geschrieben von | eigene Felder | geprüft von |
 |---|---|---|---|---|---|
-| `embed` | `embedding_runs.jsonl` | eine Strategie (`C1` … `K1`) | `embed.py`, ein Eintrag je Strategie | `model`, `openai_sdk`, `chromadb`, `dimensions`, `vectors`, `vector_bytes`, `inputs_sha256` (Chunk-Datei), `canary_*`, `input_tokens`, `cost_usd`, `api_called` | `analyse.py` liest den letzten Eintrag je Strategie (Indexgröße, Embedding-Kosten), ohne Prüfsummen |
+| `embed` | `embedding_runs.jsonl` | eine Strategie (`C1` … `K1`) | `embed.py`, ein Eintrag je Strategie | `model`, `openai_sdk`, `chromadb`, `dimensions`, `vectors`, `vector_bytes`, `inputs_sha256` (Chunk-Datei), `canary_*`, `input_tokens`, `cost_usd`, `api_called` | `analyse.py` liest je Strategie den letzten Eintrag mit Tokens über die aktuelle Chunk-Datei (Indexgröße, Embedding-Kosten); ein späterer Neuaufbau ohne API zählt nicht |
 | `retrieve` | `embedding_runs.jsonl` | `C1,C2,C3` bzw. `K1` (`--control`) | `retrieve.py`; Pilot-Sets über `scripts/difficulty_probe.py` | wie `embed` ohne `vector_bytes`, `vectors`/`dimensions` der Fragen, `inputs_sha256` (Fragen, Ground Truth nach [ADR 0017](../adr/0017-fragenkatalog.md), Abschnitte, Vektor- und Chunk-Dateien), seit 17.10.2026 `outputs_sha256` | `generate.py` (Ergebnisdatei, Fragen, Ground Truth, Chunk-Dateien; ältere Pilot-Einträge ohne `outputs_sha256` nur an den Eingaben) |
 | `evaluate_retrieval` | `embedding_runs.jsonl` | `C1,C2,C3` bzw. `K1` | `evaluate_retrieval.py` | `inputs_sha256` (`retrieved_results*.csv`, Fragen, Ground Truth, `sections.jsonl`, Chunk-Dateien), `outputs_sha256` (`retrieval_scores*.csv`) | `analyse.py` |
 | `generate` | `generation_runs.jsonl` | `C1,C2,C3` | `generate.py`, nur nach einem erfolgreichen Lauf | siehe unten | `evaluate_answers.py --mode scaffold` (Fragen, Ground Truth, Chunk-Dateien, `generated_answers.csv`), `--mode scaffold --control` (Fragen, Ground Truth, `generated_answers_control.csv`), `ragas_eval.py`, `analyse.py` (nur die Antwortdateien, für die Kosten) |
@@ -452,11 +473,16 @@ Vektoren wiederverwendet wurden.
   Backend-Konfiguration (`null`, wenn die API keine meldet).
 - `openai_sdk`, `date`, `step` (`generate`), `strategy` (`C1,C2,C3`), `answers` (Zahl der Antworten C1–C3),
   `control_answers` (Zahl der K0-Antworten, [ADR 0041](../adr/0041-kontrolle-k0.md)).
+- `git_commit`, `git_dirty` (ungespeicherte Änderungen außerhalb von `data/` und `output/`), `python`,
+  `uv_lock_sha256` (alle Paketversionen); dieselben vier Felder tragen `embed`, `retrieve` und `ragas` ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
+  `prompts_sha256`: Prüfsumme der [Prompts](prompts.md); `sessions`, `aborts`, `http_errors`: Zahl der Sitzungen,
+  Abbrüche und Fehlerantworten laut Journal.
 - `inputs_sha256`: `retrieved_results.csv`, Fragen, Ground Truth und Chunk-Dateien; `outputs_sha256`:
-  `generated_answers.csv` und `generated_answers_control.csv`. `retrieved_results.csv` prüft `generate.py` schon vor
+  `generated_answers.csv`, `generated_answers_control.csv` und `generation_journal.jsonl`. `retrieved_results.csv` prüft `generate.py` schon vor
   dem Lauf gegen den `retrieve`-Eintrag; hier ist die Prüfsumme nur aufgezeichnet.
 - `prompt_tokens`, `completion_tokens`, `cost_usd` für den Lauf, `by_strategy` dieselben drei je Strategie und für K0
-  ([ADR 0008](../adr/0008-kosten-als-variable.md)).
+  ([ADR 0008](../adr/0008-kosten-als-variable.md)), dort zusätzlich `reasoning_tokens` und `cached_tokens` aus den
+  vollständigen Antworten.
 
 Einen `generate`-Lauf des Hauptexperiments gibt es noch nicht. Beispiel: Lauf des Pilot-Sets `e2e` vom 19.10.2026.
 Der ältere Eintrag in `data/pilot/hard/runs.jsonl` (17.10.2026) hat noch die Form vor K0: ohne `control_answers`,
@@ -488,7 +514,9 @@ Pilot-Beispiel im [Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21
 - `judge_prompt_tokens`, `judge_completion_tokens`, `embedding_tokens` (die Embeddings der Response Relevancy, nur sie
   gehen an das Embedding-Modell); `judge_cost_usd` (nach `RAGAS_JUDGE_PRICE_*`), `embedding_cost_usd`
   (nach `EMBEDDING_PRICE_PER_MTOK`) und `cost_usd` (Summe) in USD.
-- zuletzt `outputs_sha256`: die Ergebnisdatei des Schritts.
+- `sessions`, `aborts`, `api_calls`, `http_errors` laut Journal; Tokens und Kosten zählen auch die Aufrufe
+  abgebrochener Blöcke ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
+- zuletzt `outputs_sha256`: die Ergebnisdatei des Schritts und ihr Journal.
 
 `ragas_eval.py --repeat` verlangt, dass der `ragas`-Eintrag zur aktuellen `ragas_scores.csv` passt; `analyse.py` prüft
 beide Dateien gegen ihren Eintrag (`analysis_data._load_ragas`).
@@ -622,11 +650,11 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/questions.csv`, `ground_truth.csv`, `catalogue_plan.csv`, `catalogue_review.csv`, `closed_book_screen.csv`, `catalogue_overlap.csv`, `catalogue_freeze.json` | Fragenkatalog und seine Aufzeichnungen | [Fragen](#fragen-und-ground-truth) | versioniert |
 | `data/evaluation/archive_vue/catalogue_plan.csv` | unbenutzter Vue-Plan ([ADR 0039](../adr/0039-stichprobenplan-e2e.md)) | [Fragen](#fragen-und-ground-truth) | versioniert |
 | `data/evaluation/query_embeddings.npz`, `retrieved_results.csv`, `retrieved_results_control.csv`, `retrieval_scores.csv`, `retrieval_scores_control.csv` | Fragevektoren und Retrieval-Ergebnisse des Hauptlaufs | [Vektoren](#vektoren), [Retrieval](#retrieval-ergebnisse) | versioniert ([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)) |
-| `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl` | Antworten C1–C3 und K0, Laufprotokoll | [Antworten](#antworten), [Laufprotokoll](#laufprotokoll) | versioniert |
+| `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl`, `generation_journal.jsonl` | Antworten C1–C3 und K0, Laufprotokoll, Journal der API-Antworten | [Antworten](#antworten), [Laufprotokoll](#laufprotokoll) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
 | `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | [Bewertung](#bewertung) | versioniert |
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | [Kontrolle K0](#kontrolle-k0) | versioniert |
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
-| `data/evaluation/ragas_scores.csv` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)) | [RAGAS](#ragas) | versioniert |
+| `data/evaluation/ragas_scores.csv`, `ragas_scores_journal.jsonl` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), und ihr Journal mit allen Richteraufrufen | [RAGAS](#ragas) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
 | `data/evaluation/second_rater_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
 | `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien wie im Hauptlauf | [Vektoren](#vektoren), [Bewertung](#bewertung) | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl` |

@@ -23,7 +23,9 @@ entstehen Chunks und Index ohne API-Aufruf neu ([Auf zwei Rechnern arbeiten](wor
 ## Hauptlauf auf einen Blick
 
 Der Hauptlauf beginnt mit dem eingefrorenen Katalog. Jeder Schritt ab `retrieve.py` prüft den Freeze-Datensatz vor
-jedem API-Aufruf und bricht sonst ab. Der ganze Lauf geschieht auf einem eigenen Branch `run/hauptlauf`, nie auf
+jedem API-Aufruf und bricht sonst ab. `retrieve.py`, `generate.py` und `ragas_eval.py` rufen die API außerdem nur
+bei committetem Code-Stand auf (Änderungen in `data/` und `output/` zählen nicht), damit der Laufeintrag den Commit nennt
+([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Der ganze Lauf geschieht auf einem eigenen Branch `run/hauptlauf`, nie auf
 `main` ([AGENTS.md](../../AGENTS.md#conventions)); nach Schritt 10 wird er per Pull Request zusammengeführt
 ([Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md)). Nach jedem Schritt die versionierten Dateien committen
 ([Datenformate](../reference/data-formats.md#versioniert-und-ignoriert)), auch Fragevektoren und Retrieval-Ergebnisse
@@ -52,7 +54,7 @@ git commit -m "chore(data): Retrieval des Hauptlaufs"
 # 3. Antworten C1–C3 und K0, genau einmal (überschreibt nie), sofort committen
 uv run python src/generate.py
 git add data/evaluation/generated_answers.csv data/evaluation/generated_answers_control.csv \
-  data/evaluation/generation_runs.jsonl
+  data/evaluation/generation_journal.jsonl data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): Antworten des Hauptlaufs"
 
 # 4. Retrieval-Metriken C1–C3 und K1
@@ -86,7 +88,8 @@ git commit -m "chore(data): Bewertung K0"
 
 # 8. RAGAS (erst nach summarise; ruft die API, einmal, überschreibt nie)
 uv run python src/ragas_eval.py
-git add data/evaluation/ragas_scores.csv data/evaluation/generation_runs.jsonl
+git add data/evaluation/ragas_scores.csv data/evaluation/ragas_scores_journal.jsonl \
+  data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): RAGAS des Hauptlaufs"
 
 # 9. Zweitbewertung abschließen (R2 bewertet ab Schritt 5 an Jonas' Rechner, siehe Zweitbewertung)
@@ -107,13 +110,41 @@ Bricht ein Schritt ab, nennt die Meldung den Befehl, der den fehlenden oder vera
 `retrieve.py` schreibt seine Ergebnisdateien bei jedem Lauf neu; weicht eine neue `retrieved_results.csv` von der ab,
 auf der `generate` lief, bricht `ragas_eval.py` ab (der Scaffold prüft die Retrieval-Datei nicht). Nach Schritt 3
 deshalb nicht neu retrieven. Der Probelauf dieser Befehlsfolge ist im
-[Experiment-Protokoll](../reference/experiment-record.md#probelauf-hauptlauf-21102026) festgehalten.
+[Experiment-Protokoll](../reference/experiment-record.md#probelauf-hauptlauf-21102026) festgehalten, die Generalprobe
+mit Störungen ebenda ([Generalprobe](../reference/experiment-record.md#generalprobe-hauptlauf-16112026)).
 
 **Kosten** (geschätzt aus dem Pilot e2e mit 16 Fragen, mal 3 für 48 Fragen; Pilotwerte:
 [Experiment-Protokoll](../reference/experiment-record.md#pilot-e2e-1920102026)): Generierung C1–C3 und K0 etwa
 0,04 USD; Fragevektoren und Modellstand-Prüfung zusammen unter 0,01 USD; RAGAS etwa 6 USD für die Antworten C1–C3
 ([RAGAS-Pilot](../reference/experiment-record.md#ragas-pilot-e2e-21102026), 2,02 USD je Lauf mit 48 Antworten). Es
 sind Schätzungen, keine Messwerte.
+
+## Wenn ein Schritt abbricht
+
+Generierung und RAGAS schreiben jede API-Antwort sofort in ein Journal
+([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)); nichts Bezahltes geht verloren, und ein Neustart
+erzeugt keine zweite Stichprobe.
+
+- **Netz weg, Timeout, Ratenlimit:** Das SDK wiederholt eine Anfrage bis zu `OPENAI_MAX_RETRIES` Mal (RAGAS:
+  `RAGAS_MAX_RETRIES`), jede Wiederholung steht als `INFO openai: Retrying …` auf der Konsole. Scheitert sie danach,
+  bricht der Schritt ab, schreibt `abort` ins Journal und keine Ergebnisdatei. Denselben Befehl wieder ausführen,
+  sobald das Netz wieder da ist: Er übernimmt alle journalisierten Antworten und fragt nur die fehlenden an.
+- **Prozess getötet, Akku leer:** genauso; eine halb geschriebene letzte Journalzeile wird verworfen und diese eine
+  Antwort neu angefragt.
+- **Ergebnisdatei da, aber kein Laufeintrag** (Abbruch genau zwischen Schreiben und Eintrag: der Schritt meldet
+  „exists“, der nächste einen fehlenden oder veralteten Eintrag): die Ergebnisdatei(en) des Schritts löschen, nie das
+  Journal, und den Schritt erneut ausführen. Er baut sie aus dem Journal ohne einen Antwort-Aufruf neu.
+- **„belongs to a run with other settings or inputs“:** Einstellungen, Prompts, Modellstand oder Eingaben weichen
+  vom Journal ab. Nicht fortsetzen; mit Jonas klären, was sich geändert hat. Das Journal wird nie automatisch
+  verworfen.
+- **Abgeschnittene oder leere Antwort, ungültiger RAGAS-Wert, gewechseltes Modell:** Der Schritt bricht bei jedem
+  Neustart erneut ab, weil das Journal die Antwort behält; Jonas entscheidet über das weitere Vorgehen
+  ([ADR 0033](../adr/0033-antwortmodell.md)).
+- **Zerrissene Zeile im Laufprotokoll** (`… line N is not JSON`): die genannte letzte Zeile prüfen und entfernen, wenn sie
+  unvollständig ist; dann den Schritt erneut ausführen.
+
+Abbrüche stehen mit Fehler und bezahlten Tokens im Journal; der Laufeintrag zählt `sessions`, `aborts` und
+`http_errors`, die Kosten enthalten auch abgebrochene Aufrufe. Alles davon ins Experiment-Protokoll übernehmen.
 
 ## Bewerten (Schritte 5 und 6)
 
