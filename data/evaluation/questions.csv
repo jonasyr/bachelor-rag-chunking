@@ -39,3 +39,11 @@ Q037,What design choice allows a target's `app` fields to use values from `proce
 Q038,"When a worker terminates unexpectedly during test-file execution, how do `WORKER_EXIT` and `WORKER_CRASH` differ, and what happens to the other test results?",comparative,single,
 Q039,How can a browser test generate a key-repeat event using `browser.keyboard.down()`?,procedural,single,
 Q040,"Which outbound destination does `smol()` use for its Playwright image, and which destination category does `e2e init` contact when installing dependencies?",factual,single,D051#outbound-connections uniquely maps the smol() Playwright image download to mcr.microsoft.com and e2e init dependency installation to the package registry. D027#set-up-the-provider mentions the image download but does not identify mcr.microsoft.com. Other initialization documentation describes dependency installation without this explicit outbound destination mapping. Both answer facts belong to the central destination-and-trigger table in D051#outbound-connections.
+Q041,"How should an e2e browser test prepare for a native JavaScript dialog, and what happens if its custom handler neither accepts nor dismisses the dialog?",procedural,multi-section,
+Q042,"Why should a mobile test call `device.setPermission()` before `app.open()`, and how does configuring `app.permissions` affect subsequent app restarts and state resets?",conceptual,multi-section,
+Q043,"What happens when an `agent-device` command times out, and how does this affect the next test attempt?",limitation,paraphrase,
+Q044,"Why are only two specific failure codes allowed to be retryable, and what happens when a different code claims retryability?",conceptual,paraphrase,
+Q045,Why do the `actions` and `location` capabilities both depend on `observation`?,conceptual,detail,
+Q046,Why does the runner impose no timeout on the `prepare()` hook during provisioning?,conceptual,single,
+Q047,"How does the app information passed to `prepare()` and `init()` differ between web and device targets, and what happens to device launch arguments and permissions during warm-up?",comparative,multi-section,
+Q048,"Which example projects can a developer choose for a Chromium test where e2e starts the web app, and how should they run the examples without an AI Gateway API key?",procedural,multi-section,
