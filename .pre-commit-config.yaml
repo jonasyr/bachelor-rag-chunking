@@ -13,11 +13,15 @@ repos:
     hooks:
       - id: check-added-large-files
         args: [--maxkb=5120]
-        exclude: ^data/processed/embeddings_(c1|c2|c3|k1)\.npz$  # chunk vectors, ADR 0048
+        # chunk vectors (ADR 0048) and the journals of the API steps (ADR 0050)
+        exclude: ^data/(processed/embeddings_(c1|c2|c3|k1)\.npz|evaluation/.*journal\.jsonl)$
       - id: check-merge-conflict
       - id: check-yaml
       - id: check-toml
       - id: detect-private-key
+      # run outputs are hashed in their run records: a hook must never rewrite them (ADR 0050)
       - id: end-of-file-fixer
+        exclude: ^data/
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        exclude: ^data/
