@@ -9,8 +9,8 @@ Zweitbewertung sind umgesetzt und getestet; Pilot e2e und Probelauf des Hauptlau
 ([Experiment-Protokoll](reference/experiment-record.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
-**Nächster Schritt:** Fragenkatalog, ein Block je Tag ([Backlog](#backlog) Punkt 1). **Größtes Risiko:** Der
-Hauptkatalog hat 48 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11., Block 6 am 16.11.; Sprünge `content-elsewhere` in S15 und S37), alle Typquoten erfüllt; Closed-Book 37 retrieval-abhängig (mindestens 32, [ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); offen ist nur das Einfrieren; das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. vom 13.11. auf den 16.11. verschoben (Block 6 offen), C4 entfällt
+**Nächster Schritt:** Fragenkatalog einfrieren ([Backlog](#backlog) Punkt 1), dann Hauptlauf. **Größtes Risiko:** Der
+Hauptkatalog hat 48 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11., Block 6 am 16.11.; Sprünge `content-elsewhere` in S15 und S37), alle Typquoten erfüllt; Closed-Book 37 retrieval-abhängig (mindestens 32, [ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); offen ist nur das Einfrieren; das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. vom 13.11. auf den 16.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
 ## Zeitplan
