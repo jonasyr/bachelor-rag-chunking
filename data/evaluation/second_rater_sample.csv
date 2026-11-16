@@ -1,0 +1,13 @@
+question_id,type,difficulty
+Q001,procedural,single
+Q004,factual,paraphrase
+Q006,procedural,multi-section
+Q008,conceptual,multi-section
+Q009,limitation,detail
+Q010,factual,detail
+Q011,factual,detail
+Q015,conceptual,single
+Q017,procedural,paraphrase
+Q036,limitation,paraphrase
+Q038,comparative,single
+Q042,conceptual,multi-section
