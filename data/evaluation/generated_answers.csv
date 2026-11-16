@@ -1,0 +1,417 @@
+question_id,strategy,answer,sources,prompt_tokens,completion_tokens
+Q001,C1,"In Claude Code, add the e2e plugin marketplace and install the plugin:
+
+```bash
+claude plugin marketplace add tester-army/e2e
+claude plugin install e2e@e2e
+```
+
+Then start a new Claude Code session. The plugin adds the `e2e`, `create-verification-skill`, and `migrate-to-e2e` skills; it does **not** install the npm package or MCP server.",C1_D013_0001;C1_D055_0003;C1_D013_0002;C1_D037_0001;C1_D055_0002,2623,96
+Q001,C2,"In Claude Code, run:
+
+```bash
+claude plugin marketplace add tester-army/e2e
+claude plugin install e2e@e2e
+```
+
+Then start a new Claude Code session. The plugin installs the `e2e`, `create-verification-skill`, and `migrate-to-e2e` skills; it does not install the npm package or MCP server.",C2_D013_0002;C2_D013_0001;C2_D037_0001;C2_D037_0004;C2_D055_0002,2625,84
+Q001,C3,"In Claude Code, add the e2e repository as a plugin marketplace, then install the plugin:
+
+```bash
+claude plugin marketplace add tester-army/e2e
+claude plugin install e2e@e2e
+```
+
+Start a new Claude Code session to use it. The plugin provides the `e2e`, `create-verification-skill`, and `migrate-to-e2e` skills; it does not install the npm package or MCP server.",C3_D013_0002;C3_D037_0002;C3_D029_0003;C3_D037_0004;C3_D013_0001,1687,100
+Q002,C1,"Inspect the newly written baseline image, then commit it alongside the test. Subsequent runs can compare against that committed baseline.",C1_D058_0001;C1_D058_0002;C1_D015_0008;C1_D015_0005;C1_D007_0008,2645,27
+Q002,C2,"Inspect the newly written screenshot to confirm it looks right, then commit it alongside the test. The first run fails because there was no baseline to compare against; subsequent runs can compare against the committed image.",C2_D058_0002;C2_D058_0001;C2_D015_0004;C2_D026_0004;C2_D015_0005,2334,43
+Q002,C3,"Inspect the new screenshot, then commit it with the tests. The first run fails because there was no baseline to compare against; once the baseline is committed, run the tests again.",C3_D058_0002;C3_D058_0004;C3_D058_0003;C3_D007_0010;C3_D008_0009,1352,39
+Q003,C1,e2e identifies **DeepSeek V4 models** and **Meta Muse Spark models** as refusing the forced tool choice used during agent steps.,C1_D036_0013;C1_D041_0017;C1_D002_0001;C1_D018_0001;C1_D016_0001,2620,32
+Q003,C2,e2e identifies **DeepSeek V4 models** and **Meta Muse Spark models** as refusing the forced tool choice used during agent steps.,C2_D036_0016;C2_D041_0021;C2_D002_0001;C2_D018_0001;C2_D036_0017,2625,32
+Q003,C3,The provided excerpts do not identify any models as refusing forced tool choice during agent steps.,C3_D002_0002;C3_D018_0002;C3_D036_0001;C3_D041_0015;C3_D015_0010,2772,20
+Q004,C1,"Retrieve the token from the `EXPO_TOKEN` environment variable in the environment that starts `e2e run`. It should be an Expo access token for an account or robot with access to the project. If `EXPO_TOKEN` is unset, the EAS provider falls back to the eas-cli login stored in `~/.expo/state.json` (or under `USERPROFILE` on Windows).",C1_D043_0007;C1_D022_0002;C1_D008_0001;C1_D055_0005;C1_D028_0002,2253,83
+Q004,C2,"Set `LT_USERNAME` and `LT_ACCESS_KEY` in the environment where `e2e run` starts—for example, as CI secrets. You can copy them from **Account Settings → Password & Security → Username and Access Key**. Without either credential, the remote device lease fails before it starts.",C2_D028_0002;C2_D008_0001;C2_D055_0006;C2_D008_0002;C2_D028_0003,2265,64
+Q004,C3,"Retrieve the token from the environment in which `e2e run` starts. The variable depends on the integration: for example, `EXPO_TOKEN` for Expo, `LT_USERNAME` and `LT_ACCESS_KEY` for LambdaTest, or `LIMRUN_API_KEY` for Limrun.",C3_D022_0004;C3_D028_0003;C3_D043_0011;C3_D026_0002;C3_D028_0002,1475,63
+Q005,C1,"Use local credentials for local development and CI secrets for CI:
+
+- **Local development:** Set the provider’s required credential in the environment used to run `e2e run`. For TestMu AI, that means `LT_USERNAME` and `LT_ACCESS_KEY`; without either, the device lease fails. Keep keys out of source code.
+- **CI:** Store the required credential as a CI secret and expose it to the job’s environment. For example, provide `LT_USERNAME` and `LT_ACCESS_KEY` as secrets. Only run jobs with credentials on trusted branches: the job’s tests, config, and dependencies can access them. Tests that never use an agent need no model credential.",C1_D008_0002;C1_D008_0001;C1_D055_0005;C1_D004_0002;C1_D028_0002,2250,141
+Q005,C2,"Use local credentials for development and CI secrets in CI:
+
+- **Local development:** Configure the provider credential your agent needs in your local environment (for example, `AI_GATEWAY_API_KEY`). Tests that never use `agent` do not need a model credential.
+- **CI:** Store the credential as a CI secret and expose it only to jobs that need it. Treat it as available to the tests, configuration, and dependencies in that job; only provide it to builds of trusted branches, and run untrusted pull-request code without secrets or write tokens. GitHub does not provide secrets to pull requests from forks.
+
+The excerpts also note that `E2E_OAUTH_CREDENTIALS` can provide a stored login to CI, but refreshed tokens are not saved back, so rotating refresh-token logins work only for a limited time.",C2_D008_0002;C2_D028_0002;C2_D008_0001;C2_D055_0006;C2_D004_0005,2248,170
+Q005,C3,"For local development, use the authentication method required by the agent or provider. For example, a provider may use a login stored on the developer’s machine, or credentials set in the environment where `e2e run` starts.
+
+In CI, configure credentials explicitly as CI secrets or environment variables rather than relying on a login left on the runner. Use API keys for agents that require them; for Expo, set `EXPO_TOKEN` (it takes precedence over a login). The documentation warns that relying on a runner’s saved Expo login can start billed sessions under someone else’s account. `E2E_OAUTH_CREDENTIALS` can provide a stored login in CI, but refreshed tokens are not saved back, so rotating refresh tokens work only for a limited time.",C3_D008_0005;C3_D028_0003;C3_D055_0006;C3_D022_0004;C3_D041_0022,900,157
+Q006,C1,"Configure the iOS target with the Expo development-server launch arguments, start the server with `app.command`, and grant camera permission in `app.permissions`:
+
+```ts
+app: {
+  bundleId: 'com.example.app',
+  launchArguments: [
+    '--initialUrl', 'http://localhost:8081',
+    '-EXDevMenuShowsAtLaunch', 'NO',
+    '-EXDevMenuIsOnboardingFinished', 'YES',
+    '-EXDevMenuShowFloatingActionButton', 'NO',
+  ],
+  command: { executable: 'npx', args: ['expo', 'start', '--port', '8081'] },
+  permissions: { camera: 'grant' },
+},
+```
+
+Permissions are set before launch, so the app should start with camera access granted and no system prompt. The Expo development-build warm-up leaves the app on the dev launcher, so start each test with `app.open()`. The first launch may wait for the server to bundle the app, so allow a longer timeout for the first check.",C1_D035_0002;C1_D022_0002;C1_D035_0001;C1_D031_0001;C1_D035_0003,2649,213
+Q006,C2,"Configure the iOS target with the Expo development build’s bundle ID, launch arguments that point to the dev server and disable the dev menu UI, a command to start Expo, and a ready URL. Grant camera permission in `app.permissions`:
+
+```ts
+import type { E2EConfig } from 'e2e';
+import { mobile } from '@e2e-dev/mobile';
+
+export default {
+  targets: [
+    {
+      engine: mobile({ platform: 'ios' }),
+      app: {
+        bundleId: 'com.example.app',
+        launchArguments: [
+          '--initialUrl', 'http://localhost:8081',
+          '-EXDevMenuShowsAtLaunch', 'NO',
+          '-EXDevMenuIsOnboardingFinished', 'YES',
+          '-EXDevMenuShowFloatingActionButton', 'NO',
+        ],
+        permissions: { camera: 'grant' },
+        command: {
+          executable: 'npx',
+          args: ['expo', 'start', '--port', '8081'],
+        },
+        readyUrl: 'http://localhost:8081/status',
+      },
+    },
+  ],
+} satisfies E2EConfig;
+```
+
+Permissions are set before each fresh launch, so the camera permission is granted without a system prompt. The warm-up does not pass the launch arguments or permissions; start each test with `app.open()`. The first launch may wait for the server to bundle the app, so allow extra time for the first check.",C2_D035_0003;C2_D035_0002;C2_D022_0002;C2_D035_0001;C2_D031_0001,2646,301
+Q006,C3,"Configure the iOS target with the development server URL and dev-menu launch arguments, start the server with `app.command`, and grant camera permission in `app.permissions`:
+
+```ts
+import type { E2EConfig } from 'e2e';
+import { mobile } from '@e2e-dev/mobile';
+
+export default {
+  targets: [
+    {
+      engine: mobile({ platform: 'ios' }),
+      app: {
+        bundleId: 'com.example.app',
+        launchArguments: [
+          '--initialUrl', 'http://localhost:8081',
+          '-EXDevMenuShowsAtLaunch', 'NO',
+          '-EXDevMenuIsOnboardingFinished', 'YES',
+          '-EXDevMenuShowFloatingActionButton', 'NO',
+        ],
+        command: { executable: 'npx', args: ['expo', 'start', '--port', '8081'] },
+        readyUrl: 'http://localhost:8081/status',
+        permissions: { camera: 'grant' },
+      },
+    },
+  ],
+} satisfies E2EConfig;
+```
+
+The warm-up leaves the app on the dev launcher, so start each test with `app.open()`. The first launch may wait for the server to bundle the app; allow a longer timeout for the first check.",C3_D035_0005;C3_D047_0005;C3_D011_0001;C3_D011_0002;C3_D028_0002,2213,264
+Q007,C1,"Sign in using a normal app flow that sets a cookie or other persisted state, rather than filling a configured `Secret`. The documentation says only a secret fill turns screenshots off; a sign-in that sets a cookie leaves screenshots available.
+
+After signing in, developers can explore with the screenshot and interaction tools. Avoid filling a `Secret` during that session: once one is filled, screenshots are withheld for the rest of the attempt, including later tests in a serial group.",C1_D039_0003;C1_D038_0010;C1_D049_0012;C1_D046_0005;C1_D054_0001,2003,96
+Q007,C2,"Sign in through a flow that sets a cookie rather than filling a configured `Secret`. The docs say that a sign-in which sets a cookie leaves screenshots on; only filling a secret turns screenshots off for the rest of the attempt. Once signed in, developers can explore the app with the available agent tools, including `screenshot`.",C2_D047_0023;C2_D035_0003;C2_D046_0006;C2_D004_0005;C2_D054_0001,2638,69
+Q007,C3,"Use a saved session with `e2e explore --session <name> ...` to start the explorer signed in. To keep screenshots available, make sure the session’s setup test signs in **without filling a secret**—for example, by setting a session cookie with `browser.setCookies`. If setup fills a password or other secret, screenshots and pixel tools are unavailable for the rest of the attempt, including when restoring that session.",C3_D019_0004;C3_D051_0009;C3_D006_0002;C3_D035_0017;C3_D046_0005,1452,90
+Q008,C1,"The executor selects a text field in two stages: the decision model first chooses an operation, then chooses a target element from the goal, recent actions, and newest semantic tree. It asks for a target even if only one element fits, and can choose `none` if no target fits.
+
+When it chooses `type`, the text model determines the value using the goal, params, the field’s label, and page text. The executor types exactly the returned string. If the goal provides no value, it types nothing and asks the decision model to choose again.
+
+With vision enabled, a drawn field not listed in the tree can be handled with `type_at`: the text model names the field and supplies a value from the goal; the decision model locates the field in the screenshot, and the executor taps it and types at the caret. `type_at` does not clear existing text.",C1_D016_0003;C1_D016_0001;C1_D016_0004;C1_D016_0002;C1_D016_0005,2592,181
+Q008,C2,"The executor selects a field in two stages: the decision model chooses an operation and then a target element, using the goal, recent actions, and newest semantic tree. It asks for a target even if only one fits; if none fits, the model can choose `none`, which blocks the step.
+
+If it chooses `type`, a separate text model determines the value from the goal, params, the field’s label, and page text. The executor types that value exactly. If the goal provides no value, it types nothing and asks the decision model to choose again. Password fields are excluded from the text model; they are filled only with `typeSecret` using a declared secret handle.",C2_D016_0003;C2_D016_0001;C2_D016_0002;C2_D016_0004;C2_D016_0005,2622,141
+Q008,C3,"The decision model selects the operation first, then chooses a target element from the goal, recent actions, and newest semantic tree. Every element-target question includes a `none` option; choosing `none` blocks the step.
+
+For a text field, when the operation is `type`, a separate text model determines the value using the goal, params, field label, and page text. The executor types exactly the string it returns. If the goal provides no value, it types nothing and the decision model chooses again. Password fields are not sent to the text model; `typeSecret` fills them from a declared secret handle.",C3_D016_0004;C3_D016_0003;C3_D016_0001;C3_D016_0002;C3_D018_0002,1925,127
+Q009,C1,"No. The documentation says the built-in `maestro` job type runs Maestro flows, not e2e tests. For e2e in EAS Workflows, use custom jobs that download the build, boot a device, and run the test suite.",C1_D011_0001;C1_D032_0001;C1_D008_0001;C1_D012_0002;C1_D009_0003,2443,55
+Q009,C2,"No. The built-in `maestro` job type runs Maestro flows, not e2e tests. To run e2e tests in EAS Workflows, use custom jobs that download the app build, boot a simulator or emulator, and run the e2e suite.",C2_D011_0002;C2_D011_0001;C2_D009_0003;C2_D008_0004;C2_D032_0001,2636,59
+Q009,C3,"No. The documentation explicitly says the built-in `maestro` job type runs Maestro flows, not e2e. For e2e tests in EAS Workflows, use custom jobs that download the app build, start a simulator or emulator, and run `npx e2e run`.",C3_D011_0001;C3_D011_0003;C3_D012_0002;C3_D008_0001;C3_D032_0002,2655,63
+Q010,C1,`still queued at EAS after two minutes`,C1_D022_0004;C1_D022_0005;C1_D022_0003;C1_D022_0002;C1_D046_0009,2263,13
+Q010,C2,It logs: `still queued at EAS after two minutes`.,C2_D022_0004;C2_D022_0006;C2_D022_0005;C2_D022_0003;C2_D046_0011,2258,16
+Q010,C3,It logs: `still queued at EAS after two minutes`.,C3_D022_0007;C3_D022_0010;C3_D043_0011;C3_D022_0001;C3_D022_0002,979,16
+Q011,C1,Telemetry events are sent with a **two-second deadline** when the command finishes.,C1_D056_0008;C1_D056_0002;C1_D056_0007;C1_D056_0001;C1_D040_0030,2559,19
+Q011,C2,"Telemetry events are sent when the command finishes, with a **two-second deadline**.",C2_D056_0010;C2_D056_0009;C2_D056_0002;C2_D040_0038;C2_D056_0001,2454,20
+Q011,C3,"The telemetry request has a **two-second deadline** when the command finishes. `e2e mcp` sends each session event separately, and `e2e run --watch` sends each run’s event when that run ends.",C3_D056_0012;C3_D056_0004;C3_D040_0024;C3_D056_0001;C3_D056_0013,1890,50
+Q012,C1,"The Ubuntu image has three preinstalled AVDs: `emulator` (API 34), `emulator-35`, and `emulator-36`.",C1_D011_0002;C1_D010_0001;C1_D012_0004;C1_D011_0003;C1_D028_0002,2464,36
+Q012,C2,"The Ubuntu image has three preinstalled Android emulator profiles: `emulator` (API 34), `emulator-35`, and `emulator-36`.",C2_D010_0001;C2_D012_0004;C2_D012_0005;C2_D009_0002;C2_D008_0002,2656,36
+Q012,C3,"The Ubuntu image has three preinstalled Android emulator profiles: `emulator` (API 34), `emulator-35`, and `emulator-36`.",C3_D010_0002;C3_D011_0003;C3_D009_0002;C3_D012_0005;C3_D028_0001,2108,36
+Q013,C1,"Limrun’s device options are:
+
+| Option | Default | Purpose |
+|---|---|---|
+| `region` | Selected by Limrun | Region preference, such as `eu` or `us-east1`. Capacity may cause the device to be placed in another region. |
+| `hardTimeout` | `1h` | Maximum device lifetime, including abandoned runs. Accepts a Go duration such as `30m` or `2h`. |
+| `ios.model` | Selected by Limrun | iOS device type: `iphone` or `ipad`. |
+| `android.model` | Selected by Limrun | Android device type: `phone` or `tablet`. |
+| `android.osVersion` | `15` | Requested Android major version; it is a scheduling clue. |",C1_D026_0001;C1_D026_0002;C1_D026_0003;C1_D028_0002;C1_D047_0004,2534,167
+Q013,C2,"Limrun’s device options and defaults are:
+
+| Option | Default | Purpose |
+|---|---|---|
+| `region` | Selected by Limrun | Region preference, such as `eu` or `us-east1`; capacity may cause the device to be placed in another region. |
+| `hardTimeout` | `1h` | Maximum device lifetime, including abandoned runs. Accepts Go durations such as `30m` or `2h`. |
+| `ios.model` | Selected by Limrun | iOS device type: `iphone` or `ipad`. |
+| `android.model` | Selected by Limrun | Android device type: `phone` or `tablet`. |
+| `android.osVersion` | `15` | Requested Android major version; it is a scheduling clue. |
+
+Choose a `hardTimeout` longer than the run.",C2_D026_0001;C2_D026_0003;C2_D026_0002;C2_D026_0004;C2_D028_0004,2277,179
+Q013,C3,"Limrun’s device options are:
+
+| Option | Default | Purpose |
+|---|---|---|
+| `region` | Limrun selects | Region preference, such as `eu` or `us-east1`; capacity may cause the device to be placed in another region. |
+| `hardTimeout` | `1h` | Maximum device lifetime, including abandoned runs. Accepts a Go duration such as `30m` or `2h`. |
+| `ios.model` | Limrun selects | iOS device type: `iphone` or `ipad`. |
+| `android.model` | Limrun selects | Android device type: `phone` or `tablet`. |
+| `android.osVersion` | `15` | Requested Android major version, used as a scheduling clue. |
+
+Set these options when configuring `device: limrun()` on the mobile engine. Limrun chooses the region and device model when they aren’t specified. The hard timeout is an upper bound, so choose one longer than the run.",C3_D026_0001;C3_D026_0006;C3_D026_0003;C3_D026_0002;C3_D047_0005,1658,210
+Q014,C1,"The excerpts don’t say whether a failed `mutates: true` project-tool call consumes an action step. They define action steps as committed engine actions, but don’t specify how project-tool failures count.",C1_D001_0002;C1_D038_0006;C1_D001_0001;C1_D002_0004;C1_D051_0002,2307,44
+Q014,C2,"The excerpts don’t specify whether a failed `mutates: true` project tool call consumes an action step. They say action steps count committed engine actions, but don’t explain how failed mutating project-tool calls are counted.",C2_D038_0007;C2_D051_0002;C2_D001_0003;C2_D044_0005;C2_D001_0002,2511,48
+Q014,C3,"The excerpts don’t say whether a failed `mutates: true` project tool call consumes an action step. They define action steps as committed engine actions, but don’t specify how failed project-tool calls count.",C3_D038_0008;C3_D001_0006;C3_D001_0004;C3_D002_0007;C3_D051_0004,1324,45
+Q015,C1,"Developers run a script before the page starts when they need to set up browser state before the app’s own scripts execute—for example, to mock a browser API, seed `Math.random`, or set a flag the app reads during boot. An init script runs in every document before the page’s scripts.",C1_D005_0002;C1_D005_0003;C1_D003_0002;C1_D031_0003;C1_D033_0013,2366,64
+Q015,C2,"Developers run a script before the page starts to set up browser state the app needs at boot—for example, mock a browser API, seed `Math.random` for predictable behavior, or set a flag the app reads when it initializes. An init script runs in each document before the page’s own scripts.",C2_D027_0002;C2_D005_0003;C2_D035_0003;C2_D033_0016;C2_D053_0010,2642,64
+Q015,C3,"Developers run a script before the page’s own scripts when they need to set up the browser environment at startup—for example, to mock a browser API, seed `Math.random` for predictable behavior, or set a flag the app reads as it boots.",C3_D005_0007;C3_D021_0002;C3_D027_0003;C3_D037_0003;C3_D059_0001,1624,54
+Q016,C1,"The failure recap prints the recording’s path—or its URL if it’s hosted. Local recordings are in the failed attempt’s artifact directory, under `video/`.",C1_D015_0005;C1_D015_0001;C1_D015_0006;C1_D041_0016;C1_D015_0004,2629,35
+Q016,C2,The failure recap prints the recording’s file path—or its URL if a hosted browser stores it. Each recording is in that attempt’s directory.,C2_D015_0006;C2_D026_0002;C2_D015_0001;C2_D015_0007;C2_D015_0004,2634,31
+Q016,C3,The failure recap prints the recording’s file path—or its URL if a hosted browser keeps it. Recordings are stored in the attempt’s directory under `.e2e/results/` (or your configured output directory).,C3_D015_0008;C3_D013_0005;C3_D008_0003;C3_D015_0006;C3_D015_0001,1492,46
+Q017,C1,"Use Node.js directly in the async tests: for file access, use Node’s file-system facilities; for database access, use the relevant Node.js database client or library. The excerpts don’t specify particular APIs or packages.",C1_D030_0001;C1_D030_0002;C1_D033_0002;C1_D030_0003;C1_D033_0001,2649,47
+Q017,C2,Use Node.js directly—such as its file-system APIs for file access and database client libraries for database access—in place of `cy.task` or `cy.exec`. The excerpts don’t specify particular Node.js facilities or migration details for these operations.,C2_D030_0001;C2_D033_0002;C2_D030_0002;C2_D033_0001;C2_D033_0003,2638,52
+Q017,C3,"Use Node.js directly: `fetch` for requests, `fs` for file access, and your database client for database operations.",C3_D030_0001;C3_D033_0001;C3_D033_0010;C3_D033_0012;C3_D030_0004,3643,29
+Q018,C1,"Unsupported locator-composition methods are `locator.and(other)` and `locator.or(other)`. The nested-selector method `locator.locator('css')` is also unsupported.
+
+For nested selectors, use a semantic query within the existing scope (for example, `cell.getByRole('textbox')` instead of `cell.locator('input')`), start with `browser.locator('css')` and then use a semantic query, or express the entire path in one `browser.locator` selector.",C1_D033_0006;C1_D033_0008;C1_D034_0004;C1_D005_0010;C1_D033_0005,2373,104
+Q018,C2,"The unsupported Playwright locator-composition methods are `locator.and(other)` and `locator.or(other)`; they are “not yet” supported.
+
+For nested selectors, e2e does not support `locator.locator('css')`. Alternatives are:
+- Use a semantic query within the scoped locator, such as `cell.getByRole('textbox')` instead of `cell.locator('input')`.
+- Start with `browser.locator('css')` and then use a semantic query, such as `.getByRole(...)`.
+- Use a single `browser.locator` selector for the entire path.",C2_D033_0007;C2_D033_0010;C2_D032_0009;C2_D033_0008;C2_D033_0006,2668,125
+Q018,C3,"The unsupported Playwright locator-composition methods are **`locator.and(other)`** and **`locator.or(other)`**; they are not yet available in e2e. **`filter({ hasNot, hasNotText })`** is also unsupported.
+
+For nested selectors, use a semantic query within the parent locator’s scope—for example, `cell.getByRole('textbox')` instead of `cell.locator('input')`. On the web, you can also use `browser.locator('css').getByRole(...)`, or express the entire path in one `browser.locator` selector. For structural matching, e2e supports `filter({ has, hasText })` and chaining.",C3_D032_0008;C3_D033_0007;C3_D033_0006;C3_D034_0004;C3_D033_0015,3248,145
+Q019,C1,"`browser.evaluate` runs code in the page, so values must cross the boundary between the test and the page. e2e serializes the function and passes its argument and result across that boundary; restricting them to `JsonValue` ensures they survive JSON serialization. Pass test-side data through `arg` rather than closing over test variables.",C1_D053_0012;C1_D053_0022;C1_D005_0002;C1_D005_0006;C1_D042_0031,2653,71
+Q019,C2,"`browser.evaluate` runs code in the page, so its inputs and results must cross the boundary between the test process and the browser page. e2e serializes the function and passes outside data through `arg`; restricting `arg` and the return value to `JsonValue` ensures they can be represented as plain JSON. Non-JSON values cause `INVALID_ARGUMENT`.",C2_D053_0028;C2_D042_0039;C2_D005_0002;C2_D053_0014;C2_D053_0015,2386,77
+Q019,C3,"The excerpts don’t state why `browser.evaluate` is restricted to JSON input and output. They define `JsonValue` as data that survives JSON serialization and explain that e2e serializes the function, but they don’t explicitly connect those facts to the restriction.",C3_D005_0006;C3_D021_0002;C3_D053_0021;C3_D015_0007;C3_D025_0007,1521,56
+Q020,C1,"- **Text taps:** Maestro’s `tapOn` becomes an awaited e2e locator call, such as `await screen.getByText('Get started').tap()`. In e2e, `getByText` matches the **whole string, case-sensitively**; Maestro treats text as a **case-insensitive regular expression**. For pattern matching, use a regex such as `getByText(/^mute account$/i)`, or `{ exact: false }` for a case-insensitive substring. e2e also fails on multiple matches rather than tapping the first, so use `.first()` when that is intended.
+- **Visibility-conditional flows:** Maestro’s `optional` checks and `runFlow: { when }` branches are replaced by an awaited `isVisible()` check, typically in an `if` condition. It returns `false` when there are no matches, but fails with `LOCATOR_AMBIGUOUS` when there are several; use `{ visible: true }` in the query or `.first()` if a hidden duplicate may exist.",C1_D032_0001;C1_D032_0008;C1_D032_0004;C1_D032_0002;C1_D034_0001,2641,222
+Q020,C2,"Maestro’s YAML commands become awaited TypeScript calls, usually on a locator—for example, a text tap becomes a call such as `screen.getByText('Get started').tap()`. Visibility-conditional flows and optional commands become an explicit check: `if (await locator.isVisible()) { ... }`.
+
+Text matching also becomes stricter. Maestro treats text as a case-insensitive regular expression, so `""Mute Account""` can match `Mute account` and `"".*Save.*""` can match text containing “Save.” e2e’s `getByText` matches the whole string with case preserved by default. For pattern matching, use a regular expression such as `getByText(/^mute account$/i)`; for a case-insensitive substring, use `{ exact: false }`. Also, Maestro taps the first of multiple matches, while e2e reports `LOCATOR_AMBIGUOUS`; use `.first()` when the first match is intended. `isVisible()` returns `false` for no matches but reports `LOCATOR_AMBIGUOUS` for several, so narrow the query (for example, with `{ visible: true }`) or use `.first()` when appropriate.",C2_D032_0010;C2_D032_0001;C2_D032_0009;C2_D032_0004;C2_D032_0002,2545,243
+Q020,C3,"- **Text taps:** Maestro’s `tapOn: ""Text""` becomes `await screen.getByText('Text').tap()`. Unlike Maestro’s case-insensitive regex matching, e2e matches the **whole string, including case**. For patterns, use a regex such as `getByText(/^mute account$/i)`; for a case-insensitive substring, use `{ exact: false }`. Also, e2e fails with `LOCATOR_AMBIGUOUS` if multiple elements match, rather than tapping the first; use `.first()` when that is intended.
+- **Visibility-conditional flows:** Replace `optional` steps and `runFlow: { when }` checks with `isVisible()`. It returns `false` when there are no matches, but is ambiguous when there are several. Add `{ visible: true }` to the query or use `.first()` if a hidden duplicate may exist.",C3_D032_0002;C3_D032_0008;C3_D032_0001;C3_D032_0006;C3_D032_0004,2160,189
+Q021,C1,"Use `pressSequentially`, not `fill`: it focuses the input and types one character at a time through the keyboard, delivering the key events an autocomplete may depend on. For example:
+
+```ts
+await screen.getByLabel('City').pressSequentially('War');
+```
+
+A custom e2e engine’s `keyboard.type` must use the platform’s keyboard path rather than setting the value directly. If no editable field that accepts text has focus, it must throw `NOT_ACTIONABLE` instead of silently sending keystrokes to the document body.",C1_D060_0004;C1_D016_0002;C1_D042_0011;C1_D038_0009;C1_D050_0012,2661,115
+Q021,C2,"Use the keyboard-based `type` action without a target once the autocomplete’s editable field has focus. The harness must first tap the field, or the model must know it already has focus. Typing must follow the platform’s keyboard path so the app receives key events; setting the field’s value without keystrokes is not compliant.
+
+A custom e2e engine must implement the `keyboard` capability for this behavior. If nothing that accepts text has focus, it should throw `NOT_ACTIONABLE`.",C2_D042_0013;C2_D038_0011;C2_D016_0003;C2_D042_0054;C2_D016_0002,2458,103
+Q021,C3,"Enter the autocomplete text through the keyboard path so the app receives the key events it expects. Focus the autocomplete first, then use `keyboard.type` (or `locator.pressSequentially`, which focuses the locator and then calls `keyboard.type`). Don’t set the field’s value directly without keystrokes. Use `replace: true` if the existing text should be cleared first.
+
+A custom e2e engine must throw `NOT_ACTIONABLE` if no editable field has focus; it must not silently send the keystrokes to the document body.",C3_D042_0009;C3_D060_0007;C3_D042_0008;C3_D060_0001;C3_D038_0011,2397,113
+Q022,C1,`locator.nth()` throws `INVALID_LOCATOR` when the index is negative or not an integer.,C1_D053_0011;C1_D005_0010;C1_D050_0007;C1_D034_0004;C1_D033_0006,2357,24
+Q022,C2,`locator.nth()` throws `INVALID_LOCATOR` when the index is negative or not an integer.,C2_D050_0008;C2_D047_0014;C2_D034_0005;C2_D044_0016;C2_D032_0010,2200,24
+Q022,C3,`locator.nth()` throws a test error with code `INVALID_LOCATOR` when the index is negative or not an integer.,C3_D042_0026;C3_D044_0011;C3_D050_0006;C3_D045_0015;C3_D042_0025,2382,29
+Q023,C1,"A failure can be reported in `beforeEach` because that phase includes fixture setup, not just user-registered hooks. For example, a custom fixture can fail before the test body starts: a fixture that throws before calling `use`, returns without calling `use`, or defines a name already supplied by the engine can fail with `TEST_SETUP_FAILED` in `beforeEach`. Thus, no `beforeEach` hook needs to have executed for the attempt to fail in that phase.",C1_D052_0005;C1_D044_0011;C1_D044_0012;C1_D052_0011;C1_D052_0009,2635,99
+Q023,C2,"Fixture setup runs before the `beforeEach` hooks. Each fixture definition in the test’s `extend` chain runs in declaration order, even if the test does not name that fixture. If setup fails—for example, a fixture throws before calling `use`—the attempt is reported as failing in the `beforeEach` phase, before any `beforeEach` hook has run.",C2_D052_0013;C2_D052_0006;C2_D045_0017;C2_D044_0013;C2_D044_0014,2639,79
+Q023,C3,"A failure can be attributed to the `beforeEach` phase when fixture setup fails before the user’s `beforeEach` hooks run. For example, a fixture definition can throw before calling `use`, return without calling `use`, or define a name that conflicts with one supplied by the target’s engine. These failures are reported during `beforeEach` as `TEST_SETUP_FAILED` or with the thrown error, even though no `beforeEach` hook executed.",C3_D052_0010;C3_D052_0005;C3_D044_0010;C3_D042_0010;C3_D060_0005,2615,95
+Q024,C1,"A shared `Role` vocabulary provides the consistency: each engine maps its platform’s element types to those common role names, so the same role query has the same meaning across browsers and devices. If a platform has no widget for a role, the query simply matches nothing there.",C1_D042_0043;C1_D050_0019;C1_D005_0003;C1_D050_0003;C1_D050_0020,2640,58
+Q024,C2,"The framework uses a **closed, shared `Role` vocabulary**. Each engine maps its platform’s element types to those common role names, so a role query has the same meaning in browsers and on devices. If a platform has no widget for a role, the query simply matches nothing there.",C2_D042_0054;C2_D005_0004;C2_D050_0023;C2_D060_0002;C2_D042_0051,2440,62
+Q024,C3,"A shared, closed `Role` vocabulary provides the consistency. Each engine maps its platform’s element types to those common role names, so the same role query has the same meaning across browser and device engines. A role with no corresponding widget on a platform simply matches nothing there.",C3_D042_0041;C3_D042_0001;C3_D050_0017;C3_D050_0003;C3_D060_0001,2152,58
+Q025,C1,An `agent.act` instruction must be **1–8192 UTF-8 bytes after NFC normalization**.,C1_D038_0012;C1_D001_0001;C1_D038_0002;C1_D002_0002;C1_D038_0001,2636,25
+Q025,C2,An `agent.act` instruction must be **1–8192 UTF-8 bytes after NFC normalization**.,C2_D038_0002;C2_D051_0007;C2_D038_0015;C2_D001_0001;C2_D002_0002,2628,25
+Q025,C3,"An `agent.act` instruction must be **1–8,192 UTF-8 bytes after NFC normalization**.",C3_D059_0009;C3_D038_0003;C3_D007_0006;C3_D041_0021;C3_D051_0003,1452,26
+Q026,C1,"`expect(locator).toBeVisible()` waits for the locator to resolve to a visible element, so it can pass if the element appears or becomes visible before the assertion times out. If the element stays absent or hidden, it times out.
+
+`locator.isVisible()` checks visibility immediately and does not wait for a delayed appearance. It returns `false` when the element is absent or hidden at the time of the check.",C1_D045_0002;C1_D050_0006;C1_D050_0017;C1_D045_0003;C1_D033_0008,2750,87
+Q026,C2,"`expect(locator).toBeVisible()` waits for the locator to resolve to one visible match. If the element is absent or hidden now, it keeps polling until it becomes visible or the assertion times out and fails.
+
+`locator.isVisible()` is an immediate state check: it returns `false` if the element is absent or currently hidden. It does not wait for the element to appear or become visible.",C2_D050_0007;C2_D050_0022;C2_D050_0021;C2_D045_0003;C2_D033_0011,2746,84
+Q026,C3,"`expect(locator).toBeVisible()` polls until exactly one match is visible. If the element is absent or hidden, it keeps waiting for it to appear and become visible; it fails if the timeout expires.
+
+`locator.isVisible()` is a current-state read, not a wait. The excerpts don’t specify its behavior when the locator is absent or hidden, so they don’t establish whether it returns `false` or throws in those cases.",C3_D045_0003;C3_D050_0014;C3_D033_0009;C3_D045_0015;C3_D050_0015,2994,92
+Q027,C1,"A screenshot written earlier in the same run is not treated as a usable baseline for comparison:
+
+- **Without `--update-snapshots`:** a positive `toHaveScreenshot()` fails with `ASSERTION_FAILED` until the next run, even if a retry, repeat, or another test wrote the screenshot.
+- **With `--update-snapshots`:** a positive matcher can compare against that screenshot and may write it again. Missing or different screenshots are written from a screen that holds still, and the matcher passes.
+- **With `.not`:** the same-run screenshot is never used for comparison, even with `--update-snapshots`. A negated assertion passes once the screen differs from a stored screenshot; if no usable screenshot is stored, it fails with `ASSERTION_FAILED`.",C1_D058_0002;C1_D058_0001;C1_D045_0005;C1_D058_0003;C1_D033_0010,2463,163
+Q027,C2,"A screenshot written earlier in the same run is **not treated as a usable baseline** when `--update-snapshots` is off: a positive `toHaveScreenshot()` fails with `ASSERTION_FAILED` until the next run, even if the screenshot was written by a retry, repeat, or another test using the same name.
+
+With `--update-snapshots`, a positive matcher can compare against and write the screenshot again; missing or different screenshots are updated from a screen that holds still, and the matcher passes.
+
+For `.not`, the same-run rule always applies—even with `--update-snapshots`: it does not pass by comparing against a screenshot written earlier in that run. A negated assertion passes once the screen differs from a stored screenshot; if no usable screenshot is stored, it fails with `ASSERTION_FAILED`.",C2_D058_0002;C2_D058_0001;C2_D058_0003;C2_D045_0006;C2_D015_0004,2640,171
+Q027,C3,"Without `--update-snapshots`, a screenshot written earlier in the same run is **not used as a baseline**. A later assertion that names it fails with `ASSERTION_FAILED` until the next run—even if it is a retry, repeat, or another test. This also applies to `.not`.
+
+With `--update-snapshots`, a **positive** `toHaveScreenshot()` can compare against a screenshot written earlier in that run and may write it again. A missing or different screenshot is written from a screen that holds still, and the matcher passes. The same-run exception still applies to `.not`: negated assertions never compare against a screenshot written earlier in the run.",C3_D058_0004;C3_D058_0002;C3_D045_0005;C3_D058_0001;C3_D058_0003,1887,141
+Q028,C1,"The coding-agent integration returns:
+
+- **0** when the client disconnects, whether or not a session is open.
+- **1** when an uncaught error shuts down the server.
+- **2** when the launch command line is invalid.
+- **The error’s category exit code** when startup fails. The documentation does not specify one fixed number for startup failures.",C1_D044_0013;C1_D044_0004;C1_D046_0010;C1_D044_0003;C1_D044_0001,2159,78
+Q028,C2,"- Client disconnects: **0**
+- Unhandled error shuts down the server: **1**
+- Invalid launch arguments: **2**
+- Startup failure: **the error’s category code** (for example, configuration **2** or infrastructure **3**)",C2_D044_0016;C2_D046_0012;C2_D044_0004;C2_D044_0001;C2_D044_0015,2261,55
+Q028,C3,"The excerpts do not specify process statuses for a coding-agent integration when a client disconnects, an unhandled error occurs, launch arguments are invalid, or startup fails. They describe runner error exit codes, but do not map those four situations to numeric statuses.",C3_D044_0004;C3_D044_0011;C3_D044_0007;C3_D044_0001;C3_D044_0002,2865,54
+Q029,C1,"- **`f`** reruns tests that did not pass in the last run.
+- **`u`** reruns the current selection with `--update-snapshots`, refreshing screenshot baselines.
+- **`p`** prompts for a file or other positional filter; **`t`** prompts for a title pattern. Empty input clears the respective filter.",C1_D040_0020;C1_D040_0021;C1_D040_0015;C1_D040_0022;C1_D040_0027,2637,78
+Q029,C2,"- **`f`** reruns tests that did not pass in the last run.
+- **`u`** reruns the current selection with snapshot updates, refreshing screenshot baselines.
+- **`p`** prompts for a file, name, or glob to filter the next runs.
+- **`t`** prompts for a title pattern to filter tests, like `--grep`.",C2_D040_0025;C2_D040_0026;C2_D040_0027;C2_D040_0022;C2_D040_0013,2623,82
+Q029,C3,"- **`f`** reruns tests that did not pass in the last run.
+- **`u`** reruns the current selection with screenshot baselines updated.
+- **`p`** prompts for a file, name, or glob to filter runs; **`t`** prompts for a title pattern. An empty response clears that filter.",C3_D040_0017;C3_D040_0016;C3_D040_0012;C3_D040_0011;C3_D040_0008,3587,75
+Q030,C1,"A `Secret` handle is opaque and is accepted only by designated secret sinks; a JSON sink expects a string, not a handle. Passing the handle there would expose or stringify a secret outside the supported secure handling path, so e2e rejects it. The excerpts don’t specify the exact error produced for a `Secret` reaching a JSON sink, so I can’t identify that error from the provided documentation.",C1_D051_0004;C1_D044_0007;C1_D051_0003;C1_D051_0005;C1_D060_0005,2633,85
+Q030,C2,"A `Secret` is an opaque handle with no plaintext accessor, and JSON sinks are not among the sinks that accept one. `validateJsonValue` therefore rejects a `Secret` to prevent it from being passed as JSON.
+
+It produces `POLICY_DENIED`, unless `rules.onSecret` is provided and throws a different error.",C2_D051_0004;C2_D051_0005;C2_D044_0008;C2_D051_0006;C2_D042_0039,2639,70
+Q030,C3,"A `Secret` is only an opaque handle, not the secret value, and JSON serialization would expose or imply a value that the handle does not contain. e2e therefore rejects a `Secret` reaching a JSON sink with **`POLICY_DENIED`**.",C3_D051_0008;C3_D046_0008;C3_D060_0009;C3_D051_0005;C3_D041_0019,1925,57
+Q031,C1,"`@e2e-dev/github` uses these GitHub Actions variables:
+
+- **Identify the pull request:** `GITHUB_EVENT_PATH` and `GITHUB_REF`. It reads the PR number and head commit from the event payload, or gets the PR number from a ref such as `refs/pull/42/merge`.
+- **Find its own comment on reruns:** `GITHUB_WORKFLOW` and `GITHUB_JOB` are joined in a marker used to locate the comment.
+- **Construct artifact links:** `GITHUB_REPOSITORY` and `GITHUB_RUN_ID` are used to build the links.",C1_D020_0001;C1_D043_0005;C1_D043_0006;C1_D012_0005;C1_D020_0004,2404,129
+Q031,C2,"- **Identify the pull request:** `GITHUB_EVENT_PATH` and `GITHUB_REF`. The reporter gets the PR number and head commit from the event payload, or the PR number from a ref such as `refs/pull/42/merge`.
+- **Find and update its own comment on reruns:** `GITHUB_WORKFLOW` and `GITHUB_JOB` join the marker used to find the reporter’s comment.
+- **Construct artifact links:** `GITHUB_REPOSITORY` and `GITHUB_RUN_ID`.",C2_D020_0001;C2_D043_0007;C2_D043_0006;C2_D012_0006;C2_D020_0005,2304,109
+Q031,C3,"- **Identify the pull request:** `GITHUB_EVENT_PATH` provides the pull request number and head commit from the event payload; `GITHUB_REF` can provide the number from a ref such as `refs/pull/42/merge`.
+- **Find and update its own comment on reruns:** `GITHUB_WORKFLOW` and `GITHUB_JOB` are combined into a marker used to find the reporter’s comment.
+- **Construct artifact links:** `GITHUB_REPOSITORY` and `GITHUB_RUN_ID` are used to build the links.",C3_D043_0009;C3_D020_0001;C3_D012_0006;C3_D020_0002;C3_D043_0006,1516,116
+Q032,C1,"Under `on-all-retries`, a **trace page** is kept for each test that was retried, while **video** records every attempt after the first retry-triggering attempt. If a test is never retried, neither a trace page nor a video is recorded. This also applies when the runner does not retry a failure, such as `LAUNCH_TIMEOUT`.",C1_D041_0016;C1_D041_0015;C1_D041_0014;C1_D015_0005;C1_D015_0002,2638,77
+Q032,C2,"Under `on-all-retries`, a trace page is kept for each test that was retried, while videos are recorded for every attempt after the first. So the trace preserves a page for the retried test; the video preserves recordings of its retry attempts, not its initial attempt.
+
+If a test is never retried, neither a trace nor a video is recorded under this mode. This includes tests configured with `retries: 0` and failures the runner does not retry.",C2_D041_0019;C2_D041_0018;C2_D015_0002;C2_D015_0006;C2_D013_0003,2644,100
+Q032,C3,"Under `on-all-retries`, **trace pages** are kept for each test that was retried, while **videos** are recorded for every attempt after the first. So the trace is a test-level artifact; the video captures the retry attempts.
+
+If a test is never retried, neither a trace page nor a video is recorded under this mode. This includes tests configured with `retries: 0` and failures the runner does not retry; the run prints a plan-time notice for each artifact type that will not be recorded.",C3_D041_0014;C3_D015_0003;C3_D013_0005;C3_D041_0013;C3_D015_0006,2537,111
+Q033,C1,"Set the budgets on each named entry under `agents` using `maxObservationBytes` and `maxInputTokens`. Agent entries do not inherit from `default`, so configure the values for every agent that needs them. Per-call options can lower an agent’s budgets, but cannot raise them.
+
+The run report’s `run.limits` block records the ceilings enforced for the run. Its `maxObservationBytes` and `maxModelTokensPerCall` fields are the largest configured values across agents’ `maxObservationBytes` and `maxInputTokens`, respectively. The report has no separate `limits` configuration key.",C1_D041_0025;C1_D041_0019;C1_D002_0001;C1_D038_0005;C1_D056_0006,2647,126
+Q033,C2,"Set `maxObservationBytes` and `maxInputTokens` on each named agent in the config, under `agents.<name>`. In a multi-worker run, each worker constructs its own config instance, so keep the config deterministic across workers. Named agents do not inherit the `default` agent’s model; configure each agent with what it needs.
+
+The run report’s `run.limits` block records the enforced ceilings: `maxObservationBytes` is the largest value configured across agents, and `maxModelTokensPerCall` is the largest `maxInputTokens` value across agents. Per-call options can only lower an agent’s budgets.",C2_D041_0024;C2_D002_0002;C2_D041_0031;C2_D038_0007;C2_D015_0008,2633,132
+Q033,C3,"Set the budgets on each named agent in `e2e.config.ts`, using `maxObservationBytes` for the observation-size ceiling and `maxInputTokens` for the model-input token ceiling. Agent entries do not inherit from `default`, so configure the values on every agent that needs them. Per-call options can only lower an agent’s configured budgets.
+
+The run report records the **largest** configured value across agents in `run.limits.maxObservationBytes` and `run.limits.maxModelTokensPerCall`, respectively.",C3_D038_0008;C3_D041_0021;C3_D002_0002;C3_D051_0003;C3_D036_0011,1351,108
+Q034,C1,"A live e2e `ModelInstance` implements the AI SDK language-model interface and includes a callable `doGenerate` method. An object with only `specificationVersion`, `provider`, and `modelId` has identifying metadata but lacks the generate call that distinguishes a live instance.",C1_D041_0032;C1_D041_0019;C1_D036_0001;C1_D041_0017;C1_D017_0002,2195,60
+Q034,C2,"A live `ModelInstance` includes a `doGenerate` function—the AI SDK language model’s generation call. An object with only `specificationVersion`, `provider`, and `modelId` has the identifying fields but lacks that function, so it is not a live model instance.",C2_D041_0039;C2_D041_0040;C2_D036_0017;C2_D036_0001;C2_D041_0023,2648,60
+Q034,C3,"A live `ModelInstance` has a `doGenerate` function—the generate call implemented by AI SDK language models. An object with only `specificationVersion`, `provider`, and `modelId` contains identification fields but lacks that function, so it is not a live instance.",C3_D041_0036;C3_D036_0001;C3_D029_0002;C3_D041_0015;C3_D056_0007,2022,59
+Q035,C1,Add the custom output directory to `.gitignore` yourself. `e2e init` only adds ignore entries for the default `.e2e/` paths.,C1_D041_0012;C1_D007_0007;C1_D051_0008;C1_D041_0013;C1_D040_0027,2620,36
+Q035,C2,Add the custom output directory to `.gitignore` yourself. `e2e init` only adds ignore entries for the default `.e2e/` paths.,C2_D041_0015;C2_D007_0009;C2_D041_0014;C2_D051_0010;C2_D041_0016,2625,36
+Q035,C3,"Add the custom artifact directory to `.gitignore`. The excerpts say `e2e init` ignores the default `.e2e/cache/`, but don’t say it automatically ignores a custom output directory.",C3_D007_0010;C3_D051_0016;C3_D041_0011;C3_D020_0002;C3_D015_0006,1744,44
+Q036,C1,"The excerpts don’t specify how a custom store for saved agent actions is constructed or shared across workers, so they don’t establish that multiple workers can rely on one shared instance. They do note that some worker-side operations run in worker processes and shouldn’t depend on state built in the runner process, but that guidance is about browser leases, not custom stores.",C1_D002_0003;C1_D018_0006;C1_D005_0007;C1_D041_0017;C1_D002_0002,2232,74
+Q036,C2,"The excerpts don’t say whether multiple workers share a single constructed custom store for saved agent actions. They describe worker slots and custom executors, but not a custom store’s construction or sharing behavior.",C2_D041_0021;C2_D005_0008;C2_D036_0017;C2_D002_0002;C2_D036_0018,2631,42
+Q036,C3,"The excerpts don’t specify how a custom store for saved agent actions is constructed or shared across workers, so they don’t establish whether multiple workers can rely on one instance. The documented replay cache is described as recording entries per agent, keyed by agent name and context, but its worker-sharing behavior is not covered.",C3_D002_0002;C3_D002_0006;C3_D005_0013;C3_D021_0002;C3_D004_0008,2064,65
+Q037,C1,"The config module is designed to read environment variables directly when defining the target—for example, it reads `APP_URL` from `process.env`. This is separate from the app process: if the dev server also needs that variable, pass it through `command.env`.",C1_D041_0007;C1_D043_0008;C1_D059_0002;C1_D041_0008;C1_D027_0003,2223,55
+Q037,C2,"The config is TypeScript, so `app` fields can use JavaScript expressions such as `process.env.MY_VAR` directly; the runner resolves `app` at config load.",C2_D043_0009;C2_D041_0010;C2_D041_0007;C2_D041_0008;C2_D059_0002,2528,40
+Q037,C3,"The target config is JavaScript/TypeScript, so its `app` fields can evaluate expressions such as `process.env.APP_URL ?? 'http://localhost:3000'` directly. The docs distinguish this from the app process’s environment, which must be passed through `command.env` if the dev server needs it.",C3_D059_0002;C3_D043_0012;C3_D059_0004;C3_D033_0003;C3_D041_0007,1896,68
+Q038,C1,"`WORKER_EXIT` is the run-level condition: a worker exits unexpectedly while running a file. The test in flight is recorded as `WORKER_CRASH`, and the file’s other tests are skipped. Tests that finished before the exit remain in the report, including earlier retry attempts and finished members of a serial group. The crash is recorded as the next attempt after those results, or on the last attempt if it happened afterward, such as in `afterAll`.
+
+`WORKER_CRASH` specifically identifies the worker’s exit during a particular test. If an unhandled rejection caused the worker to exit, the rejection is recorded as the run error instead of `WORKER_EXIT`.",C1_D044_0013;C1_D040_0022;C1_D040_0032;C1_D044_0012;C1_D044_0010,2326,140
+Q038,C2,"`WORKER_EXIT` records the unexpected worker termination while it was running a file. The test in flight is reported as failing with `WORKER_CRASH`; `WORKER_CRASH` is the code for that specific test’s failure, not the worker-exit event itself.
+
+The file’s other tests are skipped. Attempts that finished before the exit remain in the report—including earlier retry attempts and finished members of a serial group. The crash is recorded on the attempt after those finished attempts, or on the last attempt if it occurred afterward, such as during `afterAll`.",C2_D044_0015;C2_D044_0014;C2_D044_0016;C2_D040_0027;C2_D044_0013,2534,118
+Q038,C3,"`WORKER_EXIT` records the unexpected worker exit while it was running a file. The test in flight fails with `WORKER_CRASH`, and the file’s remaining tests are skipped. Tests that finished before the exit remain in the report, including earlier retry attempts and completed members of a serial group. The crash is recorded as an attempt after those results—or on the last attempt if it happened afterward, such as during `afterAll`.
+
+`WORKER_CRASH` is the infrastructure failure assigned to the specific test whose execution was cut short by the worker exit. If an unhandled rejection caused the worker to end, the rejection is recorded as the run error instead of `WORKER_EXIT`.",C3_D044_0010;C3_D044_0011;C3_D040_0025;C3_D027_0007;C3_D040_0014,2505,142
+Q039,C1,"The excerpts don’t specify how `browser.keyboard.down()` generates a key-repeat event. They only show `keyboard.press()` and `keyboard.type()` examples, so the exact `down()` usage or repeat behavior can’t be determined from the provided documentation.",C1_D053_0016;C1_D060_0004;C1_D053_0017;C1_D005_0001;C1_D050_0013,2663,53
+Q039,C2,"The excerpts don’t include the `browser.keyboard.down()` method or explain how to generate a key-repeat event with it, so I can’t give the documented syntax.",C2_D053_0020;C2_D042_0013;C2_D033_0009;C2_D053_0021;C2_D005_0001,2664,36
+Q039,C3,Call `browser.keyboard.down(key)` again for the same key while it is held; repeated `down()` calls send a key-repeat event. Release it afterward with `browser.keyboard.up(key)`.,C3_D060_0007;C3_D053_0012;C3_D033_0008;C3_D042_0009;C3_D053_0020,1894,42
+Q040,C1,"`smol()`’s Playwright image is pulled from an unspecified destination in the excerpts. When `e2e init` installs dependencies, it contacts the package registry—`registry.npmjs.org`—as the destination category.",C1_D027_0001;C1_D027_0002;C1_D051_0009;C1_D040_0004;C1_D033_0002,2639,51
+Q040,C2,"`smol()` has unrestricted outbound network access, so the excerpt does not identify a specific destination for its Playwright image download. It says the first boot pulls the Playwright Ubuntu image.
+
+The `e2e init` excerpt says to install dependencies, but does not specify which destination category it contacts.",C2_D027_0001;C2_D027_0002;C2_D027_0003;C2_D033_0002;C2_D051_0011,2638,64
+Q040,C3,"`smol()` contacts **`mcr.microsoft.com`** to pull the Playwright image. When `e2e init` installs dependencies, it contacts **the package registry**.",C3_D027_0002;C3_D051_0017;C3_D027_0001;C3_D054_0006;C3_D033_0003,1888,41
+Q041,C1,"Register a dialog handler **before** triggering the action that opens the dialog:
+
+```ts
+const off = await browser.onDialog('accept');
+await screen.getByRole('button', 'Delete').tap();
+await off();
+```
+
+A function handler receives the dialog and must call `dialog.accept(text?)` or `dialog.dismiss()`. If it does neither, the dialog is dismissed, just as an unhandled dialog is. The test then fails on the next step—or at the end of the attempt if there is no next step—with `APP_NOT_OPEN`.",C1_D005_0001;C1_D053_0016;C1_D005_0002;C1_D025_0004;C1_D060_0002,2671,115
+Q041,C2,"Register a dialog handler **before** triggering the action that opens the dialog, because an unhandled `alert`, `confirm`, or `prompt` fails the next step. For example:
+
+```ts
+const off = await browser.onDialog('accept');
+await screen.getByRole('button', 'Delete').tap();
+await off();
+```
+
+A custom function handler receives the dialog and must call `dialog.accept(text?)` or `dialog.dismiss()`. If it does neither, the documentation does not specify the resulting behavior.",C2_D005_0001;C2_D053_0020;C2_D005_0002;C2_D025_0004;C2_D025_0005,2677,107
+Q041,C3,"Register a dialog handler **before** triggering the action that opens the native dialog:
+
+```ts
+const off = await browser.onDialog('accept');
+await screen.getByRole('button', 'Delete').tap();
+await off();
+```
+
+You can use `'accept'`, `'dismiss'`, or a function handler. A function must call `dialog.accept(text?)` or `dialog.dismiss()`. If it does neither, the dialog is dismissed, and the next step fails with `APP_NOT_OPEN`—the same outcome as an unhandled dialog.",C3_D005_0003;C3_D053_0012;C3_D005_0001;C3_D025_0006;C3_D025_0007,2147,113
+Q042,C1,"Call `device.setPermission()` before `app.open()` because changing a permission can terminate a running app on iOS or revoke it on Android. Setting it first ensures the app starts with the intended permission state; permissions are applied before launch, so no system prompt appears.
+
+Configuring `app.permissions` applies those permission states on every fresh launch of the pinned app, including `app.open()` and `app.restart()`. `app.clearState()` resets permissions along with app data, then applies the configured states again. The warm-up launch does not apply configured permissions, so tests should start with `app.open()`.",C1_D047_0006;C1_D035_0002;C1_D047_0013;C1_D035_0001;C1_D047_0005,2666,126
+Q042,C2,"Call `device.setPermission()` before `app.open()` because changing a permission can terminate a running app on iOS or revoke it on Android. Setting it first ensures the app starts with the intended permission state; permissions are configured before launch, so no system prompt appears.
+
+`app.permissions` applies to every fresh launch of the pinned app, including `app.open()`, `app.restart()`, and `app.clearState()`. `app.clearState()` resets permissions along with app data, then applies the configured permissions again.",C2_D047_0007;C2_D035_0002;C2_D047_0008;C2_D047_0016;C2_D035_0001,2673,108
+Q042,C3,"Call `device.setPermission()` before `app.open()` so the permission is configured before the app launches. Changing a permission can terminate a running app on iOS or Android, and setting it before launch avoids that disruption. It also lets the app start with the intended permission state rather than encountering a system prompt.
+
+Configuring `app.permissions` applies those permission states on every fresh launch, including `app.open()` and `app.restart()`. `app.clearState()` resets permissions along with app data, then applies the configured states again.",C3_D035_0004;C3_D047_0005;C3_D047_0004;C3_D032_0009;C3_D035_0008,2703,110
+Q043,C1,"A device-side timeout—such as during simulator boot, runner connection, or app launch—is reported as `ENGINE_FAILURE`, with agent-device’s message and hint. It is not reported as `LAUNCH_TIMEOUT`, `ACTION_FAILED`, or `STEP_TIMEOUT`.
+
+If an action such as a tap or fill exceeds its timeout, the step fails as `ACTION_FAILED` and is **not retried**, because the input may already have reached the device. The excerpts don’t specify whether a later test attempt is automatically retried.",C1_D028_0004;C1_D035_0015;C1_D015_0002;C1_D044_0012;C1_D035_0014,2295,107
+Q043,C2,"A device-side timeout during simulator boot, runner connection, or app launch is reported as `ENGINE_FAILURE`, with agent-device’s message and hint—not as `LAUNCH_TIMEOUT`, `ACTION_FAILED`, or `STEP_TIMEOUT`.
+
+For an action such as a tap, fill, key, swipe, or `back` that exceeds its timeout, the step fails with `ACTION_FAILED` and is **not retried**, because the input may already have taken effect. If the next run encounters a busy or wedged iOS runner again, the documentation recommends stopping the agent-device daemon and rebooting the simulator; stopping the daemon drops all sessions, and the next run starts the daemon again.",C2_D035_0019;C2_D035_0017;C2_D035_0018;C2_D044_0005;C2_D015_0009,2576,139
+Q043,C3,"If a device action (such as tap, fill, key, swipe, or back) exceeds its timeout, the step fails with `ACTION_FAILED` and is **not retried**, because the input may already have reached the device. The next test attempt is not guaranteed to start from an unchanged state. The excerpts don’t specify any automatic reset or recovery before that attempt.",C3_D028_0005;C3_D035_0019;C3_D013_0005;C3_D048_0007;C3_D044_0005,2272,78
+Q044,C1,"Only `MODEL_PROVIDER_FAILED` and `MODEL_OUTPUT_INVALID` are allowed to be retryable: they represent model-call failures for which retrying may help—provider transport problems, or invalid structured output that may be repaired. The runner assigns error codes and controls retryability; it does not trust model text to set it. If another code claims to be retryable, that claim is rejected rather than honored. The excerpts don’t specify the exact error or handling used for that rejection.",C1_D044_0013;C1_D044_0003;C1_D044_0004;C1_D044_0002;C1_D044_0011,2524,99
+Q044,C2,"Only `ENVIRONMENT_UNAVAILABLE` and `SEED_DATA_MISSING` are allowed to claim retryability because they represent conditions that may be resolved by changing the environment or its seed data. The excerpts provided do not state this rule or explain what happens if another code claims retryability, so I can’t determine those details from the documentation shown.",C2_D044_0016;C2_D044_0014;C2_D044_0007;C2_D044_0003;C2_D044_0004,2526,72
+Q044,C3,"Only `NODE_STALE` and `FRAME_NOT_FOUND` are allowed to be retryable. The excerpt states this restriction but does not explain why those two were chosen. If a different code claims retryability, the documentation does not specify what happens.",C3_D044_0010;C3_D044_0004;C3_D060_0011;C3_D044_0011;C3_D044_0002,2758,53
+Q045,C1,"Both capabilities operate on nodes identified from the current screen. `observation` provides the snapshot and node references: `actions` uses those references to perform actions, while `location` resolves a locator against the nodes currently present. Without observation, neither has the screen state needed to act on or locate nodes.",C1_D046_0004;C1_D042_0004;C1_D042_0008;C1_D042_0021;C1_D042_0022,2642,64
+Q045,C2,"Both capabilities need `observation` because their operations rely on the engine’s observed semantic tree. `actions` performs actions on node references from the newest observation, while `location` resolves expressions against the nodes currently matched in that tree. Without `observe`, there is no observed node data for either capability to act on or locate.",C2_D042_0010;C2_D042_0005;C2_D042_0012;C2_D042_0026;C2_D042_0009,2641,69
+Q045,C3,"Both capabilities operate on references that come from an observation. `actions` acts on observed nodes, whose IDs are valid in the newest observation; `location` provides `screen` and `Locator` references in that same observation-based ID space. Therefore, both require `observe` to supply the screen state and references they use.",C3_D060_0004;C3_D042_0007;C3_D046_0004;C3_D018_0004;C3_D042_0008,3572,68
+Q046,C1,"Provisioning has no timeout because it may involve work such as a first-run download whose duration depends on the network. Cutting it short could fail every test that depends on the provisioned resources. The `prepare()` hook is still abortable on an interrupt, but it has no time budget.",C1_D042_0012;C1_D042_0013;C1_D042_0014;C1_D027_0003;C1_D052_0005,2638,61
+Q046,C2,"Provisioning may involve work such as a first-run download, whose duration depends on the network. Imposing a timeout could cut that work short and fail every test that depends on it. The runner therefore gives `prepare()` no time budget; its signal aborts only on interrupt.",C2_D042_0015;C2_D042_0014;C2_D042_0016;C2_D042_0017;C2_D052_0006,2635,59
+Q046,C3,"Provisioning may involve work with unpredictable duration, such as a first-run download. The documentation says there is no provisioning budget because cutting that work short could fail every test that depends on it. `prepare()` can still be aborted on an interrupt via `info.signal`.",C3_D042_0010;C3_D042_0011;C3_D060_0005;C3_D052_0005;C3_D042_0012,2486,56
+Q047,C1,"For a **web target**, `app` is configured with a `url`; it does not use device app launch arguments or permissions. The excerpts don’t specify further differences in the app information passed to `prepare()` and `init()`.
+
+For a **device target**, the app is identified by `bundleId` and/or `appPath`, and can also have `launchArguments` and `permissions`. Those settings apply to fresh launches, but **warm-up passes no launch arguments and touches no permissions**. So warm-up neither applies the configured arguments nor changes permissions; use `app.open()` to start the app with the target’s configured launch settings.",C1_D047_0006;C1_D035_0002;C1_D041_0007;C1_D035_0001;C1_D047_0020,2666,134
+Q047,C2,"For **web targets**, `prepare()` and `init()` receive the app’s resolved `site` (derived from its URL); the URL itself is not included in `EngineAppInfo`. The runner passes navigation URLs separately. For **device targets**, they receive the declared device fields: `bundleId`, `appPath`, `launchArguments`, and `permissions` (along with `site` only if the app has a URL).
+
+During device warm-up, the engine passes **no launch arguments and does not change permissions**. Those settings apply to fresh launches such as `app.open()`, `app.restart()`, and `app.clearState()`, so tests should call `app.open()` when they need the configured arguments and permissions applied.",C2_D035_0002;C2_D047_0007;C2_D042_0032;C2_D047_0008;C2_D035_0001,2665,152
+Q047,C3,"For a **web target**, `EngineAppInfo` provides the app’s `site` (the registrable domain derived from its URL), used for surface-level policies such as scoping injected credentials and observed child frames. The web app URL itself is not passed as a navigation URL; navigation URLs are passed separately through `session.open`.
+
+For a **device target**, the app information describes what to launch: `bundleId` and/or `appPath`, plus `launchArguments` and `permissions` when declared. Device targets do not use an app URL or `navigate`.
+
+During device warm-up, the app may be brought up, but warm-up **passes no launch arguments and does not change permissions**. Those settings apply to fresh launches; use `app.open()` to start a test with the target’s configured arguments and permissions.",C3_D035_0004;C3_D047_0005;C3_D035_0017;C3_D042_0023;C3_D047_0004,2277,170
+Q048,C1,"For a Chromium test where e2e starts the web app, choose **Next.js** or **Astro**: both examples are started by the runner and tested in Chromium.
+
+Run the project’s README instructions to install and start the example, then run its tests. The **locator tests need no model**. The agent tests use Vercel AI Gateway and are skipped unless `AI_GATEWAY_API_KEY` is set, so you can run the examples without an AI Gateway API key by running the locator tests only.",C1_D017_0001;C1_D037_0002;C1_D037_0003;C1_D037_0001;C1_D026_0002,2666,108
+Q048,C2,"For a Chromium test where e2e starts the web app, choose **Next.js** or **Astro**: both examples are started by the runner and tested in Chromium.
+
+Follow the chosen project’s README to install and run it. The locator tests need no model; the agent tests use Vercel AI Gateway and skip when `AI_GATEWAY_API_KEY` is not set. So you can run the examples without an API key and use the locator tests; the agent tests will be skipped.",C2_D017_0001;C2_D037_0003;C2_D037_0004;C2_D037_0002;C2_D036_0002,2659,104
+Q048,C3,"For a Chromium test where e2e starts the web app, choose **Next.js** (App Router) or **Astro** (no UI framework). Both examples are started by the runner and tested in Chromium.
+
+Follow the chosen project’s README to install and run it. The locator tests need no model; the agent tests use Vercel AI Gateway and are skipped unless `AI_GATEWAY_API_KEY` is set. So you can run the examples without a key—the locator tests will run, while the agent tests will skip.",C3_D017_0001;C3_D017_0002;C3_D037_0003;C3_D017_0003;C3_D055_0002,2247,111
