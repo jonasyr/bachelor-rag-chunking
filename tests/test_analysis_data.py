@@ -477,3 +477,24 @@ def test_key_points_are_compared_as_rows_not_hashes(second):
         extra={"rater": "R2"},
     )  # fmt: skip
     assert load(second, main=False).second_rating is not None
+
+
+def test_embedding_costs_come_from_the_run_that_paid_for_the_vectors(tmp_path):
+    from analysis_data import _embedding_run
+    from run_log import sha256_of
+
+    chunks = tmp_path / "chunks_c1.jsonl"
+    chunks.write_text("{}\n", encoding="utf-8")
+    old = {"step": "embed", "strategy": "C1", "input_tokens": 5, "inputs_sha256": {}}
+    paid = {
+        "step": "embed",
+        "strategy": "C1",
+        "input_tokens": 100,
+        "inputs_sha256": {chunks.name: sha256_of(chunks)},
+    }
+    reused = paid | {"input_tokens": 0, "api_called": False}  # a later rebuild from stored vectors
+    runs = tmp_path / "embedding_runs.jsonl"
+    runs.write_text("".join(json.dumps(r) + "\n" for r in (old, paid, reused)), encoding="utf-8")
+    assert _embedding_run(runs, "C1", chunks)["input_tokens"] == 100
+    assert _embedding_run(runs, "C1", None)["input_tokens"] == 100
+    assert _embedding_run(runs, "C2", chunks) is None

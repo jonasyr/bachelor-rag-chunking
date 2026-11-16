@@ -349,7 +349,41 @@ def test_main_wires_the_scorer_without_network(monkeypatch):
         return 0
 
     monkeypatch.setattr(ragas_eval, "run", fake_run)
+    monkeypatch.setattr("run_log.require_clean_tree", lambda: None)
     ragas_eval.main([])
     assert callable(seen["scorer"])
     assert isinstance(seen["recorder"], ApiRecorder)
     assert seen["main"] is True and seen["repeat"] is False
+
+
+def test_main_refuses_uncommitted_changes_before_any_call(monkeypatch):
+    import ragas_eval
+
+    def dirty():
+        raise RuntimeError("uncommitted changes")
+
+    monkeypatch.setattr("run_log.require_clean_tree", dirty)
+    monkeypatch.setattr(ragas_eval, "run", lambda *a, **k: pytest.fail("ran"))
+    with pytest.raises(RuntimeError, match="uncommitted"):
+        ragas_eval.main([])
+
+
+def test_recorder_keeps_every_call_with_its_job_and_restores_totals():
+    recorder = ApiRecorder()
+    client = async_client(recorder, httpx.MockTransport(_handler))
+
+    async def ask():
+        ragas_client.JOB.set("Q001/C1/faithfulness")
+        await client.chat.completions.create(
+            model="gpt-6-sol", messages=[{"role": "user", "content": "x"}]
+        )
+
+    asyncio.run(ask())
+    calls = recorder.drain()
+    assert len(calls) == 1 and recorder.calls == []
+    assert calls[0]["job"] == "Q001/C1/faithfulness" and calls[0]["status"] == 200
+    assert calls[0]["request"]["messages"] == [{"role": "user", "content": "x"}]
+    restored = ApiRecorder()
+    restored.restore(calls)
+    assert restored.chat_prompt_tokens == recorder.chat_prompt_tokens
+    assert restored.models == recorder.models

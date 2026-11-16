@@ -7,7 +7,7 @@ The API key is read only when a call is made, so tests never need it.
 """
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from config import LLM_MAX_TOKENS, LLM_MODEL, LLM_REASONING_EFFORT, LLM_SEED, LLM_TEMPERATURE
@@ -22,6 +22,7 @@ class Completion:
     prompt_tokens: int  # as billed (usage)
     completion_tokens: int
     system_fingerprint: str | None
+    raw: dict = field(default_factory=dict)  # the whole API response, kept in the journal (D50)
 
 
 Completer = Callable[[list[dict]], Completion]
@@ -47,6 +48,7 @@ def complete(messages: list[dict], client: Any = None) -> Completion:
         prompt_tokens=response.usage.prompt_tokens,
         completion_tokens=response.usage.completion_tokens,
         system_fingerprint=getattr(response, "system_fingerprint", None),
+        raw=response.model_dump(mode="json"),
     )
 
 

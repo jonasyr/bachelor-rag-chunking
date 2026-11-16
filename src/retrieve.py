@@ -258,12 +258,19 @@ def retrieve_control(embedder: Embedder = embed_texts, client: Any = None, **pat
 
 if __name__ == "__main__":
     import argparse
+    import logging
+
+    from run_log import require_clean_tree
 
     p = argparse.ArgumentParser(
         description="Retrieve the top-k chunks per question for all strategies at once."
     )
     p.add_argument("--control", action="store_true", help="the size-matched control K1 instead")
-    if p.parse_args().control:
+    args = p.parse_args()
+    require_clean_tree()  # the record names the exact code (ADR 0050)
+    logging.basicConfig(format="%(levelname)s %(name)s: %(message)s")
+    logging.getLogger("openai").setLevel(logging.INFO)  # shows each SDK retry (ADR 0050)
+    if args.control:
         print(f"{retrieve_control()} rows -> {CONTROL_RETRIEVED_FILE}")
     else:
         print(f"{retrieve()} rows -> {RETRIEVED_RESULTS_FILE}")

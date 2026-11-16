@@ -12,7 +12,28 @@ from typing import Any
 import numpy as np
 from dotenv import load_dotenv
 
-from config import EMBEDDING_BATCH_SIZE, EMBEDDING_DIMENSIONS, EMBEDDING_MODEL
+from config import (
+    EMBEDDING_BATCH_SIZE,
+    EMBEDDING_DIMENSIONS,
+    EMBEDDING_MODEL,
+    OPENAI_MAX_RETRIES,
+    OPENAI_TIMEOUT_S,
+)
+
+# Every non-2xx response the client received (status, path), retried or not, in order; a step
+# that journals its calls takes them with `drain_http_errors` (ADR 0050).
+HTTP_ERRORS: list[dict] = []
+
+
+def drain_http_errors() -> list[dict]:
+    taken = list(HTTP_ERRORS)
+    HTTP_ERRORS.clear()
+    return taken
+
+
+def _note_error(response: Any) -> None:
+    if response.status_code >= 300:
+        HTTP_ERRORS.append({"status": response.status_code, "path": response.request.url.path})
 
 
 @dataclass(frozen=True)
@@ -28,9 +49,13 @@ def _openai_client() -> Any:
     load_dotenv()
     if not os.environ.get("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY is not set; copy .env.example to .env and add your key")
-    from openai import OpenAI
+    from openai import DefaultHttpxClient, OpenAI
 
-    return OpenAI()
+    return OpenAI(
+        max_retries=OPENAI_MAX_RETRIES,
+        timeout=OPENAI_TIMEOUT_S,
+        http_client=DefaultHttpxClient(event_hooks={"response": [_note_error]}),
+    )
 
 
 def embed_texts(

@@ -3,11 +3,17 @@ and dates)."""
 
 import hashlib
 import json
+import os
+import platform
+import subprocess
 from datetime import date
 from importlib.metadata import version
 from pathlib import Path
 
 from config import (
+    CLOSED_BOOK_SYSTEM_PROMPT,
+    CLOSED_BOOK_USER_TEMPLATE,
+    CONTEXT_SEPARATOR,
     CONTROL_ANSWER_STRATEGIES,
     CONTROL_STRATEGIES,
     EMBEDDING_MODEL,
@@ -28,7 +34,10 @@ from config import (
     RAGAS_SEED,
     RAGAS_STRICTNESS,
     RAGAS_TEMPERATURE,
+    ROOT,
     SCORING_METHOD,
+    SYSTEM_PROMPT,
+    USER_PROMPT_TEMPLATE,
 )
 
 (K1,) = CONTROL_STRATEGIES  # "K1"
@@ -37,6 +46,42 @@ from config import (
 
 def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git(*args: str) -> str | None:
+    try:
+        done = subprocess.run(
+            ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True, timeout=30
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return done.stdout.strip()
+
+
+def environment() -> dict:
+    """Code and environment of a run (ADR 0050): commit, uncommitted changes, Python and the
+    checksum of uv.lock (every package version), so the run can be tied to its exact code."""
+    status = _git("status", "--porcelain")
+    lock = ROOT / "uv.lock"
+    return {
+        "git_commit": _git("rev-parse", "HEAD"),
+        "git_dirty": None if status is None else bool(status),
+        "python": platform.python_version(),
+        "uv_lock_sha256": sha256_of(lock) if lock.exists() else None,
+    }
+
+
+def require_clean_tree() -> None:
+    """Refuse an API step of the main run while the repository has uncommitted changes, so the
+    commit in its record is exactly the code that ran (ADR 0050)."""
+    status = _git("status", "--porcelain")
+    if status is None:
+        raise RuntimeError("git status failed; the main run needs the repository (ADR 0050)")
+    if status:
+        raise RuntimeError(
+            "the repository has uncommitted changes; commit them first so the run record names "
+            f"the exact code (ADR 0050):\n{status}"
+        )
 
 
 def append_run(
@@ -52,6 +97,7 @@ def append_run(
         "model": EMBEDDING_MODEL,
         "openai_sdk": version("openai"),
         "chromadb": version("chromadb"),
+        **environment(),
         **record,
         "input_tokens": input_tokens,
         "cost_usd": _cost(input_tokens),
@@ -71,18 +117,40 @@ def generation_cost(prompt_tokens: int, completion_tokens: int) -> float:
     )
 
 
-def append_generation_run(
-    record: dict, prompt_tokens: int, completion_tokens: int, runs_file: Path = GENERATION_RUNS_FILE
-) -> dict:
-    """Append one JSON line with the pinned settings, versions, date, tokens and cost."""
-    full = {
-        "date": date.today().isoformat(),
+def generation_settings() -> dict:
+    """The pinned settings of the answer model (ADR 0033) and the SDK that sent them."""
+    return {
         "model": LLM_MODEL,
         "reasoning_effort": LLM_REASONING_EFFORT,
         "temperature": LLM_TEMPERATURE,
         "seed": LLM_SEED,
         "max_completion_tokens": LLM_MAX_TOKENS,
         "openai_sdk": version("openai"),
+    }
+
+
+def prompts_sha256() -> str:
+    """Checksum of the answer prompts in force (RAG and closed-book, docs/reference/prompts.md)."""
+    text = "\x00".join(
+        [
+            SYSTEM_PROMPT,
+            USER_PROMPT_TEMPLATE,
+            CONTEXT_SEPARATOR,
+            CLOSED_BOOK_SYSTEM_PROMPT,
+            CLOSED_BOOK_USER_TEMPLATE,
+        ]
+    )
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def append_generation_run(
+    record: dict, prompt_tokens: int, completion_tokens: int, runs_file: Path = GENERATION_RUNS_FILE
+) -> dict:
+    """Append one JSON line with the pinned settings, versions, date, tokens and cost."""
+    full = {
+        "date": date.today().isoformat(),
+        **generation_settings(),
+        **environment(),
         **record,
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
@@ -95,6 +163,20 @@ def append_generation_run(
 def append_record(record: dict, runs_file: Path) -> None:
     """Append a record that was built beforehand."""
     _append(record, runs_file)
+
+
+def ragas_settings() -> dict:
+    """The pinned judge settings of a RAGAS run (ADR 0047) and the library versions."""
+    return {
+        "judge_model": RAGAS_JUDGE_MODEL,
+        "embedding_model": EMBEDDING_MODEL,
+        "reasoning_effort": RAGAS_REASONING_EFFORT,
+        "temperature": RAGAS_TEMPERATURE,
+        "seed": RAGAS_SEED,
+        "strictness": RAGAS_STRICTNESS,
+        "ragas_version": version("ragas"),
+        "openai_sdk": version("openai"),
+    }
 
 
 def ragas_record(record: dict) -> dict:
@@ -110,14 +192,8 @@ def ragas_record(record: dict) -> dict:
     )
     full = {
         "date": date.today().isoformat(),
-        "judge_model": RAGAS_JUDGE_MODEL,
-        "embedding_model": EMBEDDING_MODEL,
-        "reasoning_effort": RAGAS_REASONING_EFFORT,
-        "temperature": RAGAS_TEMPERATURE,
-        "seed": RAGAS_SEED,
-        "strictness": RAGAS_STRICTNESS,
-        "ragas_version": version("ragas"),
-        "openai_sdk": version("openai"),
+        **ragas_settings(),
+        **environment(),
         **record,
         "judge_cost_usd": judge,
         "embedding_cost_usd": _cost(record["embedding_tokens"]),
@@ -179,7 +255,15 @@ def latest_run(runs_file: Path, step: str, strategy: str) -> dict | None:
     """The latest record of `step` over `strategy`, or None."""
     if not runs_file.exists():
         return None
-    records = [json.loads(line) for line in runs_file.read_text(encoding="utf-8").splitlines()]
+    records = []
+    for n, line in enumerate(runs_file.read_text(encoding="utf-8").splitlines(), start=1):
+        try:
+            records.append(json.loads(line))
+        except json.JSONDecodeError:
+            raise ValueError(
+                f"{runs_file}: line {n} is not JSON (a write cut off by a killed process?); "
+                "check that line and remove it if it is a torn record"
+            ) from None
     matching = [r for r in records if r.get("step") == step and r.get("strategy") == strategy]
     return matching[-1] if matching else None
 
@@ -238,6 +322,8 @@ def _append(record: dict, runs_file: Path) -> None:
     runs_file.parent.mkdir(parents=True, exist_ok=True)
     with runs_file.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
 
 
 def _cost(tokens: int) -> float:

@@ -162,8 +162,9 @@ def key_points(rows: list[dict]) -> dict[str, list[str]]:
 def split_reference(reference: str) -> list[str]:
     """Pre-filled key points (ADR 0037): the reference answer split at semicolons and sentence
     ends; parts beyond config.KEY_POINTS_MAX stay together in the last point. The rater checks
-    and edits them before saving; nothing here decides what a key point is."""
-    parts = [p.strip() for p in REFERENCE_BREAK.split(reference) if p.strip()]
+    and edits them before saving; nothing here decides what a key point is. A key point is one
+    line, so line breaks and runs of spaces (code blocks, paragraphs) become single spaces."""
+    parts = [" ".join(p.split()) for p in REFERENCE_BREAK.split(reference) if p.strip()]
     if len(parts) > KEY_POINTS_MAX:
         parts[KEY_POINTS_MAX - 1 :] = ["; ".join(parts[KEY_POINTS_MAX - 1 :])]
     return parts

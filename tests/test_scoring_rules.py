@@ -245,3 +245,10 @@ def test_k0_rows_round_trip():
     row = rules.to_row("Q001-K0", k0_ok(), control=True)
     assert list(row) == rules.checks_header(True)
     assert rules.from_row(row, control=True) == (rules.RUBRIC_RULES_VERSION, k0_ok())
+
+
+def test_pre_filled_key_points_are_one_line_each():
+    reference = "Install it:\n\n```bash\nnpx e2e init\n```\n\nThen   run it."
+    points = rules.split_reference(reference)
+    assert points == ["Install it: ```bash npx e2e init ``` Then run it."]
+    assert all("\n" not in p for p in points)
