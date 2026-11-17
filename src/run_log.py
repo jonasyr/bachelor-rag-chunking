@@ -24,6 +24,12 @@ from config import (
     LLM_MODEL,
     LLM_PRICE_INPUT_PER_MTOK,
     LLM_PRICE_OUTPUT_PER_MTOK,
+    LLM_RATER_MAX_TOKENS,
+    LLM_RATER_MODEL,
+    LLM_RATER_REASONING_EFFORT,
+    LLM_RATER_SCOPE,
+    LLM_RATER_SEED,
+    LLM_RATER_TEMPERATURE,
     LLM_REASONING_EFFORT,
     LLM_SEED,
     LLM_TEMPERATURE,
@@ -35,6 +41,7 @@ from config import (
     RAGAS_STRICTNESS,
     RAGAS_TEMPERATURE,
     ROOT,
+    RUBRIC_RULES_VERSION,
     SCORING_METHOD,
     SYSTEM_PROMPT,
     USER_PROMPT_TEMPLATE,
@@ -193,6 +200,33 @@ def ragas_settings() -> dict:
         "ragas_version": version("ragas"),
         "openai_sdk": version("openai"),
     }
+
+
+def llm_rater_settings(scope: str = LLM_RATER_SCOPE) -> dict:
+    """The pinned settings of the LLM cross-check of the rubric checks (ADR 0046 fallback), its
+    scope and rules version, and the SDK that sent them."""
+    return {
+        "model": LLM_RATER_MODEL,
+        "reasoning_effort": LLM_RATER_REASONING_EFFORT,
+        "temperature": LLM_RATER_TEMPERATURE,
+        "seed": LLM_RATER_SEED,
+        "max_completion_tokens": LLM_RATER_MAX_TOKENS,
+        "scope": scope,
+        "rules_version": RUBRIC_RULES_VERSION,
+        "openai_sdk": version("openai"),
+    }
+
+
+def llm_rater_cost(prompt_tokens: int, completion_tokens: int) -> float:
+    """Cost of the LLM cross-check at the judge prices (its model is the RAGAS judge)."""
+    return round(
+        (
+            prompt_tokens * RAGAS_JUDGE_PRICE_INPUT_PER_MTOK
+            + completion_tokens * RAGAS_JUDGE_PRICE_OUTPUT_PER_MTOK
+        )
+        / 1_000_000,
+        10,
+    )
 
 
 def ragas_record(record: dict) -> dict:

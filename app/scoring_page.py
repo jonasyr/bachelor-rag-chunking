@@ -21,7 +21,14 @@ from ui_theme import SCORING_CSS  # noqa: E402
 
 import scoring_rules as rules  # noqa: E402
 import scoring_store as scoring  # noqa: E402
-from config import INTRA_RATER_PSEUDONYM, KEY_POINTS_MAX  # noqa: E402
+from config import (  # noqa: E402
+    INTRA_RATER_PSEUDONYM,
+    KEY_POINTS_MAX,
+    RUBRIC_CHECK_HELP,
+    RUBRIC_CHECK_QUESTIONS,
+    RUBRIC_CONTROL_QUESTIONS,
+    RUBRIC_POINT_HELP,
+)
 
 STEPS = ["Key points", "Score"]
 LABELS = {
@@ -31,43 +38,12 @@ LABELS = {
     "no_hallucination": "Free of hallucination",
     "clarity": "Clarity",
 }
-# the checks of ADR 0035 as the form asks them (docs/reference/evaluation.md)
-QUESTIONS = {
-    "declines": "Does the answer say the excerpts do not contain the answer, and give none?",
-    "core_wrong": "Does it state the core point wrongly or contradict it?",
-    "other_error": "Is any other statement factually wrong?",
-    "grounded": "How many of its statements are backed by the excerpts?",
-    "hallucination": "Does it contain anything that neither the excerpts nor the reference cover?",
-    "answers_question": "Does it address what was asked?",
-    "direct": "Does the core point come in the first two sentences?",
-    "wordy": "Is it repetitive, padded or confusing?",
-}
-# K0 (ADR 0041) saw no excerpts: these two checks refer to the reference answer instead
-CONTROL_QUESTIONS = QUESTIONS | {
-    "declines": "Does the answer say it does not know the answer, and give none?",
-    "hallucination": "Does it contain anything the reference does not cover?",
-}
-# how to apply the checks in borderline cases (ADR 0037, docs/reference/evaluation.md)
-POINT_HELP = (
-    "Covered: the same meaning, also in other words. A qualifier in brackets, such as a version, "
-    "is not required. Stated only partly: missing."
-)
-HELP = {
-    "grounded": "A true statement that the excerpts do not back counts as not backed.",
-    "hallucination": (
-        "Counts also when the addition is true (minor if it does not change the answer). An "
-        "illustrative example name is not a hallucination."
-    ),
-    "direct": (
-        "Yes when the answer's own core point comes in the first two sentences, even if it is "
-        "wrong (that counts under the facts checks) or a second part of the question is answered "
-        "later."
-    ),
-    "declines": (
-        "No when it gives part of the answer and says the rest is not covered (K0: unknown): the "
-        "missing parts count as missing key points."
-    ),
-}
+# the checks of ADR 0035 and their borderline rules live in config, which the LLM cross-check
+# (src/llm_rater.py) reads too, so both ask exactly the same (docs/reference/evaluation.md)
+QUESTIONS = RUBRIC_CHECK_QUESTIONS
+CONTROL_QUESTIONS = RUBRIC_CONTROL_QUESTIONS  # K0 (ADR 0041)
+POINT_HELP = RUBRIC_POINT_HELP
+HELP = RUBRIC_CHECK_HELP
 OPTION_LABELS = {"minor": "Minor addition"}
 GROUPS = {  # heading shown before the first check of each group
     "core_wrong": "Facts",
