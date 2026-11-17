@@ -94,9 +94,11 @@ Prüffragen beantwortet:
 | `direct` | Steht die Kernaussage der Antwort in den ersten zwei Sätzen? (auch wenn sie falsch ist, das zählt unter Korrektheit, und auch wenn ein zweiter Teil der Frage später folgt; [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md)) | `yes`, `no` |
 | `wordy` | Ist die Antwort wiederholend, aufgebläht oder verwirrend? | `yes`, `no` |
 
-Das Bewertungsformular zeigt diese Prüffragen auf Englisch aus `QUESTIONS` bzw. für K0 `CONTROL_QUESTIONS` in
-`app/scoring_page.py`; `POINT_HELP` und `HELP` ergänzen die Grenzfälle der Klammern oben. Wer eine Prüffrage oder
-ihre Grenzfallregel ändert, ändert dort beides (kein Test prüft das).
+Den Wortlaut der Prüffragen und ihrer Grenzfallregeln (Englisch) halten `config.RUBRIC_CHECK_QUESTIONS`, für K0
+`config.RUBRIC_CONTROL_QUESTIONS`, sowie `config.RUBRIC_POINT_HELP` und `config.RUBRIC_CHECK_HELP`
+([Konfiguration](configuration.md#evaluation)); das Bewertungsformular (`app/scoring_page.py`) und die
+LLM-Gegenprobe ([Zweitbewertung](#zweitbewertung)) lesen ihn von dort und fragen daher dasselbe. Wer eine Prüffrage oder
+ihre Grenzfallregel ändert, ändert sie nur dort; die Regelversion `config.RUBRIC_RULES_VERSION` bleibt davon unberührt.
 
 Ableitung der Werte, verbindlich ([ADR 0035](../adr/0035-regelbasierte-bewertung.md)):
 
@@ -172,8 +174,27 @@ Entscheidung: [ADR 0046](../adr/0046-zweitbewertung.md); Ablauf und Befehle:
 - **In `analyse.py`:** Fehlt die Zweitbewertung oder ist sie nicht abgeschlossen, entfallen Tabelle und CSV mit Hinweis
   (Dateien eines früheren Laufs werden entfernt); passen ihre Dateien nicht mehr zum Abschlusseintrag oder weichen
   Items und Kernpunkte von Jonas' Satz ab, bricht `analyse.py` ab.
-- **Ersatzverfahren** ohne zweite Person bis Mitte November (Intra-Rater und Sprachmodell, ADR 0046): noch nicht
-  umgesetzt.
+- **Ersatzverfahren** ohne zweite Person ([ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)),
+  zwei Prüfungen mit denselben Maßen und derselben Tabellenform wie für R2, aber mit anderer Aussage:
+  - **Wiederholung** (`second_rater.py --mode mark|repeat`, Pseudonym `config.INTRA_RATER_PSEUDONYM` = `R1W`): Jonas
+    bewertet die 36 Antworten der Stichprobe zuerst in seiner eigenen Bewertung und markiert das (`--mode mark`, hält
+    die Prüfsumme dieser Zeilen fest). Frühestens `config.INTRA_RATER_MIN_DAYS` Tage danach, und nur, wenn die
+    Zeilen unverändert sind, entsteht der Wiederholungssatz: dieselben Antworten, neu gemischte Codes und Fragenreihenfolge
+    (`config.INTRA_RATER_SEED`), die Zuordnung zu den ursprünglichen Codes in `intra_rater_key.csv`, die nur die
+    Auswertung liest. Tabelle `agreement_intra.tex` (Intra-Rater-Konsistenz, nicht Inter-Rater-Reliabilität), Liste
+    `output/intra_rater_disagreements.csv`. Grenze: Dieselbe Person erinnert sich; die neuen Codes und die
+    Mindestfrist mildern das, die Arbeit nennt es als Grenze.
+  - **LLM-Gegenprobe** (`llm_rater.py`): `config.LLM_RATER_MODEL` (der RAGAS-Richter, nicht das Antwortmodell)
+    beantwortet dieselben Prüffragen blind (ohne Code und Strategie) mit Jonas' eingefrorenen Kernpunkten, dem
+    Wortlaut und den Grenzfallregeln aus `config.RUBRIC_*` ([Prompt](prompts.md#prompt-der-llm-gegenprobe)), Temperatur
+    0, einmalig mit Journal ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Umfang
+    `config.LLM_RATER_SCOPE`: `all` (alle 144 Antworten C1–C3, Standard) oder `sample` (die Fragen der Ziehung).
+    Tabelle `agreement_llm.tex` (Konsistenz- bzw. Triangulationsprüfung, nicht Inter-Rater-Reliabilität; Zheng et al.,
+    2023), Liste `output/llm_rater_disagreements.csv`. Ein Modell kann Jonas' Bewertung nicht ersetzen; sie bleibt die
+    Grundlage der Arbeit.
+  - **In `analyse.py`:** Wie bei R2 entfällt, was fehlt oder nicht abgeschlossen ist, mit Hinweis; passen die Dateien
+    nicht mehr zum Abschlusseintrag (Wiederholung) bzw. zum Laufeintrag `llm_rater` (Items und Kernpunkte
+    von Jonas' Satz geändert), bricht `analyse.py` ab.
 
 ## Triangulation
 
@@ -289,6 +310,8 @@ Teile ohne Eingabedaten entfallen mit einem Hinweis in `notes` von `analysis.jso
 | RAGAS paarweise r, Median-Differenz, n′ | `ragas_effects.tex` | `ragas.effects` |
 | RAGAS gegen regelbasierte Bewertung | `ragas_agreement.tex` | `ragas_agreement` |
 | Zweitbewertung | `agreement.tex` | `agreement` |
+| Wiederholungsbewertung | `agreement_intra.tex` | `agreement_intra` |
+| LLM-Gegenprobe | `agreement_llm.tex` | `agreement_llm` |
 
 ## Visualisierungen
 

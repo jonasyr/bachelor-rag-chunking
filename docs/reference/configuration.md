@@ -222,6 +222,9 @@ beschrieben.
 | `RUBRIC_COMPLETENESS_PARTIAL` | `0.5` | Anteil enthaltener Kernpunkte für Vollständigkeit 1 | [ADR 0035](../adr/0035-regelbasierte-bewertung.md) |
 | `RUBRIC_RULES_VERSION` | `"2026-10-20"` | Version der Regeln in `src/scoring_rules.py`; steht in jeder Zeile von `scoring_checks.csv` und im Einfrier-Eintrag (`catalogue_freeze.json`), danach gesperrt | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_METHOD` | `"rules"` | Kennzeichen eines Scaffolds, das nur regelbasiert bewertet werden darf (`scoring` im `scaffold`-Eintrag) | [ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md) |
+| `RUBRIC_CHECK_QUESTIONS` | Englischer Wortlaut der acht Prüffragen (`declines` … `wordy`) | Wortlaut des Bewertungsformulars und der LLM-Gegenprobe ([Evaluation](evaluation.md#regelbasierte-bewertung)); früher in `app/scoring_page.py` | [ADR 0035](../adr/0035-regelbasierte-bewertung.md), [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `RUBRIC_CONTROL_QUESTIONS` | wie oben, `declines` und `hallucination` ohne Quellenbezug | Wortlaut für K0 | [ADR 0041](../adr/0041-kontrolle-k0.md) |
+| `RUBRIC_POINT_HELP`, `RUBRIC_CHECK_HELP` | Text, Text je Prüffrage (`grounded`, `hallucination`, `direct`, `declines`) | Grenzfallregeln zu Kernpunkten und Prüffragen, im Formular und im Prompt der LLM-Gegenprobe | [ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md), [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) |
 | `SCORING_SEED` | `20261016` | Reihenfolge der verblindeten Antworten je Frage; fest, nie angepasst | [ADR 0032](../adr/0032-blinde-rubrik-bewertung.md) |
 | `OUTPUT_DIR` | `output` | Ausgabe der Auswertung (Tabellen, Abbildungen, `analysis.json`) | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
 | `TABLES_DIR` | `output/tables` | Tabellen der Auswertung | [ADR 0044](../adr/0044-statistische-auswertung.md), [Spec](../superpowers/specs/2026-10-20-analysis-design.md) |
@@ -277,7 +280,7 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 ## Zweitbewertung
 
 [ADR 0046](../adr/0046-zweitbewertung.md); Verfahren: [Evaluation](evaluation.md#zweitbewertung), Dateien:
-[Datenformate](data-formats.md#zweitbewertung).
+[Datenformate](data-formats.md#zweitbewertung). Ersatzverfahren (`INTRA_RATER_*`, `LLM_RATER_*`): [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst).
 
 | Schlüssel | Wert/Typ | Bedeutung | Entscheidung |
 |---|---|---|---|
@@ -291,4 +294,21 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 | `SECOND_RATER_PSEUDONYM` | `"R2"` | einziger Name der zweiten Person in Dateien, Einträgen und Ausgaben | [ADR 0046](../adr/0046-zweitbewertung.md) (Nachtrag Datenschutz) |
 | `SECOND_RATER_DIR_NAME`, `SECOND_RATER_DIR` | `"second_rater"`, `data/evaluation/second_rater` | Ordner des R2-Satzes (im Pilot-Set `DIR/second_rater`) | [ADR 0046](../adr/0046-zweitbewertung.md) |
 | `SECOND_RATER_SAMPLE_FILE` | `data/evaluation/second_rater_sample.csv` | gezogene Fragen | [ADR 0046](../adr/0046-zweitbewertung.md) |
-| `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2-Modus der App; nur Wert `R2` erlaubt, sonst Abbruch ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
+| `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2- und den Wiederholungsmodus der App; nur die Werte `R2` und `R1W` erlaubt, sonst Abbruch ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
+| `INTRA_RATER_PSEUDONYM` | `"R1W"` | Name der Wiederholungsbewertung in Dateien und Einträgen; auch der Wert von `SCORING_RATER` für ihre App | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `INTRA_RATER_DIR_NAME`, `INTRA_RATER_DIR` | `"intra_rater"`, `data/evaluation/intra_rater` | Ordner des Wiederholungssatzes (im Pilot-Set `DIR/intra_rater`) | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `INTRA_RATER_MIN_DAYS` | `14` | Tage zwischen `--mode mark` und `--mode repeat` | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `INTRA_RATER_SEED` | `20261117` | Seed der Neumischung (Fragenreihenfolge, Buchstaben); fest, nie getunt | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `INTRA_RATER_KEY_FILE_NAME` | `"intra_rater_key.csv"` | Schlüsseldatei neuer Code → ursprünglicher Code; nur die Auswertung liest sie | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `INTRA_RATER_DISAGREEMENTS_FILE_NAME` | `"intra_rater_disagreements.csv"` | Abweichungsliste der Wiederholung in `output/` | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_MODEL` | `RAGAS_JUDGE_MODEL` | Modell der LLM-Gegenprobe (der RAGAS-Richter, nicht das Antwortmodell); Preise `RAGAS_JUDGE_PRICE_*` | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_REASONING_EFFORT` | `"none"` | einzige Stufe, bei der die API eine Temperatur annimmt ([ADR 0033](../adr/0033-antwortmodell.md)) | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_TEMPERATURE` | `0.0` | Temperatur der LLM-Gegenprobe | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_SEED` | `20261117` | Sampling-Seed (bestmöglich deterministisch); fest, nie getunt | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_MAX_TOKENS` | `1024` | `max_completion_tokens` je Antwort; eine abgeschnittene Ausgabe beendet den Lauf | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_SCOPE` | `"all"` | `all` = alle Antworten C1–C3, `sample` = nur die Fragen der Ziehung | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_DIR_NAME`, `LLM_RATER_DIR` | `"llm_rater"`, `data/evaluation/llm_rater` | Ordner ihrer Prüfungen und ihres Bogens (im Pilot-Set `DIR/llm_rater`) | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_JOURNAL_FILE_NAME` | `"llm_rater_journal.jsonl"` | Journal der Rohantworten in diesem Ordner | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst), [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md) |
+| `LLM_RATER_SCHEMA_NAME` | `"rubric_checks"` | Name des strikten JSON-Schemas der Antwort | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_DISAGREEMENTS_FILE_NAME` | `"llm_rater_disagreements.csv"` | Abweichungsliste der Gegenprobe in `output/` | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
+| `LLM_RATER_SYSTEM_PROMPT`, `LLM_RATER_USER_TEMPLATE`, `LLM_RATER_POINT_TEMPLATE`, `LLM_RATER_EXCERPT_TEMPLATE` | Texte | Prompt der Gegenprobe, der System-Prompt aus `RUBRIC_*` zusammengesetzt; Wortlaut: [Prompts](prompts.md#prompt-der-llm-gegenprobe) | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
