@@ -384,7 +384,8 @@ Embeddings ohne die Vektoren). `abort` trägt zusätzlich die `calls` des abgebr
 ## Zweitbewertung
 
 [ADR 0046](../adr/0046-zweitbewertung.md), Verfahren: [Evaluation](evaluation.md#zweitbewertung). Im Pilot-Set liegen
-die Dateien im Set-Ordner (`DIR/second_rater_sample.csv`, `DIR/second_rater/`, Einträge in `DIR/runs.jsonl`).
+die Dateien im Set-Ordner (`DIR/second_rater_sample.csv`, `DIR/second_rater/`, `DIR/intra_rater/`, `DIR/llm_rater/`,
+Einträge in `DIR/runs.jsonl`). Das Ersatzverfahren ([ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)) legt die Ordner `intra_rater/` und `llm_rater/` an.
 
 **`second_rater_sample.csv`** (`data/evaluation/`, `second_rater.py --mode draw`): die gezogenen Fragen, sortiert nach
 `question_id`.
@@ -400,6 +401,27 @@ eine Zeile ohne Werte), `runs.jsonl` (Einträge `scaffold` und `key_points` für
 ein erneuter Export beginnt die Datei neu); die App schreibt `scoring_checks.csv` dazu. Kein Schlüssel, keine
 Prüfantworten von Jonas.
 
+**`intra_rater/`** (`data/evaluation/intra_rater/`, `second_rater.py --mode repeat`): der Wiederholungssatz von Jonas
+(Pseudonym `R1W`) in genau den Formaten von `second_rater/`: `scoring_items.jsonl` (dieselben Antworten der Stichprobe,
+aber unter neuen Codes und in neuer Fragenreihenfolge), `key_points.csv`, `scoring_sheet.csv`, `runs.jsonl` (`scaffold`,
+`key_points`, danach `intra_rater_close`); die App schreibt `scoring_checks.csv` dazu (`SCORING_RATER=R1W`). Dazu die
+**Schlüsseldatei** `intra_rater_key.csv` (`config.INTRA_RATER_KEY_FILE_NAME`): neuer Code → ursprünglicher Code, nur
+die Auswertung liest sie, Jonas öffnet sie nie vor dem Abschluss.
+```csv
+code,original_code
+Q004-C,Q004-A
+```
+
+**`llm_rater/`** (`data/evaluation/llm_rater/`, `llm_rater.py`): die Prüfungen des Modells in den Formaten von Jonas'
+Dateien und in derselben Codereihenfolge: `scoring_checks.csv` (Format wie [Bewertung](#bewertung)), `scoring_sheet.csv`
+(Werte nach den Regeln aus den Prüfungen abgeleitet, `notes` leer) und `llm_rater_journal.jsonl`
+(`config.LLM_RATER_JOURNAL_FILE_NAME`, [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Das Journal
+hat die Einträge `start` (Schritt, Strategie, Einstellungen, `prompts_sha256`, `model_created`, `inputs_sha256`),
+`session` (Umgebung), je Antwort `item` (`code`, `question_id`, `request_sha256` über Nachrichten und Schema, die
+Felder der Antwort, die vollständige Rohantwort `response` samt Begründung `reason`, `http_errors`) und `abort`. Der
+Lauf schreibt nie über vorhandene Ausgaben (`FileExistsError`); löscht man Prüfungen und Bogen, baut er sie ohne
+API-Aufruf aus dem Journal neu.
+
 **`second_rater_disagreements.csv`** (`output/`, im Set `DIR/output/`; `analyse.py`, nur mit abgeschlossener
 Zweitbewertung, sonst löscht `analyse.py` eine ältere Datei): je abweichender Prüffrage, Kernpunkt-Markierung oder
 Kriterium eine Zeile, ohne Strategie.
@@ -407,6 +429,11 @@ Kriterium eine Zeile, ohne Strategie.
 code,question_id,field,first,second
 Q004-B,Q004,direct,yes,no
 ```
+
+`intra_rater_disagreements.csv` und `llm_rater_disagreements.csv` (`output/`, im Set `DIR/output/`; je nur mit
+abgeschlossener Wiederholung bzw. vorhandenem Laufeintrag `llm_rater`, sonst löscht `analyse.py` eine ältere Datei) haben
+dasselbe Format; `first` ist Jonas' Erstbewertung, `second` die Wiederholung bzw. das Modell, `code` der Code der
+Erstbewertung.
 
 ## Laufprotokoll
 
@@ -417,9 +444,11 @@ prüft mit `run_log.require_run`, dass er auf genau den Dateien des letzten pass
 - **`embedding_runs.jsonl`** (`data/processed/`, `config.EMBEDDING_RUNS_FILE`; Kosten nach
   [ADR 0008](../adr/0008-kosten-als-variable.md)): Schritte `embed`, `retrieve`, `evaluate_retrieval`.
 - **`generation_runs.jsonl`** (`data/evaluation/`, `config.GENERATION_RUNS_FILE`;
-  [ADR 0033](../adr/0033-antwortmodell.md)): alle übrigen Schritte außer `second_rater_close`.
+  [ADR 0033](../adr/0033-antwortmodell.md)): alle übrigen Schritte außer `second_rater_close` und
+  `intra_rater_close`.
 - **`second_rater/runs.jsonl`** (`config.PILOT_RUNS_FILE_NAME` im R2-Ordner): `scaffold`, `key_points` und
-  `second_rater_close` des R2-Satzes.
+  `second_rater_close` des R2-Satzes; ebenso **`intra_rater/runs.jsonl`** mit `intra_rater_close` für den
+  Wiederholungssatz.
 
 Pilot-Sets schreiben ihre Einträge in `DIR/runs.jsonl` ([Pilot-Sets](#pilot-sets)): `retrieve` (über
 `scripts/difficulty_probe.py`), `evaluate_retrieval` und die Schritte aus `generation_runs.jsonl`; `embed` läuft nur
@@ -446,10 +475,24 @@ Felder und `outputs_sha256`.
 | `second_rater_draw` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode draw` ([ADR 0046](../adr/0046-zweitbewertung.md)) | `inputs_sha256` (`questions.csv`), `outputs_sha256` (`second_rater_sample.csv`), `seed`, `questions` (Zahl) | `second_rater.py --mode export` |
 | `second_rater_export` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode export` | `inputs_sha256` (Ziehung, `scoring_items.jsonl`, `key_points.csv`), `outputs_sha256` (Items und Kernpunkte im R2-Ordner) | – |
 | `second_rater_close` | `second_rater/runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode close` | `inputs_sha256` (Items, Kernpunkte), `outputs_sha256` (`scoring_checks.csv`, `scoring_sheet.csv`), `rater` (`R2`), `rules_version` | `analyse.py`; danach verweigern Export und Close, die App zeigt den Satz schreibgeschützt |
+| `intra_rater_mark` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode mark` ([Nachtrag](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)) | `inputs_sha256` (Ziehung, Item-Datei), `outputs_sha256` (leer), `time` (UTC, ISO; ab hier zählen `config.INTRA_RATER_MIN_DAYS`), `sample_sha256` (Prüfungen und Bogenzeilen der Stichprobe, mit `notes`) | `second_rater.py --mode repeat` |
+| `intra_rater_export` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode repeat` | `inputs_sha256` (Ziehung, Item-Datei, Kernpunkte), `outputs_sha256` (Items, Kernpunkte und Schlüsseldatei im Ordner `intra_rater/`), `seed` | – |
+| `intra_rater_close` | `intra_rater/runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode close --repeat` | wie `second_rater_close`, `inputs_sha256` zusätzlich mit der Schlüsseldatei; `rater` (`R1W`), `rules_version` | `analyse.py`; danach verweigern Wiederholung und Close, die App zeigt den Satz schreibgeschützt |
+| `llm_rater` | `generation_runs.jsonl` (Pilot: `DIR/runs.jsonl`) | `C1,C2,C3` | `llm_rater.py` ([Nachtrag](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)), nur nach einem erfolgreichen Lauf | siehe unten | `analyse.py` (Jonas' Items und Kernpunkte unverändert) |
 | `closed_book_screen` | `generation_runs.jsonl` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten | – |
 
 Die R2-Einträge `scaffold` und `key_points` schreibt `--mode export` in derselben Form wie oben; `--mode close` prüft
-den `scaffold`-Eintrag gegen die exportierte Item-Datei.
+den `scaffold`-Eintrag gegen die exportierte Item-Datei. `--mode repeat` schreibt sie für `intra_rater/` ebenso.
+
+**`llm_rater`**, Eintrag der LLM-Gegenprobe: `date`, dann die gepinnten Einstellungen (`model`, `reasoning_effort`,
+`temperature`, `seed`, `max_completion_tokens`, `scope`, `rules_version`, `openai_sdk`), die Umgebung (`git_commit`,
+`git_dirty`, `python`, `uv_lock_sha256`), `step`, `strategy`, `model_reported`, `model_created`, `system_fingerprint`,
+`prompts_sha256` (System-Prompt, drei Vorlagen und Aufbau des Schemas), `answers`, `sessions`, `session_commits`,
+`aborts`, `http_errors`, `inputs_sha256` (Items, Kernpunkte; bei `scope` `sample` auch die Ziehung, deren Eintrag
+`second_rater_draw` dann vorliegen muss), `outputs_sha256` (Prüfungen, Bogen, Journal), `prompt_tokens`,
+`completion_tokens`, `reasoning_tokens`, `cached_tokens` und `cost_usd`. Die Kosten zählen alle Eingabe-Tokens zum
+vollen Eingabepreis des Richtermodells (`RAGAS_JUDGE_PRICE_*`), auch die zwischengespeicherten
+(`cached_tokens`): eine leichte Überschätzung, wie bei `generate`.
 
 **`embed`**, Lauf C2 vom 18.10.2026 (alle Läufe im [Experiment-Protokoll](experiment-record.md#embedding-e2e)).
 `input_tokens`/`cost_usd` zählen nur die eigenen Texte des Schritts (Chunks einer Strategie bzw. Fragen); `canary_*`
@@ -560,6 +603,8 @@ Klasse; negative Werte mit typografischem Minus.
 | `ragas_effects` | paarweise r, Median-Differenz und n′ | `ragas_scores.csv` fehlt |
 | `ragas_agreement` | Spearmans ρ mit dem regelbasierten Gegenstück ([Evaluation](evaluation.md#triangulation)) | `ragas_scores.csv` fehlt |
 | `agreement` | Erst- gegen Zweitbewertung ([Evaluation](evaluation.md#zweitbewertung)) | keine abgeschlossene Zweitbewertung |
+| `agreement_intra` | Erst- gegen Wiederholungsbewertung | keine abgeschlossene Wiederholung |
+| `agreement_llm` | Erstbewertung gegen LLM-Gegenprobe | kein Laufeintrag `llm_rater` |
 
 **Abbildungen** (`output/figures/<Name>.pdf`, in Endgröße; Inhalte: [Evaluation](evaluation.md#visualisierungen)):
 
@@ -601,13 +646,15 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
   vorliegt, also bei Pilot-Sets.
 - `agreement`: `rows` (je Prüffrage, Kernpunkte und Kriterium mit `group`, `label`, `n`, `agreement`, `measure`, `ac`,
   `ac_ci`, `alpha`, `alpha_ci`, `dropped`), `n_codes`, `n_questions`, `reps`, `level` (Niveau der Intervalle,
-  `config.AGREEMENT_CI_LEVEL`); `null` ohne abgeschlossene Zweitbewertung.
+  `config.AGREEMENT_CI_LEVEL`); `null` ohne abgeschlossene Zweitbewertung. `agreement_intra` und `agreement_llm` haben
+  dieselbe Form (`agreement_llm` zusätzlich `model`), `null` ohne ihre Quelle.
 - `notes`: entfallene Teile, Hinweise.
 
 Fehlt `ragas_scores.csv`, sind `ragas` und `ragas_agreement` `null`, und die drei Tabellen `ragas`, `ragas_effects`,
 `ragas_agreement` entfallen mit Hinweis.
 
-`second_rater_disagreements.csv` liegt ebenfalls in `output/` ([Zweitbewertung](#zweitbewertung)).
+`second_rater_disagreements.csv`, `intra_rater_disagreements.csv` und `llm_rater_disagreements.csv` liegen ebenfalls in
+`output/` ([Zweitbewertung](#zweitbewertung)).
 
 ## Pilot-Sets
 
@@ -658,10 +705,11 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
 | `data/evaluation/ragas_scores.csv`, `ragas_scores_journal.jsonl` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), und ihr Journal mit allen Richteraufrufen | [RAGAS](#ragas) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
 | `data/evaluation/second_rater_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
-| `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
+| `data/evaluation/intra_rater/` (alle Dateien), `data/evaluation/llm_rater/` (alle Dateien) | Wiederholungssatz mit Schlüsseldatei und LLM-Gegenprobe mit Journal | [Zweitbewertung](#zweitbewertung) | versioniert (der Schlüssel erst nach `--mode close --repeat`, [Ablauf](../how-to/run-the-experiment.md#zweitbewertung)) |
+| `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/`, `intra_rater/`, `llm_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien wie im Hauptlauf | [Vektoren](#vektoren), [Bewertung](#bewertung) | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl` |
-| `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`), auch `second_rater_disagreements.csv` | [Auswertung](#auswertung-output) | ignoriert |
-| `output/tables/*.tex`, `output/analysis.json`, `output/second_rater_disagreements.csv` | Tabellen, Kennzahlen und Abweichungsliste der Auswertung | [Auswertung](#auswertung-output), [Zweitbewertung](#zweitbewertung) | versioniert (nicht in `.gitignore`) |
+| `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`), auch die Abweichungslisten | [Auswertung](#auswertung-output) | ignoriert |
+| `output/tables/*.tex`, `output/analysis.json`, `output/second_rater_disagreements.csv`, `output/intra_rater_disagreements.csv`, `output/llm_rater_disagreements.csv` | Tabellen, Kennzahlen und Abweichungslisten der Auswertung | [Auswertung](#auswertung-output), [Zweitbewertung](#zweitbewertung) | versioniert (nicht in `.gitignore`) |
 | `output/figures/*.pdf` | Abbildungen der Auswertung | [Auswertung](#auswertung-output) | versioniert (Ausnahme von `*.pdf`) |
 | `data/corpus_probe/docs/`, `probes/`, `sources/`, `questions/*-sections.json` | nachgebaute Seiten, Proben mit Abschnittstext, Klone der Kandidaten | [Korpusauswahl](corpus-selection.md#dateien-und-befehle) | ignoriert; übrige Dateien in `data/corpus_probe/` versioniert |
 | `*.pdf` | erzeugte Dokumente | – | ignoriert, außer `output/figures/*.pdf` (siehe oben) |

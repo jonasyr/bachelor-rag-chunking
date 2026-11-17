@@ -65,12 +65,13 @@ Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlau
 1. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
    Antworten in `data/pilot/e2e_jonas/` bewertet sind und der Vergleich mit der Agentenbewertung im
    [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026) steht.
-2. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas. Frist: Mitte November.
-   Fertig, wenn eine Person mündlich zugestimmt hat (Vermerk außerhalb des Repos, in Dateien nur das Pseudonym `R2`);
-   sonst gilt das Ersatzverfahren (Punkt 3).
-3. **Ersatzverfahren der Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md)). Wer: Jonas entscheidet, ob es
-   gebraucht wird; Claude setzt die Intra-Rater-Wiederholung und die LLM-Gegenprobe um. Frist: Mitte November. Fertig,
-   wenn feststeht, ob es gebraucht wird, und es im Bedarfsfall umgesetzt und getestet ist.
+2. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)): entschieden am 17.11.2026, keine
+   Person; es gilt das Ersatzverfahren (Punkt 3). Sagt sie doch zu, gilt zusätzlich der R2-Weg.
+3. **Ersatzverfahren der Zweitbewertung** ([ADR 0046](adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)).
+   Wer: Claude setzt Intra-Rater-Wiederholung und LLM-Gegenprobe um
+   ([Plan](superpowers/plans/2026-11-17-second-rating-fallback.md)); Jonas bewertet die Stichprobe zuerst und
+   wiederholt sie frühestens 14 Tage später (etwa ab 03.12.). Frist: umgesetzt vor dem 19.11. Fertig, wenn der PR
+   gemergt ist.
 4. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
    R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
    ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
@@ -166,3 +167,6 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   jede API-Antwort und setzen nach einem Abbruch fort, Laufeinträge nennen Commit und Umgebung
   ([ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md),
   [Generalprobe](reference/experiment-record.md#generalprobe-hauptlauf-16112026)).
+- 17.11.2026: Hauptlauf Schritte 0–4 (Ziehung, Retrieval, Generierung, Retrieval-Metriken, Scaffold); keine zweite
+  bewertende Person, Ersatzverfahren ausgelöst
+  ([ADR 0046](adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)).

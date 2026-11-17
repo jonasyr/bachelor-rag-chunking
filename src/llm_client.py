@@ -29,17 +29,32 @@ Completer = Callable[[list[dict]], Completion]
 ModelCreated = Callable[[], int]
 
 
-def complete(messages: list[dict], client: Any = None) -> Completion:
-    """One answer to `messages` with the pinned settings."""
+def complete(
+    messages: list[dict],
+    client: Any = None,
+    *,
+    model: str = LLM_MODEL,
+    reasoning_effort: str = LLM_REASONING_EFFORT,
+    temperature: float = LLM_TEMPERATURE,
+    max_tokens: int = LLM_MAX_TOKENS,
+    seed: int = LLM_SEED,
+    response_format: dict | None = None,
+) -> Completion:
+    """One answer to `messages` with the pinned settings (default: the answer model of ADR 0033;
+    another step passes its own config values). `response_format` (structured output) is sent
+    only when given, so the default request stays exactly the one the generation ran with."""
     client = client or _openai_client()
-    response = client.chat.completions.create(
-        model=LLM_MODEL,
-        messages=messages,
-        temperature=LLM_TEMPERATURE,
-        reasoning_effort=LLM_REASONING_EFFORT,
-        max_completion_tokens=LLM_MAX_TOKENS,
-        seed=LLM_SEED,
-    )
+    request = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+        "reasoning_effort": reasoning_effort,
+        "max_completion_tokens": max_tokens,
+        "seed": seed,
+    }
+    if response_format is not None:
+        request["response_format"] = response_format
+    response = client.chat.completions.create(**request)
     choice = response.choices[0]
     return Completion(
         text=choice.message.content or "",

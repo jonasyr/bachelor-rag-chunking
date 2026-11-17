@@ -58,6 +58,55 @@ Question: {question}
 Answer:
 ```
 
+## Prompt der LLM-Gegenprobe
+
+Die LLM-Gegenprobe ([ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst))
+lässt `config.LLM_RATER_MODEL` je Antwort die Prüffragen der Rubrik beantworten ([Evaluation](evaluation.md#zweitbewertung)).
+Sie gehört nicht zum konstanten Prompt des Experiments: Das Modell sieht weder Code noch Strategie. Der System-Prompt
+setzt sich aus dem Wortlaut der App zusammen (`config.RUBRIC_CHECK_QUESTIONS`, `RUBRIC_POINT_HELP`,
+`RUBRIC_CHECK_HELP`); hier steht er zusammengesetzt (`config.LLM_RATER_SYSTEM_PROMPT`). Die Antwort ist JSON nach
+einem strikten Schema (Optionen aus `scoring_rules.CHECKS`, ein Wert je Kernpunkt, zuletzt eine kurze Begründung
+`reason`, die nur im Journal bleibt).
+
+```
+You score one answer of a RAG system against fixed checks. Answer only from the question, the reference answer, the key points and the excerpts shown.
+
+Answer every check with one of its options:
+- declines: Does the answer say the excerpts do not contain the answer, and give none? No when it gives part of the answer and says the rest is not covered (K0: unknown): the missing parts count as missing key points.
+- points: one mark per key point, in their order (point 1 is the core point). Covered: the same meaning, also in other words. A qualifier in brackets, such as a version, is not required. Stated only partly: missing.
+- core_wrong: Does it state the core point wrongly or contradict it?
+- other_error: Is any other statement factually wrong?
+- grounded: How many of its statements are backed by the excerpts? A true statement that the excerpts do not back counts as not backed.
+- hallucination: Does it contain anything that neither the excerpts nor the reference cover? Counts also when the addition is true (minor if it does not change the answer). An illustrative example name is not a hallucination.
+- answers_question: Does it address what was asked?
+- direct: Does the core point come in the first two sentences? Yes when the answer's own core point comes in the first two sentences, even if it is wrong (that counts under the facts checks) or a second part of the question is answered later.
+- wordy: Is it repetitive, padded or confusing?
+- reason: one or two short sentences on the decisive checks.
+
+If declines is yes, the key points and the checks core_wrong, other_error, grounded and hallucination are not asked: mark every key point missing and answer no, no, all, none.
+```
+
+Nutzernachricht (`config.LLM_RATER_USER_TEMPLATE`); `{key_points}` sind Zeilen nach `config.LLM_RATER_POINT_TEMPLATE`
+(`{n}. {text}`), `{excerpts}` die Auszüge des Items in Rangfolge nach `config.LLM_RATER_EXCERPT_TEMPLATE` (`### Excerpt {n}`, dann
+der Text), getrennt durch eine Leerzeile:
+
+```
+## Question
+{question}
+
+## Reference answer
+{reference_answer}
+
+## Key points
+{key_points}
+
+## Excerpts
+{excerpts}
+
+## Answer
+{answer}
+```
+
 ## Parameter
 
 Konstant für alle Strategien, die Closed-Book-Prüfung und K0: `LLM_MODEL`, `LLM_REASONING_EFFORT`, `LLM_SEED`,
