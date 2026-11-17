@@ -401,8 +401,8 @@ def run_mark(p: dict) -> dict:
 
 def relabel(items: list[dict], seed: int) -> tuple[list[dict], list[dict]]:
     """The items under new codes and the key rows (new code, original code). The question order
-    is shuffled and the letters of each question permuted; both differ from the original
-    whenever a choice exists, so neither order nor letter repeats the first rating."""
+    is shuffled (never the original order) and the letters of each question deranged (no answer
+    keeps its letter), so neither order nor code repeats the first rating."""
     rng = random.Random(seed)
     by_question: dict[str, list[dict]] = {}
     for item in sorted(items, key=lambda i: i["code"]):
@@ -416,9 +416,9 @@ def relabel(items: list[dict], seed: int) -> tuple[list[dict], list[dict]]:
         group = by_question[qid]
         letters = [i["code"].rsplit("-", 1)[1] for i in group]
         shuffled = letters[:]
-        rng.shuffle(shuffled)
-        if len(letters) > 1 and shuffled == letters:
-            shuffled = shuffled[1:] + shuffled[:1]
+        # a derangement: no answer keeps its first-rating letter (the seeded rng picks which)
+        while len(letters) > 1 and any(a == b for a, b in zip(shuffled, letters, strict=True)):
+            rng.shuffle(shuffled)
         renamed = [
             (f"{qid}-{new}", item | {"code": f"{qid}-{new}"}, item["code"])
             for item, new in zip(group, shuffled, strict=True)

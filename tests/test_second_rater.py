@@ -564,6 +564,18 @@ def test_relabel_is_seeded():
     assert second_rater.relabel(items, 5) != second_rater.relabel(items, 6)
 
 
+@pytest.mark.parametrize("seed", range(20))
+def test_relabel_moves_every_answer_to_another_letter(seed):
+    items = [
+        {"code": f"Q{n:03d}-{x}", "question_id": f"Q{n:03d}", "answer": f"{n}{x}"}
+        for n in range(1, 13)
+        for x in "ABC"
+    ]
+    _, key = second_rater.relabel(items, seed)
+    assert len(key) == len(items)
+    assert all(k["code"] != k["original_code"] for k in key)
+
+
 def test_repeat_never_overwrites_values(marked):
     p, _, mark = marked
     out = second_rater.run_repeat(p, now=later(mark, 20))
