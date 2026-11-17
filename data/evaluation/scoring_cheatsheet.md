@@ -126,6 +126,16 @@ Passt eine Regel nicht, kommt das in „Notes“. Werte werden nie von Hand übe
 - `hallucination`: „Does it contain anything the reference does not cover?“ – Maßstab ist **nur die Referenz**.
 - Nicht blind: die Strategie ist bekannt.
 
+## Reihenfolge und Wiederholung (ADR 0046, Nachtrag 17.11.2026)
+
+- **Zuerst die Stichprobe:** Q001, Q004, Q006, Q008, Q009, Q010, Q011, Q015, Q017, Q036, Q038, Q042 (je drei
+  Antworten, 36 insgesamt; über „Jump to“). Danach Claude Bescheid geben: `second_rater.py --mode mark` hält den
+  Zeitpunkt fest. Ab da diese 36 Antworten nicht mehr ändern, sonst beginnt die Frist neu.
+- Dann die übrigen 36 Fragen in beliebiger Reihenfolge.
+- **Wiederholung** frühestens 14 Tage nach `mark`: dieselben Regeln, dieses Blatt, App mit `SCORING_RATER=R1W`. Die
+  Codes sind neu gemischt. Vorher die eigenen Erstwerte der Stichprobe nicht ansehen, den Schlüssel
+  (`intra_rater_key.csv`) nie öffnen.
+
 ## Nie
 
 - `scoring_key.csv` öffnen oder Strategien erraten wollen.
