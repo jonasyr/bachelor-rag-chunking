@@ -36,6 +36,8 @@ from config import (
     INTRA_RATER_DIR_NAME,
     INTRA_RATER_KEY_FILE_NAME,
     KEY_POINTS_FILE,
+    LLM_RATER_DIR,
+    LLM_RATER_DIR_NAME,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RAGAS_REPEAT_FILE_NAME,
@@ -59,6 +61,7 @@ from control_k0 import CONTROL_SCORES_HEADER
 from evaluate_answers import KEY_HEADER, SCORES_HEADER, SHEET_HEADER
 from evaluate_retrieval import SCORES_HEADER as RETRIEVAL_HEADER
 from freeze import is_main_catalogue, require_frozen
+from llm_rater import STEP as LLM_STEP
 from ragas_eval import RAGAS_HEADER
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import latest_run, require_run, sha256_of
@@ -93,6 +96,9 @@ class AnalysisData:
     # Jonas' closed repeat rating (ADR 0046 fallback), same form; its codes are mapped back to
     # the first rating's through the key file, so `paired` holds the original codes
     repeat_rating: dict | None = None
+    # the LLM cross-check (ADR 0046 fallback): its "checks" and "sheet" rows in Jonas' codes,
+    # "paired" with his first rating, and the record's "model" and number of "answers"
+    llm_rating: dict | None = None
 
 
 def main_paths() -> dict:
@@ -120,6 +126,7 @@ def main_paths() -> dict:
             "key_points_file": KEY_POINTS_FILE,
             "second_rater_dir": SECOND_RATER_DIR,
             "intra_rater_dir": INTRA_RATER_DIR,
+            "llm_rater_dir": LLM_RATER_DIR,
         },
         RETRIEVED_RESULTS_FILE.parent,
     )
@@ -150,6 +157,7 @@ def set_paths(set_dir: Path) -> dict:
             "key_points_file": set_dir / KEY_POINTS_FILE.name,
             "second_rater_dir": set_dir / SECOND_RATER_DIR_NAME,
             "intra_rater_dir": set_dir / INTRA_RATER_DIR_NAME,
+            "llm_rater_dir": set_dir / LLM_RATER_DIR_NAME,
         },
         set_dir,
     )
@@ -366,6 +374,34 @@ def _load_rating(
     return second | {"paired": paired}
 
 
+def _load_llm_rating(paths: dict, notes: list[str]) -> dict | None:
+    """The LLM cross-check (ADR 0046 fallback), paired with Jonas' own rating. Its codes are
+    Jonas' (no key). Its files must be those the latest llm_rater record hashed, and that run
+    must have rated with the current items and key points (changed after -> RuntimeError). No
+    record: None with a note."""
+    folder, runs = paths.get("llm_rater_dir"), paths.get("generation_runs_file")
+    if folder is None or runs is None or latest_run(runs, LLM_STEP, EXPERIMENT) is None:
+        notes.append(
+            "LLM-Gegenprobe fehlt oder ist nicht abgeschlossen: Tabelle agreement_llm entfällt"
+        )
+        return None
+    own = {k: paths.get(k) for k in ("scoring_items_file", "key_points_file")}
+    own_checks, own_sheet = paths.get("scoring_checks_file"), paths.get("scoring_sheet_file")
+    missing = [p for p in (*own.values(), own_checks, own_sheet) if p is None or not p.exists()]
+    if missing:
+        raise RuntimeError(
+            f"the LLM cross-check needs the first rating's files: {missing[0]} missing"
+        )
+    checks, sheet = folder / SCORING_CHECKS_FILE.name, folder / SCORING_SHEET_FILE.name
+    record = require_run(runs, LLM_STEP, EXPERIMENT, list(own.values()), [checks, sheet])
+    llm = {"checks": read_csv(checks, CHECKS_HEADER), "sheet": read_csv(sheet, SHEET_HEADER)}
+    paired = agreement.pair(
+        read_csv(own_checks, CHECKS_HEADER), read_csv(own_sheet, SHEET_HEADER),
+        llm["checks"], llm["sheet"],
+    )  # fmt: skip
+    return llm | {"paired": paired, "model": record.get("model"), "answers": len(paired)}
+
+
 def _embedding_run(runs_file: Path, key: str, chunk_file: Path | None) -> dict | None:
     """The embed record that paid for the vectors of `key`: the latest one that called the API
     and, when the chunk file is there, embedded exactly that file. A later run that only reused
@@ -473,6 +509,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     answers_question = _load_answers_question(paths, notes)
     second_rating = _load_second_rating(paths, notes)
     repeat_rating = _load_repeat_rating(paths, notes)
+    llm_rating = _load_llm_rating(paths, notes)
 
     # the costs belong to the run that wrote the scored answers
     answers = [p for p in paths["answers_files"] if p.exists()]
@@ -492,6 +529,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         answers_question=answers_question,
         second_rating=second_rating,
         repeat_rating=repeat_rating,
+        llm_rating=llm_rating,
     )
 
 

@@ -568,3 +568,57 @@ def test_repeat_key_changed_after_close_aborts(repeat):
     key.write_text(key.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     with pytest.raises(RuntimeError, match="intra_rater_key.csv"):
         load(repeat, main=False)
+
+
+@pytest.fixture
+def llm(second):
+    """The `second` fixture plus the LLM cross-check: its files and a run record, as
+    src/llm_rater.py writes them (inputs: Jonas' items and key points, not a copy)."""
+    from evaluate_answers import SHEET_HEADER
+    from scoring_rules import CHECKS_HEADER
+
+    folder = second["scoring_items_file"].parent / "llm_rater"
+    folder.mkdir()
+    write_csv(folder / "scoring_checks.csv", CHECKS_HEADER, _checks_rows(direct="no"))
+    write_csv(folder / "scoring_sheet.csv", SHEET_HEADER, _sheet_rows())
+    (folder / "llm_rater_journal.jsonl").write_text("{}\n", encoding="utf-8")
+    append_step_run(
+        "llm_rater", R2_STRATEGY,
+        [second["scoring_items_file"], second["key_points_file"]],
+        [folder / "scoring_checks.csv", folder / "scoring_sheet.csv",
+         folder / "llm_rater_journal.jsonl"],
+        second["generation_runs_file"], extra={"model": "judge-x", "answers": len(R2_CODES)},
+    )  # fmt: skip
+    return second | {"llm_rater_dir": folder}
+
+
+def test_llm_rating_paired_with_jonas_codes(llm):
+    data = load(llm, main=False)
+    paired = data.llm_rating["paired"]
+    assert [p["code"] for p in paired] == R2_CODES
+    assert paired[0]["checks"]["direct"] == ("yes", "no")
+    assert data.llm_rating["model"] == "judge-x" and data.llm_rating["answers"] == len(R2_CODES)
+    assert not any("LLM-Gegenprobe" in n for n in data.notes)
+
+
+def test_llm_rating_missing_is_noted(second):
+    data = load(second, main=False)
+    assert data.llm_rating is None
+    assert any("LLM-Gegenprobe fehlt" in n for n in data.notes)
+
+
+def test_llm_rating_requires_matching_run_record(llm):
+    sheet = llm["llm_rater_dir"] / "scoring_sheet.csv"
+    sheet.write_text(sheet.read_text(encoding="utf-8").replace("2", "1", 1), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        load(llm, main=False)
+
+
+def test_llm_rating_refuses_changed_key_points(llm, tmp_path):
+    llm["second_rater_dir"] = tmp_path / "no_r2"  # else the R2 comparison objects first
+    kp = llm["key_points_file"]  # the LLM rated with these; they changed after the record
+    kp.write_text(
+        kp.read_text(encoding="utf-8").replace("Point Q001 1", "Changed"), encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="key_points.csv"):
+        load(llm, main=False)

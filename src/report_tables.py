@@ -46,7 +46,7 @@ TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
     "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
-    "agreement.tex", "agreement_intra.tex", "differences.tex",
+    "agreement.tex", "agreement_intra.tex", "agreement_llm.tex", "differences.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -341,6 +341,7 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
     results["breakdown"] = _breakdown(data, qids, awide, primary["recall"], notes)
     results["agreement"] = _agreement(data.second_rating)
     results["agreement_intra"] = _agreement(data.repeat_rating)
+    results["agreement_llm"] = _agreement(data.llm_rating)
     results["notes"] = notes
     return _plain(results)
 
@@ -352,6 +353,7 @@ def _agreement(paired_source: dict | None) -> dict | None:
         return None
     paired = paired_source["paired"]
     return {
+        **({"model": paired_source["model"]} if "model" in paired_source else {}),
         "rows": agreement.rows(paired),
         "n_codes": len(paired),
         "n_questions": len({p["question_id"] for p in paired}),
@@ -801,7 +803,9 @@ def _with_interval(value: float | None, ci: dict) -> str:
 
 def _agreement_table(results: dict, key: str, title: str, lead: str) -> str:
     block = results[key]
-    both = "beide Personen" if key == "agreement" else "beide Durchgänge"
+    both = {"agreement": "beide Personen", "agreement_intra": "beide Durchgänge"}.get(
+        key, "beide Bewertungen"
+    )
     header = ["Merkmal", "n", "Übereinstimmung", "AC1/AC2 [KI]", "α [KI]"]
     rows: list[list[str] | str] = []
     group = None
@@ -945,13 +949,21 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
             "Erst- und Wiederholungsbewertung durch dieselbe Person (mindestens "
             f"{INTRA_RATER_MIN_DAYS} Tage Abstand, neu gemischte Codes) derselben",
         ),
+        "agreement_llm.tex": lambda: _agreement_table(
+            results,
+            "agreement_llm",
+            "Übereinstimmung der Bewertung mit der LLM-Gegenprobe",
+            "Erstbewertung durch Jonas und Bewertung der Prüffragen durch das Modell "
+            f"{(results['agreement_llm'] or {}).get('model')} (LLM-Gegenprobe, ohne Kenntnis der "
+            "Erstbewertung) derselben",
+        ),
         "differences.tex": lambda: _differences_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
         "ragas.tex": "ragas", "ragas_effects.tex": "ragas",
         "ragas_agreement.tex": "ragas_agreement", "agreement.tex": "agreement",
-        "agreement_intra.tex": "agreement_intra",
+        "agreement_intra.tex": "agreement_intra", "agreement_llm.tex": "agreement_llm",
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:

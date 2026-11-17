@@ -22,6 +22,7 @@ from config import (
     ANALYSIS_FILE,
     FIGURES_DIR,
     INTRA_RATER_DISAGREEMENTS_FILE_NAME,
+    LLM_RATER_DISAGREEMENTS_FILE_NAME,
     OUTPUT_DIR,
     SECOND_RATER_DISAGREEMENTS_FILE_NAME,
     TABLES_DIR,
@@ -39,6 +40,7 @@ def run(data: analysis_data.AnalysisData, out_dir: Path) -> dict:
     for name, rating in (
         (SECOND_RATER_DISAGREEMENTS_FILE_NAME, data.second_rating),
         (INTRA_RATER_DISAGREEMENTS_FILE_NAME, data.repeat_rating),
+        (LLM_RATER_DISAGREEMENTS_FILE_NAME, data.llm_rating),
     ):
         disagreements = out_dir / name
         if rating is not None:  # for discussion and review; no strategy in it
