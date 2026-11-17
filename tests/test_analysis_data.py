@@ -498,3 +498,127 @@ def test_embedding_costs_come_from_the_run_that_paid_for_the_vectors(tmp_path):
     assert _embedding_run(runs, "C1", chunks)["input_tokens"] == 100
     assert _embedding_run(runs, "C1", None)["input_tokens"] == 100
     assert _embedding_run(runs, "C2", chunks) is None
+
+
+@pytest.fixture
+def repeat(second):
+    """The `second` fixture plus a closed repeat folder: Jonas' items under permuted letters."""
+    from evaluate_answers import SHEET_HEADER
+    from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
+
+    folder = second["scoring_items_file"].parent / "intra_rater"
+    folder.mkdir()
+    swap = {"A": "B", "B": "A", "C": "C"}
+    key = [{"code": c[:-1] + swap[c[-1]], "original_code": c} for c in R2_CODES]
+    new = {k["original_code"]: k["code"] for k in key}
+    items = [
+        json.loads(x) | {"code": new[json.loads(x)["code"]]}
+        for x in second["scoring_items_file"].read_text(encoding="utf-8").splitlines()
+    ]
+    (folder / "scoring_items.jsonl").write_text(
+        "".join(json.dumps(i) + "\n" for i in items), encoding="utf-8"
+    )
+    write_csv(
+        folder / "key_points.csv",
+        KEY_POINTS_HEADER,
+        read_csv(second["key_points_file"], KEY_POINTS_HEADER),
+    )
+    write_csv(folder / "intra_rater_key.csv", ["code", "original_code"], key)
+    # the repeat sees Q001-B (= original Q001-A) and answers it differently from the first time
+    checks = [r | {"code": new[r["code"]]} for r in _checks_rows(direct="no")]
+    sheet = [r | {"code": new[r["code"]]} for r in _sheet_rows()]
+    write_csv(folder / "scoring_checks.csv", CHECKS_HEADER, checks)
+    write_csv(folder / "scoring_sheet.csv", SHEET_HEADER, sheet)
+    append_step_run(
+        "intra_rater_close", R2_STRATEGY,
+        [folder / "scoring_items.jsonl", folder / "key_points.csv", folder / "intra_rater_key.csv"],
+        [folder / "scoring_checks.csv", folder / "scoring_sheet.csv"], folder / "runs.jsonl",
+        extra={"rater": "R1W"},
+    )  # fmt: skip
+    return second | {"intra_rater_dir": folder}
+
+
+def test_repeat_rating_paired_by_original_code(repeat):
+    from scoring_rules import CHECKS_HEADER
+
+    data = load(repeat, main=False)
+    paired = data.repeat_rating["paired"]
+    assert sorted(p["code"] for p in paired) == sorted(R2_CODES)
+    first = {r["code"]: r for r in read_csv(repeat["scoring_checks_file"], CHECKS_HEADER)}
+    p = next(p for p in paired if p["code"] == "Q001-A")
+    assert p["checks"]["direct"] == (first["Q001-A"]["direct"], "no")
+    assert not any("Wiederholungsbewertung" in n for n in data.notes)
+
+
+def test_repeat_rating_missing_is_noted(second):
+    data = load(second, main=False)
+    assert data.repeat_rating is None
+    assert any("Wiederholungsbewertung fehlt" in n for n in data.notes)
+
+
+def test_repeat_rating_changed_after_close_aborts(repeat):
+    sheet = repeat["intra_rater_dir"] / "scoring_sheet.csv"
+    sheet.write_text(sheet.read_text(encoding="utf-8").replace("2", "1", 1), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        load(repeat, main=False)
+
+
+def test_repeat_key_changed_after_close_aborts(repeat):
+    key = repeat["intra_rater_dir"] / "intra_rater_key.csv"
+    key.write_text(key.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="intra_rater_key.csv"):
+        load(repeat, main=False)
+
+
+@pytest.fixture
+def llm(second):
+    """The `second` fixture plus the LLM cross-check: its files and a run record, as
+    src/llm_rater.py writes them (inputs: Jonas' items and key points, not a copy)."""
+    from evaluate_answers import SHEET_HEADER
+    from scoring_rules import CHECKS_HEADER
+
+    folder = second["scoring_items_file"].parent / "llm_rater"
+    folder.mkdir()
+    write_csv(folder / "scoring_checks.csv", CHECKS_HEADER, _checks_rows(direct="no"))
+    write_csv(folder / "scoring_sheet.csv", SHEET_HEADER, _sheet_rows())
+    (folder / "llm_rater_journal.jsonl").write_text("{}\n", encoding="utf-8")
+    append_step_run(
+        "llm_rater", R2_STRATEGY,
+        [second["scoring_items_file"], second["key_points_file"]],
+        [folder / "scoring_checks.csv", folder / "scoring_sheet.csv",
+         folder / "llm_rater_journal.jsonl"],
+        second["generation_runs_file"], extra={"model": "judge-x", "answers": len(R2_CODES)},
+    )  # fmt: skip
+    return second | {"llm_rater_dir": folder}
+
+
+def test_llm_rating_paired_with_jonas_codes(llm):
+    data = load(llm, main=False)
+    paired = data.llm_rating["paired"]
+    assert [p["code"] for p in paired] == R2_CODES
+    assert paired[0]["checks"]["direct"] == ("yes", "no")
+    assert data.llm_rating["model"] == "judge-x" and data.llm_rating["answers"] == len(R2_CODES)
+    assert not any("LLM-Gegenprobe" in n for n in data.notes)
+
+
+def test_llm_rating_missing_is_noted(second):
+    data = load(second, main=False)
+    assert data.llm_rating is None
+    assert any("LLM-Gegenprobe fehlt" in n for n in data.notes)
+
+
+def test_llm_rating_requires_matching_run_record(llm):
+    sheet = llm["llm_rater_dir"] / "scoring_sheet.csv"
+    sheet.write_text(sheet.read_text(encoding="utf-8").replace("2", "1", 1), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        load(llm, main=False)
+
+
+def test_llm_rating_refuses_changed_key_points(llm, tmp_path):
+    llm["second_rater_dir"] = tmp_path / "no_r2"  # else the R2 comparison objects first
+    kp = llm["key_points_file"]  # the LLM rated with these; they changed after the record
+    kp.write_text(
+        kp.read_text(encoding="utf-8").replace("Point Q001 1", "Changed"), encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="key_points.csv"):
+        load(llm, main=False)

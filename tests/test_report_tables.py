@@ -177,8 +177,12 @@ def test_descriptive_metrics_have_no_p_in_results():
 
 
 def test_all_tables_are_written(tmp_path):
-    paths = write_tables(build_results(agreement_data(), 0.05), tmp_path)
-    assert len(TABLE_NAMES) == 14
+    data = agreement_data()
+    data = replace(
+        data, repeat_rating=data.second_rating, llm_rating=data.second_rating | {"model": "judge-x"}
+    )
+    paths = write_tables(build_results(data, 0.05), tmp_path)
+    assert len(TABLE_NAMES) == 16
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
         text = p.read_text(encoding="utf-8")
@@ -224,11 +228,13 @@ def test_missing_inputs_skip_tables_with_note(tmp_path):
 
 
 def test_skipped_tables_remove_stale_files(tmp_path):
-    for name in ("control_k0.tex", "agreement.tex"):
+    for name in ("control_k0.tex", "agreement.tex", "agreement_intra.tex", "agreement_llm.tex"):
         (tmp_path / name).write_text("stale", encoding="utf-8")
     write_tables(build_results(make_data(control=False), 0.05), tmp_path)
     assert not (tmp_path / "control_k0.tex").exists()
     assert not (tmp_path / "agreement.tex").exists()
+    assert not (tmp_path / "agreement_intra.tex").exists()
+    assert not (tmp_path / "agreement_llm.tex").exists()
 
 
 def test_gating_pairs_only_for_significant_metric():
@@ -520,3 +526,47 @@ def test_differences_table(tmp_path):
     for label in ("R@5", "MRR", "Gesamtwert"):
         assert rf"{{{label}}}" in tex
     assert "Bootstrap" in tex and "erste minus zweite" in tex
+
+
+def test_agreement_table_unchanged_for_r2(tmp_path, monkeypatch):
+    """The R2 table is byte-identical to what the code wrote before the repeat rating existed."""
+    import hashlib
+
+    import agreement
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 100)
+    write_tables(build_results(agreement_data(), 0.05), tmp_path)
+    digest = hashlib.sha256((tmp_path / "agreement.tex").read_bytes()).hexdigest()
+    assert digest == "69e19423ff7ab2af0d0f9b02dd379512879c0accfdfbf86e64584977d76105b5"
+    assert not (tmp_path / "agreement_intra.tex").exists()
+
+
+def test_agreement_intra_table_from_repeat_rating(tmp_path, monkeypatch):
+    import agreement
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 100)
+    data = agreement_data()
+    results = build_results(replace(data, repeat_rating=data.second_rating), 0.05)
+    assert results["agreement_intra"]["rows"] == results["agreement"]["rows"]
+    write_tables(results, tmp_path)
+    text = (tmp_path / "agreement_intra.tex").read_text(encoding="utf-8")
+    assert r"\label{tab:agreement_intra}" in text
+    assert "Übereinstimmung der Erst- und Wiederholungsbewertung" in text
+    assert "durch dieselbe Person (mindestens 14 Tage Abstand, neu gemischte Codes)" in text
+
+
+def test_agreement_llm_table_written(tmp_path, monkeypatch):
+    import agreement
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 100)
+    data = agreement_data()
+    llm = data.second_rating | {"model": "judge-x", "answers": len(data.second_rating["paired"])}
+    results = build_results(replace(data, llm_rating=llm), 0.05)
+    assert results["agreement_llm"]["rows"] == results["agreement"]["rows"]
+    assert results["agreement_intra"] is None
+    write_tables(results, tmp_path)
+    text = (tmp_path / "agreement_llm.tex").read_text(encoding="utf-8")
+    assert r"\label{tab:agreement_llm}" in text
+    assert "Übereinstimmung der Bewertung mit der LLM-Gegenprobe" in text
+    assert "judge-x" in text and f"{llm['answers']} Antworten" in text
+    assert not (tmp_path / "agreement_intra.tex").exists()

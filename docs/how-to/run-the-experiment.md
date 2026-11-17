@@ -29,9 +29,11 @@ bei committetem Code-Stand auf (Änderungen in `data/` und `output/` zählen nic
 `main` ([AGENTS.md](../../AGENTS.md#conventions)); nach Schritt 10 wird er per Pull Request zusammengeführt
 ([Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md)). Nach jedem Schritt die versionierten Dateien committen
 ([Datenformate](../reference/data-formats.md#versioniert-und-ignoriert)), auch Fragevektoren und Retrieval-Ergebnisse
-([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)). **Pushen** (auf `run/hauptlauf`): von Schritt 6 bis zum Abschluss der
+([ADR 0045](../adr/0045-retrieval-ergebnisse-versioniert.md)). **Pushen** (auf `run/hauptlauf`): mit R2 von Schritt 6 bis zum Abschluss der
 Zweitbewertung in Schritt 9 nichts pushen; das Repo ist öffentlich, und R2 darf Jonas' Prüfantworten nicht sehen
-([Zweitbewertung](#zweitbewertung)).
+([Zweitbewertung](#zweitbewertung)). Gilt stattdessen das Ersatzverfahren (keine zweite Person, Schritte 8a und 9a), ist
+Pushen nach Schritt 6 wieder erlaubt; nur der Schlüssel der Wiederholung (`intra_rater_key.csv`) wird erst nach
+`--mode close --repeat` committet, und nie vorher gepusht.
 
 ```bash
 # 0. Katalog eingefroren: der Freeze-Commit existiert; Lauf-Branch anlegen
@@ -72,7 +74,14 @@ git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_key.csv data/e
   data/evaluation/generation_runs.jsonl data/evaluation/second_rater/
 git commit -m "chore(data): Bewertungsbogen, Kernpunkte und Satz der Zweitbewertung"
 
-# 6. Eigene Bewertung C1–C3 (App, Schritt „Score“), dann aufdecken; committen, NICHT pushen
+# 6. Eigene Bewertung C1–C3 (App, Schritt „Score“): zuerst die 36 Antworten der 12 Fragen der Stichprobe
+#    (Fragen: data/evaluation/second_rater_sample.csv), dann festhalten, dass sie bewertet sind
+#    (Ersatzverfahren: ab jetzt laufen die 14 Tage; danach die Zeilen der Stichprobe nicht mehr ändern)
+uv run python src/second_rater.py --mode mark
+git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_checks.csv \
+  data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Stichprobe der Zweitbewertung bewertet"
+#    übrige Antworten bewerten, dann aufdecken; mit R2 committen, aber NICHT pushen (siehe oben)
 uv run python src/evaluate_answers.py --mode summarise
 git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_checks.csv \
   data/evaluation/generation_runs.jsonl
@@ -92,6 +101,11 @@ git add data/evaluation/ragas_scores.csv data/evaluation/ragas_scores_journal.js
   data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): RAGAS des Hauptlaufs"
 
+# 8a. LLM-Gegenprobe (Ersatzverfahren; ruft die API, einmal, überschreibt nie; nach den eingefrorenen Kernpunkten)
+uv run python src/llm_rater.py
+git add data/evaluation/llm_rater/ data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): LLM-Gegenprobe des Hauptlaufs"
+
 # 9. Zweitbewertung abschließen (R2 bewertet ab Schritt 5 an Jonas' Rechner, siehe Zweitbewertung)
 SCORING_RATER=R2 uv run streamlit run app/catalogue_editor.py --server.address localhost
 uv run python src/second_rater.py --mode close
@@ -103,9 +117,24 @@ git commit -m "chore(data): Zweitbewertung abgeschlossen"
 uv run python src/analyse.py
 git add output/
 git commit -m "chore(data): Auswertung des Hauptlaufs"
+
+# 9a. Wiederholung (Ersatzverfahren; frühestens 14 Tage nach dem mark in Schritt 6, ab dann erlaubt es der Code)
+uv run python src/second_rater.py --mode repeat
+#    Schlüssel nicht committen und nicht öffnen: Satz und Laufeintrag zuerst
+git add data/evaluation/intra_rater/ ':!data/evaluation/intra_rater/intra_rater_key.csv' \
+  data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Wiederholungssatz der Zweitbewertung"
+SCORING_RATER=R1W uv run streamlit run app/catalogue_editor.py --server.address localhost
+uv run python src/second_rater.py --mode close --repeat
+git add data/evaluation/intra_rater/
+git commit -m "chore(data): Wiederholung der Bewertung abgeschlossen"
+uv run python src/analyse.py   # jetzt mit der Wiederholungstabelle
+git add output/
+git commit -m "chore(data): Auswertung mit Wiederholungsbewertung"
 ```
 
 Danach Pull Request von `run/hauptlauf` und Submodul-Zeiger: [Ergebnisse in die Arbeit übernehmen](deliver-results-to-thesis.md).
+Die Schritte 8a und 9a gehören zum Ersatzverfahren ([Zweitbewertung](#zweitbewertung)); Schritt 9 entfällt dann.
 Bricht ein Schritt ab, nennt die Meldung den Befehl, der den fehlenden oder veralteten Laufeintrag schreibt.
 `retrieve.py` schreibt seine Ergebnisdateien bei jedem Lauf neu; weicht eine neue `retrieved_results.csv` von der ab,
 auf der `generate` lief, bricht `ragas_eval.py` ab (der Scaffold prüft die Retrieval-Datei nicht). Nach Schritt 3
@@ -117,7 +146,10 @@ mit Störungen ebenda ([Generalprobe](../reference/experiment-record.md#generalp
 [Experiment-Protokoll](../reference/experiment-record.md#pilot-e2e-1920102026)): Generierung C1–C3 und K0 etwa
 0,04 USD; Fragevektoren und Modellstand-Prüfung zusammen unter 0,01 USD; RAGAS etwa 6 USD für die Antworten C1–C3
 ([RAGAS-Pilot](../reference/experiment-record.md#ragas-pilot-e2e-21102026), 2,02 USD je Lauf mit 48 Antworten). Es
-sind Schätzungen, keine Messwerte.
+sind Schätzungen, keine Messwerte. Die LLM-Gegenprobe über 144 Antworten liegt nach der Schätzung im ADR bei unter
+1 USD ([ADR 0046](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)); ihr Laufeintrag zählt
+alle Eingabe-Tokens zum vollen Eingabepreis, auch zwischengespeicherte (wie die Kosten der Generierung), und
+überschätzt die Kosten daher leicht.
 
 ## Wenn ein Schritt abbricht
 
@@ -140,6 +172,12 @@ erzeugt keine zweite Stichprobe.
 - **Abgeschnittene oder leere Antwort, ungültiger RAGAS-Wert, gewechseltes Modell:** Der Schritt bricht bei jedem
   Neustart erneut ab, weil das Journal die Antwort behält; Jonas entscheidet über das weitere Vorgehen
   ([ADR 0033](../adr/0033-antwortmodell.md)).
+- **LLM-Gegenprobe, Antwort „leer“:** Verweigert das Modell die strukturierte Ausgabe (Refusal), erscheint das als
+  „the answer is empty“; die Rohantwort mit der Verweigerung steht im Journal (`llm_rater_journal.jsonl`). Der Schritt
+  bricht bei jedem Neustart erneut ab; Jonas entscheidet.
+- **Gewechselter `system_fingerprint` zwischen Sitzungen:** Auch beim Fortsetzen vergleicht der Schritt mit den
+  journalisierten Antworten; ein anderer Fingerprint (oder ein anderes Modell) beendet den Lauf, und Jonas entscheidet,
+  wie bei der Generierung ([ADR 0033](../adr/0033-antwortmodell.md), [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
 - **Zerrissene Zeile im Laufprotokoll** (`… line N is not JSON`): die genannte letzte Zeile prüfen und entfernen, wenn sie
   unvollständig ist; dann den Schritt erneut ausführen.
 
@@ -174,7 +212,8 @@ Kernpunkte, Prüffragen ohne Quellenbezug, nicht blind; `--mode summarise --cont
 
 Eine zweite Person (Pseudonym R2) bewertet eine Stichprobe der Antworten C1–C3 nach denselben Regeln
 ([ADR 0046](../adr/0046-zweitbewertung.md)); was gemessen und wo es berichtet wird:
-[Evaluation](../reference/evaluation.md#zweitbewertung). Die Schritte im Hauptlauf:
+[Evaluation](../reference/evaluation.md#zweitbewertung). Gibt es keine zweite Person, gilt das Ersatzverfahren
+([unten](#ersatzverfahren-ohne-zweite-person)). Die Schritte im Hauptlauf:
 
 1. **Ziehen** (Schritt 1, `--mode draw`): direkt nach dem Einfrieren und vor jedem eigenen Wert. Die Ziehung bricht ab,
    sobald Bogen oder Prüfantworten des Hauptlaufs Werte enthalten, und überschreibt keine vorhandene Stichprobe. Findet
@@ -196,6 +235,33 @@ Eine zweite Person (Pseudonym R2) bewertet eine Stichprobe der Antworten C1–C3
 5. **Auswerten** (Schritt 10): `analyse.py` vergleicht beide Bewertungen und schreibt `output/tables/agreement.tex` und
    `output/second_rater_disagreements.csv`. Ohne Abschluss entfallen beide mit Hinweis; wurden R2-Dateien nach dem
    Abschluss geändert, bricht `analyse.py` ab.
+
+### Ersatzverfahren ohne zweite Person
+
+[ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst): Wiederholung und LLM-Gegenprobe statt R2; Schritt 9 entfällt. Dieselbe Stichprobe (Schritt 1).
+
+1. **Stichprobe zuerst bewerten** (Schritt 6): Jonas bewertet die 36 Antworten der Fragen aus
+   `data/evaluation/second_rater_sample.csv` als Erstes, dann `--mode mark`. Der Befehl verlangt Prüfungen und einen
+   ausgefüllten Bogen für jede Antwort der Stichprobe und hält Zeit und Prüfsumme dieser Zeilen (einschließlich `notes`)
+   im Eintrag `intra_rater_mark` fest. Ändert Jonas die Zeilen danach, verweigert `--mode repeat`; ein neues `mark`
+   startet die Wartezeit neu.
+2. **LLM-Gegenprobe** (Schritt 8a, `llm_rater.py`): nach den eingefrorenen Kernpunkten, bei committetem Code-Stand;
+   Umfang `config.LLM_RATER_SCOPE`. Ergebnis: `data/evaluation/llm_rater/` (Prüfungen, Bogen, Journal), Laufeintrag
+   `llm_rater`. Ein Pilot-Set mit `--set DIR`. Abbrüche: [Wenn ein Schritt abbricht](#wenn-ein-schritt-abbricht).
+3. **Wiederholung erzeugen** (Schritt 9a, `--mode repeat`): frühestens `config.INTRA_RATER_MIN_DAYS` (14) Tage nach dem
+   `mark`; vorher nennt die Fehlermeldung den frühesten Zeitpunkt. Der Befehl schreibt `data/evaluation/intra_rater/`
+   mit denselben Antworten unter neuen Codes in neuer Fragenreihenfolge, dazu die Schlüsseldatei
+   `intra_rater_key.csv`, und die Einträge `intra_rater_export`. Er verweigert, sobald der Ordner Werte hält.
+4. **Wiederholung bewerten**: `SCORING_RATER=R1W uv run streamlit run app/catalogue_editor.py --server.address
+   localhost` zeigt nur die Seite Scoring und nur den Wiederholungssatz (er fehlt in der normalen App). Regeln wie in
+   [Bewerten](#bewerten-schritte-5-und-6); die eigenen Erstwerte vorher nicht ansehen, den Schlüssel nie öffnen.
+5. **Abschließen** (`--mode close --repeat`): prüft wie bei R2 (alle Antworten in der Reihenfolge, eingefrorene
+   Kernpunkte, Werte folgen aus den Prüfungen) und schreibt `intra_rater_close` in `intra_rater/runs.jsonl`, mit der
+   Schlüsseldatei unter den Eingaben. **Erst danach** wird der Ordner einschließlich Schlüssel committet; vorher bleibt
+   der Schlüssel aus dem Commit und aus jedem Push.
+6. **Auswerten**: `analyse.py` schreibt `output/tables/agreement_intra.tex` und `output/tables/agreement_llm.tex` sowie
+   `output/intra_rater_disagreements.csv` und `output/llm_rater_disagreements.csv`; fehlt eine Quelle, entfällt ihr Teil
+   mit Hinweis. Da die Wiederholung erst Wochen nach der ersten Analyse vorliegt, läuft `analyse.py` ein zweites Mal.
 
 ## Auswertung (Schritt 10)
 

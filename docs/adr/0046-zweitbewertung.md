@@ -10,7 +10,8 @@ Stichprobe und Relevanz von Jonas entschieden, das Übereinstimmungsmaß ist ein
 Präzisiert am 22.10.2026: [Maß für die geordneten Prüffragen](#nachtrag-22102026-maß-für-die-geordneten-prüffragen)
 (Jonas) und [Zufallszahlen](#nachtrag-22102026-zufallszahlen) (Jonas). Ziehung, Export, Abschluss und
 Übereinstimmungsrechnung umgesetzt am 22.10.2026 (PR #40, `src/second_rater.py`, `src/agreement.py`); die Konsequenz
-„noch umzusetzen“ ist erledigt, das Ersatzverfahren ist nicht umgesetzt
+„noch umzusetzen“ ist erledigt. Am 17.11.2026 [Ersatzverfahren ausgelöst](#nachtrag-17112026-ersatzverfahren-ausgelöst)
+(Jonas).
 
 ## Kontext
 
@@ -79,6 +80,30 @@ der blinden Bewertung ([ADR 0032](0032-blinde-rubrik-bewertung.md)) mischt ebenf
 [ADR 0031](0031-stichprobenplan-und-ki-durchsicht.md) für den Stichprobenplan SHA-256. Hier genügt der Seed trotzdem:
 Stichprobe (`second_rater_sample.csv`), Schlüssel (`scoring_key.csv`) und Laufeinträge werden gespeichert, nie neu
 gezogen und nie überschrieben; maßgeblich sind diese Dateien, nicht eine Wiederholung der Ziehung.
+
+## Nachtrag 17.11.2026: Ersatzverfahren ausgelöst
+
+Von Jonas entschieden; löst das Ersatzverfahren der Entscheidung oben aus und legt seine offenen Einzelheiten fest.
+
+- Es gibt keine zweite Person: Der vorgesehene Kommilitone hat neben fünf parallelen Kursen keine Zeit. Es gilt das
+  Ersatzverfahren; die Stichprobe (`second_rater_sample.csv`, gezogen vor jeder eigenen Bewertung) bleibt dieselbe.
+  Sagt die Person doch noch zu, gilt zusätzlich der ursprüngliche Weg.
+- **Intra-Rater-Wiederholung:** Jonas bewertet die 36 Antworten der Stichprobe als Erstes in seiner eigenen
+  Bewertung und hält das mit einem Eintrag `intra_rater_mark` fest (Prüfsumme dieser Prüfantworten). Der
+  Wiederholungssatz entsteht frühestens `config.INTRA_RATER_MIN_DAYS` (14) Tage danach und nur, wenn diese
+  Prüfantworten seitdem unverändert sind; das prüft der Code. Die Wiederholung zeigt dieselben Antworten unter neu
+  gemischten Codes in neu gemischter Fragenreihenfolge (`config.INTRA_RATER_SEED`); die Zuordnung zu den Codes der
+  Erstbewertung liegt in einem eigenen Schlüssel, den erst die Auswertung liest. Sie folgt auf das Aufdecken der
+  eigenen Bewertung, damit Analyse und Schreiben nicht zwei Wochen warten; die neuen Codes mildern das, die Arbeit
+  nennt es als Grenze.
+- **LLM-Gegenprobe:** `config.LLM_RATER_MODEL` (gpt-6-sol, der RAGAS-Richter, nicht das Antwortmodell) beantwortet
+  dieselben Prüffragen mit Jonas' eingefrorenen Kernpunkten und dem Wortlaut und den Grenzfallregeln der App, blind
+  (ohne Strategie), Temperatur 0, einmalig mit Journal
+  ([ADR 0050](0050-journal-und-fortsetzen-der-api-schritte.md)). Umfang: `config.LLM_RATER_SCOPE` (alle 144 Antworten
+  C1–C3, weil das bei unter 1 USD deutlich engere Intervalle gibt als die 36 der Stichprobe).
+- **Bericht:** je eine Tabelle mit denselben Maßen wie für R2 (einfache Übereinstimmung, AC1/AC2, α mit
+  Bootstrap-Intervall), als Konsistenz- bzw. Triangulationsprüfung, nicht als Inter-Rater-Reliabilität
+  (Zheng et al., 2023). Die Werte der Arbeit bleiben Jonas' Erstbewertung.
 
 ## Literatur
 

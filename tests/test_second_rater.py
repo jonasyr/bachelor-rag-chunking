@@ -400,3 +400,225 @@ def test_cli_close_with_set(exported):
     score_all(r2)
     second_rater.main(["--mode", "close", "--set", str(p["sample_file"].parent)])
     assert scoring_store.is_read_only(r2)
+
+
+# ---------------------------------------------------------------------------
+# Repeat rating (ADR 0046 fallback)
+# ---------------------------------------------------------------------------
+from datetime import datetime, timedelta  # noqa: E402
+
+from config import INTRA_RATER_MIN_DAYS  # noqa: E402
+
+
+@pytest.fixture
+def two_questions(tmp_path):
+    """Like `scaffolded`, but the draw holds both questions H01 and H02 (six answers)."""
+    folder = tmp_path / "pilot_two"
+    write_scoring_set(folder)
+    p = second_rater.paths(folder)
+    mine = scoring_store.ScoringSet(
+        "own",
+        p["items_file"],
+        p["sheet_file"],
+        p["scores_file"],
+        p["key_points_file"],
+        p["checks_file"],
+        p["runs_file"],
+    )
+    items = scoring_store.load_items(mine)
+    scoring_store.save_key_points(mine, items, "H01", ["Core one"])
+    scoring_store.save_key_points(mine, items, "H02", ["Core two", "Second two"])
+    scoring_store.freeze_key_points(mine, items)
+    write_csv(
+        p["sample_file"],
+        second_rater.SAMPLE_HEADER,
+        [
+            {"question_id": "H01", "type": "factual", "difficulty": "hard"},
+            {"question_id": "H02", "type": "factual", "difficulty": "hard"},
+        ],
+    )
+    append_step_run("second_rater_draw", "C1,C2,C3", [], [p["sample_file"]], p["runs_file"])
+    return p, mine
+
+
+def score_own(mine, skip=()):
+    for item in scoring_store.load_items(mine):
+        code = item["code"]
+        if code not in skip:
+            n = 1 if code.startswith("H01") else 2
+            scoring_store.save_score(mine, code, GOOD | {"points": ["covered"] * n}, "")
+
+
+@pytest.fixture
+def marked(two_questions):
+    p, mine = two_questions
+    score_own(mine)
+    return p, mine, second_rater.run_mark(p)
+
+
+def later(mark, days):
+    return datetime.fromisoformat(mark["time"]) + timedelta(days=days)
+
+
+def test_mark_needs_every_sample_answer_scored(two_questions):
+    p, mine = two_questions
+    score_own(mine, skip=("H02-C",))
+    with pytest.raises(RuntimeError, match="H02-C"):
+        second_rater.run_mark(p)
+    assert latest_run(p["runs_file"], second_rater.MARK_STEP, "C1,C2,C3") is None
+
+
+def test_mark_records_sample_hash(marked):
+    p, _, mark = marked
+    assert mark["sample_sha256"] == second_rater.sample_rows_sha256(p)
+    assert latest_run(p["runs_file"], "intra_rater_mark", "C1,C2,C3") == mark
+
+
+def test_repeat_refused_before_min_days(marked):
+    p, _, mark = marked
+    with pytest.raises(RuntimeError, match=later(mark, INTRA_RATER_MIN_DAYS).date().isoformat()):
+        second_rater.run_repeat(p, now=later(mark, INTRA_RATER_MIN_DAYS - 1))
+    assert not p["intra_dir"].exists()
+
+
+def test_repeat_refused_without_mark(two_questions):
+    p, _ = two_questions
+    with pytest.raises(RuntimeError, match="mark"):
+        second_rater.run_repeat(p)
+
+
+def test_repeat_refused_when_sample_changed_after_mark(marked):
+    p, mine, mark = marked
+    rows = read_csv(p["checks_file"], CHECKS_HEADER)
+    rows[0]["wordy"] = "yes" if rows[0]["wordy"] != "yes" else "no"
+    write_csv(p["checks_file"], CHECKS_HEADER, rows)
+    with pytest.raises(RuntimeError, match="mark again"):
+        second_rater.run_repeat(p, now=later(mark, 30))
+    assert not p["intra_dir"].exists()
+
+
+def test_repeat_writes_relabelled_set(marked):
+    p, _, mark = marked
+    out = second_rater.run_repeat(p, now=later(mark, INTRA_RATER_MIN_DAYS))
+    assert {f.name for f in out.iterdir()} == {
+        "scoring_items.jsonl",
+        "key_points.csv",
+        "scoring_sheet.csv",
+        "runs.jsonl",
+        "intra_rater_key.csv",
+    }
+    original = {
+        json.loads(x)["code"]: json.loads(x)
+        for x in p["items_file"].read_text(encoding="utf-8").splitlines()
+    }
+    new = [
+        json.loads(x)
+        for x in (out / "scoring_items.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    key = read_csv(out / "intra_rater_key.csv", second_rater.REPEAT_KEY_HEADER)
+    assert [k["code"] for k in key] == [i["code"] for i in new]
+    for item, k in zip(new, key, strict=True):
+        assert {x: y for x, y in original[k["original_code"]].items() if x != "code"} == {
+            x: y for x, y in item.items() if x != "code"
+        }
+        assert item["question_id"] == k["original_code"].split("-")[0]
+    for qid in ("H01", "H02"):
+        assert sorted(i["code"] for i in new if i["question_id"] == qid) == [
+            f"{qid}-A",
+            f"{qid}-B",
+            f"{qid}-C",
+        ]
+        assert {k["original_code"] for k in key if k["code"].startswith(qid)} == {
+            f"{qid}-A",
+            f"{qid}-B",
+            f"{qid}-C",
+        }
+    questions = list(dict.fromkeys(i["question_id"] for i in new))
+    assert questions != sorted(questions)
+    assert all(k["code"] != k["original_code"] for k in key)
+    rows = read_csv(out / "scoring_sheet.csv", SHEET_HEADER)
+    assert [r["code"] for r in rows] == [i["code"] for i in new]
+    assert all(not r["correctness"] for r in rows)
+    assert latest_run(out / "runs.jsonl", "scaffold", "C1,C2,C3")
+    assert latest_run(out / "runs.jsonl", "key_points", "C1,C2,C3")
+    assert latest_run(p["runs_file"], "intra_rater_export", "C1,C2,C3")
+
+
+def test_repeat_set_is_frozen_and_open_for_the_app(marked, monkeypatch):
+    p, _, mark = marked
+    out = second_rater.run_repeat(p, now=later(mark, 20))
+    monkeypatch.setattr(scoring_store, "PILOT_DIR", out.parent.parent)
+    monkeypatch.setattr(scoring_store, "INTRA_RATER_DIR", out.parent / "none")
+    monkeypatch.setenv("SCORING_RATER", "R1W")
+    (s,) = scoring_store.scoring_sets()
+    assert s.repeat and scoring_store.is_frozen(s) and not scoring_store.is_read_only(s)
+
+
+def test_relabel_is_seeded():
+    items = [
+        {"code": f"{q}-{x}", "question_id": q, "answer": f"{q}{x}"}
+        for q in ("Q001", "Q002", "Q003")
+        for x in "ABC"
+    ]
+    assert second_rater.relabel(items, 5) == second_rater.relabel(items, 5)
+    assert second_rater.relabel(items, 5) != second_rater.relabel(items, 6)
+
+
+@pytest.mark.parametrize("seed", range(20))
+def test_relabel_moves_every_answer_to_another_letter(seed):
+    items = [
+        {"code": f"Q{n:03d}-{x}", "question_id": f"Q{n:03d}", "answer": f"{n}{x}"}
+        for n in range(1, 13)
+        for x in "ABC"
+    ]
+    _, key = second_rater.relabel(items, seed)
+    assert len(key) == len(items)
+    assert all(k["code"] != k["original_code"] for k in key)
+
+
+def test_repeat_never_overwrites_values(marked):
+    p, _, mark = marked
+    out = second_rater.run_repeat(p, now=later(mark, 20))
+    rows = read_csv(out / "scoring_sheet.csv", SHEET_HEADER)
+    rows[0]["correctness"] = "2"
+    write_csv(out / "scoring_sheet.csv", SHEET_HEADER, rows)
+    with pytest.raises(FileExistsError):
+        second_rater.run_repeat(p, now=later(mark, 20))
+    assert read_csv(out / "scoring_sheet.csv", SHEET_HEADER)[0]["correctness"] == "2"
+
+
+def test_repeat_allows_existing_scores_file(marked):
+    p, _, mark = marked
+    p["scores_file"].write_text("question_id,strategy\n", encoding="utf-8")
+    assert second_rater.run_repeat(p, now=later(mark, 20)).exists()
+
+
+def test_close_repeat_records_rater_R1W(marked):
+    p, _, mark = marked
+    out = second_rater.run_repeat(p, now=later(mark, 20))
+    rs = scoring_store._rater_set("Repeat rating", out, repeat=True)
+    for item in scoring_store.load_items(rs):
+        n = 1 if item["code"].startswith("H01") else 2
+        scoring_store.save_score(rs, item["code"], GOOD | {"points": ["covered"] * n}, "")
+    record = second_rater.run_close(p, repeat=True)
+    assert record["rater"] == "R1W" and record["step"] == "intra_rater_close"
+    assert set(record["inputs_sha256"]) == {
+        "scoring_items.jsonl",
+        "key_points.csv",
+        "intra_rater_key.csv",
+    }
+    assert scoring_store.is_read_only(rs)
+    with pytest.raises(RuntimeError, match="closed already"):
+        second_rater.run_close(p, repeat=True)
+
+
+def test_cli_mark_and_repeat_and_flag_rules(two_questions, capsys):
+    p, mine = two_questions
+    score_own(mine)
+    folder = p["sample_file"].parent
+    second_rater.main(["--mode", "mark", "--set", str(folder)])
+    assert "marked at" in capsys.readouterr().out
+    with pytest.raises(RuntimeError, match="too early"):
+        second_rater.main(["--mode", "repeat", "--set", str(folder)])
+    with pytest.raises(SystemExit):
+        second_rater.main(["--mode", "export", "--set", str(folder), "--repeat"])

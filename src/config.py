@@ -417,6 +417,44 @@ KEY_POINTS_MAX = 4  # key points per question; point 1 is the core point (D35)
 RUBRIC_COMPLETENESS_PARTIAL = 0.5  # share of covered key points for completeness 1 (D35)
 RUBRIC_RULES_VERSION = "2026-10-20"  # version of the rules in src/scoring_rules.py (D35, D37, D43)
 SCORING_METHOD = "rules"  # mark of a scaffold that must be scored by the rules (D36)
+# The checks of D35 as the scoring form asks them (docs/reference/evaluation.md); the app and the
+# LLM cross-check (D46) both read this wording, so they ask exactly the same.
+RUBRIC_CHECK_QUESTIONS = {
+    "declines": "Does the answer say the excerpts do not contain the answer, and give none?",
+    "core_wrong": "Does it state the core point wrongly or contradict it?",
+    "other_error": "Is any other statement factually wrong?",
+    "grounded": "How many of its statements are backed by the excerpts?",
+    "hallucination": "Does it contain anything that neither the excerpts nor the reference cover?",
+    "answers_question": "Does it address what was asked?",
+    "direct": "Does the core point come in the first two sentences?",
+    "wordy": "Is it repetitive, padded or confusing?",
+}
+# K0 (D41) saw no excerpts: these two checks refer to the reference answer instead
+RUBRIC_CONTROL_QUESTIONS = RUBRIC_CHECK_QUESTIONS | {
+    "declines": "Does the answer say it does not know the answer, and give none?",
+    "hallucination": "Does it contain anything the reference does not cover?",
+}
+# how to apply the checks in borderline cases (D37, D43, docs/reference/evaluation.md)
+RUBRIC_POINT_HELP = (
+    "Covered: the same meaning, also in other words. A qualifier in brackets, such as a version, "
+    "is not required. Stated only partly: missing."
+)
+RUBRIC_CHECK_HELP = {
+    "grounded": "A true statement that the excerpts do not back counts as not backed.",
+    "hallucination": (
+        "Counts also when the addition is true (minor if it does not change the answer). An "
+        "illustrative example name is not a hallucination."
+    ),
+    "direct": (
+        "Yes when the answer's own core point comes in the first two sentences, even if it is "
+        "wrong (that counts under the facts checks) or a second part of the question is answered "
+        "later."
+    ),
+    "declines": (
+        "No when it gives part of the answer and says the rest is not covered (K0: unknown): the "
+        "missing parts count as missing key points."
+    ),
+}
 SCORING_SEED = 20261016  # order of the blinded answers per question (D32); fixed, never tuned
 
 # Analysis and report output (D44): statistics in src/stats.py, tables and figures from analyse.py
@@ -546,3 +584,59 @@ SECOND_RATER_DIR_NAME = "second_rater"  # folder of R2's set (inside data/evalua
 SECOND_RATER_DIR = DATA_EVAL / SECOND_RATER_DIR_NAME
 SECOND_RATER_SAMPLE_FILE = DATA_EVAL / "second_rater_sample.csv"  # the drawn questions
 SECOND_RATER_ENV = "SCORING_RATER"  # environment variable that starts the app in R2 mode
+INTRA_RATER_PSEUDONYM = (
+    "R1W"  # Jonas' repeat rating (ADR 0046 fallback); also the SCORING_RATER value
+)
+INTRA_RATER_DIR_NAME = (
+    "intra_rater"  # folder of the repeat set (inside data/evaluation or a pilot set)
+)
+INTRA_RATER_DIR = DATA_EVAL / INTRA_RATER_DIR_NAME
+INTRA_RATER_MIN_DAYS = 14  # days between the first rating of the sample (mark) and the repeat set
+INTRA_RATER_SEED = 20261117  # seed of the relabelling (question order and letters)
+INTRA_RATER_KEY_FILE_NAME = (
+    "intra_rater_key.csv"  # new code -> original code; read by analysis only
+)
+INTRA_RATER_DISAGREEMENTS_FILE_NAME = "intra_rater_disagreements.csv"  # list for review, in output/
+# LLM cross-check (D46 fallback): the RAGAS judge answers the rubric checks of C1-C3, blind, once,
+# with Jonas' frozen key points and the app's wording (src/llm_rater.py, journal per D50)
+LLM_RATER_MODEL = RAGAS_JUDGE_MODEL  # not the answer model; priced at RAGAS_JUDGE_PRICE_*
+LLM_RATER_REASONING_EFFORT = "none"  # the only effort at which the API accepts a temperature (D33)
+LLM_RATER_TEMPERATURE = 0.0
+LLM_RATER_SEED = 20261117  # best-effort deterministic sampling; fixed, never tuned
+LLM_RATER_MAX_TOKENS = 1024  # max_completion_tokens; a cut-off answer stops the run
+LLM_RATER_SCOPE = "all"  # "all" = every C1-C3 answer; "sample" = the questions of the R2 draw
+LLM_RATER_DIR_NAME = "llm_rater"  # folder of its checks and sheet (inside data/evaluation or a set)
+LLM_RATER_DIR = DATA_EVAL / LLM_RATER_DIR_NAME
+LLM_RATER_DISAGREEMENTS_FILE_NAME = "llm_rater_disagreements.csv"  # list for review, in output/
+LLM_RATER_JOURNAL_FILE_NAME = "llm_rater_journal.jsonl"  # raw API results (D50), in that folder
+LLM_RATER_SCHEMA_NAME = "rubric_checks"  # name of the structured-output schema sent to the API
+LLM_RATER_SYSTEM_PROMPT = "\n".join(
+    [
+        "You score one answer of a RAG system against fixed checks. Answer only from the "
+        "question, the reference answer, the key points and the excerpts shown.",
+        "",
+        "Answer every check with one of its options:",
+        f"- declines: {RUBRIC_CHECK_QUESTIONS['declines']} {RUBRIC_CHECK_HELP['declines']}",
+        "- points: one mark per key point, in their order (point 1 is the core point). "
+        + RUBRIC_POINT_HELP,
+        *(
+            f"- {check}: {question}"
+            + (f" {RUBRIC_CHECK_HELP[check]}" if check in RUBRIC_CHECK_HELP else "")
+            for check, question in RUBRIC_CHECK_QUESTIONS.items()
+            if check != "declines"
+        ),
+        "- reason: one or two short sentences on the decisive checks.",
+        "",
+        "If declines is yes, the key points and the checks core_wrong, other_error, grounded and "
+        "hallucination are not asked: mark every key point missing and answer no, no, all, none.",
+    ]
+)
+LLM_RATER_USER_TEMPLATE = (
+    "## Question\n{question}\n\n"
+    "## Reference answer\n{reference_answer}\n\n"
+    "## Key points\n{key_points}\n\n"
+    "## Excerpts\n{excerpts}\n\n"
+    "## Answer\n{answer}"
+)
+LLM_RATER_POINT_TEMPLATE = "{n}. {text}"  # one line per key point in the user message
+LLM_RATER_EXCERPT_TEMPLATE = "### Excerpt {n}\n{text}"  # excerpts 1-5 in rank order
