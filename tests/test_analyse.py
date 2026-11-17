@@ -1,6 +1,6 @@
 import json
 
-from test_analysis_data import paths, second  # noqa: F401 (fixtures)
+from test_analysis_data import paths, repeat, second  # noqa: F401 (fixtures)
 
 import analyse
 
@@ -61,3 +61,23 @@ def test_set_output_folder_name_comes_from_config(paths, monkeypatch, tmp_path):
     monkeypatch.setattr(analyse.analysis_data, "set_paths", lambda set_dir: paths)
     analyse.main(["--set", str(tmp_path)])
     assert (tmp_path / "results" / "analysis.json").exists()
+
+
+def test_run_writes_intra_outputs_and_removes_them_again(repeat, monkeypatch, tmp_path):  # noqa: F811 (fixture)
+    import agreement
+
+    monkeypatch.setattr(agreement, "AGREEMENT_BOOTSTRAP_REPS", 50)
+    monkeypatch.setattr(analyse.analysis_data, "set_paths", lambda set_dir: repeat)
+    analyse.main(["--set", str(tmp_path)])
+    out = tmp_path / "output"
+    assert (out / "tables" / "agreement_intra.tex").exists()
+    lines = (out / "intra_rater_disagreements.csv").read_text(encoding="utf-8").splitlines()
+    assert lines[0] == "code,question_id,field,first,second"
+    assert any(",direct,yes,no" in line for line in lines)
+    assert (out / "tables" / "agreement.tex").exists()  # the R2 path is untouched
+    repeat["intra_rater_dir"].joinpath("runs.jsonl").unlink()  # not closed any more
+    analyse.main(["--set", str(tmp_path)])
+    assert not (out / "intra_rater_disagreements.csv").exists()
+    assert not (out / "tables" / "agreement_intra.tex").exists()
+    notes = json.loads((out / "analysis.json").read_text(encoding="utf-8"))["notes"]
+    assert any("Wiederholungsbewertung fehlt" in n for n in notes)

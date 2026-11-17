@@ -21,6 +21,7 @@ from config import (
     ANALYSIS_ALPHA,
     ANALYSIS_FILE,
     FIGURES_DIR,
+    INTRA_RATER_DISAGREEMENTS_FILE_NAME,
     OUTPUT_DIR,
     SECOND_RATER_DISAGREEMENTS_FILE_NAME,
     TABLES_DIR,
@@ -35,15 +36,19 @@ def run(data: analysis_data.AnalysisData, out_dir: Path) -> dict:
     report_figures.write_figures(data, results, figures)  # appends skip notes to results
     report_tables.write_tables(results, tables)
     report_tables.write_json(results, out_dir / ANALYSIS_FILE.relative_to(OUTPUT_DIR))
-    disagreements = out_dir / SECOND_RATER_DISAGREEMENTS_FILE_NAME
-    if data.second_rating is not None:  # for the discussion with R2; no strategy in it
-        write_csv(
-            disagreements,
-            agreement.DISAGREEMENTS_HEADER,
-            agreement.disagreements(data.second_rating["paired"]),
-        )
-    else:
-        disagreements.unlink(missing_ok=True)  # no stale list from an earlier run
+    for name, rating in (
+        (SECOND_RATER_DISAGREEMENTS_FILE_NAME, data.second_rating),
+        (INTRA_RATER_DISAGREEMENTS_FILE_NAME, data.repeat_rating),
+    ):
+        disagreements = out_dir / name
+        if rating is not None:  # for discussion and review; no strategy in it
+            write_csv(
+                disagreements,
+                agreement.DISAGREEMENTS_HEADER,
+                agreement.disagreements(rating["paired"]),
+            )
+        else:
+            disagreements.unlink(missing_ok=True)  # no stale list from an earlier run
     return results
 
 

@@ -32,6 +32,9 @@ from config import (
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    INTRA_RATER_DIR,
+    INTRA_RATER_DIR_NAME,
+    INTRA_RATER_KEY_FILE_NAME,
     KEY_POINTS_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
@@ -60,7 +63,7 @@ from ragas_eval import RAGAS_HEADER
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import latest_run, require_run, sha256_of
 from scoring_rules import CHECKS_HEADER, KEY_POINTS_HEADER
-from second_rater import CLOSE_STEP
+from second_rater import CLOSE_STEP, REPEAT_CLOSE_STEP, REPEAT_KEY_HEADER
 
 (K1,) = CONTROL_STRATEGIES  # "K1"
 (K0,) = CONTROL_ANSWER_STRATEGIES  # "K0"
@@ -87,6 +90,9 @@ class AnalysisData:
     # the closed second rating (ADR 0046): R2's "checks" and "sheet" rows and "paired" with the
     # first rating (agreement.pair); None where it is absent or not closed
     second_rating: dict | None = None
+    # Jonas' closed repeat rating (ADR 0046 fallback), same form; its codes are mapped back to
+    # the first rating's through the key file, so `paired` holds the original codes
+    repeat_rating: dict | None = None
 
 
 def main_paths() -> dict:
@@ -113,6 +119,7 @@ def main_paths() -> dict:
             "scoring_sheet_file": SCORING_SHEET_FILE,
             "key_points_file": KEY_POINTS_FILE,
             "second_rater_dir": SECOND_RATER_DIR,
+            "intra_rater_dir": INTRA_RATER_DIR,
         },
         RETRIEVED_RESULTS_FILE.parent,
     )
@@ -142,6 +149,7 @@ def set_paths(set_dir: Path) -> dict:
             "scoring_sheet_file": set_dir / SCORING_SHEET_FILE.name,
             "key_points_file": set_dir / KEY_POINTS_FILE.name,
             "second_rater_dir": set_dir / SECOND_RATER_DIR_NAME,
+            "intra_rater_dir": set_dir / INTRA_RATER_DIR_NAME,
         },
         set_dir,
     )
@@ -264,30 +272,91 @@ def _load_second_rating(paths: dict, notes: list[str]) -> dict | None:
     """R2's closed rating (ADR 0046), paired with Jonas' own. Its files must be those the close
     record hashed (changed after close -> RuntimeError); its items and key points must equal
     Jonas' (ValueError). Absent or not closed: None with a note."""
-    folder = paths.get("second_rater_dir")
+    return _load_rating(
+        paths,
+        notes,
+        "second_rater_dir",
+        CLOSE_STEP,
+        "Zweitbewertung fehlt oder ist nicht abgeschlossen: Tabelle agreement entfällt",
+        "the second rating",
+    )
+
+
+def _load_repeat_rating(paths: dict, notes: list[str]) -> dict | None:
+    """Jonas' closed repeat rating, paired with his first one through the key file."""
+    return _load_rating(
+        paths,
+        notes,
+        "intra_rater_dir",
+        REPEAT_CLOSE_STEP,
+        "Wiederholungsbewertung fehlt oder ist nicht abgeschlossen: Tabelle agreement_intra "
+        "entfällt",
+        "the repeat rating",
+        keyed=True,
+    )
+
+
+def _original_codes(key_file: Path, items: list[dict], own_items: list[dict]) -> dict[str, str]:
+    """new code -> original code from the key file; it must map exactly the repeat items onto
+    distinct items of the first rating."""
+    key = read_csv(key_file, REPEAT_KEY_HEADER)
+    mapping = {r["code"]: r["original_code"] for r in key}
+    if len(mapping) != len(key) or len(set(mapping.values())) != len(key):
+        raise ValueError(f"{key_file.name} maps a code twice")
+    if set(mapping) != {i["code"] for i in items}:
+        raise ValueError(f"{key_file.name} does not cover exactly the codes of the repeat items")
+    unknown = sorted(set(mapping.values()) - {i["code"] for i in own_items})
+    if unknown:
+        raise ValueError(f"{key_file.name} names {unknown[0]}, which the first rating lacks")
+    return mapping
+
+
+def _load_rating(
+    paths: dict,
+    notes: list[str],
+    folder_key: str,
+    close_step: str,
+    missing_note: str,
+    label: str,
+    keyed: bool = False,
+) -> dict | None:
+    """A closed second rating in `paths[folder_key]`, paired with Jonas' first one. With `keyed`
+    the folder holds a key file (new code -> original code), covered by the close record, and the
+    rating is mapped back to the first rating's codes before the comparison."""
+    folder = paths.get(folder_key)
     runs = None if folder is None else folder / PILOT_RUNS_FILE_NAME
-    if runs is None or latest_run(runs, CLOSE_STEP, EXPERIMENT) is None:
-        notes.append(
-            "Zweitbewertung fehlt oder ist nicht abgeschlossen: Tabelle agreement entfällt"
-        )
+    if runs is None or latest_run(runs, close_step, EXPERIMENT) is None:
+        notes.append(missing_note)
         return None
     items, points = folder / SCORING_ITEMS_FILE.name, folder / KEY_POINTS_FILE.name
     checks, sheet = folder / SCORING_CHECKS_FILE.name, folder / SCORING_SHEET_FILE.name
-    require_run(runs, CLOSE_STEP, EXPERIMENT, [items, points], [checks, sheet])
+    key_file = folder / INTRA_RATER_KEY_FILE_NAME
+    require_run(
+        runs,
+        close_step,
+        EXPERIMENT,
+        [items, points, *([key_file] if keyed else [])],
+        [checks, sheet],
+    )
     own = {k: paths.get(k) for k in ("scoring_items_file", "key_points_file")}
     own_checks, own_sheet = paths.get("scoring_checks_file"), paths.get("scoring_sheet_file")
     missing = [p for p in (*own.values(), own_checks, own_sheet) if p is None or not p.exists()]
     if missing:
-        raise RuntimeError(
-            f"the second rating needs the first rating's files: {missing[0]} missing"
-        )
+        raise RuntimeError(f"{label} needs the first rating's files: {missing[0]} missing")
+    second_items = _read_items(items)
+    second = {"checks": read_csv(checks, CHECKS_HEADER), "sheet": read_csv(sheet, SHEET_HEADER)}
+    if keyed:
+        mapping = _original_codes(key_file, second_items, _read_items(own["scoring_items_file"]))
+        second_items = [i | {"code": mapping[i["code"]]} for i in second_items]
+        second = {
+            name: [r | {"code": mapping[r["code"]]} for r in rows] for name, rows in second.items()
+        }
     agreement.require_same_inputs(
         _read_items(own["scoring_items_file"]),
-        _read_items(items),
+        second_items,
         read_csv(own["key_points_file"], KEY_POINTS_HEADER),
         read_csv(points, KEY_POINTS_HEADER),
     )
-    second = {"checks": read_csv(checks, CHECKS_HEADER), "sheet": read_csv(sheet, SHEET_HEADER)}
     paired = agreement.pair(
         read_csv(own_checks, CHECKS_HEADER),
         read_csv(own_sheet, SHEET_HEADER),
@@ -403,6 +472,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     ragas, ragas_repeat = _load_ragas(paths, gen_runs, main, qids, notes)
     answers_question = _load_answers_question(paths, notes)
     second_rating = _load_second_rating(paths, notes)
+    repeat_rating = _load_repeat_rating(paths, notes)
 
     # the costs belong to the run that wrote the scored answers
     answers = [p for p in paths["answers_files"] if p.exists()]
@@ -421,6 +491,7 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         ragas_repeat=ragas_repeat,
         answers_question=answers_question,
         second_rating=second_rating,
+        repeat_rating=repeat_rating,
     )
 
 

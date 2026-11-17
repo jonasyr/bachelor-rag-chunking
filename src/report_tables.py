@@ -28,6 +28,7 @@ from config import (
     CONTROL_ANSWER_STRATEGIES,
     CONTROL_CRITERIA,
     CONTROL_STRATEGIES,
+    INTRA_RATER_MIN_DAYS,
     JSON_DECIMALS,
     RAGAS_METRICS,
     REPORT_COST_DECIMALS,
@@ -45,7 +46,7 @@ TABLE_NAMES = [
     "retrieval.tex", "retrieval_sensitivity.tex", "answers.tex", "tests.tex",
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
     "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
-    "agreement.tex", "differences.tex",
+    "agreement.tex", "agreement_intra.tex", "differences.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -338,16 +339,18 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
         results["ragas_stability"] = _ragas_stability(data, qids)
     results["efficiency"] = _efficiency(data, main_means, answer_means, notes)
     results["breakdown"] = _breakdown(data, qids, awide, primary["recall"], notes)
-    results["agreement"] = _agreement(data)
+    results["agreement"] = _agreement(data.second_rating)
+    results["agreement_intra"] = _agreement(data.repeat_rating)
     results["notes"] = notes
     return _plain(results)
 
 
-def _agreement(data: AnalysisData) -> dict | None:
-    """Agreement of the first and the second rating (ADR 0046); None without a closed one."""
-    if data.second_rating is None:
+def _agreement(paired_source: dict | None) -> dict | None:
+    """Agreement of the first and a second or repeat rating (ADR 0046); None without a closed
+    one."""
+    if paired_source is None:
         return None
-    paired = data.second_rating["paired"]
+    paired = paired_source["paired"]
     return {
         "rows": agreement.rows(paired),
         "n_codes": len(paired),
@@ -796,8 +799,9 @@ def _with_interval(value: float | None, ci: dict) -> str:
     return f"{fmt_de(value, REPORT_DECIMALS)} [{low}; {high}]"
 
 
-def _agreement_table(results: dict) -> str:
-    block = results["agreement"]
+def _agreement_table(results: dict, key: str, title: str, lead: str) -> str:
+    block = results[key]
+    both = "beide Personen" if key == "agreement" else "beide Durchgänge"
     header = ["Merkmal", "n", "Übereinstimmung", "AC1/AC2 [KI]", "α [KI]"]
     rows: list[list[str] | str] = []
     group = None
@@ -815,7 +819,7 @@ def _agreement_table(results: dict) -> str:
     dropped = max(r["dropped"] for r in block["rows"])
     level = round(block["level"] * 100)
     note = (
-        f"Erst- und Zweitbewertung derselben {block['n_codes']} Antworten ({block['n_questions']} "
+        f"{lead} {block['n_codes']} Antworten ({block['n_questions']} "
         "Fragen, je C1 bis C3). n: Antworten, bei den Kernpunkten alle Kernpunkt-Markierungen. "
         "AC1: Gwets Koeffizient für Ja/Nein-Prüffragen und Kernpunkte, AC2: mit ordinalen "
         "Gewichten für „Durch Passagen gestützt“, „Halluzination“ und die Kriterien. α: "
@@ -829,14 +833,12 @@ def _agreement_table(results: dict) -> str:
             else ""
         )
         + (
-            f" „{NOT_DETERMINABLE}“: beide Personen vergaben nur eine Kategorie."
+            f" „{NOT_DETERMINABLE}“: {both} vergaben nur eine Kategorie."
             if any(r["alpha"] is None for r in block["rows"])
             else ""
         )
     )
-    return latex_table(
-        "agreement", "Übereinstimmung der Erst- und Zweitbewertung", header, rows, "lrrrr", note
-    )
+    return latex_table(key, title, header, rows, "lrrrr", note)
 
 
 def _efficiency_table(results: dict) -> str:
@@ -930,13 +932,26 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
         "ragas.tex": lambda: _ragas_table(results),
         "ragas_effects.tex": lambda: _ragas_effects_table(results),
         "ragas_agreement.tex": lambda: _ragas_agreement_table(results),
-        "agreement.tex": lambda: _agreement_table(results),
+        "agreement.tex": lambda: _agreement_table(
+            results,
+            "agreement",
+            "Übereinstimmung der Erst- und Zweitbewertung",
+            "Erst- und Zweitbewertung derselben",
+        ),
+        "agreement_intra.tex": lambda: _agreement_table(
+            results,
+            "agreement_intra",
+            "Übereinstimmung der Erst- und Wiederholungsbewertung",
+            "Erst- und Wiederholungsbewertung durch dieselbe Person (mindestens "
+            f"{INTRA_RATER_MIN_DAYS} Tage Abstand, neu gemischte Codes) derselben",
+        ),
         "differences.tex": lambda: _differences_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
         "ragas.tex": "ragas", "ragas_effects.tex": "ragas",
         "ragas_agreement.tex": "ragas_agreement", "agreement.tex": "agreement",
+        "agreement_intra.tex": "agreement_intra",
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:
