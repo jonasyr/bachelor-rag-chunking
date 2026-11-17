@@ -225,6 +225,9 @@ def step_command(step: str, strategy: str) -> str:
         return f"src/evaluate_answers.py --mode {step}{control}"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
+    if step.startswith("intra_rater_"):
+        mode = {"intra_rater_mark": "mark", "intra_rater_export": "repeat"}.get(step)
+        return f"src/second_rater.py --mode {mode or 'close --repeat'}"
     if step.startswith("second_rater_"):
         return f"src/second_rater.py --mode {step.removeprefix('second_rater_')}"
     if step == "ragas_repeat":

@@ -17,7 +17,7 @@ from scoring_store import app_pages, rater_mode  # noqa: E402
 
 st.set_page_config(layout="wide")
 st.markdown(CSS + palette_css(), unsafe_allow_html=True)
-# second rater (ADR 0046): in R2 mode the scoring page only
+# second rater (ADR 0046): in R2 and R1W mode the scoring page only
 st.navigation(
     [
         st.Page(file, title=title, default=n == 0)

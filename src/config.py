@@ -546,3 +546,16 @@ SECOND_RATER_DIR_NAME = "second_rater"  # folder of R2's set (inside data/evalua
 SECOND_RATER_DIR = DATA_EVAL / SECOND_RATER_DIR_NAME
 SECOND_RATER_SAMPLE_FILE = DATA_EVAL / "second_rater_sample.csv"  # the drawn questions
 SECOND_RATER_ENV = "SCORING_RATER"  # environment variable that starts the app in R2 mode
+INTRA_RATER_PSEUDONYM = (
+    "R1W"  # Jonas' repeat rating (ADR 0046 fallback); also the SCORING_RATER value
+)
+INTRA_RATER_DIR_NAME = (
+    "intra_rater"  # folder of the repeat set (inside data/evaluation or a pilot set)
+)
+INTRA_RATER_DIR = DATA_EVAL / INTRA_RATER_DIR_NAME
+INTRA_RATER_MIN_DAYS = 14  # days between the first rating of the sample (mark) and the repeat set
+INTRA_RATER_SEED = 20261117  # seed of the relabelling (question order and letters)
+INTRA_RATER_KEY_FILE_NAME = (
+    "intra_rater_key.csv"  # new code -> original code; read by analysis only
+)
+INTRA_RATER_DISAGREEMENTS_FILE_NAME = "intra_rater_disagreements.csv"  # list for review, in output/

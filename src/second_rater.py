@@ -24,15 +24,28 @@
                key points as inputs, of checks and sheet as outputs) to the R2 run log, which makes
                the set read-only in the app. A closed rating cannot be closed again.
 
+Fallback without a second person (ADR 0046, addendum 17.11.2026): Jonas repeats the rating himself.
+--mode mark    After scoring all sample answers in his own set, record that fact
+               (`intra_rater_mark`: time and a checksum of the sample's checks and sheet rows).
+--mode repeat  At least config.INTRA_RATER_MIN_DAYS after the mark, and only while those rows are
+               unchanged, write the repeat set to data/evaluation/intra_rater/ (pilot:
+               DIR/intra_rater/): the same answers under new codes (letters permuted per question,
+               question order shuffled, seeded) plus the key file intra_rater_key.csv (new code ->
+               original code) that only the analysis reads. Run record `intra_rater_export`.
+--mode close --repeat  Close the repeat rating like R2's one (record `intra_rater_close`, rater
+               R1W; the key file is among its inputs).
+
 --questions N (pilot sets only) sets the number of questions; the main catalogue always draws
 config.SECOND_RATER_QUESTIONS.
 """
 
 import csv
+import hashlib
 import json
 import random
 import sys
 from collections import Counter
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import scoring_store
@@ -42,6 +55,12 @@ from config import (
     DOCUMENTS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    INTRA_RATER_DIR,
+    INTRA_RATER_DIR_NAME,
+    INTRA_RATER_KEY_FILE_NAME,
+    INTRA_RATER_MIN_DAYS,
+    INTRA_RATER_PSEUDONYM,
+    INTRA_RATER_SEED,
     KEY_POINTS_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
@@ -72,11 +91,16 @@ from run_log import (
     require_run,
     sha256_of,
 )
+from scoring_rules import CHECKS_HEADER
 
 SAMPLE_HEADER = ["question_id", "type", "difficulty"]
 DRAW_STEP = "second_rater_draw"
 EXPORT_STEP = "second_rater_export"
 CLOSE_STEP = "second_rater_close"
+MARK_STEP = "intra_rater_mark"
+REPEAT_STEP = "intra_rater_export"
+REPEAT_CLOSE_STEP = "intra_rater_close"
+REPEAT_KEY_HEADER = ["code", "original_code"]
 STRATEGY = ",".join(STRATEGY_IDS)
 
 
@@ -136,6 +160,7 @@ def paths(set_dir: Path | None) -> dict[str, Path]:
             "scores_file": SCORES_FILE,
             "sample_file": SECOND_RATER_SAMPLE_FILE,
             "dir": SECOND_RATER_DIR,
+            "intra_dir": INTRA_RATER_DIR,
             "runs_file": GENERATION_RUNS_FILE,
         }
     return {
@@ -151,6 +176,7 @@ def paths(set_dir: Path | None) -> dict[str, Path]:
         "scores_file": set_dir / SCORES_FILE.name,
         "sample_file": set_dir / SECOND_RATER_SAMPLE_FILE.name,
         "dir": set_dir / SECOND_RATER_DIR_NAME,
+        "intra_dir": set_dir / INTRA_RATER_DIR_NAME,
         "runs_file": set_dir / PILOT_RUNS_FILE_NAME,
     }
 
@@ -211,14 +237,8 @@ def run_draw(p: dict, n: int, pilot: bool) -> list[dict]:
     return rows
 
 
-def run_export(p: dict, pilot: bool) -> Path:
-    """Write R2's set from the drawn questions; return its folder. Main run: every guard aborts;
-    pilot set: a present scores.csv only warns."""
-    for key in ("sample_file", "items_file"):
-        if not p[key].exists():
-            raise RuntimeError(f"{p[key]} not found; run the draw and the scaffold first")
-    require_run(p["runs_file"], DRAW_STEP, STRATEGY, [], [p["sample_file"]])
-    mine = scoring_store.ScoringSet(
+def _own_set(p: dict) -> scoring_store.ScoringSet:
+    return scoring_store.ScoringSet(
         "own",
         p["items_file"],
         p["sheet_file"],
@@ -227,24 +247,24 @@ def run_export(p: dict, pilot: bool) -> Path:
         p["checks_file"],
         p["runs_file"],
     )
+
+
+def _require_sample(p: dict) -> None:
+    for key in ("sample_file", "items_file"):
+        if not p[key].exists():
+            raise RuntimeError(f"{p[key]} not found; run the draw and the scaffold first")
+    require_run(p["runs_file"], DRAW_STEP, STRATEGY, [], [p["sample_file"]])
+
+
+def _require_frozen_points(p: dict) -> None:
     try:
-        scoring_store.require_frozen_key_points(mine)
+        scoring_store.require_frozen_key_points(_own_set(p))
     except PermissionError as error:
         raise RuntimeError(f"{error}; freeze the key points in the app first") from None
-    if p["scores_file"].exists():
-        message = f"{p['scores_file']} exists: the scores were unblinded already (ADR 0046)"
-        if not pilot:
-            raise RuntimeError(message)
-        print(f"warning: {message}", file=sys.stderr)
-    out = p["dir"]
-    sheet_file, checks_file = out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name
-    present = own_values(sheet_file, checks_file)
-    if (out / SCORES_FILE.name).exists():
-        present.append(SCORES_FILE.name)
-    if latest_run(out / PILOT_RUNS_FILE_NAME, CLOSE_STEP, STRATEGY) is not None:
-        present.append("close record")
-    if present:
-        raise FileExistsError(f"{out} already holds values ({', '.join(present)}); not overwritten")
+
+
+def _sample_items(p: dict) -> tuple[list[str], list[dict]]:
+    """The item lines (unchanged) and items of the sampled questions, three per question."""
     sampled = {r["question_id"] for r in read_csv(p["sample_file"], SAMPLE_HEADER)}
     lines = [
         line
@@ -258,17 +278,38 @@ def run_export(p: dict, pilot: bool) -> Path:
             raise RuntimeError(
                 f"{qid} has {n} items in {p['items_file']}, expected {len(STRATEGY_IDS)}"
             )
-    points = [
+    return lines, items
+
+
+def _sample_points(p: dict, items: list[dict]) -> list[dict]:
+    sampled = {i["question_id"] for i in items}
+    return [
         r
         for r in read_csv(p["key_points_file"], scoring_store.KEY_POINTS_HEADER)
         if r["question_id"] in sampled
     ]
+
+
+def _holds_values(out: Path, close_step: str) -> list[str]:
+    """What an R2 or repeat folder already holds that a new export would destroy."""
+    present = own_values(out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name)
+    if (out / SCORES_FILE.name).exists():
+        present.append(SCORES_FILE.name)
+    if latest_run(out / PILOT_RUNS_FILE_NAME, close_step, STRATEGY) is not None:
+        present.append("close record")
+    return present
+
+
+def _write_set(out: Path, lines: list[str], points: list[dict]) -> tuple[Path, Path]:
+    """Write a rater's set: items, key points, an empty sheet and a run log that makes the app
+    accept it as scaffolded and frozen. Return the item and key point files."""
+    items = [json.loads(line) for line in lines]
     out.mkdir(parents=True, exist_ok=True)
     items_out, points_out = out / SCORING_ITEMS_FILE.name, out / KEY_POINTS_FILE.name
     items_out.write_text("".join(lines), encoding="utf-8")
     write_csv(points_out, scoring_store.KEY_POINTS_HEADER, points)
     write_csv(
-        sheet_file,
+        out / SCORING_SHEET_FILE.name,
         SHEET_HEADER,
         [
             {"code": i["code"], "question_id": i["question_id"]}
@@ -283,6 +324,25 @@ def run_export(p: dict, pilot: bool) -> Path:
     append_key_points_run(
         STRATEGY, {points_out.name: sha256_of(points_out), items_out.name: items_sha}, runs_out
     )
+    return items_out, points_out
+
+
+def run_export(p: dict, pilot: bool) -> Path:
+    """Write R2's set from the drawn questions; return its folder. Main run: every guard aborts;
+    pilot set: a present scores.csv only warns."""
+    _require_sample(p)
+    _require_frozen_points(p)
+    if p["scores_file"].exists():
+        message = f"{p['scores_file']} exists: the scores were unblinded already (ADR 0046)"
+        if not pilot:
+            raise RuntimeError(message)
+        print(f"warning: {message}", file=sys.stderr)
+    out = p["dir"]
+    present = _holds_values(out, CLOSE_STEP)
+    if present:
+        raise FileExistsError(f"{out} already holds values ({', '.join(present)}); not overwritten")
+    lines, items = _sample_items(p)
+    items_out, points_out = _write_set(out, lines, _sample_points(p, items))
     append_step_run(
         EXPORT_STEP,
         STRATEGY,
@@ -293,17 +353,141 @@ def run_export(p: dict, pilot: bool) -> Path:
     return out
 
 
-def run_close(p: dict) -> dict:
-    """Check R2's finished rating and log the close record; return it."""
-    out = p["dir"]
+def sample_rows_sha256(p: dict) -> str:
+    """SHA-256 of Jonas' check rows and sheet rows of the sample's answers, as canonical JSON."""
+    _, items = _sample_items(p)
+    codes = {i["code"] for i in items}
+    checks = sorted(
+        (r for r in read_csv(p["checks_file"], CHECKS_HEADER) if r["code"] in codes),
+        key=lambda r: r["code"],
+    )
+    sheet = sorted(
+        (r for r in read_csv(p["sheet_file"], SHEET_HEADER) if r["code"] in codes),
+        key=lambda r: r["code"],
+    )
+    blob = json.dumps({"checks": checks, "sheet": sheet}, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def run_mark(p: dict) -> dict:
+    """Record that every sample answer is scored in Jonas' own set; this starts the repeat wait."""
+    _require_sample(p)
+    _, items = _sample_items(p)
+    codes = [i["code"] for i in items]
+    checked = {r["code"] for r in read_csv(p["checks_file"], CHECKS_HEADER)}
+    scored = {
+        r["code"]
+        for r in read_csv(p["sheet_file"], SHEET_HEADER)
+        if all(r[c] for c in RUBRIC_CRITERIA)
+    }
+    missing = sorted(c for c in codes if c not in checked or c not in scored)
+    if missing:
+        raise RuntimeError(
+            f"{len(missing)} sample answers are not scored yet: {', '.join(missing)}; "
+            "score them before marking"
+        )
+    return append_step_run(
+        MARK_STEP,
+        STRATEGY,
+        [p["sample_file"], p["items_file"]],
+        [],
+        p["runs_file"],
+        extra={
+            "time": datetime.now(UTC).isoformat(timespec="seconds"),
+            "sample_sha256": sample_rows_sha256(p),
+        },
+    )
+
+
+def relabel(items: list[dict], seed: int) -> tuple[list[dict], list[dict]]:
+    """The items under new codes and the key rows (new code, original code). The question order
+    is shuffled and the letters of each question permuted; both differ from the original
+    whenever a choice exists, so neither order nor letter repeats the first rating."""
+    rng = random.Random(seed)
+    by_question: dict[str, list[dict]] = {}
+    for item in sorted(items, key=lambda i: i["code"]):
+        by_question.setdefault(item["question_id"], []).append(item)
+    order = list(by_question)
+    rng.shuffle(order)
+    if len(order) > 1 and order == sorted(order):
+        order = order[1:] + order[:1]
+    new_items, key = [], []
+    for qid in order:
+        group = by_question[qid]
+        letters = [i["code"].rsplit("-", 1)[1] for i in group]
+        shuffled = letters[:]
+        rng.shuffle(shuffled)
+        if len(letters) > 1 and shuffled == letters:
+            shuffled = shuffled[1:] + shuffled[:1]
+        renamed = [
+            (f"{qid}-{new}", item | {"code": f"{qid}-{new}"}, item["code"])
+            for item, new in zip(group, shuffled, strict=True)
+        ]
+        for code, item, original in sorted(renamed, key=lambda r: r[0]):
+            new_items.append(item)
+            key.append({"code": code, "original_code": original})
+    return new_items, key
+
+
+def run_repeat(p: dict, now: datetime | None = None) -> Path:
+    """Write Jonas' repeat set; return its folder. Needs the mark, INTRA_RATER_MIN_DAYS passed
+    since it and the marked rows unchanged."""
+    now = now or datetime.now(UTC)
+    _require_sample(p)
+    mark = latest_run(p["runs_file"], MARK_STEP, STRATEGY)
+    if mark is None:
+        raise RuntimeError(
+            f"{p['runs_file']} has no {MARK_STEP} run; score the sample, then run "
+            "src/second_rater.py --mode mark"
+        )
+    earliest = datetime.fromisoformat(mark["time"]) + timedelta(days=INTRA_RATER_MIN_DAYS)
+    if now < earliest:
+        raise RuntimeError(
+            f"too early: the repeat is allowed from {earliest.isoformat(timespec='seconds')} "
+            f"({INTRA_RATER_MIN_DAYS} days after the mark)"
+        )
+    if sample_rows_sha256(p) != mark["sample_sha256"]:
+        raise RuntimeError(
+            "the sample answers' checks or sheet rows changed after the mark; "
+            "run src/second_rater.py --mode mark again (this restarts the wait)"
+        )
+    _require_frozen_points(p)
+    out = p["intra_dir"]
+    present = _holds_values(out, REPEAT_CLOSE_STEP)
+    if present:
+        raise FileExistsError(f"{out} already holds values ({', '.join(present)}); not overwritten")
+    _, items = _sample_items(p)
+    new_items, key = relabel(items, INTRA_RATER_SEED)
+    lines = [json.dumps(i, ensure_ascii=False) + "\n" for i in new_items]
+    items_out, points_out = _write_set(out, lines, _sample_points(p, items))
+    key_out = out / INTRA_RATER_KEY_FILE_NAME
+    write_csv(key_out, REPEAT_KEY_HEADER, key)
+    append_step_run(
+        REPEAT_STEP,
+        STRATEGY,
+        [p["sample_file"], p["items_file"], p["key_points_file"]],
+        [items_out, points_out, key_out],
+        p["runs_file"],
+        extra={"seed": INTRA_RATER_SEED},
+    )
+    return out
+
+
+def run_close(p: dict, repeat: bool = False) -> dict:
+    """Check the finished rating (R2's, or with `repeat` Jonas' repeat) and log the close
+    record; return it."""
+    out = p["intra_dir"] if repeat else p["dir"]
+    close_step = REPEAT_CLOSE_STEP if repeat else CLOSE_STEP
+    key = out / INTRA_RATER_KEY_FILE_NAME
+    export = "--mode repeat" if repeat else "--mode export"
     items, points = out / SCORING_ITEMS_FILE.name, out / KEY_POINTS_FILE.name
     sheet, checks = out / SCORING_SHEET_FILE.name, out / SCORING_CHECKS_FILE.name
     runs = out / PILOT_RUNS_FILE_NAME
-    for f in (items, points, sheet, runs):
+    for f in (items, points, sheet, runs, *([key] if repeat else [])):
         if not f.exists():
-            raise RuntimeError(f"{f} not found; export R2's set first")
-    if latest_run(runs, CLOSE_STEP, STRATEGY) is not None:
-        raise RuntimeError(f"the second rating in {out} is closed already")
+            raise RuntimeError(f"{f} not found; run src/second_rater.py {export} first")
+    if latest_run(runs, close_step, STRATEGY) is not None:
+        raise RuntimeError(f"the rating in {out} is closed already")
     require_run(runs, "scaffold", STRATEGY, [], [items])  # the exported item file, unchanged
     lines = items.read_text(encoding="utf-8").splitlines()
     exported = [json.loads(line)["code"] for line in lines if line.strip()]
@@ -316,12 +500,15 @@ def run_close(p: dict) -> dict:
         )
     check_derived(sheet, checks, points, runs)  # every code has checks; scores follow from them
     return append_step_run(
-        CLOSE_STEP,
+        close_step,
         STRATEGY,
-        [items, points],
+        [items, points, *([key] if repeat else [])],
         [checks, sheet],
         runs,
-        extra={"rater": SECOND_RATER_PSEUDONYM, "rules_version": RUBRIC_RULES_VERSION},
+        extra={
+            "rater": INTRA_RATER_PSEUDONYM if repeat else SECOND_RATER_PSEUDONYM,
+            "rules_version": RUBRIC_RULES_VERSION,
+        },
     )
 
 
@@ -329,10 +516,13 @@ def main(argv: list[str] | None = None) -> None:
     import argparse
 
     ap = argparse.ArgumentParser(description="Second rating by R2 (ADR 0046).")
-    ap.add_argument("--mode", choices=["draw", "export", "close"], required=True)
+    ap.add_argument("--mode", choices=["draw", "export", "close", "mark", "repeat"], required=True)
+    ap.add_argument("--repeat", action="store_true", help="close, the repeat rating (R1W)")
     ap.add_argument("--set", type=Path, metavar="DIR", help="a pilot set instead of the main run")
     ap.add_argument("--questions", type=int, metavar="N", help="draw, pilot sets only: sample size")
     args = ap.parse_args(argv)
+    if args.repeat and args.mode != "close":
+        ap.error("--repeat is for --mode close only")
     if args.questions is not None and args.mode != "draw":
         ap.error("--questions is for --mode draw only")
     if args.questions is not None and not args.set:
@@ -343,8 +533,15 @@ def main(argv: list[str] | None = None) -> None:
     if args.mode == "draw" and args.set and args.questions is None:
         ap.error("--mode draw with --set needs --questions N for the sample size")
     files = paths(args.set)
+    if args.mode == "mark":
+        print(f"marked at {run_mark(files)['time']}")
+        return
+    if args.mode == "repeat":
+        print(f"repeat set -> {run_repeat(files)}")
+        return
     if args.mode == "close":
-        print(f"R2 rating closed -> {run_close(files)['outputs_sha256']}")
+        who = INTRA_RATER_PSEUDONYM if args.repeat else SECOND_RATER_PSEUDONYM
+        print(f"{who} rating closed -> {run_close(files, repeat=args.repeat)['outputs_sha256']}")
         return
     if args.mode == "export":
         print(f"R2 set -> {run_export(files, pilot=bool(args.set))}")

@@ -21,7 +21,7 @@ from ui_theme import SCORING_CSS  # noqa: E402
 
 import scoring_rules as rules  # noqa: E402
 import scoring_store as scoring  # noqa: E402
-from config import KEY_POINTS_MAX, SECOND_RATER_PSEUDONYM  # noqa: E402
+from config import INTRA_RATER_PSEUDONYM, KEY_POINTS_MAX  # noqa: E402
 
 STEPS = ["Key points", "Score"]
 LABELS = {
@@ -335,7 +335,14 @@ def form(
 def main() -> None:
     st.markdown(SCORING_CSS, unsafe_allow_html=True)
     sets = scoring.scoring_sets()
-    if not sets and scoring.rater_mode() == SECOND_RATER_PSEUDONYM:
+    mode = scoring.rater_mode()
+    if not sets and mode == INTRA_RATER_PSEUDONYM:
+        st.info(
+            "No single repeat rating set found: it comes from "
+            "`src/second_rater.py --mode repeat`; keep one pilot repeat set at most."
+        )
+        return
+    if not sets and mode is not None:
         st.info(
             "No single second rater set found: ask for the export "
             "(`src/second_rater.py --mode export`), and keep one pilot second-rater set at most."
@@ -357,17 +364,18 @@ def main() -> None:
         return
     locked = scoring.is_read_only(s)
     if locked and s.rater:
-        st.info("The second rating was closed, so it is read-only.")
+        st.info("This rating was closed, so it is read-only.")
     elif locked:
         st.info(
             f"The scores of this set were summarised ({s.scores_file.name} exists), so it is "
             "read-only."
         )
     frozen = scoring.is_frozen(s)
-    if s.rater and not frozen:  # the export freezes the key points; R2 can never edit them
+    if s.rater and not frozen:  # the export freezes the key points; they are never edited here
+        command = "--mode repeat" if s.repeat else "--mode export"
         st.error(
             f"The key points of {s.name} are not frozen for this item file; the set must be "
-            "exported again (`src/second_rater.py --mode export`)."
+            f"exported again (`src/second_rater.py {command}`)."
         )
         return
     step_key = f"scoring_step|{s.name}"

@@ -540,3 +540,32 @@ def test_unknown_rater_value_fails_closed(monkeypatch, value):
     monkeypatch.setenv("SCORING_RATER", value)
     with pytest.raises(ValueError, match="SCORING_RATER"):
         scoring.rater_mode()
+
+
+def test_rater_mode_accepts_R1W(dirs, monkeypatch):
+    main, _ = dirs
+    monkeypatch.setattr(scoring, "INTRA_RATER_DIR", main / "intra_rater")
+    write_scoring_set(main / "second_rater")
+    write_scoring_set(main / "intra_rater")
+    monkeypatch.setenv("SCORING_RATER", "R1W")
+    assert scoring.rater_mode() == "R1W"
+    (s,) = scoring.single_rater_set()
+    assert s.name == "Repeat rating" and s.repeat and s.rater
+    assert s.items_file == main / "intra_rater" / "scoring_items.jsonl"
+    assert [x.name for x in scoring.scoring_sets()] == ["Repeat rating"]
+    assert scoring.app_pages("R1W") == [("scoring_page.py", "Scoring")]
+
+
+def test_repeat_set_stays_out_of_the_normal_app(dirs, monkeypatch):
+    main, pilot = dirs
+    monkeypatch.setattr(scoring, "INTRA_RATER_DIR", main / "intra_rater")
+    write_scoring_set(main / "intra_rater")
+    write_scoring_set(pilot / "hard" / "intra_rater")
+    assert scoring.scoring_sets() == []
+
+
+@pytest.mark.parametrize("value", ["r1w", "R1", "R2R1W", "R1W "])
+def test_rater_mode_rejects_other(monkeypatch, value):
+    monkeypatch.setenv("SCORING_RATER", value)
+    with pytest.raises(ValueError, match="SCORING_RATER"):
+        scoring.rater_mode()

@@ -20,6 +20,9 @@ from atomic_csv import read_csv, write_csv
 from config import (
     CONTROL_CRITERIA,
     GENERATION_RUNS_FILE,
+    INTRA_RATER_DIR,
+    INTRA_RATER_DIR_NAME,
+    INTRA_RATER_PSEUDONYM,
     KEY_POINTS_FILE,
     KEY_POINTS_MAX,
     PILOT_DIR,
@@ -59,6 +62,7 @@ class ScoringSet:
     control: bool = False  # the control K0 (ADR 0041): K0 rules, four criteria
     freeze_items_file: Path | None = None  # K0: the C1-C3 item file its key points were frozen on
     rater: bool = False  # the second rater's set (ADR 0046): frozen key points, no K0 set
+    repeat: bool = False  # Jonas' repeat set (ADR 0046 fallback); also a `rater` set
 
 
 def criteria(s: ScoringSet) -> list[str]:
@@ -92,15 +96,15 @@ def rater_mode() -> str | None:
     """The rater named by the environment (config.SECOND_RATER_ENV), if any. Any other set value
     raises, so a typo never falls back to the full app with the own sets (blinding, ADR 0046)."""
     value = os.environ.get(SECOND_RATER_ENV)
-    if value is not None and value != SECOND_RATER_PSEUDONYM:
+    if value is not None and value not in (SECOND_RATER_PSEUDONYM, INTRA_RATER_PSEUDONYM):
         raise ValueError(
             f"{SECOND_RATER_ENV}={value!r}: set it to {SECOND_RATER_PSEUDONYM} for the second "
-            "rater or leave it unset"
+            f"rater, {INTRA_RATER_PSEUDONYM} for the repeat rating, or leave it unset"
         )
     return value
 
 
-def _rater_set(name: str, folder: Path) -> ScoringSet:
+def _rater_set(name: str, folder: Path, repeat: bool = False) -> ScoringSet:
     return ScoringSet(
         name,
         folder / SCORING_ITEMS_FILE.name,
@@ -110,43 +114,58 @@ def _rater_set(name: str, folder: Path) -> ScoringSet:
         folder / SCORING_CHECKS_FILE.name,
         folder / PILOT_RUNS_FILE_NAME,
         rater=True,
+        repeat=repeat,
     )
+
+
+def _folder_sets(main_dir: Path, dir_name: str, label: str, repeat: bool) -> list[ScoringSet]:
+    """The set in `main_dir` and one per pilot folder named `dir_name`, if they hold items."""
+    sets = []
+    if (main_dir / SCORING_ITEMS_FILE.name).exists():
+        sets.append(_rater_set(label, main_dir, repeat))
+    for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
+        if items.parent.name == dir_name:
+            rel = items.parent.parent.relative_to(PILOT_DIR).as_posix()
+            lower = label.lower()
+            name = f"Pilot: {lower}" if rel == "." else f"Pilot: {rel}: {lower}"
+            sets.append(_rater_set(name, items.parent, repeat))
+    return sets
 
 
 def rater_sets() -> list[ScoringSet]:
     """The second rater's sets: the main one and one per pilot folder `second_rater/`."""
-    sets = []
-    if (SECOND_RATER_DIR / SCORING_ITEMS_FILE.name).exists():
-        sets.append(_rater_set("Second rater", SECOND_RATER_DIR))
-    for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
-        if items.parent.name == SECOND_RATER_DIR_NAME:
-            rel = items.parent.parent.relative_to(PILOT_DIR).as_posix()
-            name = "Pilot: second rater" if rel == "." else f"Pilot: {rel}: second rater"
-            sets.append(_rater_set(name, items.parent))
-    return sets
+    return _folder_sets(SECOND_RATER_DIR, SECOND_RATER_DIR_NAME, "Second rater", False)
+
+
+def repeat_sets() -> list[ScoringSet]:
+    """Jonas' repeat sets: the main one and one per pilot folder `intra_rater/`."""
+    return _folder_sets(INTRA_RATER_DIR, INTRA_RATER_DIR_NAME, "Repeat rating", True)
 
 
 def single_rater_set() -> list[ScoringSet]:
-    """What R2 sees: the main second-rater set, else the only pilot one, else nothing."""
-    sets = rater_sets()
-    if sets and sets[0].name == "Second rater":
+    """What the rater named by the environment sees: the main set, else the only pilot one, else
+    nothing (R2: the second rater's set; R1W: the repeat set)."""
+    repeat = rater_mode() == INTRA_RATER_PSEUDONYM
+    sets = repeat_sets() if repeat else rater_sets()
+    main = "Repeat rating" if repeat else "Second rater"
+    if sets and sets[0].name == main:
         return sets[:1]
     return sets if len(sets) == 1 else []
 
 
 def app_pages(rater: str | None) -> list[tuple[str, str]]:
-    """The app's pages as (file, title): R2 mode gets the scoring page only."""
+    """The app's pages as (file, title): R2 and R1W mode get the scoring page only."""
     scoring_page = ("scoring_page.py", "Scoring")
-    if rater == SECOND_RATER_PSEUDONYM:
+    if rater in (SECOND_RATER_PSEUDONYM, INTRA_RATER_PSEUDONYM):
         return [scoring_page]
     return [("catalogue_page.py", "Catalogue"), scoring_page]
 
 
 def scoring_sets() -> list[ScoringSet]:
     """The main run and every pilot folder that holds an item file, each followed by its K0 set
-    (ADR 0041) when that exists, then the second rater's sets. In R2 mode (`rater_mode`) only
-    the second rater's sets, so nothing else is reachable."""
-    if rater_mode() == SECOND_RATER_PSEUDONYM:
+    (ADR 0041) when that exists, then the second rater's sets. In R2 or R1W mode (`rater_mode`)
+    only that rater's set, so nothing else is reachable."""
+    if rater_mode() is not None:
         return single_rater_set()
     sets = []
     if SCORING_ITEMS_FILE.exists():
@@ -165,6 +184,8 @@ def scoring_sets() -> list[ScoringSet]:
         folder = items.parent
         if folder.name == SECOND_RATER_DIR_NAME:
             continue  # listed below as a second rater set
+        if folder.name == INTRA_RATER_DIR_NAME:
+            continue  # shown only in R1W mode
         rel = folder.relative_to(PILOT_DIR).as_posix()
         name = "Pilot" if rel == "." else f"Pilot: {rel}"
         sets.append(
@@ -343,7 +364,8 @@ def require_frozen_key_points(s: ScoringSet) -> None:
 
 def is_closed(s: ScoringSet) -> bool:
     """A second rater's set closed by `second_rater.py --mode close` (ADR 0046)."""
-    return s.rater and latest_run(s.runs_file, "second_rater_close", STRATEGY) is not None
+    step = "intra_rater_close" if s.repeat else "second_rater_close"
+    return s.rater and latest_run(s.runs_file, step, STRATEGY) is not None
 
 
 def is_read_only(s: ScoringSet) -> bool:
