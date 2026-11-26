@@ -7,7 +7,8 @@ of the answer row's `sources` in that order (exactly what the answer model saw) 
 reference. The scorer is injected (src/ragas_client.py builds the real one), so the step is
 tested without the API. Everything is checked before the first call: the main catalogue must be
 frozen, `generated_answers.csv` must be the output of the latest `generate` run and, on the main
-catalogue, a current `summarise` record must exist (the rule-based scoring is done); a pilot set
+catalogue, a current `summarise` record (hybrid run: `hybrid_summarise`, ADR 0051) must exist (the
+rule-based scoring is done); a pilot set
 without it only gets a note. The output is never overwritten. The run stops without writing
 anything if a value is invalid (outside 0-1, or empty without a reason from the metric itself),
 if the scorer fails, or if the judge changed (several reported models or system fingerprints, or a
@@ -51,6 +52,7 @@ from config import (
 from embed import load_jsonl
 from freeze import is_main_catalogue, require_frozen
 from generate import ANSWERS_HEADER, created_iso
+from hybrid import SUMMARISE_STEP as HYBRID_SUMMARISE_STEP
 from journal import Journal
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER, QUESTIONS_REQUIRED, read_rows
 from run_log import (
@@ -240,13 +242,19 @@ def run(
         *(chunk_files[k] for k in keys),
     ]
     require_run(runs_file, "generate", EXPERIMENT, generate_inputs, [answers_file])
-    if latest_run(runs_file, "summarise", EXPERIMENT) is None and not main:
+    # the hybrid run (ADR 0051) writes scores.csv with `hybrid_summarise` instead of `summarise`
+    scored = (
+        HYBRID_SUMMARISE_STEP
+        if latest_run(runs_file, HYBRID_SUMMARISE_STEP, EXPERIMENT)
+        else "summarise"
+    )
+    if latest_run(runs_file, scored, EXPERIMENT) is None and not main:
         print(
             f"note: {runs_file} has no `summarise` record (pilot set, scored under an older rule "
             "version); RAGAS runs anyway (ADR 0047)"
         )
     else:
-        require_run(runs_file, "summarise", EXPERIMENT, [], [scores_file])
+        require_run(runs_file, scored, EXPERIMENT, [], [scores_file])
     if out_file.exists():
         raise FileExistsError(
             f"{out_file} exists; RAGAS runs once (ADR 0047). If it was written without a run "
