@@ -256,7 +256,7 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   Kernpunkte werden aus der Referenzantwort vorbefüllt und von Jonas bestätigt
   ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)).
 - **Triangulation:** Die regelbasierte, referenzbasierte Bewertung ist primär, weil sie auf der eigenen Ground Truth
-  beruht und nicht zirkulär ist; seit ADR 0051 ist sie hybrid. Seit [ADR 0051](../adr/0051-hybride-bewertung.md) bewertet Jonas die Hälfte der Fragen; für die übrigen beantwortet ein Sprachmodell
+  beruht und nicht zirkulär ist. Seit [ADR 0051](../adr/0051-hybride-bewertung.md) ist sie hybrid: Jonas bewertet die Hälfte der Fragen; für die übrigen beantwortet ein Sprachmodell
   dieselben Prüffragen mit Jonas' Kernpunkten, und die Übereinstimmung beider auf Jonas' 72 Antworten wird berichtet. RAGAS kommt als feste zweite Sicht erst nach der regelbasierten
   Bewertung, mit einem anderen Richtermodell als dem Antwortmodell; die Übereinstimmung beider ist selbst ein Befund,
   und RAGAS ist nie alleinige Grundlage ([ADR 0007](../adr/0007-triangulation.md),
