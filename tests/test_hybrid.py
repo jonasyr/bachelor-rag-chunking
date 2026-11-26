@@ -313,6 +313,15 @@ def test_require_summarise_checks_both_raters_files(scored):
         hybrid.require_summarise(scored)
 
 
+def test_require_summarise_refuses_an_edited_llm_sheet(scored):
+    hybrid.run_summarise(scored)
+    rows = read_csv(scored["llm_sheet_file"], SHEET_HEADER)
+    rows[0][RUBRIC_CRITERIA[0]] = "0"
+    write_csv(scored["llm_sheet_file"], SHEET_HEADER, rows)
+    with pytest.raises(RuntimeError, match="scoring_sheet.csv"):
+        hybrid.require_summarise(scored)
+
+
 def test_require_summarise_needs_the_record(scored):
     with pytest.raises(RuntimeError, match="hybrid_summarise"):
         hybrid.require_summarise(scored)
