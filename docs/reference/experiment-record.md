@@ -122,6 +122,24 @@ prüfbar war, zeigte ein Prüfaufruf am selben Abend (Skript außerhalb des Repo
 | SHA-256 `questions.csv` | `7e1cb42c185fae77804b3a9244aad4480cadb4dce1b93b20573e1c9e9332bf1c` |
 | SHA-256 `ground_truth.csv` | `18f0b75799b802abb2e2255a7369547c99b52d9e87eeaa5ced1dbcfc35ed1552` |
 
+## Hybride Bewertung des Hauptlaufs (ab 26.11.2026)
+
+Verfahren: [ADR 0051](../adr/0051-hybride-bewertung.md), Ablauf:
+[Experiment durchführen](../how-to/run-the-experiment.md#hybride-bewertung-ohne-zweite-person). Branch `run/hauptlauf`.
+
+| Feld | Wert |
+|---|---|
+| Kernpunkte eingefroren | 26.11.2026, 48 Fragen, 119 Kernpunkte; SHA-256 `key_points.csv` `e558ca0942864d95cf0c573ee961fb47df2cc3c96f68dbe59701640462307096` (Commit `046ad1f`) |
+| Stichprobe (Schritt 1) | `second_rater_sample.csv`: Q001, Q004, Q006, Q008, Q009, Q010, Q011, Q015, Q017, Q036, Q038, Q042 |
+| Zusatzfragen | 26.11.2026, `hybrid.py --mode draw`, Seed 20261126, Laufeintrag `hybrid_draw` (Commit `cffc5a6`): Q005, Q012, Q014, Q020, Q024, Q027, Q029, Q030, Q033, Q035, Q040, Q045 |
+| Anteile beider Ziehungen | je 6 procedural, factual, conceptual, je 3 comparative und limitation; je 6 Fragen jeder Konstruktionsklasse |
+| Jonas | 24 Fragen × C1–C3 = 72 Antworten |
+| Sprachmodell | alle 144 Antworten C1–C3 (`llm_rater.py`) und 48 Antworten K0 (`llm_rater.py --control`) |
+| Wiederholung | entfällt (ADR 0051) |
+
+Bewertung, Läufe des Sprachmodells mit Kosten, Zusammenführen und Übereinstimmung werden hier eingetragen, sobald sie
+gelaufen sind.
+
 ## Pilot e2e (19./20.10.2026)
 
 Vortest der ganzen Pipeline auf dem e2e-Korpus vor dem [Fragenkatalog](question-catalogue.md); zählt nicht zur
