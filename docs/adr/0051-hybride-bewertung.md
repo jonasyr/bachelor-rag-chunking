@@ -2,7 +2,7 @@
 
 ## Status
 
-Vorgeschlagen (26.11.2026; Umfang, Aufteilung und Wegfall der Wiederholung von Jonas entschieden am 25.11.2026,
+Angenommen (26.11.2026, von Jonas freigegeben; Umfang, Aufteilung und Wegfall der Wiederholung von Jonas entschieden am 25.11.2026,
 Schichtung der Ziehung, Vergleichsbasis von K0 und die zweite Sensitivitätsanalyse sind Vorschläge von Claude); ändert
 [ADR 0007](0007-triangulation.md) (primär manuelle Bewertung), [ADR 0035](0035-regelbasierte-bewertung.md) (wer die
 Prüffragen beantwortet), [ADR 0041](0041-kontrolle-k0.md) (wer K0 bewertet), [ADR 0044](0044-statistische-auswertung.md)

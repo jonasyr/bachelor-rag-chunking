@@ -92,4 +92,4 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |
 | [0049](0049-schreibhilfen-im-editor.md) | Schreibhilfen im Katalog-Editor | Angenommen; ergänzt 0031; Nachtrag 09.11.2026 (Vorbereitungsblätter für jeden Block), 10.11.2026 (Typ-Eignung im Vorbereitungsblatt) |
 | [0050](0050-journal-und-fortsetzen-der-api-schritte.md) | Journal und Fortsetzen der API-Schritte | Angenommen; ergänzt 0033 und 0047 |
-| [0051](0051-hybride-bewertung.md) | Hybride Bewertung: Jonas 24 Fragen, Sprachmodell alle Antworten | Vorgeschlagen; ändert 0007, 0035, 0041, 0044, 0046 |
+| [0051](0051-hybride-bewertung.md) | Hybride Bewertung: Jonas 24 Fragen, Sprachmodell alle Antworten | Angenommen; ändert 0007, 0035, 0041, 0044, 0046 |
