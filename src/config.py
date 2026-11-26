@@ -611,6 +611,7 @@ LLM_RATER_MAX_TOKENS = 1024  # max_completion_tokens; a cut-off answer stops the
 LLM_RATER_SCOPE = "all"  # "all" = every C1-C3 answer; "sample" = the questions of the R2 draw
 LLM_RATER_DIR_NAME = "llm_rater"  # folder of its checks and sheet (inside data/evaluation or a set)
 LLM_RATER_DIR = DATA_EVAL / LLM_RATER_DIR_NAME
+LLM_RATER_SCORES_FILE = LLM_RATER_DIR / SCORES_FILE.name  # LLM-only values (ADR 0051)
 LLM_RATER_DISAGREEMENTS_FILE_NAME = "llm_rater_disagreements.csv"  # list for review, in output/
 LLM_RATER_JOURNAL_FILE_NAME = "llm_rater_journal.jsonl"  # raw API results (D50), in that folder
 LLM_RATER_SCHEMA_NAME = "rubric_checks"  # name of the structured-output schema sent to the API
