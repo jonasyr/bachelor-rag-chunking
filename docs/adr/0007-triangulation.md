@@ -5,7 +5,7 @@
 Angenommen (D7 im Leitfaden; Quelle: Chat, verschärft die Baseline, in der RAGAS nur optional war); Zweitbewertung
 konkretisiert durch [ADR 0046](0046-zweitbewertung.md) (12 Fragen × C1–C3, 25 %); RAGAS konkretisiert und Metriken
 geändert durch [ADR 0047](0047-ragas-als-triangulation.md) (Faithfulness, Response Relevancy, Context Precision, Context
-Recall statt „Kontextrelevanz“)
+Recall statt „Kontextrelevanz“); primäre Bewertung geändert durch [ADR 0051](0051-hybride-bewertung.md) (hybrid: Jonas 24 Fragen, Sprachmodell den Rest)
 
 ## Kontext
 

@@ -294,6 +294,9 @@ Einmalige Diagnose, kein Teil des Experiments; Verfahren: [Korpusauswahl](corpus
 | `SECOND_RATER_PSEUDONYM` | `"R2"` | einziger Name der zweiten Person in Dateien, Einträgen und Ausgaben | [ADR 0046](../adr/0046-zweitbewertung.md) (Nachtrag Datenschutz) |
 | `SECOND_RATER_DIR_NAME`, `SECOND_RATER_DIR` | `"second_rater"`, `data/evaluation/second_rater` | Ordner des R2-Satzes (im Pilot-Set `DIR/second_rater`) | [ADR 0046](../adr/0046-zweitbewertung.md) |
 | `SECOND_RATER_SAMPLE_FILE` | `data/evaluation/second_rater_sample.csv` | gezogene Fragen | [ADR 0046](../adr/0046-zweitbewertung.md) |
+| `HYBRID_EXTRA_QUESTIONS` | `12` | Zusatzfragen, die Jonas neben der Stichprobe bewertet, geschichtet gezogen aus den übrigen Fragen | [ADR 0051](../adr/0051-hybride-bewertung.md) |
+| `HYBRID_SEED` | `20261126` | Seed dieser Ziehung | [ADR 0051](../adr/0051-hybride-bewertung.md) |
+| `HYBRID_EXTRA_SAMPLE_FILE` | `data/evaluation/hybrid_extra_sample.csv` | gezogene Zusatzfragen | [ADR 0051](../adr/0051-hybride-bewertung.md) |
 | `SECOND_RATER_ENV` | `"SCORING_RATER"` | Umgebungsvariable für den R2- und den Wiederholungsmodus der App; nur die Werte `R2` und `R1W` erlaubt, sonst Abbruch ([Umgebungsvariablen](tooling.md#umgebungsvariablen)) | [ADR 0046](../adr/0046-zweitbewertung.md), [Spec](../superpowers/specs/2026-10-22-second-rater-design.md) |
 | `INTRA_RATER_PSEUDONYM` | `"R1W"` | Name der Wiederholungsbewertung in Dateien und Einträgen; auch der Wert von `SCORING_RATER` für ihre App | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |
 | `INTRA_RATER_DIR_NAME`, `INTRA_RATER_DIR` | `"intra_rater"`, `data/evaluation/intra_rater` | Ordner des Wiederholungssatzes (im Pilot-Set `DIR/intra_rater`) | [ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst) |

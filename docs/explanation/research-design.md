@@ -82,7 +82,8 @@ Entscheidung: [ADR 0011](../adr/0011-forschungsluecke.md).
    (Suchprotokoll im Recherche-Log der Arbeit, PaperLab). Die im Exposé genannten „unternehmensinternen technischen
    Dokumente“ stützt nur eine Quelle, die die Lücke nicht trägt ([ADR
    0011](../adr/0011-forschungsluecke.md#nachtrag-26102026-taiwo-kein-beleg-der-lücke)).
-3. **Striktere Methodik:** referenzbasierte manuelle Bewertung als Primärverfahren, Fragetyp-Differenzierung,
+3. **Striktere Methodik:** referenzbasierte, regelbasierte Bewertung (seit [ADR 0051](../adr/0051-hybride-bewertung.md) hybrid: die Hälfte der Fragen manuell,
+   der Rest durch ein Sprachmodell nach denselben Regeln, Übereinstimmung auf den manuellen Antworten gemessen), Fragetyp-Differenzierung,
    Reproduzierbarkeit über einen fixierten Snapshot, eine Closed-Book-Prüfung des Fragenkatalogs und die Kontrollen K1
    und K0.
 
@@ -121,7 +122,7 @@ des ganzen Dokuments und die JSON-Aufteilung übertreffen; innerhalb der Endpunk
 signifikanten Unterschied (S. 1530). Gemessen wird nur das Retrieval, als Recall und Precision der gefundenen Endpunkte
 (S. 1527); Antworten werden nicht bewertet. Davon grenzt sich die Arbeit zweifach ab: über die Dokumentart
 (Prosa-Leitfäden und Referenzseiten statt strukturierter API-Spezifikationen) und über die Methodik (Säule 3:
-Antwortqualität, regelbasiert und manuell bewertet).
+Antwortqualität, regelbasiert und hybrid bewertet, [ADR 0051](../adr/0051-hybride-bewertung.md)).
 
 Ein Praktiker-Blogbeitrag (Mai 2026) mit nahezu gleichem Setup erscheint in der Arbeit nicht: Das Thesis-Handbuch
 schließt Blogbeiträge in der theoretischen Fundierung aus
@@ -254,8 +255,9 @@ Bewertung der Strategien färbt. Regeln: [Evaluation](../reference/evaluation.md
   Der Pilot zeigte Abzüge aus Regelfällen statt aus schwachen Antworten; die Prüfregeln sind darum präzisiert, und die
   Kernpunkte werden aus der Referenzantwort vorbefüllt und von Jonas bestätigt
   ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)).
-- **Triangulation:** Die manuelle, referenzbasierte Bewertung ist primär, weil sie auf der eigenen Ground Truth beruht
-  und nicht zirkulär ist. RAGAS kommt als feste zweite Sicht erst nach der regelbasierten
+- **Triangulation:** Die regelbasierte, referenzbasierte Bewertung ist primär, weil sie auf der eigenen Ground Truth
+  beruht und nicht zirkulär ist. Seit [ADR 0051](../adr/0051-hybride-bewertung.md) ist sie hybrid: Jonas bewertet die Hälfte der Fragen; für die übrigen beantwortet ein Sprachmodell
+  dieselben Prüffragen mit Jonas' Kernpunkten, und die Übereinstimmung beider auf Jonas' 72 Antworten wird berichtet. RAGAS kommt als feste zweite Sicht erst nach der regelbasierten
   Bewertung, mit einem anderen Richtermodell als dem Antwortmodell; die Übereinstimmung beider ist selbst ein Befund,
   und RAGAS ist nie alleinige Grundlage ([ADR 0007](../adr/0007-triangulation.md),
   [ADR 0047](../adr/0047-ragas-als-triangulation.md)).
@@ -347,6 +349,13 @@ Welche Schritte schon umgesetzt sind: [Plan](../plan.md#stand).
   die Antworten einmal erzeugt und gespeichert ([ADR 0033](../adr/0033-antwortmodell.md)). Wie stark die
   Bewertung von der bewertenden Person abhängt, misst die Zweitbewertung
   ([Zweitbewertung](#warum-die-evaluation-so-angelegt-ist)).
+- **Gemischtes Instrument** ([ADR 0051](../adr/0051-hybride-bewertung.md)): Die Hälfte der primären Antwortwerte stammt von einem Sprachmodell, das
+  dieselben Prüffragen mit Jonas' Kernpunkten beantwortet. Bekannte Verzerrungen eines LLM-Richters (ähnliche
+  Modellfamilie wie das Antwortmodell, Bevorzugung längerer Antworten; Zheng et al., 2023) bleiben möglich. Gestützt
+  wird es durch die Übereinstimmung Mensch–Sprachmodell auf Jonas' 72 Antworten und zwei Sensitivitätsanalysen (nur
+  Jonas' 24 Fragen; alle 48 nur mit den Werten des Sprachmodells). Weil alle Tests nach Frage gepaart sind und je
+  Frage nur ein Bewerter vorkommt, berührt ein Bewerterunterschied den Strategievergleich innerhalb einer Frage nicht.
+  Eine Intra-Rater-Messung gibt es nicht; die Arbeit nennt die Abweichung vom Exposé und vom Testplan.
 - **Generator:** Das Antwortmodell antwortet direkt, ohne verdecktes Reasoning (`config.LLM_REASONING_EFFORT` =
   `none`, die Voraussetzung für Temperatur 0). Die Ergebnisse gelten für einen solchen Generator; ein Reasoning-Modell
   könnte schwache Kontexte teilweise ausgleichen, sodass die Unterschiede zwischen den Strategien kleiner ausfielen

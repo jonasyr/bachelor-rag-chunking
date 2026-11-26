@@ -394,6 +394,10 @@ question_id,type,difficulty
 Q004,factual,detail
 ```
 
+**`hybrid_extra_sample.csv`** (`data/evaluation/`, `hybrid.py --mode draw`, [ADR 0051](../adr/0051-hybride-bewertung.md)):
+die 12 Zusatzfragen der hybriden Bewertung, gezogen aus den Fragen außerhalb von `second_rater_sample.csv`; Format
+wie dort.
+
 **`second_rater/`** (`data/evaluation/second_rater/`, `--mode export`): der Bewertungssatz der zweiten Person (nur das
 Pseudonym R2): `scoring_items.jsonl` (die Zeilen der gezogenen Fragen aus Jonas' Item-Datei, unverändert),
 `key_points.csv` (die eingefrorenen Kernpunkte dieser Fragen), `scoring_sheet.csv` (Format wie oben, anfangs je Code
@@ -473,6 +477,7 @@ Felder und `outputs_sha256`.
 | `ragas` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), nur nach einem erfolgreichen Lauf | siehe unten | `ragas_eval.py --repeat`, `analyse.py` |
 | `ragas_repeat` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py --repeat` (nur Pilot-Sets) | wie `ragas`, `outputs_sha256` (`ragas_scores_repeat.csv`) | `analyse.py` |
 | `second_rater_draw` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode draw` ([ADR 0046](../adr/0046-zweitbewertung.md)) | `inputs_sha256` (`questions.csv`), `outputs_sha256` (`second_rater_sample.csv`), `seed`, `questions` (Zahl) | `second_rater.py --mode export` |
+| `hybrid_draw` | `generation_runs.jsonl` | `C1,C2,C3` | `hybrid.py --mode draw` ([ADR 0051](../adr/0051-hybride-bewertung.md)) | `inputs_sha256` (`questions.csv`, `second_rater_sample.csv`), `outputs_sha256` (`hybrid_extra_sample.csv`), `seed`, `questions` (Zahl) | – |
 | `second_rater_export` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode export` | `inputs_sha256` (Ziehung, `scoring_items.jsonl`, `key_points.csv`), `outputs_sha256` (Items und Kernpunkte im R2-Ordner) | – |
 | `second_rater_close` | `second_rater/runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode close` | `inputs_sha256` (Items, Kernpunkte), `outputs_sha256` (`scoring_checks.csv`, `scoring_sheet.csv`), `rater` (`R2`), `rules_version` | `analyse.py`; danach verweigern Export und Close, die App zeigt den Satz schreibgeschützt |
 | `intra_rater_mark` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode mark` ([Nachtrag](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)) | `inputs_sha256` (Ziehung, Item-Datei), `outputs_sha256` (leer), `time` (UTC, ISO; ab hier zählen `config.INTRA_RATER_MIN_DAYS`), `sample_sha256` (Prüfungen und Bogenzeilen der Stichprobe, mit `notes`) | `second_rater.py --mode repeat` |
@@ -704,7 +709,7 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | [Kontrolle K0](#kontrolle-k0) | versioniert |
 | `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
 | `data/evaluation/ragas_scores.csv`, `ragas_scores_journal.jsonl` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), und ihr Journal mit allen Richteraufrufen | [RAGAS](#ragas) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
-| `data/evaluation/second_rater_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
+| `data/evaluation/second_rater_sample.csv`, `data/evaluation/hybrid_extra_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung, Zusatzfragen der hybriden Bewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
 | `data/evaluation/intra_rater/` (alle Dateien), `data/evaluation/llm_rater/` (alle Dateien) | Wiederholungssatz mit Schlüsseldatei und LLM-Gegenprobe mit Journal | [Zweitbewertung](#zweitbewertung) | versioniert (der Schlüssel erst nach `--mode close --repeat`, [Ablauf](../how-to/run-the-experiment.md#zweitbewertung)) |
 | `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/`, `intra_rater/`, `llm_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien wie im Hauptlauf | [Vektoren](#vektoren), [Bewertung](#bewertung) | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl` |
