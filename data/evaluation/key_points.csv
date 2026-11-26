@@ -1,0 +1,120 @@
+question_id,point,text
+Q001,1,Register the plugin marketplace using `claude plugin marketplace add tester-army/e2e`.
+Q001,2,Install the plugin using `claude plugin install e2e@e2e`.
+Q001,3,Start a new Claude Code session after installation.
+Q002,1,Inspect the newly written screenshot.
+Q002,2,Commit the screenshot alongside the tests.
+Q002,3,Run the test again so the stored screenshot serves as the comparison baseline.
+Q003,1,DeepSeek V4 refuses forced tool choice during agent steps.
+Q003,2,Meta Muse Spark refuses forced tool choice during agent steps.
+Q004,1,Read the authentication token from `request.env` provided to `DeviceProvider.acquire`.
+Q004,2,Do not retrieve the authentication token directly from `process.env`.
+Q005,1,"For local development, use an existing subscription login (e.g. `npx e2e login openai`) or configure an AI SDK provider with the required credentials and environment variables."
+Q005,2,"In CI, provide the model provider's API key through CI secrets."
+Q005,3,"A CI job exposes its API key to executed tests, configuration, and dependencies, so keys must be restricted to trusted builds."
+Q005,4,Run untrusted pull-request code without secrets or write tokens.
+Q006,1,Configure `app.launchArguments` with `--initialUrl` pointing to the Expo development server.
+Q006,2,Set `camera: 'grant'` in `app.permissions` to grant camera access without a system permission prompt.
+Q006,3,"Begin each test with `app.open()`, because the initial warm-up does not apply the configured launch arguments or permissions."
+Q007,1,Start exploration with `npx e2e explore --session <name>` using a named session saved by a setup test.
+Q007,2,The explorer runs only the corresponding setup test and restores its saved session before exploration begins.
+Q007,3,"Authenticate in setup using a session cookie via `browser.setCookies` instead of filling a secret, because a secret fill disables screenshots for the restored exploration."
+Q008,1,The decision-model executor selects the `type` operation and identifies the target field from the latest screen observation.
+Q008,2,"A separate text model generates the input value using the goal, parameters, field label, and page text."
+Q008,3,The executor enters exactly the generated string into the selected field.
+Q009,1,"The built-in `maestro` job type runs Maestro flows, not e2e tests."
+Q009,2,Running e2e tests in EAS Workflows requires custom jobs.
+Q010,1,"After two minutes in the EAS Simulators queue, e2e logs `still queued at EAS after two minutes`."
+Q011,1,The telemetry request has a two-second deadline when an e2e command finishes.
+Q012,1,The Ubuntu image includes the Android AVD `emulator` (API 34).
+Q012,2,The Ubuntu image includes the Android AVD `emulator-35`.
+Q012,3,The Ubuntu image includes the Android AVD `emulator-36`.
+Q013,1,"Limrun provides five device configuration options: `region`, `hardTimeout`, `ios.model`, `android.model`, and `android.osVersion`."
+Q013,2,`region`: Limrun selects the region by default; a preferred region such as `eu` may overflow to another region when capacity is limited.
+Q013,3,"`hardTimeout`: Limits maximum device lifetime, including abandoned runs; defaults to `1h` and accepts Go-style durations."
+Q013,4,"`ios.model` and `android.model`: Limrun selects models by default, with `iphone` or `ipad` for iOS and `phone` or `tablet` for Android. `android.osVersion` defaults to `15` and serves as a scheduling hint."
+Q014,1,"A `mutates: true` project tool call consumes one action slot before execution, even if the call fails."
+Q015,1,A pre-page script prepares browser behavior before the application starts.
+Q015,2,"Examples include mocking a browser API, seeding `Math.random`, or setting a flag that the application reads at boot."
+Q016,1,"The failure recap shows the recording's file path, or its URL if a hosted browser retains the video remotely."
+Q017,1,Use Node.js `fs` for filesystem operations.
+Q017,2,Use an appropriate database client for database operations.
+Q018,1,`locator.and(other)` and `locator.or(other)` are unsupported and have no direct equivalents.
+Q018,2,Playwright's `locator.locator('css')` method is unsupported in e2e.
+Q018,3,"Use scoped semantic queries for nested selectors, such as `cell.getByRole('textbox')`."
+Q018,4,"Chain `getByRole(...)` after `browser.locator('css')`, or express the entire selector path in a single `browser.locator` selector."
+Q019,1,Restricting `browser.evaluate` to JSON input and output values allows e2e to record and redact the result in the test report.
+Q020,1,"Replace Maestro's `tapOn: ""Save""` with `screen.getByText('Save').tap()`."
+Q020,2,Replace conditional `runFlow` with `if (await locator.isVisible()) { ... }`.
+Q020,3,"Maestro uses case-insensitive regex matching and taps the first match; e2e uses exact, case-sensitive string matching and raises `LOCATOR_AMBIGUOUS` for multiple matches."
+Q020,4,"Use `{ exact: false }` or a regular expression for flexible text matching, and `.first()` or `{ visible: true }` to narrow multiple matches."
+Q021,1,Use `pressSequentially()` instead of `fill()` for autocomplete fields that depend on keyboard events.
+Q021,2,`fill()` sets the field value without emitting keyboard events.
+Q021,3,`pressSequentially()` uses the platform keyboard and supports a delay between characters.
+Q021,4,"If no text-accepting field has focus, a custom engine's `EngineKeyboard.type` must throw `NOT_ACTIONABLE` instead of silently discarding input."
+Q022,1,`locator.nth()` throws `INVALID_LOCATOR` when the index is negative or not an integer.
+Q023,1,Custom resource setup runs before any `beforeEach` hook executes.
+Q023,2,Custom resource setup counts against the test timeout.
+Q023,3,"A failure during custom resource setup is reported in the `beforeEach` phase, even if no `beforeEach` hook has started."
+Q024,1,"Each engine maps its platform-specific element types to e2e's shared, closed Role vocabulary."
+Q024,2,The shared Role vocabulary gives the same role query consistent meaning across browser and device targets.
+Q025,1,An `agent.act` instruction must contain 1–8192 UTF-8 bytes after NFC normalization.
+Q026,1,`expect(locator).toBeVisible()` repeatedly checks for a visible element until the condition is met or the timeout expires.
+Q026,2,"If no element appears, `toBeVisible()` eventually fails with `ASSERTION_FAILED`; a hidden element also keeps it waiting."
+Q026,3,`locator.isVisible()` checks the current state immediately and returns `false` if the element is absent or hidden.
+Q027,1,"Without `--update-snapshots`, an assertion against a baseline written earlier in the same run fails with `ASSERTION_FAILED` until the next run."
+Q027,2,"A negated screenshot assertion cannot pass against a baseline written earlier in the same run, even with `--update-snapshots`."
+Q027,3,"With `--update-snapshots`, a positive assertion can compare against a same-run baseline and may rewrite it."
+Q028,1,A client disconnect or termination signal returns exit status `0`.
+Q028,2,An uncaught error returns exit status `1`.
+Q028,3,Invalid command-line arguments return exit status `2`.
+Q028,4,Startup failures return the underlying error's category-specific exit status.
+Q029,1,"Press `f` to rerun previously unsuccessful tests, including those outside the current positional and `p` selection."
+Q029,2,Press `u` to rerun the current selection with `--update-snapshots`.
+Q029,3,"Press `p` to select a file, bare name, or glob for subsequent runs."
+Q029,4,Press `t` to filter tests by a test-title pattern.
+Q030,1,The security policy forbids serializing secret values into JSON.
+Q030,2,"When a `Secret` handle reaches a JSON sink, e2e rejects the operation with `POLICY_DENIED`."
+Q031,1,`GITHUB_EVENT_PATH` and `GITHUB_REF` identify the pull request; the event payload also supplies its head commit.
+Q031,2,`GITHUB_WORKFLOW` and `GITHUB_JOB` form the marker used to find and update the reporter's existing comment on reruns.
+Q031,3,`GITHUB_REPOSITORY` and `GITHUB_RUN_ID` are used to construct artifact links.
+Q032,1,"Under `on-all-retries`, e2e retains a trace page for each test that was retried."
+Q032,2,"Under `on-all-retries`, video captures every attempt after the first, but not the initial attempt."
+Q032,3,"If a test is never retried, neither a trace page nor a video is produced under `on-all-retries`."
+Q033,1,Configure `maxObservationBytes` on each relevant named agent under `agents`.
+Q033,2,Configure `maxInputTokens` on each relevant named agent under `agents`.
+Q033,3,Each worker constructs its own agents from the configuration module.
+Q033,4,The report stores the largest per-agent observation budget in `run.limits.maxObservationBytes` and the largest input-token budget in `run.limits.maxModelTokensPerCall`.
+Q034,1,"A live AI SDK `ModelInstance` provides the `doGenerate` method for generation calls, rather than only the identifying fields `specificationVersion`, `provider`, and `modelId`."
+Q035,1,"Manually add the custom results directory to `.gitignore`, because `e2e init` only creates ignore entries for the default `.e2e/` paths."
+Q036,1,"Each worker constructs its own custom `store` instance, so workers cannot rely on sharing a single constructed instance."
+Q037,1,"The target's `app` fields explicitly accept `undefined` in their types, allowing direct use of `process.env` values even when the variables are unset."
+Q038,1,`WORKER_EXIT` indicates that a worker terminated unexpectedly during test-file execution.
+Q038,2,The test in flight fails with `WORKER_CRASH`.
+Q038,3,The remaining tests in the affected file are skipped.
+Q038,4,"Attempts completed before the worker exit remain in the report, including earlier retries and completed serial-group members."
+Q039,1,Call `browser.keyboard.down(key)` again while the same key is still held to emit a key-repeat event.
+Q040,1,`smol()` uses `mcr.microsoft.com` as the outbound destination for its Playwright image.
+Q040,2,`e2e init` contacts the package registry when installing dependencies.
+Q041,1,Register `browser.onDialog` before triggering the native JavaScript dialog.
+Q041,2,A custom dialog handler must call either `dialog.accept()` or `dialog.dismiss()`.
+Q041,3,"If the custom handler does neither, e2e dismisses the dialog and reports `APP_NOT_OPEN` on the next step, not during handler registration."
+Q042,1,"On iOS, changing a permission terminates a running app, so `device.setPermission()` should be called before `app.open()`."
+Q042,2,"On Android, revoking a permission terminates a running app, so permissions should be changed before `app.open()`."
+Q042,3,"Configured `app.permissions` are reapplied on every fresh launch of the pinned app, including `app.open()` and `app.restart()`."
+Q042,4,"`app.clearState()` resets app data and permissions, and the configured `app.permissions` are applied on the fresh launch."
+Q043,1,A timed-out `agent-device` command continues running on the device because these commands do not support abort signals.
+Q043,2,The next test attempt must wait for the timed-out command to settle before proceeding.
+Q044,1,Only the two permitted failure codes may be retryable because they describe repeatable reads.
+Q044,2,"If another failure code claims retryability, the runner coerces it into a non-retryable `ENGINE_FAILURE`."
+Q045,1,Both `actions` and `location` depend on `observation` because their node references use identifiers from the observation's ID space.
+Q046,1,Provisioning may require a first-run download whose duration depends on the network.
+Q046,2,A premature timeout in `prepare()` could prevent all subsequent tests from running.
+Q047,1,"For web targets, `validateApp()` receives the URL, while `prepare()` and `init()` receive only the site through `info.app.site`."
+Q047,2,"For web targets, the URL is opened later through `session.open()`, not during `prepare()` or `init()`."
+Q047,3,"For device targets, `prepare()` and `init()` receive the declared `bundleId`, `appPath`, `launchArguments`, and `permissions`."
+Q047,4,Device warm-up passes no launch arguments and does not modify permissions.
+Q048,1,Developers can choose either the Next.js App Router or the Astro example; both use runner-started web apps tested in Chromium.
+Q048,2,"Follow the selected project's README to install, build, and run the example."
+Q048,3,Locator tests require no AI model and can run without `AI_GATEWAY_API_KEY`.
+Q048,4,Agent tests are skipped unless `AI_GATEWAY_API_KEY` is set.
