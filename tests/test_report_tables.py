@@ -763,3 +763,15 @@ def test_hybrid_table_shows_holm_adjusted_p(tmp_path):
     assert rows["nur Jonas' Fragen"][4] == fmt_de(0.21, 3)
     assert rows["nur Sprachmodell"][4] == fmt_de(0.41, 3)
     assert "gemischt: p nach Holm wie in Tabelle tests" in text
+
+
+def test_hybrid_answers_table_does_not_call_k0_comparable(tmp_path):
+    """ADR 0051: K0 is rated only by the LLM, C1-C3 are mixed; answers.tex must not present them
+    as comparable and must point to control_k0, which compares on the LLM's values only."""
+    write_tables(build_results(hybrid_data(), 0.05), tmp_path)
+    text = (tmp_path / "answers.tex").read_text(encoding="utf-8")
+    assert "macht K0 mit C1 bis C3 vergleichbar" not in text
+    assert "nur vom Sprachmodell" in text and "control" in text
+    write_tables(build_results(make_data(), 0.05), tmp_path / "plain")
+    plain = (tmp_path / "plain" / "answers.tex").read_text(encoding="utf-8")
+    assert "macht K0 mit C1 bis C3 vergleichbar" in plain

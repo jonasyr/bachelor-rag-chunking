@@ -1,6 +1,6 @@
-from test_report_tables import make_data
+from test_report_tables import QIDS, hybrid_data, make_data
 
-from report_figures import FIGURE_NAMES, write_figures
+from report_figures import FIGURE_NAMES, distribution_series, write_figures
 from report_tables import build_results
 
 
@@ -80,3 +80,14 @@ def test_dot_offsets_centre_equal_values():
 
     offsets = report_figures._dot_offsets([2.0, 2.0, 2.0, 1.0])
     assert offsets[3] == 0.0 and offsets[1] == 0.0 and offsets[0] == -offsets[2] != 0
+
+
+def test_hybrid_distribution_leaves_out_k0(tmp_path):
+    """ADR 0051: in the hybrid run K0 (LLM only) is not drawn next to the mixed C1-C3."""
+    data = hybrid_data()
+    assert [key for key, _, _ in distribution_series(data, QIDS)] == ["C1", "C2", "C3"]
+    plain = make_data()
+    assert [key for key, _, _ in distribution_series(plain, QIDS)][-1] == "K0"
+    results = build_results(data, 0.05)
+    write_figures(data, results, tmp_path)
+    assert any("K0" in n and "answers_distribution" in n for n in results["notes"])

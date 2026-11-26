@@ -614,11 +614,19 @@ def _answers_table(results: dict) -> str:
             hidden = s == K0 and key == "total_score"  # K0 has no groundedness score
             cells.append(DASH if hidden else fmt_opt(means[s].get(key)))
         rows.append([label, *cells])
-    note = (
-        "Mittelwerte der Bewertung von 0 bis 2. K0 ohne Retrieval wird ohne Quellenbezug "
-        "bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 mit C1 bis C3 "
-        "vergleichbar."
-    )
+    if results.get("hybrid") is None:
+        note = (
+            "Mittelwerte der Bewertung von 0 bis 2. K0 ohne Retrieval wird ohne Quellenbezug "
+            "bewertet; der Gesamtwert über die vier gemeinsamen Kriterien macht K0 mit C1 bis C3 "
+            "vergleichbar."
+        )
+    else:  # ADR 0051: C1-C3 mixed, K0 only by the LLM; the like-for-like comparison is control_k0
+        note = (
+            "Mittelwerte der Bewertung von 0 bis 2. C1 bis C3: hybride Bewertung (menschlich "
+            "bewertete Fragen und Sprachmodell). K0 ohne Retrieval wird nur vom Sprachmodell und "
+            "ohne Quellenbezug bewertet und ist hier nicht mit C1 bis C3 vergleichbar; den "
+            "Vergleich auf gleicher Grundlage zeigt Tabelle control_k0."
+        )
     return latex_table(
         "answers", "Antwortqualität je Kriterium und Strategie", ["Kriterium", *strategies],
         rows, "l" + "r" * len(strategies), note,

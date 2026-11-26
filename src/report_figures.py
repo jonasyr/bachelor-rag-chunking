@@ -217,19 +217,27 @@ def _dot_offsets(values: list[float], width: float = 0.7) -> list[float]:
     return offsets
 
 
-def _answers_distribution(data: AnalysisData, qids: list[str], path: Path) -> Path:
-    """Answer total per question as a dot plot, with median (bar) and mean (white diamond)."""
+def distribution_series(data: AnalysisData, qids: list[str]) -> list[tuple[str, str, list]]:
+    """(key, label, totals per question) of the answer distribution: C1-C3 and, outside the
+    hybrid run, K0 on its four criteria. In the hybrid run (ADR 0051) K0 is rated only by the LLM
+    and C1-C3 are mixed, so K0 is left out (its comparison is the table control_k0)."""
     scores = data.scores.copy()
     scores["total_score"] = pd.to_numeric(scores["total_score"])
     wide = _wide(scores, "total_score", list(STRATEGY_IDS), qids)
     series = [(s, s, wide[s]) for s in STRATEGY_IDS]
-    if data.scores_control is not None:
+    if data.scores_control is not None and data.human_questions is None:
         ctrl = data.scores_control.copy()
         for c in CONTROL_CRITERIA:
             ctrl[c] = pd.to_numeric(ctrl[c])
         ctrl["total_four"] = ctrl[CONTROL_CRITERIA].mean(axis=1)
         k0 = _wide(ctrl, "total_four", [K0], qids)[K0]
         series.append((K0, "K0 (vier Kriterien)", k0))
+    return series
+
+
+def _answers_distribution(data: AnalysisData, qids: list[str], path: Path) -> Path:
+    """Answer total per question as a dot plot, with median (bar) and mean (white diamond)."""
+    series = distribution_series(data, qids)
     fig, ax = plt.subplots(figsize=(WIDTH, 7.5 * CM))
     for x, (key, _, values) in enumerate(series):
         offsets = _dot_offsets(values)
@@ -404,6 +412,11 @@ def write_figures(data: AnalysisData, results: dict, out_dir: Path) -> list[Path
         _scatter(data, qids, results, out_dir / "scatter_retrieval_answer.pdf"),
         _composition(data, out_dir / "catalogue_composition.pdf"),
     ]
+    if data.human_questions is not None and data.scores_control is not None:
+        results["notes"].append(
+            "K0 in answers_distribution.pdf entfällt: hybride Bewertung, K0 nur vom Sprachmodell "
+            "bewertet (Vergleich in Tabelle control_k0, ADR 0051)"
+        )
     if data.chunks is None:
         results["notes"].append("Abbildung chunk_lengths.pdf entfällt: Chunk-Dateien fehlen")
     else:
