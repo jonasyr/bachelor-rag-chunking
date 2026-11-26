@@ -8,7 +8,7 @@ Angenommen (20.10.2026; vor dem Hauptlauf festgelegt; ergänzt [ADR 0008](0008-k
 Tests](#nachtrag-22102026-konfirmatorische-tests) (Jonas); die dort genannte Tabellennotiz von `tests.tex` ist
 korrigiert (PR #42). Präzisiert am 26.10.2026: [Holm über die testbaren
 Metriken](#nachtrag-26102026-holm-über-die-testbaren-metriken) (Jonas). Ergänzt am 26.10.2026: [Konfidenzintervalle der
-Differenzen](#nachtrag-26102026-konfidenzintervalle-der-differenzen) (Jonas, vor dem Hauptlauf)
+Differenzen](#nachtrag-26102026-konfidenzintervalle-der-differenzen) (Jonas, vor dem Hauptlauf); Instrument des Gesamtwerts geändert durch [ADR 0051](0051-hybride-bewertung.md) (gemischter Satz, zwei Sensitivitätsanalysen)
 
 ## Kontext
 

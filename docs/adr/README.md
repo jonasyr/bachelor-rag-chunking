@@ -3,7 +3,7 @@
 *[Doku-Index](../README.md) · Entscheidungen*
 
 Verbindliche Entscheidungen der Bachelorarbeit, je Datei eine. ADR 0001–0018 sind aus dem Decision Log des früheren
-Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0050 sind seit der Umsetzung hinzugekommen, ab
+Ground-Truth-Leitfadens übertragen (D1–D18, Stand Juni 2026); ADR 0019–0051 sind seit der Umsetzung hinzugekommen, ab
 0019 ist Dn = ADR n. Der Leitfaden lag als `docs/Ground_Truth_Projektleitfaden.md` im Repo, zuletzt auf Commit
 `15304d6^` (`git show 15304d6^:docs/Ground_Truth_Projektleitfaden.md`); „Leitfaden §N“ in ADR 0001–0018 meint seine
 Abschnitte, die Links führen zur heutigen Seite des Themas.
@@ -48,7 +48,7 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0004](0004-zeitraum-und-abgabe.md) | Bearbeitungszeitraum Juli–Dezember 2026, Abgabe 24.12.2026 | Angenommen |
 | [0005](0005-drei-chunking-strategien.md) | Drei Chunking-Strategien C1–C3, C4 optional | Angenommen; konkretisiert durch 0021; ergänzt durch 0026; C4-Bedingung präzisiert durch 0028; Hinweis: Korpus seit 0038 e2e |
 | [0006](0006-nur-chunking-variiert.md) | Nur das Chunking variiert | Angenommen; Hinweis: Kontrollen K1 (0026) und K0 (0038, 0041) sind keine Strategien |
-| [0007](0007-triangulation.md) | Evaluation als Triangulation: manuell primär, RAGAS sekundär | Angenommen; konkretisiert durch 0046; RAGAS konkretisiert und Metriken geändert durch 0047 |
+| [0007](0007-triangulation.md) | Evaluation als Triangulation: manuell primär, RAGAS sekundär | Angenommen; konkretisiert durch 0046; RAGAS konkretisiert und Metriken geändert durch 0047; primäre Bewertung geändert durch 0051 |
 | [0008](0008-kosten-als-variable.md) | Kosten/Effizienz als eigene abhängige Variable | Angenommen; ergänzt durch 0044 |
 | [0009](0009-hypothesen.md) | Drei geschärfte Hypothesen H1–H3, explorativ | Angenommen; Auswertungsart geändert durch 0044; Nachtrag 22.10.2026 |
 | [0010](0010-starke-baseline.md) | Fixed-size mit Overlap ist eine starke Baseline | Angenommen; Hinweis: Autorenreihenfolge Qu, Tu & Bao |
@@ -76,19 +76,20 @@ Spalte „Titel“ = Überschrift der Datei; „Status“ = Status und Beziehung
 | [0032](0032-blinde-rubrik-bewertung.md) | Blinde Rubrik-Bewertung der Antworten | Angenommen; ergänzt durch 0034, 0035; Hinweis: Mischen mit Seed (Nachtrag in 0046) |
 | [0033](0033-antwortmodell.md) | Antwortmodell und einmalige Generierung | Angenommen; ergänzt durch 0041; Nachtrag 22.10.2026 (Belege) |
 | [0034](0034-bewertung-in-der-app.md) | Bewertung in der App | Angenommen; ergänzt durch 0035 |
-| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037, 0043 (zwei Regelanpassungen); für K0 ergänzt durch 0041; Intra-Rater-Folgeschritt ersetzt durch 0046 |
+| [0035](0035-regelbasierte-bewertung.md) | Regelbasierte Rubrik-Bewertung mit Kernpunkten | Angenommen; präzisiert durch 0036, 0037, 0043 (zwei Regelanpassungen); für K0 ergänzt durch 0041; Intra-Rater-Folgeschritt ersetzt durch 0046; wer bewertet, geändert durch 0051 |
 | [0036](0036-regelbasierte-bewertung-verpflichtend.md) | Regelbasierte Bewertung verpflichtend für neue Scaffolds | Angenommen |
 | [0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) | Präzisierte Prüfregeln und vorbefüllte Kernpunkte | Angenommen; präzisiert durch 0043 |
 | [0038](0038-korpus-e2e.md) | Korpus: e2e-Dokumentation statt Vue.js; Closed-Book-Prüfung und Kontrolle K0 | Angenommen; ersetzt 0001, 0025; Stichprobenplan 0039; Beurteilung festgelegt durch 0040; K0 umgesetzt durch 0041; Bereinigungsregel geändert durch 0042 |
 | [0039](0039-stichprobenplan-e2e.md) | Stichprobenplan und Bereichsquoten auf e2e | Angenommen |
 | [0040](0040-closed-book-pruefung.md) | Closed-Book-Prüfung des Fragenkatalogs | Angenommen; ergänzt 0017, 0030, 0031; Prompt auch für K0 (0041) |
-| [0041](0041-kontrolle-k0.md) | Kontrolle K0: Erzeugung und Bewertung | Angenommen |
+| [0041](0041-kontrolle-k0.md) | Kontrolle K0: Erzeugung und Bewertung | Angenommen; Bewertung geändert durch 0051 |
 | [0042](0042-mdx-umwandlung.md) | MDX-Umwandlung: eigene Anker, Agent-Prompts und Video-Karten bleiben | Angenommen; ersetzt die Ankerregel von 0019; ändert die Bereinigungsregel von 0038 |
 | [0043](0043-praezisierung-direct-und-teilantworten.md) | Präzisierte Prüfregeln: `direct` bei falscher Kernaussage, Teilantworten | Angenommen; präzisiert 0035, 0037 |
-| [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0012, 0013, 0015 (SciPy); ändert die Auswertungsart von 0009; Nachtrag 22.10.2026 (konfirmatorische Tests, Tabellennotiz korrigiert in PR #42); Nachtrag 26.10.2026 (Holm-Familie) |
+| [0044](0044-statistische-auswertung.md) | Statistische Auswertung und Abbildungen | Angenommen; ergänzt 0008, 0012, 0013, 0015 (SciPy); ändert die Auswertungsart von 0009; Nachtrag 22.10.2026 (konfirmatorische Tests, Tabellennotiz korrigiert in PR #42); Nachtrag 26.10.2026 (Holm-Familie); Instrument des Gesamtwerts geändert durch 0051 |
 | [0045](0045-retrieval-ergebnisse-versioniert.md) | Retrieval-Ergebnisse des Hauptlaufs versioniert | Angenommen; ändert die Versionierung von 0024; Chunk-Vektoren geändert durch 0048 |
-| [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007; ersetzt den Intra-Rater-Folgeschritt von 0035; umgesetzt (PR #40); Nachträge 22.10.2026 (Datenschutz, Maß, Zufallszahlen), 17.11.2026 (Ersatzverfahren ausgelöst) |
+| [0046](0046-zweitbewertung.md) | Zweitbewertung der Antworten | Angenommen; konkretisiert 0007; ersetzt den Intra-Rater-Folgeschritt von 0035; umgesetzt (PR #40); Nachträge 22.10.2026 (Datenschutz, Maß, Zufallszahlen), 17.11.2026 (Ersatzverfahren ausgelöst); Ersatzverfahren geändert durch 0051 |
 | [0047](0047-ragas-als-triangulation.md) | RAGAS als feste Triangulation | Angenommen; konkretisiert 0007 und ändert dessen Metriken; ändert 0015; umgesetzt (PR #37); Nachträge 21.10.2026 (Strictness), 26.10.2026 (fehlende Werte) |
 | [0048](0048-korpus-und-chunk-vektoren-versioniert.md) | Korpus-Snapshot und Chunk-Vektoren versioniert | Angenommen; ändert die Archivierung von 0024 und die Versionierung von 0045 |
 | [0049](0049-schreibhilfen-im-editor.md) | Schreibhilfen im Katalog-Editor | Angenommen; ergänzt 0031; Nachtrag 09.11.2026 (Vorbereitungsblätter für jeden Block), 10.11.2026 (Typ-Eignung im Vorbereitungsblatt) |
 | [0050](0050-journal-und-fortsetzen-der-api-schritte.md) | Journal und Fortsetzen der API-Schritte | Angenommen; ergänzt 0033 und 0047 |
+| [0051](0051-hybride-bewertung.md) | Hybride Bewertung: Jonas 24 Fragen, Sprachmodell alle Antworten | Angenommen; ändert 0007, 0035, 0041, 0044, 0046 |

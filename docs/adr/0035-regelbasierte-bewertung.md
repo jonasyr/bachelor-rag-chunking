@@ -10,7 +10,7 @@ durch [ADR 0041](0041-kontrolle-k0.md) (Regeln ohne `grounded`). Die Regeln wurd
 unten vorgesehen: nach dem Pilot-Set `hard` durch
 [ADR 0037](0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md) (Version `2026-10-18`) und nach dem Pilot e2e
 durch [ADR 0043](0043-praezisierung-direct-und-teilantworten.md) (Version `2026-10-20`); der Hauptlauf nutzt
-`config.RUBRIC_RULES_VERSION` = `2026-10-20`
+`config.RUBRIC_RULES_VERSION` = `2026-10-20`; wer die Prüffragen beantwortet, geändert durch [ADR 0051](0051-hybride-bewertung.md) (Jonas 24 Fragen, Sprachmodell den Rest; Kernpunkte bleiben Jonas')
 
 ## Kontext
 

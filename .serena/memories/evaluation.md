@@ -9,6 +9,6 @@ Metrics, rubric, rule-based scoring, K0, RAGAS, second rater, statistics: `docs/
 - Second rating without a second person (ADR 0046 addendum): repeat rating (`second_rater.py --mode mark|repeat`,
   `SCORING_RATER=R1W`, key file only after `close --repeat`) and LLM cross-check (`llm_rater.py`); the check wording is
   `config.RUBRIC_*`, shared by the app and the LLM: `docs/reference/evaluation.md#zweitbewertung`,
-  steps `docs/how-to/run-the-experiment.md#ersatzverfahren-ohne-zweite-person`.
+  steps `docs/how-to/run-the-experiment.md#hybride-bewertung-ohne-zweite-person`; hybrid scoring (Jonas 24 questions, LLM all, no repeat rating): ADR 0051.
 - RAGAS, second-rater and LLM cross-check steps are one-shot and never overwrite; options: `docs/reference/tooling.md#skripte-und-optionen`;
   test isolation (autouse fixtures): `docs/reference/tooling.md#tests`.

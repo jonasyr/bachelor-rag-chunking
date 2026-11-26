@@ -584,6 +584,10 @@ SECOND_RATER_DIR_NAME = "second_rater"  # folder of R2's set (inside data/evalua
 SECOND_RATER_DIR = DATA_EVAL / SECOND_RATER_DIR_NAME
 SECOND_RATER_SAMPLE_FILE = DATA_EVAL / "second_rater_sample.csv"  # the drawn questions
 SECOND_RATER_ENV = "SCORING_RATER"  # environment variable that starts the app in R2 mode
+# Hybrid scoring (D51): Jonas scores the R2 sample plus HYBRID_EXTRA_QUESTIONS more questions
+HYBRID_EXTRA_QUESTIONS = 12  # drawn from the questions outside the R2 sample, stratified like it
+HYBRID_SEED = 20261126  # seed of that draw
+HYBRID_EXTRA_SAMPLE_FILE = DATA_EVAL / "hybrid_extra_sample.csv"  # the extra questions drawn
 INTRA_RATER_PSEUDONYM = (
     "R1W"  # Jonas' repeat rating (ADR 0046 fallback); also the SCORING_RATER value
 )
