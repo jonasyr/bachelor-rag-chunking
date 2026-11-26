@@ -181,8 +181,8 @@ def test_all_tables_are_written(tmp_path):
     data = replace(
         data, repeat_rating=data.second_rating, llm_rating=data.second_rating | {"model": "judge-x"}
     )
-    paths = write_tables(build_results(data, 0.05), tmp_path)
-    assert len(TABLE_NAMES) == 16
+    paths = write_tables(build_results(hybrid_data(data), 0.05), tmp_path)
+    assert len(TABLE_NAMES) == 17
     assert sorted(p.name for p in paths) == sorted(TABLE_NAMES)
     for p in paths:
         text = p.read_text(encoding="utf-8")
@@ -570,3 +570,151 @@ def test_agreement_llm_table_written(tmp_path, monkeypatch):
     assert "Übereinstimmung der Bewertung mit der LLM-Gegenprobe" in text
     assert "judge-x" in text and f"{llm['answers']} Antworten" in text
     assert not (tmp_path / "agreement_intra.tex").exists()
+
+
+# ---------------------------------------------------------------- hybrid scoring (ADR 0051)
+
+HUMAN = QIDS[:6]  # Jonas' questions in the hybrid fixture
+
+
+def hybrid_data(base: AnalysisData | None = None) -> AnalysisData:
+    """Mixed `scores` (Jonas' values on HUMAN, the LLM's on the rest, `rater` per row) and the
+    LLM's values of every answer; on HUMAN the LLM rates one point higher (capped at 2), so the
+    mixed and the LLM-only set differ."""
+    base = base or make_data()
+    llm_rows, mixed_rows = [], []
+    for r in base.scores.to_dict("records"):
+        human = r["question_id"] in HUMAN
+        crit = {c: str(min(2, int(r[c]) + 1)) if human else r[c] for c in RUBRIC_CRITERIA}
+        total = sum(int(v) for v in crit.values()) / len(crit)
+        llm = {**r, **crit, "total_score": str(total)}
+        llm_rows.append(llm)
+        mixed_rows.append({**(r if human else llm), "rater": "human" if human else "llm"})
+    return replace(
+        base,
+        scores=pd.DataFrame(mixed_rows),
+        scores_llm=pd.DataFrame(llm_rows),
+        human_questions=list(HUMAN),
+    )
+
+
+def _means(frame: pd.DataFrame, qids: list[str]) -> dict:
+    sub = frame[frame["question_id"].isin(qids)]
+    cols = [*RUBRIC_CRITERIA, "total_score"]
+    return {
+        s: {c: float(pd.to_numeric(sub[sub["strategy"] == s][c]).mean()) for c in cols} for s in C
+    }
+
+
+def test_hybrid_sensitivity_blocks():
+    data = hybrid_data()
+    hyb = build_results(data, 0.05)["hybrid"]
+    assert hyb["n_human_questions"] == len(HUMAN)
+    assert hyb["n_llm_questions"] == len(QIDS) - len(HUMAN)
+    assert hyb["raters"] == {"human": len(HUMAN) * 3, "llm": (len(QIDS) - len(HUMAN)) * 3}
+    human, llm = hyb["sensitivity"]["human"], hyb["sensitivity"]["llm"]
+    assert human["n_questions"] == len(HUMAN) and llm["n_questions"] == len(QIDS)
+    for block, expected in (
+        (human, _means(data.scores, HUMAN)),
+        (llm, _means(data.scores_llm, QIDS)),
+    ):
+        for s in C:
+            for c, v in expected[s].items():
+                assert block["means"][s][c] == pytest.approx(v)
+        assert block["test"]["n"] == block["n_questions"]
+        assert "significant" in block["test"] and "p_adj" in block["test"]
+        assert set(block["differences"]) == {"C1-C2", "C1-C3", "C2-C3"}
+        assert block["descriptive"] is True
+    d = llm["differences"]["C1-C2"]["mean_diff"]
+    assert d == pytest.approx(llm["means"]["C1"]["total_score"] - llm["means"]["C2"]["total_score"])
+    # the mixed means stay those of `scores`, and the confirmatory family is unchanged
+    results = build_results(data, 0.05)
+    mixed = _means(data.scores, QIDS)
+    assert results["answers"]["means"]["C1"]["total_score"] == pytest.approx(
+        mixed["C1"]["total_score"]
+    )
+    assert set(results["confirmatory"]) == {"recall", "reciprocal_rank", "total_score"}
+
+
+def test_hybrid_k0_uses_llm_side():
+    data = hybrid_data()
+    results = build_results(data, 0.05)
+    k0 = pd.to_numeric(data.scores_control[CONTROL_CRITERIA].stack()).groupby(level=0).mean()
+    k0_mean = float(k0.mean())
+    for s in C:
+        llm = data.scores_llm[data.scores_llm["strategy"] == s]
+        llm_four = float(llm[CONTROL_CRITERIA].apply(pd.to_numeric).mean(axis=1).mean())
+        mixed = data.scores[data.scores["strategy"] == s]
+        mixed_four = float(mixed[CONTROL_CRITERIA].apply(pd.to_numeric).mean(axis=1).mean())
+        assert llm_four != pytest.approx(mixed_four)  # the fixture separates the two sides
+        diff = results["control_k0"][s]["diff"]
+        assert diff["total_four"] == pytest.approx(llm_four - k0_mean)
+        for c in CONTROL_CRITERIA:
+            assert diff[c] == pytest.approx(
+                float(pd.to_numeric(llm[c]).mean())
+                - float(pd.to_numeric(data.scores_control[c]).mean())
+            )
+    # the answers table keeps the mixed set for C1-C3
+    mixed_c1 = data.scores[data.scores["strategy"] == "C1"]
+    assert results["answers"]["means"]["C1"]["total_four"] == pytest.approx(
+        float(mixed_c1[CONTROL_CRITERIA].apply(pd.to_numeric).mean(axis=1).mean())
+    )
+
+
+# sha256 of the results (without `hybrid` and the hybrid skip note) computed before the hybrid
+# analysis existed (commit 9b555d9); a changed digest means the non-hybrid numbers moved
+NON_HYBRID_DIGESTS = {
+    "full": "f2fa8fe9125200fee579eaff2ea7a75cec1b11e7abdc0e18e6f6d236f2e638b4",
+    "minimal": "e4861a98d14099397ea9fa64d039bb6fa151c0467cb1be10a96396745fc597a3",
+    "ragas_repeat": "316ed8ff1b6ac533133eeb68c0f0b38ef1a1dd31495d415bde1590c1750fdc5d",
+}
+HYBRID_NOTE = "Tabelle Sensitivität der hybriden Bewertung entfällt: keine hybride Bewertung"
+
+
+def test_non_hybrid_results_unchanged():
+    import hashlib
+
+    full = agreement_data()
+    full = replace(
+        full, repeat_rating=full.second_rating, llm_rating=full.second_rating | {"model": "judge-x"}
+    )
+    cases = {
+        "full": full,
+        "minimal": make_data(verdicts=False, chunks=False, embedding=False, control=False),
+        "ragas_repeat": ragas_data(repeat=True),
+    }
+    for name, data in cases.items():
+        results = build_results(data, 0.05)
+        assert results.pop("hybrid") is None
+        assert results["notes"][-1] == HYBRID_NOTE
+        results["notes"] = results["notes"][:-1]
+        text = json.dumps(results, sort_keys=True)
+        assert hashlib.sha256(text.encode()).hexdigest() == NON_HYBRID_DIGESTS[name], name
+
+
+def test_write_hybrid_sensitivity_table(tmp_path):
+    results = build_results(hybrid_data(), 0.05)
+    paths = {p.name for p in write_tables(results, tmp_path / "h")}
+    assert "hybrid_sensitivity.tex" in paths
+    text = (tmp_path / "h" / "hybrid_sensitivity.tex").read_text(encoding="utf-8")
+    assert r"\label{tab:hybrid_sensitivity}" in text
+    assert "Sensitivitätsanalyse der hybriden Bewertung (ADR 0051)" in text
+    for label in ("gemischt", "nur Jonas' Fragen", "nur Sprachmodell"):
+        assert label in text
+    assert "deskriptiv" in text and r"\hline" not in text
+    assert fmt_de(results["hybrid"]["sensitivity"]["llm"]["means"]["C2"]["total_score"], 2) in text
+    # not hybrid: no table (a stale one is removed) and a note
+    (tmp_path / "n").mkdir()
+    (tmp_path / "n" / "hybrid_sensitivity.tex").write_text("stale", encoding="utf-8")
+    plain = build_results(make_data(), 0.05)
+    assert plain["hybrid"] is None and HYBRID_NOTE in plain["notes"]
+    assert "hybrid_sensitivity.tex" not in {p.name for p in write_tables(plain, tmp_path / "n")}
+    assert not (tmp_path / "n" / "hybrid_sensitivity.tex").exists()
+
+
+def test_hybrid_results_in_json(tmp_path):
+    results = build_results(hybrid_data(), 0.05)
+    write_json(results, tmp_path / "analysis.json")
+    loaded = json.loads((tmp_path / "analysis.json").read_text(encoding="utf-8"))
+    assert loaded["hybrid"]["n_human_questions"] == len(HUMAN)
+    assert set(loaded["hybrid"]["sensitivity"]) == {"human", "llm"}

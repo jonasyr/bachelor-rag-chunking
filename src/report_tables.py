@@ -47,6 +47,7 @@ TABLE_NAMES = [
     "control_k0.tex", "correlation.tex", "efficiency.tex", "breakdown.tex",
     "ragas.tex", "ragas_agreement.tex", "tests_descriptive.tex", "ragas_effects.tex",
     "agreement.tex", "agreement_intra.tex", "agreement_llm.tex", "differences.tex",
+    "hybrid_sensitivity.tex",
 ]  # fmt: skip
 DASH = "--"
 MINUS = "\u2212"  # typographic minus, also in the figures (Arial has it)
@@ -227,8 +228,9 @@ def _retrieval_block(data: AnalysisData, rule: str, qids: list[str]) -> tuple[di
     return means, effects
 
 
-def _answer_frame(data: AnalysisData) -> pd.DataFrame:
-    frame = _num(data.scores, [*RUBRIC_CRITERIA, "total_score"])
+def _answer_frame(data: AnalysisData, scores: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Numeric answer values (of `data.scores` unless `scores` is given) plus `total_four`."""
+    frame = _num(data.scores if scores is None else scores, [*RUBRIC_CRITERIA, "total_score"])
     frame["total_four"] = frame[CONTROL_CRITERIA].mean(axis=1)
     return frame
 
@@ -237,6 +239,45 @@ def _k0_frame(data: AnalysisData) -> pd.DataFrame:
     frame = _num(data.scores_control, [*CONTROL_CRITERIA, "total_score"])
     frame["total_four"] = frame[CONTROL_CRITERIA].mean(axis=1)
     return frame
+
+
+def _total_block(frame: pd.DataFrame, qids: list[str], alpha: float) -> dict:
+    """Means of C1-C3, the Friedman test of the total score as a family of its own and the mean
+    differences of the total with bootstrap CIs; one sensitivity analysis of ADR 0051, descriptive
+    (not part of the confirmatory family)."""
+    cols = [*RUBRIC_CRITERIA, "total_score"]
+    wide = {c: _wide(frame, c, list(STRATEGY_IDS), qids) for c in cols}
+    total = wide["total_score"]
+    return {
+        "n_questions": len(qids),
+        "descriptive": True,
+        "means": {s: {c: _mean(wide[c][s]) for c in cols} for s in STRATEGY_IDS},
+        "test": stats.confirmatory({"total_score": total}, alpha)["total_score"],
+        "differences": {
+            f"{x}-{y}": stats.mean_diff_ci(
+                total[x], total[y], ANALYSIS_BOOTSTRAP_REPS, ANALYSIS_CI_LEVEL, ANALYSIS_SEED
+            )
+            for x, y in stats._pair_names(total)  # noqa: SLF001 (same pair order as the tests)
+        },
+    }
+
+
+def _hybrid(data: AnalysisData, qids: list[str], alpha: float) -> dict | None:
+    """The hybrid scoring (ADR 0051): counts and the two sensitivity analyses, (a) Jonas' values
+    on his questions only, (b) the LLM's values on all questions; None outside a hybrid run."""
+    if data.human_questions is None:
+        return None
+    human = sorted(data.human_questions)
+    raters = data.scores["rater"].value_counts()
+    return {
+        "n_human_questions": len(human),
+        "n_llm_questions": len(qids) - len(human),
+        "raters": {r: int(raters.get(r, 0)) for r in ("human", "llm")},
+        "sensitivity": {
+            "human": _total_block(_answer_frame(data), human, alpha),
+            "llm": _total_block(_answer_frame(data, data.scores_llm), qids, alpha),
+        },
+    }
 
 
 def build_results(data: AnalysisData, alpha: float) -> dict:
@@ -301,16 +342,23 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
         "answers": desc_answers,
     }
 
-    # K0 control
+    # K0 control; in a hybrid run C1-C3 come from the LLM's values, so both sides share one
+    # rater (ADR 0051); the answers table keeps the mixed set
+    k_means, k_four = answer_means, awide["total_four"]
+    if k0 is not None and data.human_questions is not None:
+        llm = _answer_frame(data, data.scores_llm)
+        lw = {c: _wide(llm, c, list(STRATEGY_IDS), qids) for c in answer_cols}
+        k_means = {s: {c: _mean(lw[c][s]) for c in answer_cols} for s in STRATEGY_IDS}
+        k_means[K0], k_four = answer_means[K0], lw["total_four"]
     if k0 is None:
         results["control_k0"] = None
         notes.append("Tabelle K0-Vergleich entfällt: keine K0-Bewertung")
     else:
         control = {}
         for s in STRATEGY_IDS:
-            diffs = {c: answer_means[s][c] - answer_means[K0][c] for c in CONTROL_CRITERIA}
-            diffs["total_four"] = answer_means[s]["total_four"] - answer_means[K0]["total_four"]
-            pair = stats.wilcoxon_pair(awide["total_four"][s], k0w["total_four"])
+            diffs = {c: k_means[s][c] - k_means[K0][c] for c in CONTROL_CRITERIA}
+            diffs["total_four"] = k_means[s]["total_four"] - k_means[K0]["total_four"]
+            pair = stats.wilcoxon_pair(k_four[s], k0w["total_four"])
             control[s] = {
                 "diff": diffs,
                 "r": pair["r"],
@@ -342,6 +390,11 @@ def build_results(data: AnalysisData, alpha: float) -> dict:
     results["agreement"] = _agreement(data.second_rating)
     results["agreement_intra"] = _agreement(data.repeat_rating)
     results["agreement_llm"] = _agreement(data.llm_rating)
+    results["hybrid"] = _hybrid(data, qids, alpha)
+    if results["hybrid"] is None:
+        notes.append(
+            "Tabelle Sensitivität der hybriden Bewertung entfällt: keine hybride Bewertung"
+        )
     results["notes"] = notes
     return _plain(results)
 
@@ -682,10 +735,45 @@ def _k0_table(results: dict) -> str:
         "Mittlere Differenz der Bewertung (Strategie minus K0, Kontrolle ohne Retrieval), "
         "deskriptiv, ohne p-Werte."
     )
+    if results.get("hybrid") is not None:
+        note += " C1 bis C3 und K0 beide mit den Werten des Sprachmodells (ADR 0051)."
     header = ["Maß", *(f"{s} {MINUS} K0" for s in strategies)]
     return latex_table(
         "control_k0", "Antwortqualität im Vergleich mit der Kontrolle K0", header, rows,
         "l" + "r" * len(strategies), note,
+    )  # fmt: skip
+
+
+def _hybrid_table(results: dict) -> str:
+    """Total score per strategy for the mixed set and the two sensitivity analyses (ADR 0051)."""
+    hyb = results["hybrid"]
+    header = ["Bewertung", *STRATEGY_IDS, "p (Friedman)", "n"]
+    mixed = results["confirmatory"]["total_score"]
+    blocks = [
+        ("gemischt", results["answers"]["means"], mixed, results["n_questions"]),
+        *(
+            (label, b["means"], b["test"], b["n_questions"])
+            for label, b in (
+                ("nur Jonas' Fragen", hyb["sensitivity"]["human"]),
+                ("nur Sprachmodell", hyb["sensitivity"]["llm"]),
+            )
+        ),
+    ]
+    rows = [
+        [label, *(fmt_de(means[s]["total_score"], REPORT_DECIMALS) for s in STRATEGY_IDS),
+         fmt_p(test["p"]) if test["testable"] else "nicht testbar", str(n)]
+        for label, means, test, n in blocks
+    ]  # fmt: skip
+    note = (
+        "Mittlerer Gesamtwert der Antwort je Strategie. Gemischt: Hauptauswertung "
+        f"({hyb['n_human_questions']} Fragen von Jonas, {hyb['n_llm_questions']} vom "
+        "Sprachmodell bewertet), p ohne Holm-Korrektur. Nur Jonas' Fragen und nur Sprachmodell "
+        "(alle Fragen mit den Werten des Sprachmodells): Sensitivitätsanalysen, deskriptiv, "
+        "Friedman-Test je Analyse für sich."
+    )
+    return latex_table(
+        "hybrid_sensitivity", "Sensitivitätsanalyse der hybriden Bewertung (ADR 0051)", header,
+        rows, "l" + "r" * (len(STRATEGY_IDS) + 2), note,
     )  # fmt: skip
 
 
@@ -958,12 +1046,14 @@ def write_tables(results: dict, out_dir: Path) -> list[Path]:
             "Erstbewertung) derselben",
         ),
         "differences.tex": lambda: _differences_table(results),
+        "hybrid_sensitivity.tex": lambda: _hybrid_table(results),
     }
     skipped = {
         "control_k0.tex": "control_k0", "efficiency.tex": "efficiency",
         "ragas.tex": "ragas", "ragas_effects.tex": "ragas",
         "ragas_agreement.tex": "ragas_agreement", "agreement.tex": "agreement",
         "agreement_intra.tex": "agreement_intra", "agreement_llm.tex": "agreement_llm",
+        "hybrid_sensitivity.tex": "hybrid",
     }  # fmt: skip
     written = []
     for name in TABLE_NAMES:
