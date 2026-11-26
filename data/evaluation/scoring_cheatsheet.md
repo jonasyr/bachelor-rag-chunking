@@ -2,14 +2,14 @@
 
 KI-Hilfe (Claude), erstellt am 17.11.2026. Das Blatt fasst nur die geltenden Regeln zusammen:
 [Evaluation](../../docs/reference/evaluation.md#regelbasierte-bewertung), ADR 0035, 0037, 0041, 0043, Regelversion
-`2026-10-20` (`config.RUBRIC_RULES_VERSION`). Es enthält keine Frage, keine Antwort und keinen Kernpunkt und führt
+`2026-10-20` (`config.RUBRIC_RULES_VERSION`); Umfang nach ADR 0051 (hybride Bewertung, 26.11.2026). Es enthält keine Frage, keine Antwort und keinen Kernpunkt und führt
 keine neue Regel ein; bei einem Widerspruch gilt die Evaluation-Seite. Jede bewertende Person bekommt dasselbe Blatt.
 
 ## Ablauf in der App
 
 1. `uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“.
-2. Set „Main catalogue“ (C1–C3, blind). K0 erst danach als eigener Satz („control K0“, nicht blind).
-3. Schritt „Key points“: 48 Fragen, dann einfrieren. Schritt „Score“: 144 Antworten.
+2. Set „Main catalogue“ (C1–C3, blind). K0 bewertet nur das Sprachmodell (ADR 0051).
+3. Schritt „Key points“: 48 Fragen, dann einfrieren. Schritt „Score“: nur die 72 Antworten deiner 24 Fragen (siehe unten).
 4. Pausieren ist jederzeit möglich; gespeichert ist, was mit „Save and next“ bestätigt wurde.
 
 ## Teil 1: Kernpunkte (einmal je Frage, vor dem Bewerten)
@@ -120,25 +120,27 @@ Passt eine Regel nicht, kommt das in „Notes“. Werte werden nie von Hand übe
 
 ## K0 (eigener Satz, nach C1–C3)
 
+Nur zur Information: Seit ADR 0051 bewertet K0 das Sprachmodell mit diesen Regeln, nicht du.
+
 - Dieselben eingefrorenen Kernpunkte; **kein `grounded`**, keine Passagen.
 - `declines`: „Does the answer say it does not know the answer, and give none?“ (Teilantwort + „Rest unbekannt“ =
   `no`).
 - `hallucination`: „Does it contain anything the reference does not cover?“ – Maßstab ist **nur die Referenz**.
 - Nicht blind: die Strategie ist bekannt.
 
-## Reihenfolge und Wiederholung (ADR 0046, Nachtrag 17.11.2026)
+## Welche Fragen (ADR 0051, hybride Bewertung)
 
-- **Zuerst die Stichprobe:** Q001, Q004, Q006, Q008, Q009, Q010, Q011, Q015, Q017, Q036, Q038, Q042 (je drei
-  Antworten, 36 insgesamt; über „Jump to“). Danach Claude Bescheid geben: `second_rater.py --mode mark` hält den
-  Zeitpunkt fest. Ab da diese 36 Antworten nicht mehr ändern, sonst beginnt die Frist neu.
-- Dann die übrigen 36 Fragen in beliebiger Reihenfolge.
-- **Wiederholung** frühestens 14 Tage nach `mark`: dieselben Regeln, dieses Blatt, App mit `SCORING_RATER=R1W`. Die
-  Codes sind neu gemischt. Vorher die eigenen Erstwerte der Stichprobe nicht ansehen, den Schlüssel
-  (`intra_rater_key.csv`) nie öffnen.
+- **Nur diese 24 Fragen**, je alle drei Antworten (72 insgesamt), in beliebiger Reihenfolge über „Jump to“:
+  - Stichprobe: Q001, Q004, Q006, Q008, Q009, Q010, Q011, Q015, Q017, Q036, Q038, Q042
+  - Zusatzfragen: Q005, Q012, Q014, Q020, Q024, Q027, Q029, Q030, Q033, Q035, Q040, Q045
+- Die übrigen 24 Fragen und alle K0-Antworten bewertet das Sprachmodell; sie nicht bewerten.
+- Keine Wiederholung, kein `mark`, keine 14 Tage.
+- `summarise` erst, wenn der Folge-PR (Zusammenführen) gemergt ist.
 
 ## Nie
 
 - `scoring_key.csv` öffnen oder Strategien erraten wollen.
 - Kernpunkte nach dem Einfrieren ändern oder `key_points.csv` von Hand bearbeiten.
+- Fragen außerhalb deiner 24 bewerten.
 - Werte überschreiben; stattdessen „Notes“.
 - Empfehlung, keine Regel: Ergebnisse (Retrieval-Metriken, RAGAS) erst nach der eigenen Bewertung ansehen.
