@@ -42,7 +42,7 @@ from config import (
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
-from evaluate_answers import GROUPS, SCORES_HEADER, catalogue
+from evaluate_answers import GROUPS, catalogue, read_scores
 from generate import ANSWERS_HEADER
 from run_log import append_scaffold_run, append_step_run, latest_run, require_run, sha256_of
 
@@ -93,7 +93,7 @@ def scaffold_control(
         )
     if sheet_file.exists():
         raise FileExistsError(f"{sheet_file} exists and may hold K0 scores; move it away first")
-    qids = sorted({r["question_id"] for r in read_csv(scores_file, SCORES_HEADER)})
+    qids = sorted({r["question_id"] for r in read_scores(scores_file)})
     points = frozen_key_points(key_points_file, generation_runs_file)
     missing = [q for q in qids if q not in points]
     if missing:
@@ -220,7 +220,7 @@ def summarise_control(
     entries = [
         {"question_id": r["question_id"], "strategy": r["strategy"]}
         | {c: int(r[c]) for c in CONTROL_CRITERIA}
-        for r in [*read_csv(scores_file, SCORES_HEADER), *rows]
+        for r in [*read_scores(scores_file), *rows]
         if r["question_id"] in k0_ids
     ]
     for e in entries:

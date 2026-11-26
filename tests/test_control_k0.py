@@ -19,7 +19,7 @@ from control_k0 import (
     scaffold_control,
     summarise_control,
 )
-from evaluate_answers import SCORES_HEADER
+from evaluate_answers import HYBRID_SCORES_HEADER, SCORES_HEADER
 from generate import ANSWERS_HEADER
 from run_log import sha256_of
 
@@ -256,3 +256,16 @@ def test_summarise_control_logs_a_run_record(k0):
     run_summary(k0)
     record = latest_run(k0["generation_runs_file"], "summarise_control", "K0")
     assert record["outputs_sha256"] == {"scores_control.csv": sha256_of(k0["control_scores_file"])}
+
+
+def test_control_reads_a_scores_file_with_the_rater_column(k0):
+    rows = read(k0["scores_file"])
+    write_csv(
+        k0["scores_file"],
+        HYBRID_SCORES_HEADER,
+        [[*(r[h] for h in SCORES_HEADER), "llm"] for r in rows],
+    )
+    run_scaffold(k0)
+    score_all(k0)
+    summary = run_summary(k0)
+    assert summary[("all", "all", "C1")]["total_score"] == 1.5

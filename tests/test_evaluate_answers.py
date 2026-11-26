@@ -9,12 +9,17 @@ import scoring_rules as rules
 from config import CONTROL_STRATEGIES, RUBRIC_CRITERIA, RUBRIC_MAX_SCORE, STRATEGY_IDS
 from evaluate_answers import (
     ANSWERS_HEADER,
+    HYBRID_SCORES_HEADER,
     KEY_HEADER,
     SCORES_HEADER,
     SHEET_HEADER,
+    check_derived,
     pilot_paths,
+    read_scores,
     scaffold,
     summarise,
+    unblind,
+    unblind_rows,
 )
 from retrieve import GROUND_TRUTH_HEADER, QUESTIONS_HEADER
 from run_log import sha256_of
@@ -773,3 +778,61 @@ def test_summarise_logs_a_run_record(files):
     run_summarise(files)
     record = latest_run(files["generation_runs_file"], "summarise", ",".join(STRATEGIES))
     assert record["outputs_sha256"] == {"scores.csv": sha256_of(files["scores_file"])}
+
+
+def test_read_scores_accepts_both_headers(tmp_path):
+    rows = [["Q001", "C1", *["2"] * 5, "2.0"]]
+    old, new = tmp_path / "old.csv", tmp_path / "new.csv"
+    write_csv(old, SCORES_HEADER, rows)
+    write_csv(new, HYBRID_SCORES_HEADER, [[*r, "llm"] for r in rows])
+    expected = [dict(zip(SCORES_HEADER, rows[0], strict=True))]
+    assert read_scores(old) == expected
+    assert read_scores(new) == expected
+    assert list(read_scores(new)[0]) == SCORES_HEADER
+
+
+def test_read_scores_rejects_other_header(tmp_path):
+    path = tmp_path / "scores.csv"
+    write_csv(path, ["question_id", "strategy", "rater"], [["Q001", "C1", "llm"]])
+    with pytest.raises(ValueError, match="columns"):
+        read_scores(path)
+
+
+CHECKED_ARGS = ["sheet_file", "checks_file", "key_points_file", "generation_runs_file"]
+
+
+def checked_set(files, n_checks):
+    """Scaffolded and filled set with frozen key points; checks for the first `n_checks` codes."""
+    run_scaffold(files)
+    fill(files, all_two())
+    codes = [r["code"] for r in read(files["sheet_file"])]
+    freeze_points(files)
+    write_checks(files, [rules.to_row(c, GOOD_CHECKS) for c in codes[:n_checks]])
+    return codes
+
+
+def test_check_derived_limited_to_codes(files):
+    codes = checked_set(files, 3)
+    args = [files[k] for k in CHECKED_ARGS]
+    check_derived(*args, codes=set(codes[:3]))
+    with pytest.raises(ValueError, match="no checks for"):
+        check_derived(*args)
+    with pytest.raises(ValueError, match="no checks for"):
+        check_derived(*args, codes=None)
+
+
+def test_check_derived_codes_rejects_checks_outside(files):
+    codes = checked_set(files, 3)
+    args = [files[k] for k in CHECKED_ARGS]
+    with pytest.raises(ValueError, match="checks outside the codes to summarise"):
+        check_derived(*args, codes=set(codes[:2]))
+
+
+def test_unblind_rows_matches_unblind(files):
+    run_scaffold(files)
+    fill(files, all_two())
+    qids = list(QIDS)
+    sheet = read(files["sheet_file"])
+    key = read(files["key_file"])
+    expected = unblind(files["sheet_file"], files["key_file"], qids)
+    assert unblind_rows(sheet, key, qids, files["sheet_file"]) == expected
