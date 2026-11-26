@@ -4,7 +4,7 @@
 
 Angenommen (19.10.2026; setzt die Kontrolle K0 aus [ADR 0038](0038-korpus-e2e.md) um; Prompt aus
 [ADR 0040](0040-closed-book-pruefung.md); ergänzt [ADR 0033](0033-antwortmodell.md) und
-[ADR 0035](0035-regelbasierte-bewertung.md))
+[ADR 0035](0035-regelbasierte-bewertung.md)); Bewertung von K0 geändert durch [ADR 0051](0051-hybride-bewertung.md) (nur das Sprachmodell; Vergleich mit C1–C3 auf dessen Werten)
 
 ## Kontext
 

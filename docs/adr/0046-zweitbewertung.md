@@ -11,7 +11,7 @@ Präzisiert am 22.10.2026: [Maß für die geordneten Prüffragen](#nachtrag-2210
 (Jonas) und [Zufallszahlen](#nachtrag-22102026-zufallszahlen) (Jonas). Ziehung, Export, Abschluss und
 Übereinstimmungsrechnung umgesetzt am 22.10.2026 (PR #40, `src/second_rater.py`, `src/agreement.py`); die Konsequenz
 „noch umzusetzen“ ist erledigt. Am 17.11.2026 [Ersatzverfahren ausgelöst](#nachtrag-17112026-ersatzverfahren-ausgelöst)
-(Jonas).
+(Jonas). Ersatzverfahren geändert durch [ADR 0051](0051-hybride-bewertung.md) (keine Wiederholung; die Werte der Arbeit sind hybrid).
 
 ## Kontext
 

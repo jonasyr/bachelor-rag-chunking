@@ -146,7 +146,8 @@ Mittelwert. Der Vergleich mit C1–C3 nutzt dieselben vier Kriterien (die Gesamt
 vier neu gemittelt), über alle Fragen, je Fragetyp, je Konstruktionsklasse und getrennt nach dem Closed-Book-Urteil
 (retrieval-abhängig, bekannt, nicht beurteilt; [ADR 0040](../adr/0040-closed-book-pruefung.md); `src/control_k0.py`).
 Je Strategie stehen die mittlere Differenz je Kriterium sowie r und Median-Differenz des Gesamtwerts über vier
-Kriterien gegen K0. K0 wird nicht blind bewertet. Begründung:
+Kriterien gegen K0. K0 wird nicht blind bewertet. Hybrid ([ADR 0051](../adr/0051-hybride-bewertung.md)): K0 bewertet nur das Sprachmodell; der Vergleich mit
+C1–C3 nutzt deshalb auch für C1–C3 dessen Werte. Begründung:
 [Forschungsdesign](../explanation/research-design.md#warum-closed-book-prüfung-und-k0).
 
 ## Zweitbewertung
@@ -170,12 +171,12 @@ Entscheidung: [ADR 0046](../adr/0046-zweitbewertung.md); Ablauf und Befehle:
 - **Bericht:** Tabelle `agreement.tex` (Anhang B) mit den Bezeichnungen Ablehnung (`declines`), Kernaussage falsch
   (`core_wrong`), Anderer Fehler (`other_error`), Durch Passagen gestützt (`grounded`), Halluzination
   (`hallucination`), Frage beantwortet (`answers_question`), Direkt (`direct`), Wortreich (`wordy`); dazu
-  `output/second_rater_disagreements.csv` zum Besprechen. Die Werte der Arbeit bleiben Jonas' Bewertung.
+  `output/second_rater_disagreements.csv` zum Besprechen. Welche Werte die Arbeit nutzt: [Hybride Bewertung](#hybride-bewertung).
 - **In `analyse.py`:** Fehlt die Zweitbewertung oder ist sie nicht abgeschlossen, entfallen Tabelle und CSV mit Hinweis
   (Dateien eines früheren Laufs werden entfernt); passen ihre Dateien nicht mehr zum Abschlusseintrag oder weichen
   Items und Kernpunkte von Jonas' Satz ab, bricht `analyse.py` ab.
-- **Ersatzverfahren** ohne zweite Person ([ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)),
-  zwei Prüfungen mit denselben Maßen und derselben Tabellenform wie für R2, aber mit anderer Aussage:
+- **Ersatzverfahren** ohne zweite Person ([ADR 0046, Nachtrag 17.11.2026](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst);
+  im Hauptlauf geändert durch [ADR 0051](../adr/0051-hybride-bewertung.md): keine Wiederholung, das Sprachmodell liefert Werte der Arbeit), zwei Prüfungen mit denselben Maßen und derselben Tabellenform wie für R2, aber mit anderer Aussage:
   - **Wiederholung** (`second_rater.py --mode mark|repeat`, Pseudonym `config.INTRA_RATER_PSEUDONYM` = `R1W`): Jonas
     bewertet die 36 Antworten der Stichprobe zuerst in seiner eigenen Bewertung und markiert das (`--mode mark`, hält
     die Prüfsumme dieser Zeilen fest). Frühestens `config.INTRA_RATER_MIN_DAYS` Tage danach, und nur, wenn die
@@ -190,11 +191,30 @@ Entscheidung: [ADR 0046](../adr/0046-zweitbewertung.md); Ablauf und Befehle:
     0, einmalig mit Journal ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Umfang
     `config.LLM_RATER_SCOPE`: `all` (alle 144 Antworten C1–C3, Standard) oder `sample` (die Fragen der Ziehung).
     Tabelle `agreement_llm.tex` (Konsistenz- bzw. Triangulationsprüfung, nicht Inter-Rater-Reliabilität; Zheng et al.,
-    2023), Liste `output/llm_rater_disagreements.csv`. Ein Modell kann Jonas' Bewertung nicht ersetzen; sie bleibt die
-    Grundlage der Arbeit.
+    2023), Liste `output/llm_rater_disagreements.csv`. Seit ADR 0051 auch Quelle der Werte für die Fragen, die Jonas
+    nicht bewertet ([Hybride Bewertung](#hybride-bewertung)).
   - **In `analyse.py`:** Wie bei R2 entfällt, was fehlt oder nicht abgeschlossen ist, mit Hinweis; passen die Dateien
     nicht mehr zum Abschlusseintrag (Wiederholung) bzw. zum Laufeintrag `llm_rater` (Items und Kernpunkte
     von Jonas' Satz geändert), bricht `analyse.py` ab.
+
+## Hybride Bewertung
+
+Entscheidung: [ADR 0051](../adr/0051-hybride-bewertung.md); Ablauf: [Experiment durchführen](../how-to/run-the-experiment.md#hybride-bewertung-ohne-zweite-person).
+
+- **Wer bewertet:** Jonas die 24 Fragen aus `second_rater_sample.csv` und `hybrid_extra_sample.csv` (je C1–C3, 72
+  Antworten), das Sprachmodell (`llm_rater.py`) alle 144 Antworten C1–C3 und alle 48 Antworten K0.
+- **Zusatzfragen:** `config.HYBRID_EXTRA_QUESTIONS` Fragen aus den 36 außerhalb der Stichprobe, geschichtet wie die
+  Stichprobe ([Zweitbewertung](#zweitbewertung)), Seed `config.HYBRID_SEED` (`src/hybrid.py --mode draw`). Beide
+  Ziehungen zusammen bilden die Anteile des Katalogs genau ab: je 6 `procedural`, `factual`, `conceptual`, je 3
+  `comparative` und `limitation`, je 6 Fragen jeder Konstruktionsklasse.
+- **Werte der Arbeit:** je Frage die von Jonas, wenn er sie bewertet hat, sonst die des Sprachmodells; die Quelle steht
+  in jeder Zeile. Alle Tests sind nach Frage gepaart, so dass innerhalb einer Frage nur ein Bewerter vorkommt.
+- **Sensitivität** (beschreibend): dieselben Tests und Kennzahlen nur auf Jonas' 24 Fragen und auf allen 48 Fragen
+  nur mit den Werten des Sprachmodells.
+- **Übereinstimmung** Mensch–Sprachmodell auf den 72 Antworten mit den Maßen der [Zweitbewertung](#zweitbewertung),
+  Tabelle `agreement_llm.tex`.
+- **Umsetzung:** Zusatzfragen umgesetzt; K0 durch das Sprachmodell, Zusammenführen und die Auswertungen folgen
+  ([Plan](../plan.md#backlog), Punkt 3).
 
 ## Triangulation
 
