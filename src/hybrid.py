@@ -29,6 +29,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+import control_k0
 import llm_rater
 import second_rater
 from atomic_csv import read_csv, write_csv
@@ -37,10 +38,14 @@ from config import (
     HYBRID_EXTRA_SAMPLE_FILE,
     HYBRID_SEED,
     LLM_RATER_SCORES_FILE,
+    QUESTIONS_FILE,
     RUBRIC_CRITERIA,
+    SCORES_CONTROL_FILE,
     SCORES_FILE,
+    SCORING_CHECKS_CONTROL_FILE,
     SCORING_CHECKS_FILE,
     SCORING_KEY_FILE,
+    SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
 )
 from evaluate_answers import (
@@ -71,7 +76,12 @@ def paths(set_dir: Path | None) -> dict[str, Path]:
         extra, key = set_dir / HYBRID_EXTRA_SAMPLE_FILE.name, set_dir / SCORING_KEY_FILE.name
     llm_dir = llm_rater.paths(set_dir)["out_dir"]
     llm_scores = LLM_RATER_SCORES_FILE if set_dir is None else llm_dir / SCORES_FILE.name
+    scores_control = SCORES_CONTROL_FILE if set_dir is None else set_dir / SCORES_CONTROL_FILE.name
     return p | {
+        "control_items_file": llm_rater.paths(set_dir)["control_items_file"],
+        "llm_control_sheet_file": llm_dir / SCORING_SHEET_CONTROL_FILE.name,
+        "llm_control_checks_file": llm_dir / SCORING_CHECKS_CONTROL_FILE.name,
+        "scores_control_file": scores_control,
         "extra_file": extra,
         "key_file": key,
         "llm_dir": llm_dir,
@@ -272,14 +282,51 @@ def require_summarise(p: dict[str, Path]) -> dict:
     return record
 
 
+def run_summarise_control(p: dict[str, Path]) -> dict[tuple, dict]:
+    """Score K0 from the LLM's checks (scores_control.csv) and return the K0 and C1-C3 statistics
+    with the LLM's values on both sides (ADR 0051). Refuses unless hybrid summarise and the LLM's
+    control run happened and none of their files changed since."""
+    require_summarise(p)  # the LLM's folder and the summarise record, files unchanged
+    for path in (p["llm_control_sheet_file"], p["llm_control_checks_file"]):
+        _require_exists(path, "src/llm_rater.py --control")
+    require_run(
+        p["runs_file"],
+        llm_rater.CONTROL_STEP,
+        control_k0.CODE_SUFFIX,
+        [p["control_items_file"], p["key_points_file"]],
+        [p["llm_control_checks_file"], p["llm_control_sheet_file"]],
+    )
+    # summarise_control's record names `scores.csv` once: the LLM's file, not the mixed one
+    return control_k0.summarise_control(
+        questions_file=p["questions_file"],
+        ground_truth_file=p["ground_truth_file"],
+        sections_file=p["sections_file"],
+        documents_file=p["documents_file"],
+        freeze_file=p["freeze_file"],
+        scores_file=p["llm_scores_file"],
+        key_points_file=p["key_points_file"],
+        items_file=p["control_items_file"],
+        sheet_file=p["llm_control_sheet_file"],
+        checks_file=p["llm_control_checks_file"],
+        control_scores_file=p["scores_control_file"],
+        generation_runs_file=p["runs_file"],
+        # closed-book verdicts exist for the main catalogue only (as control_paths)
+        **({} if p["questions_file"] == QUESTIONS_FILE else {"closed_book_file": None}),
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     import argparse
 
     ap = argparse.ArgumentParser(description="Hybrid scoring (ADR 0051).")
-    ap.add_argument("--mode", choices=["draw", "summarise"], required=True)
+    ap.add_argument("--mode", choices=["draw", "summarise", "summarise-control"], required=True)
     ap.add_argument("--set", type=Path, metavar="DIR", help="a pilot set instead of the main run")
     args = ap.parse_args(argv)
     files = paths(args.set)
+    if args.mode == "summarise-control":
+        control_k0.print_control_summary(run_summarise_control(files))
+        print(f"K0 from the LLM -> {files['scores_control_file']}")
+        return
     if args.mode == "summarise":
         answers = run_summarise(files)
         print(

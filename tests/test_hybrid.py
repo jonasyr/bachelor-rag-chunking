@@ -12,7 +12,8 @@ import scoring_rules as rules
 import scoring_store
 import second_rater
 from atomic_csv import read_csv, write_csv
-from config import QUESTION_CLASSES, RUBRIC_CRITERIA, STRATEGY_IDS
+from config import CONTROL_CRITERIA, QUESTION_CLASSES, RUBRIC_CRITERIA, STRATEGY_IDS
+from control_k0 import CONTROL_SCORES_HEADER
 from evaluate_answers import HYBRID_SCORES_HEADER, KEY_HEADER, SCORES_HEADER, SHEET_HEADER
 from run_log import latest_run, sha256_of
 
@@ -417,3 +418,118 @@ def test_cli_summarise(scored, capsys):
     out = capsys.readouterr().out
     assert "72 human" in out and "72 llm" in out
     assert scored["scores_file"].exists() and scored["llm_scores_file"].exists()
+
+
+# --- summarise-control: K0 from the LLM (ADR 0051) -----------------------------------------------
+
+LLM_K0 = valid(1, wordy="yes")
+
+
+@pytest.fixture
+def k0_scored(scored, monkeypatch):
+    """`scored` after hybrid summarise, plus a K0 scaffold over every question and the LLM's
+    control run."""
+    from conftest import write_control_set
+
+    from run_log import append_scaffold_run
+
+    hybrid.run_summarise(scored)
+    folder = scored["llm_dir"].parent
+    qids = sorted(r[0] for r in valid_rows())
+    write_control_set(folder, qids)
+    items = scored["control_items_file"]
+    append_scaffold_run("K0", len(qids), {items.name: sha256_of(items)}, scored["runs_file"])
+    llm_rater.run(
+        llm_rater.paths(folder),
+        FakeOpenAI(reply=lambda n, call: valid_control(n, wordy="yes")),
+        control=True,
+    )
+    return scored
+
+
+def valid_control(n, **override):
+    return {k: v for k, v in valid(n).items() if k != "grounded"} | override
+
+
+def test_paths_add_the_control_files(tmp_path):
+    p = hybrid.paths(tmp_path)
+    assert p["control_items_file"] == tmp_path / "scoring_items_control.jsonl"
+    assert p["llm_control_sheet_file"] == tmp_path / "llm_rater" / "scoring_sheet_control.csv"
+    assert p["llm_control_checks_file"] == tmp_path / "llm_rater" / "scoring_checks_control.csv"
+    assert p["scores_control_file"] == tmp_path / "scores_control.csv"
+    assert hybrid.paths(None)["scores_control_file"] == hybrid.SCORES_CONTROL_FILE
+
+
+def test_summarise_control_uses_llm_values(k0_scored):
+    summary = hybrid.run_summarise_control(k0_scored)
+    rows = read_csv(k0_scored["scores_control_file"], CONTROL_SCORES_HEADER)
+    assert len(rows) == 48 and {r["strategy"] for r in rows} == {"K0"}
+    checks = rules.from_row(
+        read_csv(k0_scored["llm_control_checks_file"], rules.checks_header(True))[0], control=True
+    )[1]
+    for criterion, value in rules.derive_control(checks).items():
+        assert {r[criterion] for r in rows} == {str(value)}
+    # the C1-C3 side is the LLM's values, not the mixed file's (the raters differ on clarity)
+    llm = expected(LLM)
+    mixed = expected(HUMAN)
+    assert llm != mixed
+    for strategy in STRATEGY_IDS:
+        side = summary[("all", "all", strategy)]
+        for criterion in CONTROL_CRITERIA:
+            assert side[criterion] == pytest.approx(int(llm[criterion]))
+    assert summary[("all", "all", "K0")]["n"] == 48
+
+
+def test_summarise_control_logs_the_llm_inputs(k0_scored):
+    hybrid.run_summarise_control(k0_scored)
+    record = latest_run(k0_scored["runs_file"], "summarise_control", "K0")
+    assert record["inputs_sha256"] == {
+        "scoring_sheet_control.csv": sha256_of(k0_scored["llm_control_sheet_file"]),
+        "scoring_checks_control.csv": sha256_of(k0_scored["llm_control_checks_file"]),
+        "key_points.csv": sha256_of(k0_scored["key_points_file"]),
+        "scores.csv": sha256_of(k0_scored["llm_scores_file"]),
+    }
+
+
+def test_summarise_control_needs_llm_control_run(scored):
+    hybrid.run_summarise(scored)
+    with pytest.raises(RuntimeError, match="llm_rater"):
+        hybrid.run_summarise_control(scored)
+    assert not scored["scores_control_file"].exists()
+
+
+def test_summarise_control_refuses_an_edited_llm_control_sheet(k0_scored):
+    from control_k0 import CONTROL_SHEET_HEADER
+
+    rows = read_csv(k0_scored["llm_control_sheet_file"], CONTROL_SHEET_HEADER)
+    rows[0][CONTROL_CRITERIA[0]] = "0"
+    write_csv(k0_scored["llm_control_sheet_file"], CONTROL_SHEET_HEADER, rows)
+    with pytest.raises(RuntimeError, match="scoring_sheet_control.csv"):
+        hybrid.run_summarise_control(k0_scored)
+    assert not k0_scored["scores_control_file"].exists()
+
+
+def test_summarise_control_needs_hybrid_summarise(k0_scored):
+    runs = k0_scored["runs_file"]
+    kept = [
+        line
+        for line in runs.read_text(encoding="utf-8").splitlines()
+        if hybrid.SUMMARISE_STEP not in line
+    ]
+    runs.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="hybrid_summarise"):
+        hybrid.run_summarise_control(k0_scored)
+
+
+def test_summarise_control_refuses_an_edited_llm_scores_file(k0_scored):
+    k0_scored["llm_scores_file"].write_text(
+        k0_scored["llm_scores_file"].read_text(encoding="utf-8") + "\n", encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="scores.csv"):
+        hybrid.run_summarise_control(k0_scored)
+
+
+def test_cli_summarise_control(k0_scored, capsys):
+    hybrid.main(["--mode", "summarise-control", "--set", str(k0_scored["questions_file"].parent)])
+    assert "K0 from the LLM" in capsys.readouterr().out
+    assert k0_scored["scores_control_file"].exists()

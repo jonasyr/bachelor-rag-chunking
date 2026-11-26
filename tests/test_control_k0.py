@@ -269,3 +269,15 @@ def test_control_reads_a_scores_file_with_the_rater_column(k0):
     score_all(k0)
     summary = run_summary(k0)
     assert summary[("all", "all", "C1")]["total_score"] == 1.5
+
+
+def test_control_scaffold_reads_the_mixed_scores(k0):
+    rows = read(k0["scores_file"])
+    write_csv(
+        k0["scores_file"],
+        HYBRID_SCORES_HEADER,
+        [[*(r[h] for h in SCORES_HEADER), "human"] for r in rows],
+    )
+    assert run_scaffold(k0) == len(QIDS)
+    items = [json.loads(line) for line in k0["items_file"].read_text().splitlines()]
+    assert [i["code"] for i in items] == [f"{q}-K0" for q in sorted(QIDS)]
