@@ -747,7 +747,7 @@ def _k0_table(results: dict) -> str:
 def _hybrid_table(results: dict) -> str:
     """Total score per strategy for the mixed set and the two sensitivity analyses (ADR 0051)."""
     hyb = results["hybrid"]
-    header = ["Bewertung", *STRATEGY_IDS, "p (Friedman)", "n"]
+    header = ["Bewertung", *STRATEGY_IDS, "p (Friedman, Holm)", "n"]
     mixed = results["confirmatory"]["total_score"]
     blocks = [
         ("gemischt", results["answers"]["means"], mixed, results["n_questions"]),
@@ -761,15 +761,15 @@ def _hybrid_table(results: dict) -> str:
     ]
     rows = [
         [label, *(fmt_de(means[s]["total_score"], REPORT_DECIMALS) for s in STRATEGY_IDS),
-         fmt_p(test["p"]) if test["testable"] else "nicht testbar", str(n)]
+         fmt_p(test["p_adj"]) if test["testable"] else "nicht testbar", str(n)]
         for label, means, test, n in blocks
     ]  # fmt: skip
     note = (
-        "Mittlerer Gesamtwert der Antwort je Strategie. Gemischt: Hauptauswertung "
+        "Mittlerer Gesamtwert der Antwort je Strategie; gemischt: Hauptauswertung "
         f"({hyb['n_human_questions']} Fragen von Jonas, {hyb['n_llm_questions']} vom "
-        "Sprachmodell bewertet), p ohne Holm-Korrektur. Nur Jonas' Fragen und nur Sprachmodell "
-        "(alle Fragen mit den Werten des Sprachmodells): Sensitivitätsanalysen, deskriptiv, "
-        "Friedman-Test je Analyse für sich."
+        "Sprachmodell bewertet), nur Sprachmodell: alle Fragen mit dessen Werten. "
+        "gemischt: p nach Holm wie in Tabelle tests; die Sensitivitätsanalysen sind beschreibend, "
+        "je eine eigene Familie."
     )
     return latex_table(
         "hybrid_sensitivity", "Sensitivitätsanalyse der hybriden Bewertung (ADR 0051)", header,

@@ -659,10 +659,28 @@ def test_hybrid_k0_uses_llm_side():
     assert results["answers"]["means"]["C1"]["total_four"] == pytest.approx(
         float(mixed_c1[CONTROL_CRITERIA].apply(pd.to_numeric).mean(axis=1).mean())
     )
+    # the effect compares the LLM's C1 with K0, question by question
+    import stats
+
+    llm_c1 = data.scores_llm[data.scores_llm["strategy"] == "C1"].set_index("question_id")
+    four = llm_c1[CONTROL_CRITERIA].apply(pd.to_numeric).mean(axis=1)
+    k0_four = data.scores_control.set_index("question_id")[CONTROL_CRITERIA]
+    k0_four = k0_four.apply(pd.to_numeric).mean(axis=1)
+    pair = stats.wilcoxon_pair([float(four[q]) for q in QIDS], [float(k0_four[q]) for q in QIDS])
+    assert results["control_k0"]["C1"]["n_nonzero"] == pair["n_nonzero"]
+    assert results["control_k0"]["C1"]["r"] == pytest.approx(pair["r"])
 
 
 # sha256 of the results (without `hybrid` and the hybrid skip note) computed before the hybrid
-# analysis existed (commit 9b555d9); a changed digest means the non-hybrid numbers moved
+# analysis existed (commit 9b555d9); a changed digest means the non-hybrid numbers moved.
+# To regenerate: `git checkout 9b555d9`, then run with `uv run python` from the repo root:
+#   import hashlib, json, sys; from dataclasses import replace; sys.path[:0] = ["src", "tests"]
+#   import test_report_tables as t; from report_tables import build_results
+#   h = lambda d: hashlib.sha256(json.dumps(build_results(d, 0.05), sort_keys=True).encode())
+#   full = t.agreement_data(); full = replace(full, repeat_rating=full.second_rating,
+#       llm_rating=full.second_rating | {"model": "judge-x"})
+#   for d in (full, t.make_data(verdicts=False, chunks=False, embedding=False, control=False),
+#             t.ragas_data(repeat=True)): print(h(d).hexdigest())
 NON_HYBRID_DIGESTS = {
     "full": "f2fa8fe9125200fee579eaff2ea7a75cec1b11e7abdc0e18e6f6d236f2e638b4",
     "minimal": "e4861a98d14099397ea9fa64d039bb6fa151c0467cb1be10a96396745fc597a3",
@@ -701,7 +719,7 @@ def test_write_hybrid_sensitivity_table(tmp_path):
     assert "Sensitivitätsanalyse der hybriden Bewertung (ADR 0051)" in text
     for label in ("gemischt", "nur Jonas' Fragen", "nur Sprachmodell"):
         assert label in text
-    assert "deskriptiv" in text and r"\hline" not in text
+    assert "beschreibend" in text and r"\hline" not in text
     assert fmt_de(results["hybrid"]["sensitivity"]["llm"]["means"]["C2"]["total_score"], 2) in text
     # not hybrid: no table (a stale one is removed) and a note
     (tmp_path / "n").mkdir()
@@ -718,3 +736,30 @@ def test_hybrid_results_in_json(tmp_path):
     loaded = json.loads((tmp_path / "analysis.json").read_text(encoding="utf-8"))
     assert loaded["hybrid"]["n_human_questions"] == len(HUMAN)
     assert set(loaded["hybrid"]["sensitivity"]) == {"human", "llm"}
+
+
+def test_hybrid_fields_change_only_hybrid_and_k0():
+    """At test time: the hybrid fields move only `hybrid`, the K0 comparison and the notes."""
+    hyb = hybrid_data()
+    h = build_results(hyb, 0.05)
+    p = build_results(replace(hyb, scores_llm=None, human_questions=None), 0.05)
+    assert set(h) == set(p)
+    for key in set(h) - {"hybrid", "control_k0", "notes"}:
+        assert h[key] == p[key], key
+
+
+def test_hybrid_table_shows_holm_adjusted_p(tmp_path):
+    results = build_results(hybrid_data(), 0.05)
+    results["confirmatory"]["total_score"].update(p=0.02, p_adj=0.06, testable=True)
+    for b, (p, p_adj) in zip(
+        results["hybrid"]["sensitivity"].values(), ((0.11, 0.21), (0.31, 0.41)), strict=True
+    ):
+        b["test"].update(p=p, p_adj=p_adj, testable=True)
+    write_tables(results, tmp_path)
+    text = (tmp_path / "hybrid_sensitivity.tex").read_text(encoding="utf-8")
+    assert "p (Friedman, Holm)" in text
+    rows = {line.split(" & ")[0]: line.split(" & ") for line in text.splitlines() if " & " in line}
+    assert rows["gemischt"][4] == fmt_de(0.06, 3)
+    assert rows["nur Jonas' Fragen"][4] == fmt_de(0.21, 3)
+    assert rows["nur Sprachmodell"][4] == fmt_de(0.41, 3)
+    assert "gemischt: p nach Holm wie in Tabelle tests" in text
