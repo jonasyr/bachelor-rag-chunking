@@ -717,7 +717,7 @@ def test_write_hybrid_sensitivity_table(tmp_path):
     text = (tmp_path / "h" / "hybrid_sensitivity.tex").read_text(encoding="utf-8")
     assert r"\label{tab:hybrid_sensitivity}" in text
     assert "Sensitivitätsanalyse der hybriden Bewertung (ADR 0051)" in text
-    for label in ("gemischt", "nur Jonas' Fragen", "nur Sprachmodell"):
+    for label in ("gemischt", "nur menschlich bewertete Fragen", "nur Sprachmodell"):
         assert label in text
     assert "beschreibend" in text and r"\hline" not in text
     assert fmt_de(results["hybrid"]["sensitivity"]["llm"]["means"]["C2"]["total_score"], 2) in text
@@ -757,10 +757,10 @@ def test_hybrid_table_shows_holm_adjusted_p(tmp_path):
         b["test"].update(p=p, p_adj=p_adj, testable=True)
     write_tables(results, tmp_path)
     text = (tmp_path / "hybrid_sensitivity.tex").read_text(encoding="utf-8")
-    assert "p (Friedman, Holm)" in text
+    assert "p (Friedman; gemischt: Holm)" in text
     rows = {line.split(" & ")[0]: line.split(" & ") for line in text.splitlines() if " & " in line}
     assert rows["gemischt"][4] == fmt_de(0.06, 3)
-    assert rows["nur Jonas' Fragen"][4] == fmt_de(0.21, 3)
+    assert rows["nur menschlich bewertete Fragen"][4] == fmt_de(0.21, 3)
     assert rows["nur Sprachmodell"][4] == fmt_de(0.41, 3)
     assert "gemischt: p nach Holm wie in Tabelle tests" in text
 

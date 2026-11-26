@@ -8,12 +8,12 @@ reference. The scorer is injected (src/ragas_client.py builds the real one), so 
 tested without the API. Everything is checked before the first call: the main catalogue must be
 frozen, `generated_answers.csv` must be the output of the latest `generate` run and, on the main
 catalogue, a current `summarise` record (hybrid run: `hybrid_summarise`, ADR 0051) must exist (the
-rule-based scoring is done); a pilot set
-without it only gets a note. The output is never overwritten. The run stops without writing
-anything if a value is invalid (outside 0-1, or empty without a reason from the metric itself),
-if the scorer fails, or if the judge changed (several reported models or system fingerprints, or a
-new creation time of the model object, ADR 0033). A NaN that the metric gives with a reason is
-valid: stored as an empty cell with the reason, counted and reported.
+rule-based scoring is done); a pilot set without it only gets a note. The output is never
+overwritten. The run stops without writing anything if a value is invalid (outside 0-1, or empty
+without a reason from the metric itself), if the scorer fails, or if the judge changed (several
+reported models or system fingerprints, or a new creation time of the model object, ADR 0033). A
+NaN that the metric gives with a reason is valid: stored as an empty cell with the reason, counted
+and reported.
 
 Output schema (docs/reference/data-formats.md): question_id, strategy, the four metrics,
 nan_reasons. `--repeat` (pilot sets only) writes ragas_scores_repeat.csv under the step

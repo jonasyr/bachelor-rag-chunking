@@ -378,6 +378,18 @@ def test_main_pilot_set_skips_the_tree_check(pilot, monkeypatch):
     assert seen["p"] == pilot
 
 
+def test_main_control_runs_the_k0_set(pilot, monkeypatch):
+    seen = {}
+    monkeypatch.setattr("run_log.require_clean_tree", lambda: pytest.fail("checked"))
+    monkeypatch.setattr(
+        llm_rater,
+        "run",
+        lambda p, client=None, control=False: seen.update(control=control) or {"answers": 0},
+    )
+    llm_rater.main(["--set", str(pilot["out_dir"].parent), "--control"])
+    assert seen["control"] is True
+
+
 # --- control K0 (ADR 0041, 0051) ---------------------------------------------------------------
 
 PROMPTS_SHA256_C1_C3 = "1e6468da61459fdbbfdee91122d4258dd0f26bcc4fdd06bf967690fac72e54c9"
@@ -485,7 +497,7 @@ def test_run_control_writes_k0_files_and_record(k0_set):
 
 def test_run_control_needs_k0_scaffold(pilot):
     client = FakeOpenAI()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="not found"):
         llm_rater.run(pilot, client=client, control=True)
     assert client.requests == []
 
@@ -495,7 +507,7 @@ def test_run_control_needs_scaffold_record(pilot):
 
     write_control_set(pilot["items_file"].parent)  # items, but no scaffold record
     client = FakeOpenAI()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="no scaffold run over K0"):
         llm_rater.run(pilot, client=client, control=True)
     assert client.requests == []
 
@@ -504,6 +516,6 @@ def test_run_control_refuses_changed_items(k0_set):
     with k0_set["control_items_file"].open("a", encoding="utf-8") as f:
         f.write("\n")
     client = FakeOpenAI()
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="differs from the latest scaffold run"):
         llm_rater.run(k0_set, client=client, control=True)
     assert client.requests == []

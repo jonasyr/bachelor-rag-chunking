@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 import agreement
+import hybrid
 import stats
 from analysis_data import AnalysisData
 from config import (
@@ -272,7 +273,7 @@ def _hybrid(data: AnalysisData, qids: list[str], alpha: float) -> dict | None:
     return {
         "n_human_questions": len(human),
         "n_llm_questions": len(qids) - len(human),
-        "raters": {r: int(raters.get(r, 0)) for r in ("human", "llm")},
+        "raters": {r: int(raters.get(r, 0)) for r in (hybrid.RATER_HUMAN, hybrid.RATER_LLM)},
         "sensitivity": {
             "human": _total_block(_answer_frame(data), human, alpha),
             "llm": _total_block(_answer_frame(data, data.scores_llm), qids, alpha),
@@ -755,14 +756,14 @@ def _k0_table(results: dict) -> str:
 def _hybrid_table(results: dict) -> str:
     """Total score per strategy for the mixed set and the two sensitivity analyses (ADR 0051)."""
     hyb = results["hybrid"]
-    header = ["Bewertung", *STRATEGY_IDS, "p (Friedman, Holm)", "n"]
+    header = ["Bewertung", *STRATEGY_IDS, "p (Friedman; gemischt: Holm)", "n"]
     mixed = results["confirmatory"]["total_score"]
     blocks = [
         ("gemischt", results["answers"]["means"], mixed, results["n_questions"]),
         *(
             (label, b["means"], b["test"], b["n_questions"])
             for label, b in (
-                ("nur Jonas' Fragen", hyb["sensitivity"]["human"]),
+                ("nur menschlich bewertete Fragen", hyb["sensitivity"]["human"]),
                 ("nur Sprachmodell", hyb["sensitivity"]["llm"]),
             )
         ),
@@ -774,7 +775,7 @@ def _hybrid_table(results: dict) -> str:
     ]  # fmt: skip
     note = (
         "Mittlerer Gesamtwert der Antwort je Strategie; gemischt: Hauptauswertung "
-        f"({hyb['n_human_questions']} Fragen von Jonas, {hyb['n_llm_questions']} vom "
+        f"({hyb['n_human_questions']} Fragen menschlich, {hyb['n_llm_questions']} vom "
         "Sprachmodell bewertet), nur Sprachmodell: alle Fragen mit dessen Werten. "
         "gemischt: p nach Holm wie in Tabelle tests; die Sensitivitätsanalysen sind beschreibend, "
         "je eine eigene Familie."

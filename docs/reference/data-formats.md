@@ -628,7 +628,7 @@ Klasse; negative Werte mit typografischem Minus.
 | `agreement` | Erst- gegen Zweitbewertung ([Evaluation](evaluation.md#zweitbewertung)) | keine abgeschlossene Zweitbewertung |
 | `agreement_intra` | Erst- gegen Wiederholungsbewertung | keine abgeschlossene Wiederholung |
 | `agreement_llm` | Erstbewertung gegen LLM-Gegenprobe (im hybriden Lauf nur Jonas' 72 Antworten) | kein Laufeintrag `llm_rater` |
-| `hybrid_sensitivity` | Gesamtwert je Strategie gemischt, nur Jonas' Fragen, nur Sprachmodell, mit p (Friedman, Holm) und n ([ADR 0051](../adr/0051-hybride-bewertung.md)) | kein Laufeintrag `hybrid_summarise` |
+| `hybrid_sensitivity` | Gesamtwert je Strategie gemischt, nur menschlich bewertete Fragen, nur Sprachmodell, mit p (Friedman; gemischt nach Holm) und n ([ADR 0051](../adr/0051-hybride-bewertung.md)) | kein Laufeintrag `hybrid_summarise` |
 
 **Abbildungen** (`output/figures/<Name>.pdf`, in Endgröße; Inhalte: [Evaluation](evaluation.md#visualisierungen)):
 
@@ -673,7 +673,7 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
   `config.AGREEMENT_CI_LEVEL`); `null` ohne abgeschlossene Zweitbewertung. `agreement_intra` und `agreement_llm` haben
   dieselbe Form (`agreement_llm` zusätzlich `model`), `null` ohne ihre Quelle.
 - `hybrid`: `null` außerhalb des hybriden Laufs; sonst `n_human_questions`, `n_llm_questions`, `raters` (Antworten je
-  `human`, `llm`) und `sensitivity` mit `human` (nur Jonas' Fragen) und `llm` (alle Fragen, nur Sprachmodell), je
+  `human`, `llm`) und `sensitivity` mit `human` (nur menschlich bewertete Fragen) und `llm` (alle Fragen, nur Sprachmodell), je
   `n_questions`, `descriptive` (`true`), `means` je Strategie und Kriterium, `test` (Friedman des Gesamtwerts als
   eigene Familie, Form wie in `confirmatory`; beschreibend, die p-Werte sind explorativ) und `differences` (wie
   `differences`). Im hybriden Lauf vergleicht `control_k0` K0 mit den Werten des Sprachmodells für C1–C3.

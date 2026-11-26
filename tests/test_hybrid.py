@@ -370,6 +370,18 @@ def test_summarise_needs_llm_run(set_dir, monkeypatch):
     assert no_scores(p)
 
 
+def test_summarise_needs_the_llm_record(scored):
+    """The LLM files are there but their run record is not: refused on the missing record."""
+    runs = scored["runs_file"]
+    kept = [
+        line for line in runs.read_text(encoding="utf-8").splitlines() if '"llm_rater"' not in line
+    ]
+    runs.write_text("".join(f"{line}\n" for line in kept), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="no llm_rater run"):
+        hybrid.run_summarise(scored)
+    assert no_scores(scored)
+
+
 def test_summarise_refuses_an_edited_llm_sheet(scored):
     rows = read_csv(scored["llm_sheet_file"], SHEET_HEADER)
     rows[0][RUBRIC_CRITERIA[0]] = "0"
