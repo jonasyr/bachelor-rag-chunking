@@ -35,6 +35,9 @@ from atomic_csv import read_csv, write_csv
 from config import (
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    LLM_RATER_CONTROL_JOURNAL_FILE_NAME,
+    LLM_RATER_CONTROL_SYSTEM_PROMPT,
+    LLM_RATER_CONTROL_USER_TEMPLATE,
     LLM_RATER_DIR,
     LLM_RATER_DIR_NAME,
     LLM_RATER_EXCERPT_TEMPLATE,
@@ -50,10 +53,14 @@ from config import (
     LLM_RATER_TEMPERATURE,
     LLM_RATER_USER_TEMPLATE,
     QUESTIONS_FILE,
+    SCORING_CHECKS_CONTROL_FILE,
     SCORING_CHECKS_FILE,
+    SCORING_ITEMS_CONTROL_FILE,
+    SCORING_SHEET_CONTROL_FILE,
     SCORING_SHEET_FILE,
     STRATEGY_IDS,
 )
+from control_k0 import CODE_SUFFIX, CONTROL_SHEET_HEADER
 from embedding_client import drain_http_errors
 from evaluate_answers import SHEET_HEADER
 from generate import COMPLETION_FIELDS, checked, created_iso, usage_detail
@@ -70,6 +77,7 @@ from run_log import (
 )
 
 STEP = "llm_rater"
+CONTROL_STEP = "llm_rater_control"  # the closed-book control K0 (ADR 0041, 0051)
 STRATEGY = ",".join(STRATEGY_IDS)
 SCOPES = ("all", "sample")
 
@@ -89,14 +97,19 @@ def paths(set_dir: Path | None) -> dict:
         "runs_file",
     )
     out = LLM_RATER_DIR if set_dir is None else set_dir / LLM_RATER_DIR_NAME
-    return {k: p[k] for k in keep} | {"out_dir": out}
+    control_items = (
+        SCORING_ITEMS_CONTROL_FILE if set_dir is None else set_dir / SCORING_ITEMS_CONTROL_FILE.name
+    )
+    return {k: p[k] for k in keep} | {"out_dir": out, "control_items_file": control_items}
 
 
-def schema(n_points: int) -> dict:
+def schema(n_points: int, control: bool = False) -> dict:
     """The strict JSON schema of one answer: every check with its options, one mark per key point
-    and a short reason (OpenAI strict mode: every property required, no other properties)."""
+    and a short reason (OpenAI strict mode: every property required, no other properties).
+    K0 (`control`) has no `grounded`: it saw no excerpts."""
+    checks = rules.checks_for(control)
     properties: dict[str, dict] = {
-        "declines": {"type": "string", "enum": list(rules.CHECKS["declines"])},
+        "declines": {"type": "string", "enum": list(checks["declines"])},
         "points": {
             "type": "array",
             "items": {"type": "string", "enum": list(rules.POINT_MARKS)},
@@ -104,7 +117,7 @@ def schema(n_points: int) -> dict:
             "maxItems": n_points,
         },
     }
-    for check, options in rules.CHECKS.items():
+    for check, options in checks.items():
         properties.setdefault(check, {"type": "string", "enum": list(options)})
     properties["reason"] = {"type": "string"}
     return {
@@ -115,17 +128,24 @@ def schema(n_points: int) -> dict:
     }
 
 
-def response_format(n_points: int) -> dict:
+def response_format(n_points: int, control: bool = False) -> dict:
     return {
         "type": "json_schema",
-        "json_schema": {"name": LLM_RATER_SCHEMA_NAME, "strict": True, "schema": schema(n_points)},
+        "json_schema": {
+            "name": LLM_RATER_SCHEMA_NAME,
+            "strict": True,
+            "schema": schema(n_points, control),
+        },
     }
 
 
-def messages(item: dict, key_points: list[str]) -> list[dict]:
+def messages(item: dict, key_points: list[str], control: bool = False) -> list[dict]:
     """System prompt and the user message of one blind item; only question, reference answer,
-    key points, excerpts and answer are used (never the code or anything else of the item)."""
-    user = LLM_RATER_USER_TEMPLATE.format(
+    key points, excerpts and answer are used (never the code or anything else of the item).
+    K0 (`control`) has no excerpts section."""
+    template = LLM_RATER_CONTROL_USER_TEMPLATE if control else LLM_RATER_USER_TEMPLATE
+    system = LLM_RATER_CONTROL_SYSTEM_PROMPT if control else LLM_RATER_SYSTEM_PROMPT
+    user = template.format(
         question=item["question"],
         reference_answer=item["reference_answer"],
         key_points="\n".join(
@@ -139,12 +159,12 @@ def messages(item: dict, key_points: list[str]) -> list[dict]:
         answer=item["answer"],
     )
     return [
-        {"role": "system", "content": LLM_RATER_SYSTEM_PROMPT},
+        {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
 
 
-def to_checks(parsed: Any, n_points: int) -> dict:
+def to_checks(parsed: Any, n_points: int, control: bool = False) -> dict:
     """The checks of a parsed answer, as the app stores them: with declines = yes the key points
     and skipped checks take their fixed values (rules.declined); then validated (rules.validate).
     Raise ValueError for anything else than the schema's fields and options."""
@@ -155,23 +175,21 @@ def to_checks(parsed: Any, n_points: int) -> dict:
     if not isinstance(parsed.get("points"), list):
         raise ValueError("the answer's `points` is not a list")
     checks = {k: v for k, v in parsed.items() if k != "reason"}
-    if set(checks) == {"points", *rules.CHECKS}:
-        checks = rules.declined(checks, n_points)
-    rules.validate(checks, n_points)
+    if set(checks) == {"points", *rules.checks_for(control)}:
+        checks = rules.declined(checks, n_points, control)
+    rules.validate(checks, n_points, control)
     return checks
 
 
-def prompts_sha256() -> str:
+def prompts_sha256(control: bool = False) -> str:
     """Checksum of the prompt texts and the schema layout (with one key point)."""
-    text = "\x00".join(
-        [
-            LLM_RATER_SYSTEM_PROMPT,
-            LLM_RATER_USER_TEMPLATE,
-            LLM_RATER_POINT_TEMPLATE,
-            LLM_RATER_EXCERPT_TEMPLATE,
-            json.dumps(response_format(1), sort_keys=True),
-        ]
-    )
+    if control:
+        texts = [LLM_RATER_CONTROL_SYSTEM_PROMPT, LLM_RATER_CONTROL_USER_TEMPLATE]
+        texts += [LLM_RATER_POINT_TEMPLATE]
+    else:
+        texts = [LLM_RATER_SYSTEM_PROMPT, LLM_RATER_USER_TEMPLATE, LLM_RATER_POINT_TEMPLATE]
+        texts += [LLM_RATER_EXCERPT_TEMPLATE]
+    text = "\x00".join([*texts, json.dumps(response_format(1, control), sort_keys=True)])
     return hashlib.sha256(text.encode()).hexdigest()
 
 
@@ -206,12 +224,29 @@ def _selected(p: dict, items: list[dict], scope: str) -> tuple[list[dict], list[
     return [i for i in items if i["question_id"] in sampled], [*inputs, p["sample_file"]]
 
 
-def run(p: dict, client: Any = None) -> dict:
+def _control_items(p: dict) -> list[dict]:
+    """The K0 items, refused unless the K0 scaffold record covers the file as it is now."""
+    items_file = p["control_items_file"]
+    if not items_file.exists():
+        raise RuntimeError(f"{items_file} not found; scaffold the control K0 first (ADR 0041)")
+    require_run(p["runs_file"], "scaffold", CODE_SUFFIX, [], [items_file])
+    lines = items_file.read_text(encoding="utf-8").splitlines()
+    return [json.loads(line) for line in lines if line.strip()]
+
+
+def run(p: dict, client: Any = None, control: bool = False) -> dict:
     """Ask the judge for every item of the scope (or take its answer from the journal), write
-    the checks and the sheet and append the run record; return the record."""
+    the checks and the sheet and append the run record; return the record. With `control` the
+    judge rates the whole closed-book K0 set instead (no excerpts, no grounded)."""
     out = p["out_dir"]
-    checks_file, sheet_file = out / SCORING_CHECKS_FILE.name, out / SCORING_SHEET_FILE.name
-    journal_file = out / LLM_RATER_JOURNAL_FILE_NAME
+    step, strategy = (CONTROL_STEP, CODE_SUFFIX) if control else (STEP, STRATEGY)
+    if control:
+        checks_file = out / SCORING_CHECKS_CONTROL_FILE.name
+        sheet_file = out / SCORING_SHEET_CONTROL_FILE.name
+        journal_file = out / LLM_RATER_CONTROL_JOURNAL_FILE_NAME
+    else:
+        checks_file, sheet_file = out / SCORING_CHECKS_FILE.name, out / SCORING_SHEET_FILE.name
+        journal_file = out / LLM_RATER_JOURNAL_FILE_NAME
     for path in (checks_file, sheet_file):
         if path.exists():
             raise FileExistsError(
@@ -224,8 +259,13 @@ def run(p: dict, client: Any = None) -> dict:
         scoring_store.require_frozen_key_points(own)
     except PermissionError as error:
         raise RuntimeError(f"{error}; freeze the key points in the app first") from None
-    scope = LLM_RATER_SCOPE
-    items, inputs = _selected(p, scoring_store.load_items(own), scope)
+    if control:  # K0 is always rated whole: the scope does not apply
+        scope = "all"
+        items = _control_items(p)
+        inputs = [p["control_items_file"], p["key_points_file"]]
+    else:
+        scope = LLM_RATER_SCOPE
+        items, inputs = _selected(p, scoring_store.load_items(own), scope)
     points = scoring_store.load_key_points(own)
     if not items:
         raise RuntimeError(f"no items in scope {scope!r}")
@@ -253,10 +293,10 @@ def run(p: dict, client: Any = None) -> dict:
     journal = Journal(
         journal_file,
         {
-            "step": STEP,
-            "strategy": STRATEGY,
+            "step": step,
+            "strategy": strategy,
             **llm_rater_settings(scope),
-            "prompts_sha256": prompts_sha256(),
+            "prompts_sha256": prompts_sha256(control),
             "model_created": created_iso(created_before),
             "inputs_sha256": inputs_sha256,
         },
@@ -271,7 +311,8 @@ def run(p: dict, client: Any = None) -> dict:
         for item in items:
             code, qid = item["code"], item["question_id"]
             n_points = len(points[qid])
-            msgs, fmt = messages(item, points[qid]), response_format(n_points)
+            msgs = messages(item, points[qid], control)
+            fmt = response_format(n_points, control)
             digest = request_sha256(msgs, fmt)
             entry = done.get(code)
             if entry is None:  # not yet paid for: ask the API and journal the answer at once
@@ -297,7 +338,7 @@ def run(p: dict, client: Any = None) -> dict:
             )
             try:
                 parsed = json.loads(answer.text)
-                results[code] = to_checks(parsed, n_points)
+                results[code] = to_checks(parsed, n_points, control)
             except ValueError as error:  # JSONDecodeError is a ValueError
                 raise ValueError(f"{code}: invalid answer of the judge: {error}") from None
         created_after = model_created()
@@ -311,15 +352,16 @@ def run(p: dict, client: Any = None) -> dict:
         journal.abort(error, answers_received=received, http_errors=drain_http_errors())
         raise
 
-    checks_rows = [rules.to_row(i["code"], results[i["code"]]) for i in items]
+    derive = rules.derive_control if control else rules.derive
+    checks_rows = [rules.to_row(i["code"], results[i["code"]], control) for i in items]
     sheet_rows = [
         {"code": i["code"], "question_id": i["question_id"]}
-        | {c: str(v) for c, v in rules.derive(results[i["code"]]).items()}
+        | {c: str(v) for c, v in derive(results[i["code"]]).items()}
         | {"notes": ""}
         for i in items
     ]
-    write_csv(checks_file, rules.CHECKS_HEADER, checks_rows)
-    write_csv(sheet_file, SHEET_HEADER, sheet_rows)
+    write_csv(checks_file, rules.checks_header(control), checks_rows)
+    write_csv(sheet_file, CONTROL_SHEET_HEADER if control else SHEET_HEADER, sheet_rows)
     entries = journal.of("item")
     prompt_tokens = sum(e["prompt_tokens"] for e in entries)
     completion_tokens = sum(e["completion_tokens"] for e in entries)
@@ -327,12 +369,12 @@ def run(p: dict, client: Any = None) -> dict:
         "date": date.today().isoformat(),
         **llm_rater_settings(scope),
         **environment(),
-        "step": STEP,
-        "strategy": STRATEGY,
+        "step": step,
+        "strategy": strategy,
         "model_reported": next(iter(models), None),
         "model_created": created_iso(created_before),
         "system_fingerprint": next(iter(fingerprints), None),
-        "prompts_sha256": prompts_sha256(),
+        "prompts_sha256": prompts_sha256(control),
         "answers": len(items),
         "sessions": len(journal.of("session")),
         "session_commits": session_commits(journal),
@@ -346,6 +388,8 @@ def run(p: dict, client: Any = None) -> dict:
         "cached_tokens": sum(usage_detail(e["response"], "cached_tokens") for e in entries),
         "cost_usd": llm_rater_cost(prompt_tokens, completion_tokens),
     }
+    if control:
+        record["control"] = True
     append_record(record, p["runs_file"])
     return record
 
@@ -363,6 +407,9 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--set", type=Path, metavar="DIR", help="a pilot set (e.g. data/pilot/hard) instead"
     )
+    parser.add_argument(
+        "--control", action="store_true", help="rate the closed-book control K0 instead (ADR 0051)"
+    )
     args = parser.parse_args(argv)
     if args.set and is_main_catalogue(
         args.set / QUESTIONS_FILE.name, args.set / GROUND_TRUTH_FILE.name
@@ -373,7 +420,7 @@ def main(argv: list[str] | None = None) -> None:
         require_clean_tree()
     logging.basicConfig(format="%(levelname)s %(name)s: %(message)s")
     logging.getLogger("openai").setLevel(logging.INFO)  # shows each SDK retry (ADR 0050)
-    record = run(p)
+    record = run(p, control=True) if args.control else run(p)
     print(f"{record['answers']} answers checked -> {p['out_dir']}")
 
 

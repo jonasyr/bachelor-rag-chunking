@@ -376,3 +376,134 @@ def test_main_pilot_set_skips_the_tree_check(pilot, monkeypatch):
     monkeypatch.setattr(llm_rater, "run", lambda p, client=None: seen.update(p=p) or {"answers": 0})
     llm_rater.main(["--set", str(pilot["out_dir"].parent)])
     assert seen["p"] == pilot
+
+
+# --- control K0 (ADR 0041, 0051) ---------------------------------------------------------------
+
+PROMPTS_SHA256_C1_C3 = "1e6468da61459fdbbfdee91122d4258dd0f26bcc4fdd06bf967690fac72e54c9"
+
+
+def valid_control(n: int, **override) -> dict:
+    answer = {k: v for k, v in valid(n).items() if k != "grounded"}
+    return answer | override
+
+
+@pytest.fixture
+def k0_set(pilot):
+    """The pilot set plus a K0 scaffold (items file and its scaffold record over K0)."""
+    from conftest import write_control_set
+
+    from run_log import append_scaffold_run
+
+    folder = pilot["items_file"].parent
+    write_control_set(folder)
+    items_file = pilot["control_items_file"]
+    append_scaffold_run("K0", 2, {items_file.name: sha256_of(items_file)}, pilot["runs_file"])
+    return pilot
+
+
+def control_outputs(p: dict) -> tuple[list[dict], list[dict]]:
+    from control_k0 import CONTROL_SHEET_HEADER
+
+    checks = read_csv(p["out_dir"] / "scoring_checks_control.csv", rules.checks_header(True))
+    sheet = read_csv(p["out_dir"] / "scoring_sheet_control.csv", CONTROL_SHEET_HEADER)
+    return checks, sheet
+
+
+def test_control_schema_has_no_grounded():
+    s = llm_rater.schema(2, control=True)
+    assert "grounded" not in s["properties"]
+    assert set(s["required"]) == {"points", *rules.CONTROL_CHECKS, "reason"}
+
+
+def test_control_messages_have_no_excerpts():
+    from config import LLM_RATER_CONTROL_SYSTEM_PROMPT
+
+    item = {"question": "q?", "reference_answer": "r", "answer": "a", "excerpts": []}
+    msgs = llm_rater.messages(item, ["p"], control=True)
+    assert msgs[0] == {"role": "system", "content": LLM_RATER_CONTROL_SYSTEM_PROMPT}
+    user = msgs[1]["content"]
+    assert "## Reference answer" in user and "## Answer" in user
+    assert "## Excerpts" not in user
+
+
+def test_control_prompt_uses_k0_wording():
+    from config import (
+        LLM_RATER_CONTROL_SYSTEM_PROMPT,
+        RUBRIC_CHECK_QUESTIONS,
+        RUBRIC_CONTROL_QUESTIONS,
+    )
+
+    assert RUBRIC_CONTROL_QUESTIONS["hallucination"] in LLM_RATER_CONTROL_SYSTEM_PROMPT
+    assert RUBRIC_CONTROL_QUESTIONS["declines"] in LLM_RATER_CONTROL_SYSTEM_PROMPT
+    assert RUBRIC_CHECK_QUESTIONS["grounded"] not in LLM_RATER_CONTROL_SYSTEM_PROMPT
+
+
+def test_control_declines_takes_fixed_values():
+    parsed = valid_control(2, declines="yes", core_wrong="yes", hallucination="minor")
+    checks = llm_rater.to_checks(parsed, 2, control=True)
+    expected = rules.declined({k: v for k, v in parsed.items() if k != "reason"}, 2, control=True)
+    assert checks == expected
+    assert "reason" not in checks and "grounded" not in checks
+
+
+def test_c1_c3_run_unchanged():
+    assert llm_rater.prompts_sha256() == PROMPTS_SHA256_C1_C3
+    assert llm_rater.prompts_sha256(control=True) != PROMPTS_SHA256_C1_C3
+
+
+def test_run_control_writes_k0_files_and_record(k0_set):
+    client = FakeOpenAI(reply=lambda n, call: valid_control(n, wordy="yes"))
+    record = llm_rater.run(k0_set, client=client, control=True)
+    checks, sheet = control_outputs(k0_set)
+    assert [r["code"] for r in checks] == [r["code"] for r in sheet] == ["H01-K0", "H02-K0"]
+    from config import CONTROL_CRITERIA
+
+    for c, s in zip(checks, sheet, strict=True):
+        values = rules.derive_control(rules.from_row(c, control=True)[1])
+        assert {k: int(s[k]) for k in CONTROL_CRITERIA} == values and s["notes"] == ""
+    assert len(client.requests) == 2
+    assert (
+        "grounded"
+        not in client.requests[0]["response_format"]["json_schema"]["schema"]["properties"]
+    )
+    assert record["step"] == "llm_rater_control" and record["strategy"] == "K0"
+    assert record["answers"] == 2 and record["control"] is True
+    stored = latest_run(k0_set["runs_file"], "llm_rater_control", "K0")
+    assert stored == record
+    assert stored["outputs_sha256"] == {
+        name: sha256_of(k0_set["out_dir"] / name)
+        for name in (
+            "scoring_checks_control.csv",
+            "scoring_sheet_control.csv",
+            "llm_rater_control_journal.jsonl",
+        )
+    }
+    # the C1-C3 outputs are not touched
+    assert not (k0_set["out_dir"] / "scoring_checks.csv").exists()
+
+
+def test_run_control_needs_k0_scaffold(pilot):
+    client = FakeOpenAI()
+    with pytest.raises(RuntimeError):
+        llm_rater.run(pilot, client=client, control=True)
+    assert client.requests == []
+
+
+def test_run_control_needs_scaffold_record(pilot):
+    from conftest import write_control_set
+
+    write_control_set(pilot["items_file"].parent)  # items, but no scaffold record
+    client = FakeOpenAI()
+    with pytest.raises(RuntimeError):
+        llm_rater.run(pilot, client=client, control=True)
+    assert client.requests == []
+
+
+def test_run_control_refuses_changed_items(k0_set):
+    with k0_set["control_items_file"].open("a", encoding="utf-8") as f:
+        f.write("\n")
+    client = FakeOpenAI()
+    with pytest.raises(RuntimeError):
+        llm_rater.run(k0_set, client=client, control=True)
+    assert client.requests == []

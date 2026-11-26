@@ -642,5 +642,34 @@ LLM_RATER_USER_TEMPLATE = (
     "## Excerpts\n{excerpts}\n\n"
     "## Answer\n{answer}"
 )
+# K0 (D41, D51): the same judge and settings rate the closed-book answers; no excerpts, no grounded
+LLM_RATER_CONTROL_JOURNAL_FILE_NAME = "llm_rater_control_journal.jsonl"  # raw API results, K0
+LLM_RATER_CONTROL_SYSTEM_PROMPT = "\n".join(
+    [
+        "You score one answer of a language model given without any excerpts against fixed "
+        "checks. Answer only from the question, the reference answer and the key points shown.",
+        "",
+        "Answer every check with one of its options:",
+        f"- declines: {RUBRIC_CONTROL_QUESTIONS['declines']} {RUBRIC_CHECK_HELP['declines']}",
+        "- points: one mark per key point, in their order (point 1 is the core point). "
+        + RUBRIC_POINT_HELP,
+        *(
+            f"- {check}: {question}"
+            + (f" {RUBRIC_CHECK_HELP[check]}" if check in RUBRIC_CHECK_HELP else "")
+            for check, question in RUBRIC_CONTROL_QUESTIONS.items()
+            if check not in ("declines", "grounded")
+        ),
+        "- reason: one or two short sentences on the decisive checks.",
+        "",
+        "If declines is yes, the key points and the checks core_wrong, other_error and "
+        "hallucination are not asked: mark every key point missing and answer no, no, none.",
+    ]
+)
+LLM_RATER_CONTROL_USER_TEMPLATE = (
+    "## Question\n{question}\n\n"
+    "## Reference answer\n{reference_answer}\n\n"
+    "## Key points\n{key_points}\n\n"
+    "## Answer\n{answer}"
+)
 LLM_RATER_POINT_TEMPLATE = "{n}. {text}"  # one line per key point in the user message
 LLM_RATER_EXCERPT_TEMPLATE = "### Excerpt {n}\n{text}"  # excerpts 1-5 in rank order
