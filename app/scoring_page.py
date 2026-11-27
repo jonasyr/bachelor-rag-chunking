@@ -67,7 +67,15 @@ def choose_set(sets: list[scoring.ScoringSet]) -> scoring.ScoringSet:
     return sets[names.index(name)]
 
 
-def sidebar(s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict]) -> None:
+OWN_DONE = (
+    "All your answers are scored. The LLM rater scores the rest; `src/hybrid.py --mode summarise`"
+    " merges both (ADR 0051)."
+)
+
+
+def sidebar(
+    s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict], own: bool = False
+) -> None:
     done, total = scoring.progress(items, scores)
     with st.sidebar:
         st.markdown(f"**{done} of {total} scored**")
@@ -79,6 +87,8 @@ def sidebar(s: scoring.ScoringSet, items: list[dict], scores: dict[str, dict]) -
             st.caption(
                 "Everything is scored."
                 if s.rater
+                else OWN_DONE
+                if own
                 else SUMMARISE_CONTROL
                 if s.control
                 else SUMMARISE
@@ -373,7 +383,13 @@ def main() -> None:
         st.error(str(error))
         return
 
-    sidebar(s, items, scores)
+    own = scoring.own_questions(s)
+    if own is not None:  # the hybrid scoring (ADR 0051): only Jonas' questions are offered
+        items = [i for i in items if i["question_id"] in own]
+        if not items:
+            st.error(f"None of the drawn questions is in {s.items_file.name}.")
+            return
+    sidebar(s, items, scores, own=own is not None)
     codes = [i["code"] for i in items]
     key = f"scoring_code|{s.name}"
     if "scoring_goto" in st.session_state:  # set by a button; allowed before the widget exists
@@ -407,9 +423,12 @@ def main() -> None:
             st.caption("Answered without excerpts (control K0).")
         else:
             st.markdown("**Excerpts the model saw**")
-            tabs = st.tabs([str(n) for n in range(1, len(item["excerpts"]) + 1)])
-            for tab, text in zip(tabs, item["excerpts"], strict=True):
-                with tab:
+            excerpts = item["excerpts"]
+            with st.container(key="excerpts"):  # one below the other: scroll, no switching
+                for n, text in enumerate(excerpts, start=1):
+                    if n > 1:
+                        st.divider()
+                    st.markdown(f"**Excerpt {n} of {len(excerpts)}**")
                     page(text)
     if not key_points.get(item["question_id"]):
         with side:
@@ -419,7 +438,7 @@ def main() -> None:
                 "scaffold the set as it was frozen, or start a new set."
             )
         return
-    with side:
+    with side, st.container(key="score_form"):  # stays in view while the excerpts scroll
         form(
             s,
             item,

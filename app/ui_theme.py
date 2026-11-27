@@ -99,8 +99,9 @@ mark.hl {background: var(--marker); color: inherit; padding: 0 0.12em; border-ra
 """
 # Scoring page only (injected by app/scoring_page.py): the page has no tabs above its first row,
 # so it clears Streamlit's header itself; question and reference read as context, quieter than
-# the answer under review; links in excerpts stay visible but inert (relative doc links would
-# navigate away from the page and drop unsaved scores).
+# the answer under review; the excerpts run at full length, one below the other; links in
+# excerpts stay visible but inert (relative doc links would navigate away from the page and drop
+# unsaved scores).
 SCORING_CSS = """
 <style>
 [data-testid="stMainBlockContainer"] {padding-top: 4.5rem;}
@@ -112,6 +113,12 @@ SCORING_CSS = """
   background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 3px;}
 .inert a {pointer-events: none; color: inherit; text-decoration: underline dotted var(--muted);}
 [data-testid="stButtonGroup"] button {min-width: 2.75rem; min-height: 2.75rem;}
+/* the excerpts stand one below the other at full length: the page scrolls, not each box */
+.st-key-excerpts .formatted {max-height: none; overflow-y: visible;}
+@media (min-width: 640px) {  /* the checks stay in view next to the long excerpts */
+  [data-testid="stLayoutWrapper"]:has(> .st-key-score_form) {position: sticky; top: 1rem;
+    max-height: calc(100vh - 2rem); overflow-y: auto; scrollbar-width: thin;}
+}
 @media (max-width: 639px) {
   [data-testid="stMainBlockContainer"] {padding-top: 3.75rem;}
   .slot-title span {display: block; font-size: 1rem; margin-top: 0.2rem;}

@@ -379,3 +379,69 @@ def test_closed_r2_set_is_read_only_and_says_closed(dirs, monkeypatch):
     assert not at.exception
     assert any("closed" in i.value for i in at.info)
     assert not any("summarised" in i.value for i in at.info)
+
+
+@pytest.fixture
+def main_page(dirs, monkeypatch):
+    """The main set with the hybrid draws (ADR 0051): Jonas scores only H02."""
+    main = dirs[0]
+    monkeypatch.setattr(scoring, "GENERATION_RUNS_FILE", main / "runs.jsonl")  # log_scaffold
+    sample, extra = main / "second_rater_sample.csv", main / "hybrid_extra_sample.csv"
+    sample.write_text("question_id,type,difficulty\nH02,factual,single\n", encoding="utf-8")
+    extra.write_text("question_id,type,difficulty\n", encoding="utf-8")
+    monkeypatch.setattr(scoring, "SECOND_RATER_SAMPLE_FILE", sample)
+    monkeypatch.setattr(scoring, "HYBRID_EXTRA_SAMPLE_FILE", extra)
+    write_scoring_set(main)
+    freeze(main)
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    return at
+
+
+def test_main_set_offers_only_the_questions_jonas_scores(main_page):
+    at = main_page
+    assert not at.exception
+    assert at.selectbox(key="scoring_code|Main catalogue").options == ["H02-A", "H02-C", "H02-B"]
+    assert any(m.value == "**0 of 3 scored**" for m in at.sidebar.markdown)
+    assert "question 1 of 1" in title(at)
+
+
+def test_without_the_draws_the_main_set_offers_every_answer(main_page, monkeypatch, dirs):
+    monkeypatch.setattr(scoring, "HYBRID_EXTRA_SAMPLE_FILE", dirs[0] / "missing.csv")
+    at = AppTest.from_file(str(APP / "scoring_page.py"), default_timeout=60)
+    at.run()
+    assert len(at.selectbox(key="scoring_code|Main catalogue").options) == 6
+
+
+def test_excerpts_are_shown_one_below_the_other_without_tabs(scoring_page):
+    at, _ = scoring_page
+    assert not at.tabs
+    bodies = [h.proto.body for h in at.get("html")]
+    first = next(i for i, b in enumerate(bodies) if "Excerpt one for H01-B." in b)
+    assert "Excerpt two." in bodies[first + 1]
+    assert any(m.value == "**Excerpt 2 of 2**" for m in at.markdown)
+
+
+def test_scoring_all_own_answers_points_to_the_hybrid_merge(main_page):
+    at = main_page
+    for code in ["H02-A", "H02-C", "H02-B"]:
+        for n in (1, 2):
+            at.button_group(key=f"Main catalogue|{code}|point_{n}").set_value("covered")
+        for check, value in {
+            "declines": "no",
+            "core_wrong": "no",
+            "other_error": "no",
+            "grounded": "all",
+            "hallucination": "none",
+            "answers_question": "yes",
+            "direct": "yes",
+            "wordy": "no",
+        }.items():
+            key = f"Main catalogue|{code}|{check}"
+            if any(g.key == key for g in at.button_group):
+                at.button_group(key=key).set_value(value)
+        at.run()
+        at.button(key="scoring_save").click().run()
+    assert not at.exception
+    assert any(m.value == "**3 of 3 scored**" for m in at.sidebar.markdown)
+    assert any("src/hybrid.py --mode summarise" in c.value for c in at.sidebar.caption)

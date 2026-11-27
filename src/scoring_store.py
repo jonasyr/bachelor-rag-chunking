@@ -8,6 +8,7 @@ record; every score save checks that the frozen file is unchanged. Paths are mod
 from config, read at call time, so the page and its tests share them.
 """
 
+import csv
 import json
 import os
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ from atomic_csv import read_csv, write_csv
 from config import (
     CONTROL_CRITERIA,
     GENERATION_RUNS_FILE,
+    HYBRID_EXTRA_SAMPLE_FILE,
     INTRA_RATER_DIR,
     INTRA_RATER_DIR_NAME,
     INTRA_RATER_PSEUDONYM,
@@ -41,6 +43,7 @@ from config import (
     SECOND_RATER_DIR_NAME,
     SECOND_RATER_ENV,
     SECOND_RATER_PSEUDONYM,
+    SECOND_RATER_SAMPLE_FILE,
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SHEET_HEADER
@@ -63,6 +66,7 @@ class ScoringSet:
     freeze_items_file: Path | None = None  # K0: the C1-C3 item file its key points were frozen on
     rater: bool = False  # the second rater's set (ADR 0046): frozen key points, no K0 set
     repeat: bool = False  # Jonas' repeat set (ADR 0046 fallback); also a `rater` set
+    own_question_files: tuple[Path, ...] = ()  # draws of the questions Jonas scores (ADR 0051)
 
 
 def criteria(s: ScoringSet) -> list[str]:
@@ -178,6 +182,7 @@ def scoring_sets() -> list[ScoringSet]:
                 KEY_POINTS_FILE,
                 SCORING_CHECKS_FILE,
                 GENERATION_RUNS_FILE,
+                own_question_files=(SECOND_RATER_SAMPLE_FILE, HYBRID_EXTRA_SAMPLE_FILE),
             )
         )
     for items in sorted(PILOT_DIR.rglob(SCORING_ITEMS_FILE.name)):
@@ -417,6 +422,19 @@ def load_checks(s: ScoringSet) -> dict[str, dict]:
 
 def is_scored(entry: dict) -> bool:
     return all(v is not None for v in entry["values"].values())
+
+
+def own_questions(s: ScoringSet) -> set[str] | None:
+    """The questions Jonas scores in this set: the R2 sample and the extra sample of the hybrid
+    scoring (ADR 0051, the same set as hybrid.human_questions); None until both draws exist, so
+    every answer is offered."""
+    if not s.own_question_files or not all(p.exists() for p in s.own_question_files):
+        return None
+    ids: set[str] = set()
+    for path in s.own_question_files:
+        with path.open(encoding="utf-8", newline="") as f:
+            ids |= {row["question_id"] for row in csv.DictReader(f)}
+    return ids
 
 
 def progress(items: list[dict], scores: dict[str, dict]) -> tuple[int, int]:

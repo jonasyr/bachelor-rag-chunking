@@ -185,7 +185,10 @@ localhost`, Seite „Scoring“; Regeln: [Evaluation](../reference/evaluation.md
   ([ADR 0037](../adr/0037-praezisierte-pruefregeln-und-vorbefuellte-kernpunkte.md)). Das Einfrieren gilt nur für
   dieses Scaffold; nach einem neuen Scaffold erneut einfrieren.
 - **Bewerten** (Schritt „Score“): je Code die Prüffragen beantworten, die fünf Werte folgen aus den Regeln; `notes`
-  frei, z. B. wenn eine Regel nicht passt. Von Hand eingetragene Werte nimmt `summarise` nicht an
+  frei, z. B. wenn eine Regel nicht passt. Die Excerpts stehen untereinander, die Prüffragen bleiben beim Scrollen
+  sichtbar. Im hybriden Hauptlauf bietet der Satz „Main catalogue“ nur Jonas' 24 Fragen an (Stichprobe und
+  Zusatzfragen, [ADR 0051](../adr/0051-hybride-bewertung.md)), sobald beide Ziehungen existieren
+  (`scoring_store.own_questions`). Von Hand eingetragene Werte nimmt `summarise` nicht an
   ([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)). Das Lesepaket
   `data/evaluation/scoring_packet.md` ist nur Lesekopie; `scoring_key.csv` nie öffnen.
 - **Aufdecken:** `--mode summarise` schreibt `scores.csv` (nicht versioniert); danach ist der Satz in der App
