@@ -1,0 +1,14 @@
+# Only the GitHub Actions in .github/workflows/ are updated automatically.
+# Python dependencies (uv.lock) stay pinned until the thesis is submitted, so the experiment
+# environment does not change mid-run; GitHub's Dependabot alerts report known vulnerabilities.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
