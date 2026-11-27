@@ -49,6 +49,7 @@ bachelor-rag-chunking/
 ├── pyproject.toml  uv.lock  .env.example  .pre-commit-config.yaml
 ├── LICENSE  LICENSES/                  (MIT; Apache-2.0, siehe README)
 ├── .github/workflows/ci.yml            (CI)
+├── .github/dependabot.yml              (monatliche Updates der GitHub Actions)
 ├── .claude/  .codex/  .serena/         (Agenten-Einstellungen, codex-reviewer, Agenten-Notizen; versioniert)
 ├── src/                                (Pipeline; alle Parameter in config.py)
 │   ├── snapshot.py ingest.py preprocess.py mdx.py    (Korpus)
@@ -143,6 +144,7 @@ argparse (`chunking.py`, `embed.py`, `retrieve.py`, `catalogue.py`, `generate.py
 | pytest | siehe [Tests](#tests) | `tests/`, `pyproject.toml` `[tool.pytest.ini_options]` |
 | Pyright (Editor) | Typprüfung mit uv-venv und `src/` als Importpfad | `pyproject.toml` `[tool.pyright]` |
 | GitHub Actions | `uv sync`, alle pre-commit-Hooks, `compileall` für `src/` und `app/`, `pytest` (bei Push auf `main` und jedem Pull Request) | `.github/workflows/ci.yml` |
+| Dependabot | monatlich ein gebündelter PR für die GitHub Actions der CI; die Python-Pakete (`uv.lock`) bleiben bis zur Abgabe fest, damit sich die Umgebung des Experiments nicht ändert. Bekannte Sicherheitslücken meldet GitHub als Dependabot-Alert (in den Repo-Einstellungen an) | `.github/dependabot.yml` |
 
 ## Tests
 
