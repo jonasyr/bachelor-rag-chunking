@@ -9,7 +9,8 @@ keine neue Regel ein; bei einem Widerspruch gilt die Evaluation-Seite. Jede bewe
 
 1. `uv run streamlit run app/catalogue_editor.py --server.address localhost`, Seite „Scoring“.
 2. Set „Main catalogue“ (C1–C3, blind). K0 bewertet nur das Sprachmodell (ADR 0051).
-3. Schritt „Key points“: 48 Fragen, dann einfrieren. Schritt „Score“: nur die 72 Antworten deiner 24 Fragen (siehe unten).
+3. Schritt „Key points“: 48 Fragen, dann einfrieren. Schritt „Score“: die App bietet nur die 72 Antworten deiner 24
+   Fragen an (siehe unten); die Excerpts stehen untereinander, die Prüffragen bleiben beim Scrollen sichtbar.
 4. Pausieren ist jederzeit möglich; gespeichert ist, was mit „Save and next“ bestätigt wurde.
 
 ## Teil 1: Kernpunkte (einmal je Frage, vor dem Bewerten)
@@ -130,12 +131,13 @@ Nur zur Information: Seit ADR 0051 bewertet K0 das Sprachmodell mit diesen Regel
 
 ## Welche Fragen (ADR 0051, hybride Bewertung)
 
-- **Nur diese 24 Fragen**, je alle drei Antworten (72 insgesamt), in beliebiger Reihenfolge über „Jump to“:
+- **Nur diese 24 Fragen**, je alle drei Antworten (72 insgesamt), in beliebiger Reihenfolge über „Jump to“; die
+  App zeigt nur sie an (seit PR #73):
   - Stichprobe: Q001, Q004, Q006, Q008, Q009, Q010, Q011, Q015, Q017, Q036, Q038, Q042
   - Zusatzfragen: Q005, Q012, Q014, Q020, Q024, Q027, Q029, Q030, Q033, Q035, Q040, Q045
 - Die übrigen 24 Fragen und alle K0-Antworten bewertet das Sprachmodell; sie nicht bewerten.
 - Keine Wiederholung, kein `mark`, keine 14 Tage.
-- `summarise` erst, wenn der Folge-PR (Zusammenführen) gemergt ist.
+- Kein `summarise` von Hand: das Zusammenführen (`src/hybrid.py --mode summarise`) folgt nach allen 72 Antworten.
 
 ## Nie
 
