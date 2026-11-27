@@ -622,3 +622,126 @@ def test_llm_rating_refuses_changed_key_points(llm, tmp_path):
     )
     with pytest.raises(RuntimeError, match="key_points.csv"):
         load(llm, main=False)
+
+
+# ---------------------------------------------------------------- hybrid run (ADR 0051)
+
+
+@pytest.fixture
+def hybrid(llm, tmp_path):
+    """The `llm` fixture as a hybrid run: Jonas scores Q001 only, the LLM everything; scores.csv
+    mixes both (`rater`), llm_rater/scores.csv holds the LLM's values, and a `hybrid_summarise`
+    record covers both sets of files (the LLM's under their own maps, same file names)."""
+    from evaluate_answers import HYBRID_SCORES_HEADER, KEY_HEADER, SHEET_HEADER
+    from hybrid import SUMMARISE_STEP
+    from run_log import sha256_of
+    from scoring_rules import CHECKS_HEADER
+
+    own = llm["scoring_sheet_file"].parent
+    folder = llm["llm_rater_dir"]
+    # Jonas' files hold his question only
+    write_csv(
+        llm["scoring_checks_file"], CHECKS_HEADER,
+        [r for r in _checks_rows() if r["code"].startswith("Q001")],
+    )  # fmt: skip
+    write_csv(
+        llm["scoring_sheet_file"], SHEET_HEADER,
+        [r for r in _sheet_rows() if r["question_id"] == "Q001"],
+    )  # fmt: skip
+    key_file = tmp_path / "scoring_key.csv"
+    write_csv(
+        key_file, KEY_HEADER,
+        [{"code": c, "question_id": c[:4], "strategy": STRATEGIES["ABC".index(c[-1])]}
+         for c in R2_CODES],
+    )  # fmt: skip
+    sample, extra = own / "second_rater_sample.csv", own / "hybrid_extra_sample.csv"
+    write_csv(sample, ["question_id", "type", "difficulty"],
+              [{"question_id": "Q001", "type": "factual", "difficulty": "single"}])  # fmt: skip
+    write_csv(extra, ["question_id", "type", "difficulty"], [])
+    llm_scores = folder / "scores.csv"
+    criteria = {"correctness": "1", "completeness": "1", "groundedness": "1",
+                "no_hallucination": "1", "clarity": "1", "total_score": "1.0"}  # fmt: skip
+    llm_rows = [{"question_id": q, "strategy": s} | criteria for q in QIDS for s in STRATEGIES]
+    # Jonas' own values are 2 on Q001, to tell the sets apart
+    human = {k: "2" for k in criteria} | {"total_score": "2.0"}
+    mixed = [
+        r | {"rater": "llm"} if r["question_id"] == "Q002" else r | human | {"rater": "human"}
+        for r in llm_rows
+    ]
+    write_csv(llm["scores_file"], HYBRID_SCORES_HEADER, mixed)
+    write_csv(llm_scores, SCORES_HEADER, llm_rows)
+    llm |= {
+        "scoring_key_file": key_file,
+        "second_rater_sample_file": sample,
+        "hybrid_extra_file": extra,
+        "llm_scores_file": llm_scores,
+        "second_rater_dir": tmp_path / "no_r2",  # Jonas has no checks outside Q001
+    }
+    record_inputs = [llm["scoring_sheet_file"], llm["scoring_checks_file"], key_file,
+                     llm["key_points_file"], sample, extra]  # fmt: skip
+    runs = llm["generation_runs_file"]
+    append_step_run(
+        SUMMARISE_STEP, R2_STRATEGY, record_inputs, [llm["scores_file"]], runs,
+        extra={"llm_inputs_sha256": {f.name: sha256_of(f) for f in
+                                     (folder / "scoring_sheet.csv", folder / "scoring_checks.csv")},
+               "llm_outputs_sha256": {llm_scores.name: sha256_of(llm_scores)}},
+    )  # fmt: skip
+    # the K0 record hashes the LLM's scores.csv under the name scores.csv
+    append_step_run("summarise_control", "K0", [llm["key_points_file"], llm_scores],
+                    [llm["scores_control_file"]], runs)  # fmt: skip
+    return llm
+
+
+def test_load_hybrid_run(hybrid):
+    data = load(hybrid, main=False)
+    assert "rater" in data.scores.columns
+    assert set(data.scores.loc[data.scores["question_id"] == "Q001", "rater"]) == {"human"}
+    assert set(data.scores.loc[data.scores["question_id"] == "Q002", "rater"]) == {"llm"}
+    assert list(data.scores_llm.columns) == SCORES_HEADER
+    assert set(data.scores_llm["correctness"]) == {"1"}
+    assert data.human_questions == ["Q001"]
+    assert data.scores_control is not None
+
+
+def test_load_hybrid_refuses_edited_scores(hybrid):
+    scores = hybrid["scores_file"]
+    scores.write_text(scores.read_text(encoding="utf-8").replace("2.0", "1.5", 1), "utf-8")
+    with pytest.raises(RuntimeError, match="scores.csv"):
+        load(hybrid, main=False)
+
+
+def test_load_hybrid_refuses_edited_llm_scores(hybrid):
+    scores = hybrid["llm_scores_file"]
+    scores.write_text(scores.read_text(encoding="utf-8").replace("1.0", "1.5", 1), "utf-8")
+    with pytest.raises(RuntimeError, match="scores.csv"):
+        load(hybrid, main=False)
+
+
+def test_load_hybrid_pairs_llm_on_human_codes(hybrid):
+    data = load(hybrid, main=False)
+    paired = data.llm_rating["paired"]
+    assert len(paired) == 3 * len(data.human_questions)
+    assert {p["question_id"] for p in paired} == set(data.human_questions)
+    assert not any("LLM-Gegenprobe" in n for n in data.notes)
+
+
+def test_load_hybrid_needs_llm_rating(hybrid):
+    runs = hybrid["generation_runs_file"]
+    lines = runs.read_text(encoding="utf-8").splitlines()
+    runs.write_text(
+        "".join(line + "\n" for line in lines if json.loads(line).get("step") != "llm_rater"),
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="llm_rater"):
+        load(hybrid, main=False)
+
+
+def test_load_hybrid_answers_question_mixes_both_raters(hybrid):
+    data = load(hybrid, main=False)
+    assert len(data.answers_question) == 6  # Jonas' Q001 plus the LLM's Q002
+
+
+def test_load_non_hybrid_unchanged(llm):
+    data = load(llm, main=False)
+    assert data.scores_llm is None and data.human_questions is None
+    assert "rater" not in data.scores.columns

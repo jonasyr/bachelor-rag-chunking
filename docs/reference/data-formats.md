@@ -331,6 +331,16 @@ question_id,strategy,correctness,completeness,groundedness,no_hallucination,clar
 Q001,C1,2,2,2,2,2,2.0
 ```
 
+Im hybriden Hauptlauf ([ADR 0051](../adr/0051-hybride-bewertung.md)) schreibt `hybrid.py --mode summarise`
+`scores.csv` mit einer zusätzlichen letzten Spalte `rater` (`human` für Jonas' 24 Fragen, sonst `llm`;
+`evaluate_answers.HYBRID_SCORES_HEADER`), dieselbe Sortierung, und `llm_rater/scores.csv` im Format ohne `rater` mit den
+Werten des Sprachmodells für alle Antworten (`config.LLM_RATER_SCORES_FILE`). Wer nur Werte braucht (K0-Scaffold,
+`summarise_control`), liest beide Formen (`evaluate_answers.read_scores`).
+```csv
+question_id,strategy,correctness,completeness,groundedness,no_hallucination,clarity,total_score,rater
+Q001,C1,2,2,2,2,2,2.0,human
+```
+
 ### Kontrolle K0
 
 [ADR 0041](../adr/0041-kontrolle-k0.md), Verfahren: [Evaluation](evaluation.md#kontrolle-k0).
@@ -419,7 +429,12 @@ Q004-C,Q004-A
 **`llm_rater/`** (`data/evaluation/llm_rater/`, `llm_rater.py`): die Prüfungen des Modells in den Formaten von Jonas'
 Dateien und in derselben Codereihenfolge: `scoring_checks.csv` (Format wie [Bewertung](#bewertung)), `scoring_sheet.csv`
 (Werte nach den Regeln aus den Prüfungen abgeleitet, `notes` leer) und `llm_rater_journal.jsonl`
-(`config.LLM_RATER_JOURNAL_FILE_NAME`, [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Das Journal
+(`config.LLM_RATER_JOURNAL_FILE_NAME`, [ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)). Mit
+`--control` ([ADR 0051](../adr/0051-hybride-bewertung.md)) bewertet es die K0-Items und schreibt daneben
+`scoring_checks_control.csv` und `scoring_sheet_control.csv` (Formate wie [Kontrolle K0](#kontrolle-k0), ohne
+`grounded`, Werte nach `derive_control`) und `llm_rater_control_journal.jsonl`
+(`config.LLM_RATER_CONTROL_JOURNAL_FILE_NAME`, gleicher Aufbau). `hybrid.py --mode summarise` legt hier
+`scores.csv` ab (nur Sprachmodell, nicht versioniert, siehe [Bewertung](#bewertung)). Das Journal
 hat die Einträge `start` (Schritt, Strategie, Einstellungen, `prompts_sha256`, `model_created`, `inputs_sha256`),
 `session` (Umgebung), je Antwort `item` (`code`, `question_id`, `request_sha256` über Nachrichten und Schema, die
 Felder der Antwort, die vollständige Rohantwort `response` samt Begründung `reason`, `http_errors`) und `abort`. Der
@@ -473,7 +488,7 @@ Felder und `outputs_sha256`.
 | `scaffold` | `generation_runs.jsonl` | `K0` | `evaluate_answers.py --mode scaffold --control` ([ADR 0041](../adr/0041-kontrolle-k0.md)) | wie oben, `outputs_sha256` (`scoring_items_control.jsonl`) | – |
 | `key_points` | `generation_runs.jsonl` | `C1,C2,C3` | Bewertungsseite beim Einfrieren | `outputs_sha256` (`key_points.csv`, `scoring_items.jsonl`) | Bewertungsseite, `--mode summarise`, K0-Scaffold und `--control`-Summarise, `second_rater.py --mode export` |
 | `summarise` | `generation_runs.jsonl` | `C1,C2,C3` | `evaluate_answers.py --mode summarise` (auch mit `--set`) | `inputs_sha256` (Bogen, Schlüssel und, sofern vorhanden, `scoring_checks.csv`, `key_points.csv`), `outputs_sha256` (`scores.csv`) | `ragas_eval.py` (jedes Set mit `summarise`-Eintrag; Pilot-Sets ohne Eintrag mit Hinweis), `analyse.py` (Pilot-Sets ohne Eintrag mit Hinweis, [ADR 0044](../adr/0044-statistische-auswertung.md)) |
-| `summarise_control` | `generation_runs.jsonl` | `K0` | `evaluate_answers.py --mode summarise --control` | `inputs_sha256` (Bogen und Prüfungen von K0, die eingefrorene `key_points.csv` von C1–C3, `scores.csv`), `outputs_sha256` (`scores_control.csv`) | `analyse.py` |
+| `summarise_control` | `generation_runs.jsonl` | `K0` | `evaluate_answers.py --mode summarise --control`; im hybriden Lauf `hybrid.py --mode summarise-control` | `inputs_sha256` (Bogen und Prüfungen von K0, die eingefrorene `key_points.csv` von C1–C3, `scores.csv`; im hybriden Lauf Bogen und Prüfungen K0 aus `llm_rater/` und `llm_rater/scores.csv` unter dem Namen `scores.csv`), `outputs_sha256` (`scores_control.csv`) | `analyse.py` |
 | `ragas` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py` ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), nur nach einem erfolgreichen Lauf | siehe unten | `ragas_eval.py --repeat`, `analyse.py` |
 | `ragas_repeat` | `generation_runs.jsonl` | `C1,C2,C3` | `ragas_eval.py --repeat` (nur Pilot-Sets) | wie `ragas`, `outputs_sha256` (`ragas_scores_repeat.csv`) | `analyse.py` |
 | `second_rater_draw` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode draw` ([ADR 0046](../adr/0046-zweitbewertung.md)) | `inputs_sha256` (`questions.csv`), `outputs_sha256` (`second_rater_sample.csv`), `seed`, `questions` (Zahl) | `second_rater.py --mode export` |
@@ -484,6 +499,8 @@ Felder und `outputs_sha256`.
 | `intra_rater_export` | `generation_runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode repeat` | `inputs_sha256` (Ziehung, Item-Datei, Kernpunkte), `outputs_sha256` (Items, Kernpunkte und Schlüsseldatei im Ordner `intra_rater/`), `seed` | – |
 | `intra_rater_close` | `intra_rater/runs.jsonl` | `C1,C2,C3` | `second_rater.py --mode close --repeat` | wie `second_rater_close`, `inputs_sha256` zusätzlich mit der Schlüsseldatei; `rater` (`R1W`), `rules_version` | `analyse.py`; danach verweigern Wiederholung und Close, die App zeigt den Satz schreibgeschützt |
 | `llm_rater` | `generation_runs.jsonl` (Pilot: `DIR/runs.jsonl`) | `C1,C2,C3` | `llm_rater.py` ([Nachtrag](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)), nur nach einem erfolgreichen Lauf | siehe unten | `analyse.py` (Jonas' Items und Kernpunkte unverändert) |
+| `llm_rater_control` | `generation_runs.jsonl` (Pilot: `DIR/runs.jsonl`) | `K0` | `llm_rater.py --control` ([ADR 0051](../adr/0051-hybride-bewertung.md)), nur nach einem erfolgreichen Lauf | wie `llm_rater`, dazu `control` (`true`); `inputs_sha256` (K0-Items, deren `scaffold`-Eintrag `K0` vorliegen muss, Kernpunkte), `outputs_sha256` (Prüfungen und Bogen K0, Journal) | `hybrid.py --mode summarise-control` |
+| `hybrid_summarise` | `generation_runs.jsonl` (Pilot: `DIR/runs.jsonl`) | `C1,C2,C3` | `hybrid.py --mode summarise` ([ADR 0051](../adr/0051-hybride-bewertung.md)) | `inputs_sha256` (Jonas' Bogen und Prüfungen, Schlüssel, `key_points.csv`, `second_rater_sample.csv`, `hybrid_extra_sample.csv`), `outputs_sha256` (`scores.csv`, gemischt), `llm_inputs_sha256` (Bogen und Prüfungen in `llm_rater/`), `llm_outputs_sha256` (`llm_rater/scores.csv`), `answers` (`human`, `llm`: Zahl der Antworten). Die Dateien des Sprachmodells stehen in eigenen Feldern, weil die Prüfsummen nach Dateinamen geführt werden und beide Seiten dieselben Namen haben; geprüft wird über `hybrid.require_summarise` | `hybrid.py --mode summarise-control`, `ragas_eval.py` (statt `summarise`), `analyse.py` (erkennt daran den hybriden Lauf) |
 | `closed_book_screen` | `generation_runs.jsonl` | (kein Feld) | `catalogue.py screen` ([ADR 0040](../adr/0040-closed-book-pruefung.md)) | siehe unten | – |
 
 Die R2-Einträge `scaffold` und `key_points` schreibt `--mode export` in derselben Form wie oben; `--mode close` prüft
@@ -560,7 +577,8 @@ Pilot-Beispiel im [Experiment-Protokoll](experiment-record.md#ragas-pilot-e2e-21
 - `rows` (Zahl der Zeilen der Ergebnisdatei); `nan_counts`: je Metrik die Zahl der Zeilen mit leerer Zelle (Gründe in
   `nan_reasons` der Ergebnisdatei).
 - `inputs_sha256`: `generated_answers.csv`, `retrieved_results.csv`, Fragen, Ground Truth und die drei Chunk-Dateien;
-  auf dem Hauptkatalog zusätzlich `scores.csv` (RAGAS läuft erst nach `summarise`).
+  auf dem Hauptkatalog zusätzlich `scores.csv` (RAGAS läuft erst nach `summarise`, im hybriden Lauf nach
+  `hybrid_summarise`).
 - `judge_prompt_tokens`, `judge_completion_tokens`, `embedding_tokens` (die Embeddings der Response Relevancy, nur sie
   gehen an das Embedding-Modell); `judge_cost_usd` (nach `RAGAS_JUDGE_PRICE_*`), `embedding_cost_usd`
   (nach `EMBEDDING_PRICE_PER_MTOK`) und `cost_usd` (Summe) in USD.
@@ -609,7 +627,8 @@ Klasse; negative Werte mit typografischem Minus.
 | `ragas_agreement` | Spearmans ρ mit dem regelbasierten Gegenstück ([Evaluation](evaluation.md#triangulation)) | `ragas_scores.csv` fehlt |
 | `agreement` | Erst- gegen Zweitbewertung ([Evaluation](evaluation.md#zweitbewertung)) | keine abgeschlossene Zweitbewertung |
 | `agreement_intra` | Erst- gegen Wiederholungsbewertung | keine abgeschlossene Wiederholung |
-| `agreement_llm` | Erstbewertung gegen LLM-Gegenprobe | kein Laufeintrag `llm_rater` |
+| `agreement_llm` | Erstbewertung gegen LLM-Gegenprobe (im hybriden Lauf nur Jonas' 72 Antworten) | kein Laufeintrag `llm_rater` |
+| `hybrid_sensitivity` | Gesamtwert je Strategie gemischt, nur menschlich bewertete Fragen, nur Sprachmodell, mit p (Friedman; gemischt nach Holm) und n ([ADR 0051](../adr/0051-hybride-bewertung.md)) | kein Laufeintrag `hybrid_summarise` |
 
 **Abbildungen** (`output/figures/<Name>.pdf`, in Endgröße; Inhalte: [Evaluation](evaluation.md#visualisierungen)):
 
@@ -653,6 +672,11 @@ Gleitkommazahlen auf `config.JSON_DECIMALS` gerundet. Oberste Schlüssel:
   `ac_ci`, `alpha`, `alpha_ci`, `dropped`), `n_codes`, `n_questions`, `reps`, `level` (Niveau der Intervalle,
   `config.AGREEMENT_CI_LEVEL`); `null` ohne abgeschlossene Zweitbewertung. `agreement_intra` und `agreement_llm` haben
   dieselbe Form (`agreement_llm` zusätzlich `model`), `null` ohne ihre Quelle.
+- `hybrid`: `null` außerhalb des hybriden Laufs; sonst `n_human_questions`, `n_llm_questions`, `raters` (Antworten je
+  `human`, `llm`) und `sensitivity` mit `human` (nur menschlich bewertete Fragen) und `llm` (alle Fragen, nur Sprachmodell), je
+  `n_questions`, `descriptive` (`true`), `means` je Strategie und Kriterium, `test` (Friedman des Gesamtwerts als
+  eigene Familie, Form wie in `confirmatory`; beschreibend, die p-Werte sind explorativ) und `differences` (wie
+  `differences`). Im hybriden Lauf vergleicht `control_k0` K0 mit den Werten des Sprachmodells für C1–C3.
 - `notes`: entfallene Teile, Hinweise.
 
 Fehlt `ragas_scores.csv`, sind `ragas` und `ragas_agreement` `null`, und die drei Tabellen `ragas`, `ragas_effects`,
@@ -707,10 +731,10 @@ und alles, was Jonas schreibt oder entscheidet.
 | `data/evaluation/generated_answers.csv`, `generated_answers_control.csv`, `generation_runs.jsonl`, `generation_journal.jsonl` | Antworten C1–C3 und K0, Laufprotokoll, Journal der API-Antworten | [Antworten](#antworten), [Laufprotokoll](#laufprotokoll) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
 | `data/evaluation/scoring_sheet.csv`, `scoring_key.csv`, `key_points.csv`, `scoring_checks.csv` | Primärdaten der Bewertung C1–C3 | [Bewertung](#bewertung) | versioniert |
 | `data/evaluation/scoring_items_control.jsonl`, `scoring_sheet_control.csv`, `scoring_checks_control.csv` | Bewertung K0 | [Kontrolle K0](#kontrolle-k0) | versioniert |
-| `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
+| `data/evaluation/scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv`, `llm_rater/scores.csv` | Lesepaket, Daten der Bewertungsseite (vom Scaffold wiederherstellbar), entblindete Werte | [Bewertung](#bewertung) | ignoriert |
 | `data/evaluation/ragas_scores.csv`, `ragas_scores_journal.jsonl` | RAGAS-Werte der Antworten C1–C3, einmal erzeugt ([ADR 0047](../adr/0047-ragas-als-triangulation.md)), und ihr Journal mit allen Richteraufrufen | [RAGAS](#ragas) | versioniert ([ADR 0050](../adr/0050-journal-und-fortsetzen-der-api-schritte.md)) |
 | `data/evaluation/second_rater_sample.csv`, `data/evaluation/hybrid_extra_sample.csv`, `data/evaluation/second_rater/` (alle Dateien) | Zweitbewertung, Zusatzfragen der hybriden Bewertung (die Items von R2 sind nach dem Bewerten nicht mehr neu erzeugbar) | [Zweitbewertung](#zweitbewertung) | versioniert |
-| `data/evaluation/intra_rater/` (alle Dateien), `data/evaluation/llm_rater/` (alle Dateien) | Wiederholungssatz mit Schlüsseldatei und LLM-Gegenprobe mit Journal | [Zweitbewertung](#zweitbewertung) | versioniert (der Schlüssel erst nach `--mode close --repeat`, [Ablauf](../how-to/run-the-experiment.md#zweitbewertung)) |
+| `data/evaluation/intra_rater/` (alle Dateien), `data/evaluation/llm_rater/` (alle Dateien außer `scores.csv`) | Wiederholungssatz mit Schlüsseldatei und LLM-Gegenprobe mit Journal | [Zweitbewertung](#zweitbewertung) | versioniert (der Schlüssel erst nach `--mode close --repeat`, [Ablauf](../how-to/run-the-experiment.md#zweitbewertung)) |
 | `data/pilot/**/` | Dateien der Pilot-Sets, auch `ragas_scores*.csv`, `second_rater_sample.csv`, `second_rater/`, `intra_rater/`, `llm_rater/` | [Pilot-Sets](#pilot-sets) | versioniert, außer den zwei folgenden Zeilen |
 | `data/pilot/**/query_embeddings.npz`, `scoring_packet.md`, `scoring_items.jsonl`, `scores.csv`, `scores_control.csv` | dieselben Dateien wie im Hauptlauf | [Vektoren](#vektoren), [Bewertung](#bewertung) | ignoriert, außer `data/pilot/**/second_rater/scoring_items.jsonl` |
 | `data/pilot/**/output/` | Auswertung eines Pilot-Sets (`analyse.py --set`), auch die Abweichungslisten | [Auswertung](#auswertung-output) | ignoriert |

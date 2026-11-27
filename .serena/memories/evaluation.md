@@ -10,5 +10,8 @@ Metrics, rubric, rule-based scoring, K0, RAGAS, second rater, statistics: `docs/
   `SCORING_RATER=R1W`, key file only after `close --repeat`) and LLM cross-check (`llm_rater.py`); the check wording is
   `config.RUBRIC_*`, shared by the app and the LLM: `docs/reference/evaluation.md#zweitbewertung`,
   steps `docs/how-to/run-the-experiment.md#hybride-bewertung-ohne-zweite-person`; hybrid scoring (Jonas 24 questions, LLM all, no repeat rating): ADR 0051.
+  Gotcha: run_log keys checksums by file name, and Jonas' and the LLM's files share names (scores.csv, scoring_sheet.csv,
+  scoring_checks.csv); the `hybrid_summarise` record keeps the LLM's under llm_inputs_sha256/llm_outputs_sha256, so check
+  them with `hybrid.require_summarise`, never a bare `require_run` (docs/reference/data-formats.md#laufprotokoll).
 - RAGAS, second-rater and LLM cross-check steps are one-shot and never overwrite; options: `docs/reference/tooling.md#skripte-und-optionen`;
   test isolation (autouse fixtures): `docs/reference/tooling.md#tests`.

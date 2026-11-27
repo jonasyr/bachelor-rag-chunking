@@ -82,22 +82,31 @@ git commit -m "chore(data): Zusatzfragen der hybriden Bewertung gezogen"
 #    hybrid_extra_sample.csv bewerten, in beliebiger Reihenfolge; keine anderen Fragen
 git add data/evaluation/scoring_sheet.csv data/evaluation/scoring_checks.csv
 git commit -m "chore(data): eigene Bewertung (24 Fragen)"
-#    Aufdecken (summarise) mit den Werten des Sprachmodells für die übrigen 24 Fragen: folgt mit dem Folge-PR
-#    (ADR 0051, Konsequenzen); bis dahin summarise nicht ausführen
+# 7. Bewertung durch das Sprachmodell und Zusammenführen (ADR 0051): erst wenn alle 72 eigenen Antworten
+#    bewertet sind. llm_rater bewertet alle 144 Antworten C1–C3 (ruft die API, einmal, überschreibt nie);
+#    hybrid.py --mode summarise deckt auf: scores.csv mit Jonas' Werten für seine 24 Fragen und denen des
+#    Sprachmodells für die übrigen (Spalte rater), dazu llm_rater/scores.csv nur mit den Werten des Sprachmodells
+#    (beide nicht versioniert, wie scores.csv; versioniert ist der Laufeintrag)
+uv run python src/llm_rater.py
+git add data/evaluation/llm_rater/ data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Bewertung des Hauptlaufs durch das Sprachmodell"
+uv run python src/hybrid.py --mode summarise
+git add data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): Werte des Hauptlaufs zusammengeführt (hybrid)"
 
-# 7. Kontrolle K0: bewertet nur das Sprachmodell (ADR 0051); der Befehl folgt mit dem Folge-PR
+#    Kontrolle K0: bewertet nur das Sprachmodell, verglichen mit dessen Werten für C1–C3
+uv run python src/evaluate_answers.py --mode scaffold --control
+uv run python src/llm_rater.py --control
+uv run python src/hybrid.py --mode summarise-control
+git add data/evaluation/scoring_items_control.jsonl data/evaluation/scoring_sheet_control.csv \
+  data/evaluation/llm_rater/ data/evaluation/generation_runs.jsonl
+git commit -m "chore(data): K0 durch das Sprachmodell bewertet"
 
-# 8. RAGAS (erst nach summarise; ruft die API, einmal, überschreibt nie)
+# 8. RAGAS (erst nach dem Zusammenführen; ruft die API, einmal, überschreibt nie)
 uv run python src/ragas_eval.py
 git add data/evaluation/ragas_scores.csv data/evaluation/ragas_scores_journal.jsonl \
   data/evaluation/generation_runs.jsonl
 git commit -m "chore(data): RAGAS des Hauptlaufs"
-
-# 8a. Bewertung durch das Sprachmodell (ADR 0051: alle 144 Antworten C1–C3; ruft die API, einmal, überschreibt
-#     nie; nach den eingefrorenen Kernpunkten)
-uv run python src/llm_rater.py
-git add data/evaluation/llm_rater/ data/evaluation/generation_runs.jsonl
-git commit -m "chore(data): Bewertung des Hauptlaufs durch das Sprachmodell"
 
 # 9. Nur mit R2: Zweitbewertung abschließen (R2 bewertet ab Schritt 5 an Jonas' Rechner, siehe Zweitbewertung)
 SCORING_RATER=R2 uv run streamlit run app/catalogue_editor.py --server.address localhost
@@ -180,7 +189,7 @@ localhost`, Seite „Scoring“; Regeln: [Evaluation](../reference/evaluation.md
   ([ADR 0036](../adr/0036-regelbasierte-bewertung-verpflichtend.md)). Das Lesepaket
   `data/evaluation/scoring_packet.md` ist nur Lesekopie; `scoring_key.csv` nie öffnen.
 - **Aufdecken:** `--mode summarise` schreibt `scores.csv` (nicht versioniert); danach ist der Satz in der App
-  schreibgeschützt.
+  schreibgeschützt. Im hybriden Hauptlauf deckt `hybrid.py --mode summarise` auf (Schritt 7).
 - Fehlt die nicht versionierte `scoring_items.jsonl` (neuer Klon, anderer Rechner), `--mode scaffold` mit denselben
   Optionen erneut ausführen: Er schreibt nur Lesepaket und Einträge neu, Bogen und Schlüssel bleiben unverändert.
 
@@ -190,7 +199,8 @@ localhost`, Seite „Scoring“; Regeln: [Evaluation](../reference/evaluation.md
 
 **Kontrolle K0** (Schritt 7, [ADR 0041](../adr/0041-kontrolle-k0.md)): bewertet nur das Sprachmodell
 ([ADR 0051](../adr/0051-hybride-bewertung.md)), mit denselben eingefrorenen Kernpunkten und Prüffragen ohne
-Quellenbezug; der Befehl folgt mit dem Folge-PR. Was verglichen wird:
+Quellenbezug: `llm_rater.py --control`, dann `hybrid.py --mode summarise-control`
+([unten](#hybride-bewertung-ohne-zweite-person)). Was verglichen wird:
 [Evaluation](../reference/evaluation.md#kontrolle-k0).
 
 ## Zweitbewertung
@@ -233,14 +243,24 @@ bewertet 24 Fragen, das Sprachmodell alle Antworten; Schritt 9 und die Wiederhol
    Stichprobe nicht die ihres Laufeintrags `second_rater_draw` ist, `hybrid_extra_sample.csv` schon existiert oder eine
    Frage außerhalb der Stichprobe schon eigene Werte hat. Sofort committen.
 2. **Eigene Bewertung** (Schritt 6): die 72 Antworten dieser 24 Fragen in der App, in beliebiger Reihenfolge.
-3. **Bewertung durch das Sprachmodell** (Schritt 8a, `llm_rater.py`): nach den eingefrorenen Kernpunkten, bei
-   committetem Code-Stand; Umfang `config.LLM_RATER_SCOPE` (alle 144). Ergebnis: `data/evaluation/llm_rater/`
-   (Prüfungen, Bogen, Journal), Laufeintrag `llm_rater`. Ein Pilot-Set mit `--set DIR`. Abbrüche:
-   [Wenn ein Schritt abbricht](#wenn-ein-schritt-abbricht). K0 durch das Sprachmodell folgt mit dem Folge-PR.
-4. **Zusammenführen und Auswerten** (Schritt 10): Werte der Arbeit sind Jonas' für seine 24 Fragen und die des
-   Sprachmodells für die übrigen; dazu die Übereinstimmung auf den 72 Antworten (`output/tables/agreement_llm.tex`,
-   `output/llm_rater_disagreements.csv`) und die Sensitivitätsanalysen nach ADR 0051. Zusammenführen und die neuen
-   Auswertungen folgen mit dem Folge-PR.
+3. **Bewertung durch das Sprachmodell** (Schritt 7, `llm_rater.py`): erst wenn die 72 eigenen Antworten bewertet
+   sind, nach den eingefrorenen Kernpunkten, bei committetem Code-Stand; Umfang `config.LLM_RATER_SCOPE` (alle 144).
+   Ergebnis: `data/evaluation/llm_rater/` (Prüfungen, Bogen, Journal), Laufeintrag `llm_rater`. Ein Pilot-Set mit
+   `--set DIR`. Abbrüche: [Wenn ein Schritt abbricht](#wenn-ein-schritt-abbricht).
+4. **Zusammenführen** (Schritt 7, `src/hybrid.py --mode summarise`): prüft beide Ziehungen und den Laufeintrag
+   `llm_rater` (Umfang `all`), prüft Jonas' Bogen nur auf seinen 72 Codes und den des Sprachmodells auf allen, und
+   schreibt `scores.csv` (Spalte `rater`: `human` oder `llm`) und `llm_rater/scores.csv` (nur Sprachmodell),
+   Laufeintrag `hybrid_summarise`. Bricht ab und schreibt nichts, wenn Jonas' Bogen Werte oder Prüfungen auf einer
+   Frage außerhalb seiner 24 hat, eine seiner 72 Antworten unbewertet ist oder eine Datei des Sprachmodells nicht zu
+   dessen Laufeintrag passt. `evaluate_answers.py --mode summarise` gilt im hybriden Hauptlauf nicht.
+5. **K0** (Schritt 7): `evaluate_answers.py --mode scaffold --control` schreibt die K0-Items wie bisher;
+   `llm_rater.py --control` bewertet sie ohne Ausschnitte und ohne `grounded` (Laufeintrag `llm_rater_control`);
+   `hybrid.py --mode summarise-control` schreibt `scores_control.csv` und vergleicht K0 mit den Werten des
+   Sprachmodells für C1–C3, nicht mit dem gemischten Satz.
+6. **Auswerten** (Schritt 10): `analyse.py` erkennt den hybriden Lauf am Laufeintrag `hybrid_summarise`. Die
+   konfirmatorischen Tests laufen auf dem gemischten Satz; dazu die Übereinstimmung auf Jonas' 72 Antworten
+   (`output/tables/agreement_llm.tex`, `output/llm_rater_disagreements.csv`) und die beiden beschreibenden
+   Sensitivitätsanalysen (`output/tables/hybrid_sensitivity.tex`, `analysis.json` unter `hybrid`).
 
 ## Auswertung (Schritt 10)
 

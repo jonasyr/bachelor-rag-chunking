@@ -257,6 +257,10 @@ def step_command(step: str, strategy: str) -> str:
     if step in ("scaffold", "summarise"):
         control = " --control" if strategy == K0 else ""
         return f"src/evaluate_answers.py --mode {step}{control}"
+    if step in ("hybrid_draw", "hybrid_summarise"):
+        return f"src/hybrid.py --mode {step.removeprefix('hybrid_')}"
+    if step == "llm_rater_control":
+        return "src/llm_rater.py --control"
     if step == "summarise_control":
         return "src/evaluate_answers.py --mode summarise --control"
     if step.startswith("intra_rater_"):

@@ -35,6 +35,7 @@ Output schema of scores.csv (docs/reference/data-formats.md): question_id, strat
 correctness, completeness, groundedness, no_hallucination, clarity, total_score
 """
 
+import csv
 import hashlib
 import json
 import random
@@ -82,6 +83,7 @@ from retrieve import (
 from run_log import append_scaffold_run, append_step_run, latest_run, require_run, sha256_of
 
 SCORES_HEADER = ["question_id", "strategy", *RUBRIC_CRITERIA, "total_score"]
+HYBRID_SCORES_HEADER = [*SCORES_HEADER, "rater"]  # hybrid scoring (ADR 0051)
 SHEET_HEADER = ["code", "question_id", *RUBRIC_CRITERIA, "notes"]
 KEY_HEADER = ["code", "question_id", "strategy"]
 GROUPS = ["type", "difficulty"]  # questions.csv columns the summary is broken down by
@@ -306,23 +308,51 @@ def criterion_value(row: dict, criterion: str, path: Path) -> int:
     return int(text)
 
 
+def read_scores(path: Path) -> list[dict]:
+    """Rows of a scores file with SCORES_HEADER or HYBRID_SCORES_HEADER (ADR 0051), always
+    without the `rater` column."""
+    if path.exists():
+        with path.open(encoding="utf-8", newline="") as f:
+            first = next(csv.reader(f), [])
+        if first == HYBRID_SCORES_HEADER:
+            return [{k: r[k] for k in SCORES_HEADER} for r in read_csv(path, HYBRID_SCORES_HEADER)]
+    return read_csv(path, SCORES_HEADER)
+
+
 def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
     """The sheet's scores with their strategies, in (question_id, strategy) order."""
-    sheet = read_csv(sheet_file, SHEET_HEADER)
-    key = read_csv(key_file, KEY_HEADER)
+    return unblind_rows(
+        read_csv(sheet_file, SHEET_HEADER),
+        read_csv(key_file, KEY_HEADER),
+        qids,
+        sheet_file,
+        key_file,
+    )
+
+
+def unblind_rows(
+    sheet: list[dict],
+    key: list[dict],
+    qids: list[str],
+    where: Path,
+    key_where: Path | None = None,
+) -> list[dict]:
+    """`unblind` on rows already read (or merged in memory); `where` names the sheet in errors,
+    `key_where` the key (default: `where`)."""
+    key_where = key_where or where
     if not sheet or not key:
         raise ValueError("sheet or key is empty; run --mode scaffold first")
-    check_grid(key_file, key, qids)
+    check_grid(key_where, key, qids)
     codes = [r["code"] for r in sheet]
     if sorted(codes) != sorted(r["code"] for r in key):
-        raise ValueError(f"{sheet_file}: the codes do not match the key {key_file}")
+        raise ValueError(f"{where}: the codes do not match the key {key_where}")
     by_code = {r["code"]: r for r in key}
     for row in sheet:
         if row["question_id"] != by_code[row["code"]]["question_id"]:
-            raise ValueError(f"{sheet_file}: {row['code']} has another question in the key")
+            raise ValueError(f"{where}: {row['code']} has another question in the key")
     rows = []
     for row in sheet:
-        values = [criterion_value(row, c, sheet_file) for c in RUBRIC_CRITERIA]
+        values = [criterion_value(row, c, where) for c in RUBRIC_CRITERIA]
         rows.append(
             {"question_id": row["question_id"], "strategy": by_code[row["code"]]["strategy"]}
             | dict(zip(RUBRIC_CRITERIA, values, strict=True))
@@ -333,14 +363,20 @@ def unblind(sheet_file: Path, key_file: Path, qids: list[str]) -> list[dict]:
 
 
 def check_derived(
-    sheet_file: Path, checks_file: Path, key_points_file: Path, runs_file: Path
+    sheet_file: Path,
+    checks_file: Path,
+    key_points_file: Path,
+    runs_file: Path,
+    codes: set[str] | None = None,
 ) -> None:
     """For a rule-based scaffold (ADR 0036), and wherever key points are frozen or a checks file
     exists (ADR 0035): the checks file exists, the key points are the frozen ones, every checks
     row marks as many points as its question has, and every sheet row equals the scores its
     checks derive under the current rules, so neither a hand-entered or hand-edited score,
     changed key points nor an older rule version can be unblinded. Only a scaffold from before
-    ADR 0036 without key points or checks keeps its hand-entered scores."""
+    ADR 0036 without key points or checks keeps its hand-entered scores. With `codes` (hybrid
+    scoring, ADR 0051: the codes the rater scored) only those sheet rows are checked, and checks
+    for other codes are an error."""
     record = latest_run(runs_file, "key_points", ",".join(STRATEGY_IDS))
     scaffold = latest_run(runs_file, "scaffold", ",".join(STRATEGY_IDS))
     rule_based = scaffold is not None and scaffold.get("scoring") == SCORING_METHOD
@@ -377,6 +413,14 @@ def check_derived(
         raise ValueError(f"{key_points_file}: {error}") from error
     counts = {qid: len(texts) for qid, texts in points.items()}
     sheet = read_csv(sheet_file, SHEET_HEADER)
+    if codes is not None:
+        outside = [r["code"] for r in read_csv(checks_file, rules.CHECKS_HEADER)]
+        outside = [c for c in outside if c not in codes]
+        if outside:
+            raise ValueError(
+                f"{checks_file} has checks outside the codes to summarise: {', '.join(outside)}"
+            )
+        sheet = [r for r in sheet if r["code"] in codes]
     check_rows = read_csv(checks_file, rules.CHECKS_HEADER)
     order = [r["code"] for r in sheet]
     seen: set[str] = set()

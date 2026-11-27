@@ -209,12 +209,20 @@ Entscheidung: [ADR 0051](../adr/0051-hybride-bewertung.md); Ablauf: [Experiment 
   `comparative` und `limitation`, je 6 Fragen jeder Konstruktionsklasse.
 - **Werte der Arbeit:** je Frage die von Jonas, wenn er sie bewertet hat, sonst die des Sprachmodells; die Quelle steht
   in jeder Zeile. Alle Tests sind nach Frage gepaart, so dass innerhalb einer Frage nur ein Bewerter vorkommt.
-- **Sensitivität** (beschreibend): dieselben Tests und Kennzahlen nur auf Jonas' 24 Fragen und auf allen 48 Fragen
-  nur mit den Werten des Sprachmodells.
-- **Übereinstimmung** Mensch–Sprachmodell auf den 72 Antworten mit den Maßen der [Zweitbewertung](#zweitbewertung),
+- **Zusammenführen:** `hybrid.py --mode summarise` schreibt `scores.csv` mit der Spalte `rater` (`human`, `llm`) und
+  `llm_rater/scores.csv` nur mit den Werten des Sprachmodells ([Datenformate](data-formats.md#bewertung)). Jonas' Werte
+  gelten nur, wenn sie genau seine 72 Antworten abdecken; Werte auf einer anderen Frage brechen ab.
+- **Konfirmatorisch** bleibt der gemischte Satz: Tests und beschreibende Auswertungen von
+  [ADR 0044](../adr/0044-statistische-auswertung.md) laufen darauf unverändert.
+- **Sensitivität** (beschreibend): Mittel, Friedman-Test des Gesamtwerts (je eine eigene Familie; die p-Werte sind
+  explorativ) und mittlere Differenzen mit Bootstrap-Intervall, (a) nur auf Jonas' 24 Fragen, (b) auf allen 48 Fragen
+  nur mit den Werten des Sprachmodells; Tabelle `hybrid_sensitivity.tex`, in `analysis.json` unter `hybrid`. Die
+  Zeile „gemischt“ der Tabelle zeigt den Holm-korrigierten p-Wert wie `tests.tex`.
+- **K0** bewertet nur das Sprachmodell (`llm_rater.py --control`, ohne `grounded`); der Vergleich K0 gegen C1–C3
+  nutzt auf beiden Seiten dessen Werte (`hybrid.py --mode summarise-control`, Tabelle `control_k0.tex`). Die Mittel
+  C1–C3 in `answers.tex` bleiben die des gemischten Satzes.
+- **Übereinstimmung** Mensch–Sprachmodell auf Jonas' 72 Antworten mit den Maßen der [Zweitbewertung](#zweitbewertung),
   Tabelle `agreement_llm.tex`.
-- **Umsetzung:** Zusatzfragen umgesetzt; K0 durch das Sprachmodell, Zusammenführen und die Auswertungen folgen
-  ([Plan](../plan.md#backlog), Punkt 3).
 
 ## Triangulation
 
