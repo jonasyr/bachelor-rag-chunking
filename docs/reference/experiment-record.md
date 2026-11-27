@@ -2,7 +2,7 @@
 
 *[Doku-Index](../README.md) · Referenz · Verwandt: [Korpus](corpus.md), [Datenformate](data-formats.md), [Vue-Historie](experiment-record-vue.md)*
 
-Stand: 16.11.2026. Gemessene Werte aller Läufe auf dem e2e-Korpus mit Datum; wird mit jedem Lauf fortgeschrieben und
+Stand: 27.11.2026. Gemessene Werte aller Läufe auf dem e2e-Korpus mit Datum; wird mit jedem Lauf fortgeschrieben und
 ist die Quelle für das Methodik- und Implementierungskapitel. Ausschnitt und Umfang des Korpus: [Korpus](corpus.md)
 ([ADR 0038](../adr/0038-korpus-e2e.md)); Parameter: [Konfiguration](configuration.md). Die abgeschlossenen Werte des
 Vue.js-Korpus (bis 18.10.2026) stehen in [Experiment-Protokoll: Vue.js](experiment-record-vue.md). Dateigrößen in
@@ -121,6 +121,25 @@ prüfbar war, zeigte ein Prüfaufruf am selben Abend (Skript außerhalb des Repo
 | Slots | 48 benutzt, 2 übersprungen (`content-elsewhere`, S15 und S37) |
 | SHA-256 `questions.csv` | `7e1cb42c185fae77804b3a9244aad4480cadb4dce1b93b20573e1c9e9332bf1c` |
 | SHA-256 `ground_truth.csv` | `18f0b75799b802abb2e2255a7369547c99b52d9e87eeaa5ced1dbcfc35ed1552` |
+
+## Hauptlauf (16.11.2026)
+
+Schritte 0–4 aus [Experiment durchführen](../how-to/run-the-experiment.md#hauptlauf-auf-einen-blick) am Abend des
+16.11.2026 auf Branch `run/hauptlauf`, direkt nach dem Einfrieren; Ergebnisse je Schritt committet (`2b4e26d` bis
+`f23e5f1`, 23:42–23:49 Uhr). Werte aus den Laufeinträgen (`generation_runs.jsonl`, `embedding_runs.jsonl`).
+
+| Feld | Wert |
+|---|---|
+| Ziehung der Zweitbewertung | Seed 20261022, 12 Fragen (Commit `2b4e26d`) |
+| Retrieval C1–C3 und K1 | `text-embedding-3-large` (3.072 Dimensionen), Chroma 1.5.9, 48 Fragevektoren; Modellstand-Prüfung bestanden (minimaler Kosinus 0,99994); Code-Commit `2b4e26d`, sauber; K1 ohne API-Aufruf; Ergebnisse Commit `a188374` |
+| Generierung C1–C3 und K0 | `gpt-6-luna`, Effort `none`, Temperatur 0, Seed 20261017, max. 1.024 Tokens; 144 + 48 Antworten; Code-Commit `a188374`, sauber; 1 Sitzung, 0 Abbrüche, 0 HTTP-Fehler; Modellobjekt erstellt 14.09.2026, 17:15:02 UTC (unverändert); `system_fingerprint` nicht gemeldet; Ergebnisse Commit `8191f08` |
+| Umgebung | Python 3.13.7, OpenAI SDK 2.44.0 |
+| Kosten | Generierung 0,042 USD (348.554 Prompt-, 14.935 Antwort-Tokens), Retrieval 0,0006 USD (Anfragen und Modellstand-Prüfung) |
+| Retrieval-Metriken, Bewertungsbogen | Commits `95224fd`, `f23e5f1` |
+
+Am 17.11.2026 stand fest, dass es keine zweite bewertende Person gibt
+([ADR 0046](../adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)); die Bewertung ist seit dem
+26.11.2026 hybrid (nächster Abschnitt).
 
 ## Hybride Bewertung des Hauptlaufs (ab 26.11.2026)
 

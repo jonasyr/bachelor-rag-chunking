@@ -18,7 +18,7 @@ Praktischer Schreibleitfaden mit Checkliste (englisch): [Question writing guide]
 | Vergleichend | `comparative` | 6 | What is the difference between … and …? |
 | Einschränkung/Fehler | `limitation` | 6 | What happens if …? |
 
-Die Platzhalter zeigen nur die Form (echte Beispiele: [Backlog](../plan.md#backlog), Punkt 10).
+Die Platzhalter zeigen nur die Form (echte Beispiele: [Backlog](../plan.md#backlog), Punkt 7).
 
 **Konstruktionsklassen (`difficulty`, je 12 Fragen):**
 

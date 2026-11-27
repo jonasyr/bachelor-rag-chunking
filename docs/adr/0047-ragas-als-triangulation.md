@@ -45,7 +45,8 @@ K0 bekommt kein RAGAS (ohne Kontext entfallen drei der vier Metriken).
   Modell als dem Antwortmodell; eine Abweichung ist selbst ein Befund zur Zuverlässigkeit der Metriken.
 - Negativ: Ein weiteres Modell und eine weitere Abhängigkeit sind zu pinnen und zu dokumentieren; die Werte sind nicht
   bitgleich wiederholbar und dürfen deshalb nur sekundär sein. Code dafür ist noch umzusetzen.
-- Neutral: Die Kosten liegen nach den Pilotkosten im Cent-Bereich; sie werden wie die übrigen Kosten protokolliert.
+- Neutral: Die Kosten liegen nach dem Pilot bei 2,02 USD je 48 Antworten (ursprünglich „im Cent-Bereich“, korrigiert im
+  Status); sie werden wie die übrigen Kosten protokolliert.
 
 ## Nachtrag 21.10.2026: Strictness 1
 
