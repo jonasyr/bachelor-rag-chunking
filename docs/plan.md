@@ -4,13 +4,13 @@
 
 ## Stand
 
-Stand 26.11.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
+Stand 27.11.2026. **Erledigt:** Korpus e2e, Pipeline mit K1 und K0, Auswertung (`src/analyse.py`), RAGAS-Lauf und
 Zweitbewertung sind umgesetzt und getestet; Pilot e2e, Probelauf und Generalprobe des Hauptlaufs sind bestanden
 ([Experiment-Protokoll](reference/experiment-record.md)); Generierung und RAGAS setzen nach einem Abbruch fort
 ([ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md)); Doku-Audits vom 22.10. (PR #41–#43) und 26.10. (PR #44–#46); Korpus-Snapshot
 und Chunk-Vektoren versioniert, damit sich Retrieval und Auswertung ohne API nachrechnen lassen
 ([ADR 0048](adr/0048-korpus-und-chunk-vektoren-versioniert.md)).
-**Hauptlauf** (Branch `run/hauptlauf`): Schritte 0–5 erledigt (Ziehung der Zweitbewertung, Retrieval, Antworten, Retrieval-Metriken, Bewertungsbogen; Kernpunkte am 26.11. eingefroren). Die Bewertung ist hybrid ([ADR 0051](adr/0051-hybride-bewertung.md)): Jonas bewertet 24 Fragen, das Sprachmodell alle Antworten, die Wiederholung entfällt. Die 12 Zusatzfragen sind gezogen (26.11.). **Nächster Schritt:** Jonas' 72 Antworten, dann Schritt 7 (Sprachmodell über C1–C3 und K0, Zusammenführen, [Experiment durchführen](how-to/run-the-experiment.md)); der Code dafür ist Punkt 3 im [Backlog](#backlog). **Größtes Risiko:** Die Schreibphase beginnt nach der Bewertung; Zusammenführen und Analyse müssen bis Anfang Dezember stehen. Der
+**Hauptlauf** (Branch `run/hauptlauf`): Schritte 0–5 erledigt (Ziehung der Zweitbewertung, Retrieval, Antworten, Retrieval-Metriken, Bewertungsbogen; Kernpunkte am 26.11. eingefroren). Die Bewertung ist hybrid ([ADR 0051](adr/0051-hybride-bewertung.md)): Jonas bewertet 24 Fragen, das Sprachmodell alle Antworten, die Wiederholung entfällt. Die 12 Zusatzfragen sind gezogen (26.11.). **Nächster Schritt:** Jonas' 72 Antworten, dann Schritt 7 (Sprachmodell über C1–C3 und K0, Zusammenführen, [Experiment durchführen](how-to/run-the-experiment.md)); der Code dafür ist gemergt (PR #68, #69). **Größtes Risiko:** Die Schreibphase beginnt nach der Bewertung; Zusammenführen und Analyse müssen bis Anfang Dezember stehen. Der
 Hauptkatalog ist am 16.11. eingefroren, 48 von 48 Fragen (Block 1 am 09.11., Block 2 bis 4 am 11.11., Block 5 am 12.11., Block 6 am 16.11.; Sprünge `content-elsewhere` in S15 und S37), alle Typquoten erfüllt; Closed-Book 35 retrieval-abhängig nach der Gesamtdurchsicht (Runde 9, 16.11.; mindestens 32, [ADR 0040](adr/0040-closed-book-pruefung.md)) ([Typverteilung](#zeitplan)); das Einfrieren ist am 06.11. auf den 13.11. und am 16.11. vom 13.11. auf den 16.11. verschoben, C4 entfällt
 ([Zeitplan](#zeitplan)).
 
@@ -26,7 +26,7 @@ Neu geplant am 13.10.2026: Pipeline und Fragenkatalog zuerst, dann Experimente, 
 | 23.10.–16.11. | Fragenkatalog | 48 Fragen in sechs Blöcken zu 8, ab 06.11. ein Block je Tag, nach jedem Block KI-Durchsicht ([ADR 0031](adr/0031-stichprobenplan-und-ki-durchsicht.md)) und Closed-Book-Prüfung ([ADR 0040](adr/0040-closed-book-pruefung.md)); Referenzantworten, `relevant_section_ids` (blind, [ADR 0027](adr/0027-blinde-annotation.md)); Ablauf: [Fragenkatalog erstellen](how-to/build-the-question-catalogue.md) | `questions.csv`, `ground_truth.csv`, `closed_book_screen.csv` | erledigt 16.11. (48/48) |
 | 03.–09.11. | Auswertungsskripte | Statistik, Tabellen und Abbildungen ([ADR 0044](adr/0044-statistische-auswertung.md)), RAGAS-Lauf ([ADR 0047](adr/0047-ragas-als-triangulation.md)), Zweitbewertung und Übereinstimmung ([ADR 0046](adr/0046-zweitbewertung.md)) | `analyse.py`, `ragas_eval.py`, `second_rater.py` getestet | erledigt 22.10. |
 | **16.11.** | **Meilenstein** | **Ground Truth eingefroren** ([ADR 0017](adr/0017-fragenkatalog.md)): am 06.11. vom 09.11. auf den 13.11., am 16.11. vom 13.11. auf den 16.11. verschoben; C4 entfällt damit ([ADR 0028](adr/0028-c4-bedingung.md#nachtrag-06112026-c4-entfällt)) | Commit-Hash im Experiment-Protokoll ([Fragenkatalog](reference/experiment-record.md#fragenkatalog-eingefroren-16112026)) | erledigt 16.11. |
-| 17.–18.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | erledigt 17.11. |
+| 17.–18.11. | Experimente | direkt nach dem Einfrieren und vor jeder eigenen Bewertung die Ziehung der Zweitbewertung ([ADR 0046](adr/0046-zweitbewertung.md)); volle Läufe C1–C3, Kontrolle K1 (nur Retrieval), Sensitivitätsprüfung ([ADR 0026](adr/0026-c3-vergleichbarkeit.md)), Kontrolle K0 (im selben Generierungslauf); Ergebnisse nach jedem Schritt committen ([ADR 0045](adr/0045-retrieval-ergebnisse-versioniert.md)) | `retrieved_results.csv`, `retrieved_results_control.csv` (K1), `generated_answers.csv`, `generated_answers_control.csv` (K0) | erledigt 16.11. ([Hauptlauf](reference/experiment-record.md#hauptlauf-16112026)) |
 | 19.11.–Anfang 12. | Bewertung und Analyse | Kernpunkte eingefroren 26.11.; hybride Bewertung ([ADR 0051](adr/0051-hybride-bewertung.md)): Jonas 72 Antworten (24 Fragen × C1–C3), das Sprachmodell alle 144 und K0; Übereinstimmung auf 72 Antworten; RAGAS nach dem Zusammenführen; Statistik, Tabellen, Abbildungen ([Experiment durchführen](how-to/run-the-experiment.md)) | `scores.csv`, `scores_control.csv`, `ragas_scores.csv`, `output/tables/` (mit `agreement_llm.tex`), `output/figures/` | läuft |
 | 26.11.–13.12. | Schreibphase | Methodik, Implementierung, Ergebnisse, Diskussion, Fazit | Rohfassung komplett | offen |
 | 14.–20.12. | Überarbeitung | Sprache, Argumentation, roter Faden, `./paperlab check` | Endfassung | offen |
@@ -62,32 +62,16 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 
 Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlauf).
 
-1. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
-   Antworten in `data/pilot/e2e_jonas/` bewertet sind und der Vergleich mit der Agentenbewertung im
-   [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026) steht.
-2. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)): entschieden am 17.11.2026, keine
-   Person; es gilt die hybride Bewertung (Punkt 3). Sagt sie doch zu, gilt zusätzlich der R2-Weg.
-3. **Hybride Bewertung** ([ADR 0051](adr/0051-hybride-bewertung.md)). Wer: Claude, Jonas gibt frei. (a) ADR,
-   Ziehung der Zusatzfragen und Ablauf: PR #68, gemergt. (b) K0 in `llm_rater.py --control`, Zusammenführen mit
-   `hybrid.py --mode summarise` (Spalte `rater`), K0 mit `--mode summarise-control`, `analyse.py` mit gemischtem Satz,
-   beiden Sensitivitätsanalysen und Übereinstimmung auf 72 Antworten, RAGAS nach `hybrid_summarise`, Tests,
-   Experiment-Protokoll: zweiter PR. Fertig, wenn er gemergt ist. Die
-   Wiederholung des früheren Ersatzverfahrens entfällt; ihr Code bleibt für Pilot-Sets.
-4. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
-   R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
-   ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-5. **Hauptlauf dokumentieren.** Wer: Claude. Frist: beim Hauptlauf (17.–18.11.). Fertig, wenn Python-Version,
-   Commit, `system_fingerprint`, Sitzungen und Abbrüche aus den Laufeinträgen im
-   [Experiment-Protokoll](reference/experiment-record.md) stehen ([ADR 0033](adr/0033-antwortmodell.md),
-   [ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md)).
-6. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
+1. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)): entschieden am 17.11.2026, keine
+   Person; es gilt die hybride Bewertung ([ADR 0051](adr/0051-hybride-bewertung.md)). Sagt sie doch zu, gilt zusätzlich der R2-Weg.
+2. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
-7. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
+3. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
-8. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
-9. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
+4. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+5. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
     [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
 
 ## Offene Entscheidungen
@@ -168,6 +152,13 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   jede API-Antwort und setzen nach einem Abbruch fort, Laufeinträge nennen Commit und Umgebung
   ([ADR 0050](adr/0050-journal-und-fortsetzen-der-api-schritte.md),
   [Generalprobe](reference/experiment-record.md#generalprobe-hauptlauf-16112026)).
-- 17.11.2026: Hauptlauf Schritte 0–4 (Ziehung, Retrieval, Generierung, Retrieval-Metriken, Scaffold); keine zweite
-  bewertende Person, Ersatzverfahren ausgelöst
+- 16.11.2026: Hauptlauf Schritte 0–4 (Ziehung, Retrieval, Generierung, Retrieval-Metriken, Scaffold)
+  ([Hauptlauf](reference/experiment-record.md#hauptlauf-16112026)).
+- 17.11.2026: keine zweite bewertende Person, Ersatzverfahren ausgelöst
   ([ADR 0046](adr/0046-zweitbewertung.md#nachtrag-17112026-ersatzverfahren-ausgelöst)).
+- 26.11.2026: Kernpunkte eingefroren; hybride Bewertung beschlossen und die 12 Zusatzfragen gezogen
+  ([ADR 0051](adr/0051-hybride-bewertung.md), PR #68).
+- 27.11.2026: Code der hybriden Bewertung gemergt (PR #69): K0 durch das Sprachmodell, Zusammenführen mit Spalte
+  `rater`, Sensitivitätsanalysen, RAGAS nach `hybrid_summarise`; Hauptlauf im
+  [Experiment-Protokoll](reference/experiment-record.md#hauptlauf-16112026) dokumentiert. Gestrichen (Jonas): Übungsbewertung des Pilots und Probe-Bewertung R2, beide durch den
+  Hauptlauf und die hybride Bewertung überholt.
