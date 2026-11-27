@@ -6,7 +6,7 @@ Working guide for writing the catalogue in the editor, in English like the quest
 [Fragenkatalog](question-catalogue.md) and the ADRs linked there ([ADR 0029](../adr/0029-fragetypen-und-konstruktionsklassen.md),
 [ADR 0027](../adr/0027-blinde-annotation.md), [ADR 0022](../adr/0022-h1-abschnitte-in-ground-truth.md),
 [ADR 0040](../adr/0040-closed-book-pruefung.md)); values come from `src/config.py`. If this page and those disagree,
-they win. Examples use placeholders only: real e2e examples are written by Jonas ([Backlog](../plan.md#backlog), item 7).
+they win. Examples use placeholders only: real e2e examples are written by Jonas ([Backlog](../plan.md#backlog), item 5).
 
 ## One slot in five steps
 

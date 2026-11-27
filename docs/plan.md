@@ -62,22 +62,16 @@ Der ursprüngliche Phasenplan (Juni 2026, Abgabe 15.12.) steht in der Git-Histor
 
 Offene Arbeit nach Priorität; erledigte Punkte wandern in den [Verlauf](#verlauf).
 
-1. **Übungsbewertung Pilot.** Wer: Jonas. Frist: vor der Bewertung des Hauptlaufs (19.11.). Fertig, wenn die 9
-   Antworten in `data/pilot/e2e_jonas/` bewertet sind und der Vergleich mit der Agentenbewertung im
-   [Experiment-Protokoll](reference/experiment-record.md#pilot-e2e-1920102026) steht.
-2. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)): entschieden am 17.11.2026, keine
+1. **Zweite bewertende Person finden** ([ADR 0046](adr/0046-zweitbewertung.md)): entschieden am 17.11.2026, keine
    Person; es gilt die hybride Bewertung ([ADR 0051](adr/0051-hybride-bewertung.md)). Sagt sie doch zu, gilt zusätzlich der R2-Weg.
-3. **Probe-Bewertung R2 auf dem Pilot** (optional). Wer: Jonas. Frist: vor der Ziehung im Hauptlauf. Fertig, wenn der
-   R2-Satz in `data/pilot/e2e/` bewertet und mit `second_rater.py --mode close` abgeschlossen ist
-   ([Experiment durchführen](how-to/run-the-experiment.md#zweitbewertung)).
-4. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
+2. **Lizenzen der Korpusproben.** Wer: Claude prüft, Jonas entscheidet. Frist: vor der DOI-Veröffentlichung. Fertig,
    wenn jedes Zitat aus `data/corpus_probe/` eine Lizenz hat, die die Weitergabe erlaubt, oder entfernt ist
    (Lizenzspalte in der [Korpusauswahl](reference/corpus-selection.md)).
-5. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
+3. **Ergebnisse-Seite in der App.** Wer: Claude. Frist: nach dem Hauptlauf, nur falls Zeit bleibt. Fertig, wenn eine
    eigene Spezifikation (Brainstorming) vorliegt und umgesetzt ist; ersetzt das frühere Demo-Dashboard. Die Auswertung
    für die Arbeit bleibt `src/analyse.py`.
-6. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
-7. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
+4. **Thesis-Aufgaben** (Anhang B verweisen usw.): PaperLab `docs/HANDOFF.md`.
+5. **Beispiele im Fragenkatalog.** Wer: Jonas. Frist: nach Block 1. Fertig, wenn die Tabelle der Fragetypen in
     [Fragenkatalog](reference/question-catalogue.md) je Typ eine echte e2e-Frage statt des Platzhalters zeigt.
 
 ## Offene Entscheidungen
@@ -166,4 +160,5 @@ Entschiedenes mit Begründung: [ADRs](adr/README.md).
   ([ADR 0051](adr/0051-hybride-bewertung.md), PR #68).
 - 27.11.2026: Code der hybriden Bewertung gemergt (PR #69): K0 durch das Sprachmodell, Zusammenführen mit Spalte
   `rater`, Sensitivitätsanalysen, RAGAS nach `hybrid_summarise`; Hauptlauf im
-  [Experiment-Protokoll](reference/experiment-record.md#hauptlauf-16112026) dokumentiert.
+  [Experiment-Protokoll](reference/experiment-record.md#hauptlauf-16112026) dokumentiert. Gestrichen (Jonas): Übungsbewertung des Pilots und Probe-Bewertung R2, beide durch den
+  Hauptlauf und die hybride Bewertung überholt.

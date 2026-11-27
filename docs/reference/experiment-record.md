@@ -218,8 +218,8 @@ Kernaussage, Teilantworten mit Hinweis wie bei E04 und E13) klärt
 [ADR 0043](../adr/0043-praezisierung-direct-und-teilantworten.md) (Regelversion `2026-10-20`); der Pilot ist unter
 `2026-10-18` bewertet.
 
-**Offen**: Jonas' Übungsbewertung der ersten 3 Fragen (9 Antworten, Set `data/pilot/e2e_jonas/`, Kernpunkte
-eingefroren) und ihr Vergleich mit der Agentenbewertung.
+Jonas' Übungsbewertung der ersten 3 Fragen (Set `data/pilot/e2e_jonas/`) ist am 27.11.2026 gestrichen; der Hauptlauf
+misst die Übereinstimmung Mensch–Sprachmodell auf 72 Antworten ([ADR 0051](../adr/0051-hybride-bewertung.md)).
 
 ## Probelauf Hauptlauf (21.10.2026)
 
