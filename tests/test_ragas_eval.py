@@ -280,6 +280,25 @@ def test_main_requires_freeze_summarise_and_current_answers(files, monkeypatch, 
     assert not files["out_file"].exists()
 
 
+def test_main_accepts_the_hybrid_summarise_record(files, monkeypatch):
+    """ADR 0051: in the hybrid run the scoring is done when `hybrid_summarise` wrote scores.csv."""
+    freeze_catalogue(files, monkeypatch)
+    record_upstream(files, summarise=False)
+    log(files, "hybrid_summarise", outputs=[files["scores_file"]])
+    assert run(FakeScorer(), reporting_recorder(), FakeCreated(), files, True) == len(QUESTIONS) * 3
+
+
+def test_main_refuses_scores_changed_after_hybrid_summarise(files, monkeypatch):
+    freeze_catalogue(files, monkeypatch)
+    record_upstream(files, summarise=False)
+    log(files, "hybrid_summarise", outputs=[files["scores_file"]])
+    files["scores_file"].write_text("a\n2\n", encoding="utf-8")
+    scorer = FakeScorer()
+    with pytest.raises(RuntimeError, match="hybrid_summarise"):
+        run(scorer, reporting_recorder(), FakeCreated(), files, True)
+    assert scorer.calls == []
+
+
 def test_pilot_without_summarise_notes_and_runs(files, capsys):
     assert go(files, main=False) == len(QUESTIONS) * 3
     assert "summarise" in capsys.readouterr().out

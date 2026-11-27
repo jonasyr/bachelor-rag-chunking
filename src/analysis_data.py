@@ -16,6 +16,7 @@ import pandas as pd
 
 import agreement
 import closed_book
+import hybrid
 from atomic_csv import read_csv
 from config import (
     CATALOGUE_FREEZE_FILE,
@@ -32,12 +33,14 @@ from config import (
     GENERATED_ANSWERS_FILE,
     GENERATION_RUNS_FILE,
     GROUND_TRUTH_FILE,
+    HYBRID_EXTRA_SAMPLE_FILE,
     INTRA_RATER_DIR,
     INTRA_RATER_DIR_NAME,
     INTRA_RATER_KEY_FILE_NAME,
     KEY_POINTS_FILE,
     LLM_RATER_DIR,
     LLM_RATER_DIR_NAME,
+    LLM_RATER_SCORES_FILE,
     PILOT_RUNS_FILE_NAME,
     QUESTIONS_FILE,
     RAGAS_REPEAT_FILE_NAME,
@@ -54,11 +57,12 @@ from config import (
     SCORING_SHEET_FILE,
     SECOND_RATER_DIR,
     SECOND_RATER_DIR_NAME,
+    SECOND_RATER_SAMPLE_FILE,
     SECTIONS_FILE,
     STRATEGY_IDS,
 )
 from control_k0 import CONTROL_SCORES_HEADER
-from evaluate_answers import KEY_HEADER, SCORES_HEADER, SHEET_HEADER
+from evaluate_answers import HYBRID_SCORES_HEADER, KEY_HEADER, SCORES_HEADER, SHEET_HEADER
 from evaluate_retrieval import SCORES_HEADER as RETRIEVAL_HEADER
 from freeze import is_main_catalogue, require_frozen
 from llm_rater import STEP as LLM_STEP
@@ -99,6 +103,10 @@ class AnalysisData:
     # the LLM cross-check (ADR 0046 fallback): its "checks" and "sheet" rows in Jonas' codes,
     # "paired" with his first rating, and the record's "model" and number of "answers"
     llm_rating: dict | None = None
+    # hybrid scoring (ADR 0051): `scores` then has a `rater` column; `scores_llm` holds the LLM's
+    # values of every answer (llm_rater/scores.csv); `human_questions` Jonas' questions, sorted
+    scores_llm: pd.DataFrame | None = None
+    human_questions: list[str] | None = None
 
 
 def main_paths() -> dict:
@@ -127,6 +135,9 @@ def main_paths() -> dict:
             "second_rater_dir": SECOND_RATER_DIR,
             "intra_rater_dir": INTRA_RATER_DIR,
             "llm_rater_dir": LLM_RATER_DIR,
+            "llm_scores_file": LLM_RATER_SCORES_FILE,
+            "hybrid_extra_file": HYBRID_EXTRA_SAMPLE_FILE,
+            "second_rater_sample_file": SECOND_RATER_SAMPLE_FILE,
         },
         RETRIEVED_RESULTS_FILE.parent,
     )
@@ -158,6 +169,9 @@ def set_paths(set_dir: Path) -> dict:
             "second_rater_dir": set_dir / SECOND_RATER_DIR_NAME,
             "intra_rater_dir": set_dir / INTRA_RATER_DIR_NAME,
             "llm_rater_dir": set_dir / LLM_RATER_DIR_NAME,
+            "llm_scores_file": set_dir / LLM_RATER_DIR_NAME / SCORES_FILE.name,
+            "hybrid_extra_file": set_dir / HYBRID_EXTRA_SAMPLE_FILE.name,
+            "second_rater_sample_file": set_dir / SECOND_RATER_SAMPLE_FILE.name,
         },
         set_dir,
     )
@@ -218,6 +232,25 @@ def _checked(
     require_run(runs, step, strategy, used, [path])
 
 
+def _hybrid_paths(paths: dict) -> dict[str, Path]:
+    """The files of hybrid.require_summarise, named as hybrid.paths names them, from the paths
+    of the analysis (the LLM's files sit in `llm_rater_dir`)."""
+    folder = paths["llm_rater_dir"]
+    return {
+        "runs_file": paths["generation_runs_file"],
+        "sheet_file": paths["scoring_sheet_file"],
+        "checks_file": paths["scoring_checks_file"],
+        "key_file": paths["scoring_key_file"],
+        "key_points_file": paths["key_points_file"],
+        "sample_file": paths["second_rater_sample_file"],
+        "extra_file": paths["hybrid_extra_file"],
+        "scores_file": paths["scores_file"],
+        "llm_sheet_file": folder / SCORING_SHEET_FILE.name,
+        "llm_checks_file": folder / SCORING_CHECKS_FILE.name,
+        "llm_scores_file": paths["llm_scores_file"],
+    }
+
+
 def _complete(frame: pd.DataFrame, qids: list[str], strategies: list[str], what: str) -> None:
     pairs = set(zip(frame["question_id"], frame["strategy"], strict=True))
     missing = [f"{q}/{s}" for q in qids for s in strategies if (q, s) not in pairs]
@@ -248,9 +281,12 @@ def _load_ragas(paths: dict, runs: Path, main: bool, qids: list[str], notes: lis
     return loaded
 
 
-def _load_answers_question(paths: dict, notes: list[str]) -> dict | None:
+def _load_answers_question(
+    paths: dict, notes: list[str], llm_checks: Path | None = None
+) -> dict | None:
     """`answers_question` per (question, strategy): the checks are keyed by blinded code, the
-    key maps the code back. yes = 1, no = 0."""
+    key maps the code back. yes = 1, no = 0. In a hybrid run (`llm_checks` given) Jonas' checks
+    cover his questions only; the LLM's checks fill in the codes he lacks, like in scores.csv."""
     checks, key = paths.get("scoring_checks_file"), paths.get("scoring_key_file")
     if checks is None or key is None:
         return None
@@ -260,7 +296,11 @@ def _load_answers_question(paths: dict, notes: list[str]) -> dict | None:
     by_code = {r["code"]: (r["question_id"], r["strategy"]) for r in read_csv(key, KEY_HEADER)}
     values = {"yes": 1, "no": 0}
     result = {}
-    for r in read_csv(checks, CHECKS_HEADER):
+    rows = read_csv(checks, CHECKS_HEADER)
+    if llm_checks is not None:
+        own = {r["code"] for r in rows}
+        rows += [r for r in read_csv(llm_checks, CHECKS_HEADER) if r["code"] not in own]
+    for r in rows:
         if r["code"] not in by_code:
             raise ValueError(f"{checks.name}: code {r['code']} is not in {key.name}")
         if r["answers_question"] not in values:
@@ -374,12 +414,18 @@ def _load_rating(
     return second | {"paired": paired}
 
 
-def _load_llm_rating(paths: dict, notes: list[str]) -> dict | None:
+def _load_llm_rating(paths: dict, notes: list[str], human: list[str] | None = None) -> dict | None:
     """The LLM cross-check (ADR 0046 fallback), paired with Jonas' own rating. Its codes are
     Jonas' (no key). Its files must be those the latest llm_rater record hashed, and that run
     must have rated with the current items and key points (changed after -> RuntimeError). No
     record: None with a note."""
     folder, runs = paths.get("llm_rater_dir"), paths.get("generation_runs_file")
+    if human is not None and (
+        folder is None or runs is None or (latest_run(runs, LLM_STEP, EXPERIMENT) is None)
+    ):
+        raise RuntimeError(
+            f"a hybrid run needs the {LLM_STEP} record of the LLM's scoring (ADR 0051)"
+        )
     if folder is None or runs is None or latest_run(runs, LLM_STEP, EXPERIMENT) is None:
         notes.append(
             "LLM-Gegenprobe fehlt oder ist nicht abgeschlossen: Tabelle agreement_llm entfällt"
@@ -395,6 +441,11 @@ def _load_llm_rating(paths: dict, notes: list[str]) -> dict | None:
     checks, sheet = folder / SCORING_CHECKS_FILE.name, folder / SCORING_SHEET_FILE.name
     record = require_run(runs, LLM_STEP, EXPERIMENT, list(own.values()), [checks, sheet])
     llm = {"checks": read_csv(checks, CHECKS_HEADER), "sheet": read_csv(sheet, SHEET_HEADER)}
+    if human is not None:  # Jonas rated his questions only
+        llm = {
+            "checks": [r for r in llm["checks"] if r["code"].rsplit("-", 1)[0] in human],
+            "sheet": [r for r in llm["sheet"] if r["question_id"] in human],
+        }
     paired = agreement.pair(
         read_csv(own_checks, CHECKS_HEADER), read_csv(own_sheet, SHEET_HEADER),
         llm["checks"], llm["sheet"],
@@ -452,16 +503,43 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
     _complete(retrieval, qids, [*STRATEGY_IDS, K1], paths["retrieval_file"].name)
 
     gen_runs = paths["generation_runs_file"]
-    _checked(
-        paths["scores_file"], paths["scores_inputs"], gen_runs, "summarise", EXPERIMENT, main, notes
-    )
-    scores = pd.DataFrame(read_csv(paths["scores_file"], SCORES_HEADER))
+    # hybrid scoring (ADR 0051): a hybrid_summarise record names the mixed scores.csv; the LLM's
+    # files share their names with Jonas', so hybrid.require_summarise checks both sets apart
+    is_hybrid = latest_run(gen_runs, hybrid.SUMMARISE_STEP, EXPERIMENT) is not None
+    scores_llm = human = hybrid_files = None
+    if is_hybrid:
+        hybrid_files = _hybrid_paths(paths)
+        hybrid.require_summarise(hybrid_files)
+        scores = pd.DataFrame(read_csv(paths["scores_file"], HYBRID_SCORES_HEADER))
+        scores_llm = pd.DataFrame(read_csv(paths["llm_scores_file"], SCORES_HEADER))
+        _complete(scores_llm, qids, list(STRATEGY_IDS), paths["llm_scores_file"].name)
+        human = sorted(hybrid.human_questions(hybrid_files))
+    else:
+        _checked(
+            paths["scores_file"],
+            paths["scores_inputs"],
+            gen_runs,
+            "summarise",
+            EXPERIMENT,
+            main,
+            notes,
+        )
+        scores = pd.DataFrame(read_csv(paths["scores_file"], SCORES_HEADER))
     _complete(scores, qids, list(STRATEGY_IDS), paths["scores_file"].name)
 
     control = None
     if paths["scores_control_file"].exists():
+        control_inputs = paths["scores_control_inputs"]
+        if is_hybrid:  # its record hashes the LLM's files: scores.csv, sheet and checks of K0
+            folder = paths["llm_rater_dir"]
+            control_inputs = [
+                folder / SCORING_SHEET_CONTROL_FILE.name,
+                folder / SCORING_CHECKS_CONTROL_FILE.name,
+                paths["key_points_file"],
+                paths["llm_scores_file"],
+            ]
         _checked(
-            paths["scores_control_file"], paths["scores_control_inputs"], gen_runs,
+            paths["scores_control_file"], control_inputs, gen_runs,
             "summarise_control", K0, main, notes,
         )  # fmt: skip
         control = pd.DataFrame(read_csv(paths["scores_control_file"], CONTROL_SCORES_HEADER))
@@ -506,10 +584,12 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         notes.append("Embedding-Läufe fehlen: Index- und Embedding-Kosten entfallen")
 
     ragas, ragas_repeat = _load_ragas(paths, gen_runs, main, qids, notes)
-    answers_question = _load_answers_question(paths, notes)
+    answers_question = _load_answers_question(
+        paths, notes, hybrid_files["llm_checks_file"] if hybrid_files else None
+    )
     second_rating = _load_second_rating(paths, notes)
     repeat_rating = _load_repeat_rating(paths, notes)
-    llm_rating = _load_llm_rating(paths, notes)
+    llm_rating = _load_llm_rating(paths, notes, human)
 
     # the costs belong to the run that wrote the scored answers
     answers = [p for p in paths["answers_files"] if p.exists()]
@@ -530,6 +610,8 @@ def load(paths: dict, main: bool, frozen_check: bool = True) -> AnalysisData:
         second_rating=second_rating,
         repeat_rating=repeat_rating,
         llm_rating=llm_rating,
+        scores_llm=scores_llm,
+        human_questions=human,
     )
 
 

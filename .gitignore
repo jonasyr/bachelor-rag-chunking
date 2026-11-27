@@ -26,6 +26,7 @@ data/processed/archive_vue_2026-10-18/*
 !data/processed/archive_vue_2026-10-18/embedding_runs.jsonl
 data/evaluation/scores.csv
 data/evaluation/scores_control.csv
+data/evaluation/llm_rater/scores.csv
 data/evaluation/scoring_packet.md
 data/evaluation/scoring_items.jsonl
 

@@ -42,6 +42,14 @@ def test_step_command_names_the_ragas_runs():
     assert step_command("ragas_repeat", "C1,C2,C3") == "src/ragas_eval.py --repeat"
 
 
+def test_step_command_names_the_hybrid_steps():
+    from run_log import step_command
+
+    assert step_command("hybrid_draw", "C1,C2,C3") == "src/hybrid.py --mode draw"
+    assert step_command("hybrid_summarise", "C1,C2,C3") == "src/hybrid.py --mode summarise"
+    assert step_command("llm_rater_control", "K0") == "src/llm_rater.py --control"
+
+
 def test_a_torn_run_log_line_is_named(tmp_path):
     runs = tmp_path / "runs.jsonl"
     runs.write_text('{"step": "a", "strategy": "C1"}\n{"step": "b"', encoding="utf-8")
